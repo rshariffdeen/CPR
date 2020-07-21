@@ -1,0 +1,16 @@
+{
+    "tree": {
+        "node": "addition",
+        "children": {
+            "left": {
+                "node": "x"
+            },
+            "right": {
+                "node": "constant_a"
+            }
+        }
+    },
+    "constants": {
+        "a": 1
+    }
+}
