@@ -5,11 +5,6 @@ Build and run a container:
     docker build -t trident .
     docker run --rm -ti trident /bin/bash
 
-Build runtime:
-
-    cd runtime
-    KLEE_INCLUDE_PATH=/klee/include make
-
 Run examples:
 
     ./tests/assignment/run

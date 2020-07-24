@@ -104,4 +104,13 @@ RUN pysmt-install --z3 --confirm-agreement
 
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
 
+WORKDIR /concolic-repair
+
+COPY main/ main/
+COPY runtime/ runtime/
+COPY tests/ tests/
+COPY components/ components/
+
+RUN cd runtime && KLEE_INCLUDE_PATH=/klee/include make
+
 ENV DEBIAN_FRONTEND=dialog
