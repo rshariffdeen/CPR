@@ -104,4 +104,7 @@ RUN pysmt-install --z3 --confirm-agreement
 
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
 
+RUN chmod +x /concolic-repair/main/trident-cc
+
 ENV DEBIAN_FRONTEND=dialog
+
