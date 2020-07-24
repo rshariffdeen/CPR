@@ -507,7 +507,8 @@ def parse_assertion_symbol(symbol: Formula) -> SymbolData:
     return SymbolData(type=TridentType.I32, name=m.group(1), eid=int(m.group(2)))
 
 
-def extract_lids(path: Formula) -> Set[str]:
+# Returns mapping from lids (location IDs) to corresponding type
+def extract_lids(path: Formula) -> Dict[str, TridentType]:
     """Extracting lids by checking angelic and lvalue symbols."""
     angelic_symbols = collect_symbols(path, RuntimeSymbol.is_angelic)
     lids = { RuntimeSymbol.parse(s).lid:RuntimeSymbol.parse(s).type for s in angelic_symbols }

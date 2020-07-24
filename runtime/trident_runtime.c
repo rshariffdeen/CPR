@@ -170,7 +170,7 @@ void init_tables() {
 }
 
 int __trident_choice(char* lid, char* typestr,
-                     int** rvals, char** rvals_ids, int rvals_size,
+                     int* rvals, char** rvals_ids, int rvals_size,
                      int** lvals, char** lvals_ids, int lvals_size){
     if (!choice_instances)
         init_tables();
@@ -186,7 +186,7 @@ int __trident_choice(char* lid, char* typestr,
         sprintf(name, "choice!rvalue!%s!%d!%s", lid, instance, rvals_ids[i]);
         int klee_var;
         klee_make_symbolic(&klee_var, sizeof(klee_var), name);
-        klee_assume(klee_var == *rvals[i]);
+        klee_assume(klee_var == rvals[i]);
     }
 
     bool condition = true;
@@ -200,7 +200,7 @@ int __trident_choice(char* lid, char* typestr,
     }
     for (int i = 0; i < lvals_size; i++) {
         char next_name[MAX_NAME_LENGTH];
-        sprintf(next_name, "choice!lvalue!%s!%d!%s!", lid, instance, lvals_ids[i]);
+        sprintf(next_name, "choice!lvalue!%s!%d!%s", lid, instance, lvals_ids[i]);
         int prev_lvalue = *lvals[i];
         int next_klee_var;
         klee_make_symbolic(&next_klee_var, sizeof(next_klee_var), next_name);
@@ -215,55 +215,6 @@ int __trident_choice(char* lid, char* typestr,
     return angelic;
 }
 
-int __trident_choice_semfix(char* lid, char* typestr,
-                     int** rvals, char** rvals_ids, int rvals_size,
-                     int** lvals, char** lvals_ids, int lvals_size){
-    if (!choice_instances)
-        init_tables();
-    int previous = ht_get(choice_instances, lid);
-    int instance;
-    if (table_miss) {
-        instance = 0;
-    } else {
-        instance = previous + 1;
-    }
-    ht_set(choice_instances, lid, instance);
-    for (int i=0; i<rvals_size; i++) {
-        char name[MAX_NAME_LENGTH];
-        sprintf(name, "choice!rvalue!%s!%d!%s", lid, instance, rvals_ids[i]);
-        int klee_var;
-        klee_make_symbolic(&klee_var, sizeof(klee_var), name);
-        klee_assume(klee_var == *rvals[i]);
-    }
-    char selector_name[MAX_NAME_LENGTH];
-    sprintf(selector_name, "choice!lvalue!selector!%s", lid);
-    int selector;
-    klee_make_symbolic(&selector, sizeof(selector), selector_name);
-    klee_assume(selector<lvals_size);
-    int next_klee_var[lvals_size+1];
-    for(int i=0; i<lvals_size; i++) {
-        char next_name[MAX_NAME_LENGTH];
-        sprintf(next_name, "choice!lvalue!%s!%d!%s", lid, instance, lvals_ids[i]);
-        int var;
-        klee_make_symbolic(&var, sizeof(var), next_name);
-        next_klee_var[i] = var;
-    }
-    klee_open_merge();
-    for (int i=0; i<lvals_size; i++) {
-        int prev_lvalue = *lvals[i];
-        if(selector==i) {
-            *lvals[i] = next_klee_var[i];
-        }
-    }
-    klee_close_merge();
-
-    char name[MAX_NAME_LENGTH];
-    sprintf(name, "choice!angelic!%s!%s!%d", typestr, lid, instance);
-    int angelic;
-    klee_make_symbolic(&angelic, sizeof(angelic), name);
-
-    return angelic;
-}
 
 int __trident_output(char* id, char* typestr, int value){
     if (!output_instances)

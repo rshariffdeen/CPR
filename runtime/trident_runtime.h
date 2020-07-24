@@ -11,11 +11,8 @@
 
 
 int __trident_choice(char* lid, char* typestr,
-                    int** rvals, char** rvals_ids, int rvals_size,
+                    int* rvals, char** rvals_ids, int rvals_size,
                     int** lvals, char** lvals_ids, int lvals_size);
-int __trident_choice_semfix(char* lid, char* typestr,
-                     int** rvals, char** rvals_ids, int rvals_size,
-                     int** lvals, char** lvals_ids, int lvals_size);
 
 int __trident_output(char* id, char* typestr, int value);
 
