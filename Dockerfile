@@ -112,6 +112,12 @@ COPY tests/ tests/
 COPY components/ components/
 
 RUN cd runtime && KLEE_INCLUDE_PATH=/klee/include make
+
+# add execution permissions
 RUN chmod +x /concolic-repair/main/trident-cc
+RUN chmod +x /concolic-repair/tests/assignment/run
+RUN chmod +x /concolic-repair/tests/iterations/run
+RUN chmod +x /concolic-repair/tests/multipath/run
+RUN chmod +x /concolic-repair/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
 
