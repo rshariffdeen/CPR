@@ -110,7 +110,7 @@ COPY runtime/ runtime/
 COPY tests/ tests/
 COPY components/ components/
 
-RUN cd runtime && KLEE_INCLUDE_PATH=/klee/include make
+RUN cd runtime && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
 RUN chmod +x /concolic-repair/main/trident-cc
