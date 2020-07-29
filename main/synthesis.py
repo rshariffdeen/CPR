@@ -1,5 +1,6 @@
 import argparse
 import logging
+import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
 from enum import Enum, auto
@@ -25,6 +26,12 @@ logger = logging.getLogger(__name__)
 
 
 Formula = Union[pysmt.fnode.FNode]
+File_Klee_Path = "/tmp/log_sym_path"
+File_Ktest_Path = "/tmp/concolic.ktest"
+
+
+list_path_explored = list()
+list_path_detected = list()
 
 
 def collect_symbols(formula, predicate):
@@ -720,6 +727,55 @@ def load_programs(files: Dict[str, Path], components: List[Component]) -> Dict[s
             logger.error(f"unsupported file type: {path}")
             exit(1)
     return programs
+
+
+def generate_new_input():
+    logger.info("creating new path for concolic execution")
+
+
+def generate_ktest(argument_list, second_var_list):
+    """
+        argument_list : a list containing each argument in the order that should be fed to the program
+        second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
+    """
+    global File_Ktest_Path
+    logger.info("creating ktest file")
+    ktest_path = File_Ktest_Path
+    ktest_command = "gen-bout --out-file={0}".format(ktest_path)
+    n_arg = str(len(argument_list))
+    ktest_command += " --sym-args " + n_arg
+    for argument in argument_list:
+        ktest_command += " " + str(argument)
+
+    for var in second_var_list:
+        ktest_command += " --second-var {0} {1} {2}".format(var['identifier'], var['size'], var['value'])
+    process = subprocess.Popen([ktest_command], stdout=subprocess.PIPE, shell=True)
+    (output, error) = process.communicate()
+    return ktest_path
+
+
+def run_concolic_execution(program, argument_list, second_var_list):
+    """
+        argument_list : a list containing each argument in the order that should be fed to the program
+        second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
+    """
+    logger.info("running concolic execution")
+    input_argument = ""
+    for argument in argument_list:
+        input_argument += " --sym-arg " + str(len(argument))
+    ktest_path = generate_ktest(argument_list, second_var_list)
+    klee_command = "klee " \
+                   "--posix-runtime " \
+                   "--libc=uclibc " \
+                   "--write-smt2s " \
+                   "--external-calls=all " \
+                   + "--seed-out={0} ".format(ktest_path) \
+                   + "{0}.bc ".format(program)  \
+                   + input_argument
+
+    process = subprocess.Popen([klee_command], stdout=subprocess.PIPE, shell=True)
+    (output, error) = process.communicate()
+    return process.returncode
 
 
 def load_components(comp_files: List[Path]) -> List[Component]:
