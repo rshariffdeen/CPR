@@ -72,9 +72,8 @@ RUN git clone https://github.com/klee/klee-uclibc.git . && \
 ENV KLEE_VERSION=2.0
 
 WORKDIR /klee 
-
-RUN wget -qO- https://github.com/klee/klee/archive/v${KLEE_VERSION}.tar.gz | tar xz --strip-components=1 && \
-    mkdir build && \
+RUN git clone https://github.com/rshariffdeen/klee.git source; cd source; git checkout concolic
+RUN mkdir build && \
     cd build && \
     cmake \
         -DENABLE_SOLVER_Z3=ON \
@@ -83,7 +82,7 @@ RUN wget -qO- https://github.com/klee/klee/archive/v${KLEE_VERSION}.tar.gz | tar
         -DKLEE_UCLIBC_PATH=/klee-uclibc \
         -DENABLE_UNIT_TESTS=OFF \
         -DENABLE_SYSTEM_TESTS=OFF \
-            .. && \
+            ../source && \
     make
 
 ENV PATH=/klee/build/bin/:${PATH}
