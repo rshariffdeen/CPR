@@ -21,6 +21,9 @@ list_path_detected = list()
 
 
 def collect_symbolic_path(log_path, project_path):
+    """
+       This function will read the output log of a klee concolic execution and extract the partial path conditions
+    """
     ppc_list = collections.OrderedDict()
     last_sym_path = ""
     if os.path.exists(log_path):
@@ -51,6 +54,11 @@ def collect_symbolic_path(log_path, project_path):
 
 
 def analyse_symbolic_path(ppc_list):
+    """
+       This function will analyse the partial path conditions collected at each branch location and isolate
+       the branch conditions added at each location, which can be used to negate as a constraint
+              ppc_list : a dictionary containing the partial path condition at each branch location
+    """
     constraint_list = dict()
     for control_loc in reversed(ppc_list):
         ppc = ppc_list[control_loc]
@@ -67,6 +75,10 @@ def analyse_symbolic_path(ppc_list):
 
 
 def generate_new_symbolic_paths(constraint_list):
+    """
+    This function will generate N number of new paths by negating each branch condition at a given branch location
+           constraint_list : a dictionary containing the constraints at each branch location
+    """
     new_path_list = list()
     for chosen_control_loc in constraint_list:
         chosen_constraint_list_at_loc = constraint_list[chosen_control_loc]
@@ -86,6 +98,11 @@ def generate_new_symbolic_paths(constraint_list):
 
 
 def generate_new_input(log_path, project_path):
+    """
+    This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
+           log_path : log file for the previous concolic execution that captures PPC
+           project_path: project path is the root directory of the program to filter PPC from libraries
+    """
     logger.info("creating new path for concolic execution")
     global list_path_explored, list_path_detected
     argument_list = list()
@@ -105,6 +122,7 @@ def generate_new_input(log_path, project_path):
 
 def generate_ktest(argument_list, second_var_list):
     """
+    This function will generate the ktest file provided the argument list and second order variable list
         argument_list : a list containing each argument in the order that should be fed to the program
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
@@ -126,6 +144,7 @@ def generate_ktest(argument_list, second_var_list):
 
 def run_concolic_execution(program, argument_list, second_var_list):
     """
+    This function will execute the program in concolic mode using the generated ktest file
         argument_list : a list containing each argument in the order that should be fed to the program
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
