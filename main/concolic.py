@@ -105,8 +105,10 @@ def generate_new_input(log_path, project_path):
     """
     logger.info("creating new path for concolic execution")
     global list_path_explored, list_path_detected
-    argument_list = dict()
-    second_var_list = dict()
+    gen_arg_list = dict()
+    gen_var_list = dict()
+    input_var_list = list()
+    input_arg_list = list()
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
     constraint_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
@@ -120,10 +122,23 @@ def generate_new_input(log_path, project_path):
     for var in model:
         var_name = var[0].symbol_name()
         if "arg" in var_name:
-            argument_list[var_name] = var[1]
+            gen_arg_list[var_name] = var[1]
         else:
-            second_var_list[var_name] = var[1]
-    return argument_list, second_var_list
+            gen_var_list[var_name] = var[1]
+
+    for i in range(0, len(gen_arg_list)):
+        arg_name = "arg0" + str(i)
+        arg_value = str(gen_arg_list[arg_name]).split("(")[1].split("_")[0]
+        print(arg_name, arg_value)
+        input_arg_list.append(arg_value)
+
+    for var_name in gen_var_list:
+        var_str = str(gen_var_list[var_name])
+        var_size = str(int(var_str.split("BV{")[1].split("}")[0]) / 8)
+        var_value = var_str.split("(")[1].split("_")[0]
+        print(var_name, var_size, var_value)
+        input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+    return input_arg_list, input_var_list
 
 
 def generate_ktest(argument_list, second_var_list, print_output=False):
@@ -194,21 +209,6 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
         is_initial = False
         path_count = path_count + 1
         gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, root_directory)
-        input_var_list = list()
-        input_arg_list = list()
-        for i in range(0, len(gen_arg_list)):
-            arg_name = "arg0" + str(i)
-            arg_value = str(gen_arg_list[arg_name]).split("(")[1].split("_")[0]
-            print(arg_name, arg_value)
-            input_arg_list.append(arg_value)
-
-        for var_name in gen_var_list:
-            var_str = str(gen_var_list[var_name])
-            var_size = str(int(var_str.split("BV{")[1].split("}")[0])/8)
-            var_value = var_str.split("(")[1].split("_")[0]
-            print(var_name, var_size, var_value)
-            input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
-
-        run_concolic_execution(program, input_arg_list, input_var_list)
+        run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))
