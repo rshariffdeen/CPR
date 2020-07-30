@@ -119,23 +119,26 @@ def generate_new_input(log_path, project_path):
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
     model = get_model(selected_new_path)
-    for var in model:
-        var_name = var[0].symbol_name()
+    var_list = model.__dict__['z3_model']
+    for var in var_list:
+        var_name = str(var)
+        var_model_str = str(var_list[var])
         if "arg" in var_name:
-            gen_arg_list[var_name] = var[1]
+            gen_arg_list[var_name] = var_model_str
         else:
-            gen_var_list[var_name] = var[1]
+            gen_var_list[var_name] = var_model_str
 
     for i in range(0, len(gen_arg_list)):
         arg_name = "arg0" + str(i)
-        arg_value = str(gen_arg_list[arg_name]).split("(")[1].split("_")[0]
+        arg_str = str(gen_arg_list[arg_name])
+        arg_value = arg_str.split(", ")[-1].split(")")[0]
         print(arg_name, arg_value)
         input_arg_list.append(arg_value)
 
     for var_name in gen_var_list:
         var_str = str(gen_var_list[var_name])
-        var_size = str(int(var_str.split("BV{")[1].split("}")[0]) / 8)
-        var_value = var_str.split("(")[1].split("_")[0]
+        var_size = var_str.split("BitVec(")[1].split(")")[0]
+        var_value = var_str.split(", ")[-1].split(")")[0]
         print(var_name, var_size, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     return input_arg_list, input_var_list
