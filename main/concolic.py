@@ -67,7 +67,7 @@ def analyse_symbolic_path(ppc_list):
         script = parser.get_script(cStringIO(ppc))
         formula = script.get_last_formula()
         constraint = formula.arg(1)
-        print(control_loc, constraint)
+        # print(control_loc, constraint)
         if control_loc not in constraint_list:
             constraint_list[control_loc] = list()
         constraint_list[control_loc].append(constraint)
@@ -117,7 +117,13 @@ def generate_new_input(log_path, project_path):
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
     model = get_model(selected_new_path)
-    print(model)
+    for var in model:
+        var_name = var[0].symbol_name()
+        if "arg" in var_name:
+            argument_list.append(var)
+        else:
+            second_var_list.append(var)
+    return argument_list, second_var_list
 
 
 def generate_ktest(argument_list, second_var_list, print_output=False):
@@ -159,7 +165,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
-                   "--log-ppc" \
+                   "--log-ppc " \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(program) \
@@ -182,6 +188,8 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     global list_path_explored, list_path_detected
     run_concolic_execution(program, argument_list, second_var_list, print_output=False)
     ppc_log_path = root_directory + "/klee-last/ppc.log"
-    generate_new_input(ppc_log_path, root_directory)
+    new_arg_list, new_var_list = generate_new_input(ppc_log_path, root_directory)
+    print(new_arg_list)
+    print(new_var_list)
 
 

@@ -6,7 +6,7 @@ from concolic import run_concolic_exploration
 
 ## compile the test.c
 compile_command = "export LLVM_COMPILER=clang;" \
-                  "wllvm -l kleeRuntest -o test test.c;" \
+                  "wllvm -l kleeRuntest -o -g -O0 test test.c;" \
                   "extract-bc test"
 
 process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
