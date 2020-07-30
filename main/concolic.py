@@ -13,7 +13,7 @@ import pysmt.environment
 logger = logging.getLogger(__name__)
 
 Formula = Union[pysmt.fnode.FNode]
-File_Klee_Path = "/tmp/log_sym_path"
+File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 list_path_explored = list()
@@ -120,7 +120,7 @@ def generate_new_input(log_path, project_path):
     print(model)
 
 
-def generate_ktest(argument_list, second_var_list):
+def generate_ktest(argument_list, second_var_list, print_output=False):
     """
     This function will generate the ktest file provided the argument list and second order variable list
         argument_list : a list containing each argument in the order that should be fed to the program
@@ -142,7 +142,7 @@ def generate_ktest(argument_list, second_var_list):
     return ktest_path, process.returncode
 
 
-def run_concolic_execution(program, argument_list, second_var_list):
+def run_concolic_execution(program, argument_list, second_var_list, print_output=False):
     """
     This function will execute the program in concolic mode using the generated ktest file
         program: the absolute path of the bitcode of the program
@@ -150,6 +150,7 @@ def run_concolic_execution(program, argument_list, second_var_list):
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic execution")
+    global File_Log_Path
     input_argument = ""
     for argument in argument_list:
         input_argument += " --sym-arg " + str(len(str(argument)))
@@ -158,11 +159,29 @@ def run_concolic_execution(program, argument_list, second_var_list):
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
+                   "--log-ppc" \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(program) \
                    + input_argument
-
+    if not print_output:
+        klee_command += " > " + File_Log_Path + " 2>&1 "
     process = subprocess.Popen([klee_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
     return process.returncode
+
+
+def run_concolic_exploration(program, argument_list, second_var_list, root_directory):
+    """
+    This function will explore all possible paths in a program provided one single test case
+        program: the absolute path of the bitcode of the program
+        argument_list : a list containing each argument in the order that should be fed to the program
+        second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
+    """
+    logger.info("running concolic exploration")
+    global list_path_explored, list_path_detected
+    run_concolic_execution(program, argument_list, second_var_list, print_output=False)
+    ppc_log_path = root_directory + "/klee-last/ppc.log"
+    generate_new_input(ppc_log_path, root_directory)
+
+

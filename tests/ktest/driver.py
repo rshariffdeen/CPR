@@ -29,7 +29,7 @@ assert int(process.returncode) == 0
 print(output)
 
 
-exit_code = run_concolic_execution("test.bc", argument_list, second_var_list)
+exit_code = run_concolic_execution("test.bc", argument_list, second_var_list, True)
 assert exit_code == 0
 verify_command = "cat klee-last/test000001.smt2"
 process = subprocess.Popen([verify_command], stderr=subprocess.PIPE, shell=True)
