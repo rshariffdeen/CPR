@@ -102,7 +102,7 @@ RUN python -m pip --disable-pip-version-check --no-cache-dir install wllvm && \
 RUN pysmt-install --z3 --confirm-agreement
 
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
-
+RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install six
 WORKDIR /concolic-repair
 
 COPY main/ main/

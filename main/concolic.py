@@ -129,7 +129,7 @@ def generate_ktest(argument_list, second_var_list):
     global File_Ktest_Path
     logger.info("creating ktest file")
     ktest_path = File_Ktest_Path
-    ktest_command = "gen-bout --out-file={0}".format(ktest_path)
+    ktest_command = "gen-bout --out-file {0}".format(ktest_path)
     n_arg = str(len(argument_list))
     ktest_command += " --sym-args " + n_arg
     for argument in argument_list:
