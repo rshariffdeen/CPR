@@ -21,3 +21,9 @@ ktest_path, exit_code = generate_ktest(argument_list, second_var_list)
 assert int(exit_code) == 0
 assert os.path.isfile(ktest_path)
 assert os.path.getsize(ktest_path) > 0
+
+verify_command = "ktest-tool " + ktest_path
+process = subprocess.Popen([verify_command], stdout=subprocess.PIPE, shell=True)
+(output, error) = process.communicate()
+assert int(process.returncode) == 0
+print(output)
