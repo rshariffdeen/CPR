@@ -139,7 +139,7 @@ def generate_ktest(argument_list, second_var_list):
         ktest_command += " --second-var {0} {1} {2}".format(var['identifier'], var['size'], var['value'])
     process = subprocess.Popen([ktest_command], stdout=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
-    return ktest_path
+    return ktest_path, process.returncode
 
 
 def run_concolic_execution(program, argument_list, second_var_list):
