@@ -137,7 +137,7 @@ def generate_new_input(log_path, project_path):
 
     for var_name in gen_var_list:
         var_str = str(gen_var_list[var_name])
-        var_size = var_str.split("BitVec(")[1].split(")")[0]
+        var_size = str(int(var_str.split("BitVec(")[1].split(")")[0])/8)
         var_value = var_str.split(", ")[-1].split(")")[0]
         print(var_name, var_size, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
