@@ -105,8 +105,8 @@ def generate_new_input(log_path, project_path):
     """
     logger.info("creating new path for concolic execution")
     global list_path_explored, list_path_detected
-    argument_list = list()
-    second_var_list = list()
+    argument_list = dict()
+    second_var_list = dict()
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
     constraint_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
@@ -120,9 +120,9 @@ def generate_new_input(log_path, project_path):
     for var in model:
         var_name = var[0].symbol_name()
         if "arg" in var_name:
-            argument_list.append(var)
+            argument_list[var_name] = var[1]
         else:
-            second_var_list.append(var)
+            second_var_list[var_name] = var[1]
     return argument_list, second_var_list
 
 
@@ -188,8 +188,12 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     global list_path_explored, list_path_detected
     run_concolic_execution(program, argument_list, second_var_list, print_output=False)
     ppc_log_path = root_directory + "/klee-last/ppc.log"
-    new_arg_list, new_var_list = generate_new_input(ppc_log_path, root_directory)
-    print(new_arg_list)
-    print(new_var_list)
+    is_initial = True
+    while list_path_detected or is_initial:
+        is_initial = False
+        new_arg_list, new_var_list = generate_new_input(ppc_log_path, root_directory)
+
+        print(new_arg_list)
+        print(new_var_list)
 
 
