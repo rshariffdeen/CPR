@@ -1,7 +1,9 @@
-from main.concolic import generate_ktest, run_concolic_execution
 import subprocess
 import os
 import sys
+sys.path.append('/concolic-repair/main')
+from concolic import generate_ktest, run_concolic_execution
+
 
 ## compile the test.c
 compile_command = "export LLVM_COMPILER=clang;" \
