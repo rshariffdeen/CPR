@@ -137,7 +137,7 @@ def generate_ktest(argument_list, second_var_list):
 
     for var in second_var_list:
         ktest_command += " --second-var {0} {1} {2}".format(var['identifier'], var['size'], var['value'])
-    process = subprocess.Popen([ktest_command], stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen([ktest_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
     return ktest_path, process.returncode
 
@@ -145,23 +145,24 @@ def generate_ktest(argument_list, second_var_list):
 def run_concolic_execution(program, argument_list, second_var_list):
     """
     This function will execute the program in concolic mode using the generated ktest file
+        program: the absolute path of the bitcode of the program
         argument_list : a list containing each argument in the order that should be fed to the program
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic execution")
     input_argument = ""
     for argument in argument_list:
-        input_argument += " --sym-arg " + str(len(argument))
-    ktest_path = generate_ktest(argument_list, second_var_list)
+        input_argument += " --sym-arg " + str(len(str(argument)))
+    ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
-                   + "{0}.bc ".format(program) \
+                   + "{0} ".format(program) \
                    + input_argument
 
-    process = subprocess.Popen([klee_command], stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen([klee_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
     return process.returncode

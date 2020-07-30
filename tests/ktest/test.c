@@ -20,7 +20,7 @@ int main(int argc, char** argv){
     else
         printf("Statement Six\n");
 
-    printf("\nValues: i=%d, j=%d, k=%d", i, j, k);
+    printf("\nValues: i=%d, j=%d, k=%d\n\n", i, j, k);
     return 0;
 
 }
