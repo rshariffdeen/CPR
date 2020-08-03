@@ -6,12 +6,13 @@ from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
 from enum import Enum, auto
 import re
 import json
+import os
 from collections import namedtuple
 
 import pysmt.fnode
 from pysmt.solvers.solver import Model
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat
+from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, SBV
 import pysmt.environment
 from pysmt.walkers import DagWalker, IdentityDagWalker
 from pysmt.environment import get_env
@@ -112,7 +113,7 @@ class Instance(Enum):
             return par
 
 
-# Component is a pair of component id and component semantics expressed as 
+# Component is a pair of component id and component semantics expressed as
 # formula over symbols representing program variables, holes, constants and return values
 # There are some restriction for components:
 #   - all lvalues should be defined in terms of rvalues for all inputs
@@ -152,17 +153,17 @@ class ComponentSymbol(Enum):
     LBRANCH = auto()  # lvalue of branch
     RVALUE  = auto()  # rvalue of variable
     LVALUE  = auto()  # lvalue of variable
-    RHOLE   = auto()  # rvalue of subexpression  
+    RHOLE   = auto()  # rvalue of subexpression
     LHOLE   = auto()  # lvalue of subexpression
 
     @staticmethod
     def _regex(s):
         return {
             ComponentSymbol.CONST:   re.compile(r'const_(\w+)$'),
-            ComponentSymbol.RRETURN: re.compile(r'(rreturn)$'),    
-            ComponentSymbol.LRETURN: re.compile(r'(lreturn)$'),    
-            ComponentSymbol.RBRANCH: re.compile(r'(rbranch)$'),    
-            ComponentSymbol.LBRANCH: re.compile(r'(lbranch)$'),    
+            ComponentSymbol.RRETURN: re.compile(r'(rreturn)$'),
+            ComponentSymbol.LRETURN: re.compile(r'(lreturn)$'),
+            ComponentSymbol.RBRANCH: re.compile(r'(rbranch)$'),
+            ComponentSymbol.LBRANCH: re.compile(r'(lbranch)$'),
             ComponentSymbol.RVALUE:  re.compile(r'rvalue_(\w+)$'),
             ComponentSymbol.LVALUE:  re.compile(r'lvalue_(\w+)$'),
             ComponentSymbol.RHOLE:   re.compile(r'rhole_(\w+)$'),
@@ -227,9 +228,9 @@ class ComponentSemantics:
     def get_lhole(formula, name):
         lholes = list(collect_symbols(formula, all_fn(ComponentSymbol.is_lhole, lambda x: ComponentSymbol.parse(x).name == name)))
         return lholes[0] if lholes else None
-   
 
-# Program is a pair of 
+
+# Program is a pair of
 # - a tree of components
 # - a valuation of parameters (constants)
 # A tree of components is represented as pair of
@@ -275,16 +276,16 @@ def program_to_formula(program: Program) -> Formula:
                 lhole = ComponentSemantics.get_lhole(root, hole_id)
                 if lhole:
                     hole_substitution[lhole] = subtree_lbranch
-            children_semantics = And(children_semantics, subtree_semantics)              
+            children_semantics = And(children_semantics, subtree_semantics)
         bound_root = instantiated_root.substitute(hole_substitution)
-        result = And(bound_root, children_semantics) if children else bound_root 
+        result = And(bound_root, children_semantics) if children else bound_root
         return (result, root_rbranch, root_lbranch)
 
     (semantics, rbranch, _) = tree_to_formula(tree, [0])
     rreturn = ComponentSemantics.get_rreturn(tree[0][1])
     if rreturn:
         semantics = And(semantics, EqualsOrIff(rreturn, rbranch))
-    const_substitution = { ComponentSymbol.const(k): BV(v, 32) for k, v in constants.items() }
+    const_substitution = { ComponentSymbol.const(k): SBV(v, 32) for k, v in constants.items() }
     return semantics.substitute(const_substitution)
 
 
@@ -314,7 +315,7 @@ def program_to_code(program: Program) -> str:
         'logical-or': '||',
         'sequence': ';'
     }
-    
+
     def tree_to_code(tree):
         ((cid, semantics), children) = tree
         m = re.search(r'constant_(\w+)', cid)
@@ -333,8 +334,8 @@ def program_to_code(program: Program) -> str:
             elif set(children.keys()) == set(['condition', 'left', 'right']) and cid == 'guarded_assignment':
                 return f"if ({tree_to_code(children['condition'])}) {tree_to_code(children['left'])} = {tree_to_code(children['right'])}"
             else:
-                return f"{cid}(...)"  #TODO: print arguments 
-    
+                return f"{cid}(...)"  #TODO: print arguments
+
     return tree_to_code(tree)
 
 
@@ -351,7 +352,7 @@ def program_to_json(program: Program):
                     json_tree["children"] = {}
                 json_tree["children"][k] = tree_to_json(v)
         return json_tree
-    
+
     json_tree = tree_to_json(tree)
     result = { "tree": json_tree, "constants": constants }
     return result
@@ -378,14 +379,14 @@ def program_of_json(doc, components) -> Program:
 # Path is a formula over special trident symbols (angelic, environment, output).
 # Test assertion is a formula over trident output symbols.
 # The semantics of specification is the satisfiability of
-#   for all tests. (V paths) ^ test assertion 
+#   for all tests. (V paths) ^ test assertion
 Specification = Dict[str, Tuple[List[Formula], Formula]]
 
 
 class RuntimeSymbol(Enum):
     ANGELIC  = auto()
     RVALUE   = auto()
-    LVALUE   = auto() 
+    LVALUE   = auto()
     SELECTOR = auto()
     OUTPUT   = auto()
 
@@ -675,16 +676,20 @@ def synthesize(components: List[Component],
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
-        result = verify({lid: (tree, {})}, specification)
-        if result:
-            yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
+        # result = verify({lid: (tree, {})}, specification)
+        # if result:
+        #     yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
+        for value in range(-10, 11): # TODO hard coded enumeration of concrete values
+           result = verify({lid: (tree, {"a" : value})}, specification)
+           if result:
+               yield {lid: (tree, {"a" : value})}
 
 
 def load_specification(spec_files: List[Tuple[Path, Path]]) -> Specification:
     logger.info("loading specification")
     specification: Specification = {}
     smt_parser = SmtLibParser()
-    
+
     for (assertion_file, klee_dir) in spec_files:
         logger.info(f"loading test assertion {assertion_file}")
         tid = assertion_file.stem
@@ -725,7 +730,7 @@ def load_programs(files: Dict[str, Path], components: List[Component]) -> Dict[s
 def load_components(comp_files: List[Path]) -> List[Component]:
     logger.info("loading components")
     components = []
-    
+
     for component_file in comp_files:
         logger.info(f"loading component {component_file}")
         cid = component_file.stem
@@ -746,8 +751,8 @@ def load_components(comp_files: List[Path]) -> List[Component]:
 
     return components
 
-   
-def main():
+
+def main(args):
     parser = argparse.ArgumentParser('Trident synthesizer')
     parser.add_argument('--tests',
                         nargs='+',
@@ -771,8 +776,12 @@ def main():
     parser.add_argument('--all',
                         action='store_true',
                         help='generate all patches')
-    args = parser.parse_args()
-    
+    parser.add_argument('--output',
+                        nargs='+',
+                        metavar='DIR',
+                        help='specify output directory')
+    args = parser.parse_args(args)
+
     rootLogger = logging.getLogger()
     rootLogger.setLevel(logging.INFO)
     consoleHandler = logging.StreamHandler()
@@ -783,6 +792,10 @@ def main():
     spec_files = [(Path(a[0]), Path(a[1])) for a in args.tests]
 
     specification = load_specification(spec_files)
+
+    if args.output:
+        if not os.path.exists(args.output[0]):
+            os.makedirs(args.output[0])
 
     components = []
     if args.components:
@@ -807,14 +820,25 @@ def main():
             for i, v in enumerate(result):
                 for (lid, prog) in v.items():
                     print(f"#{i} {lid}:\t{program_to_code(prog)}")
+                    print(f"#{i} {lid}:\t{program_to_json(prog)}")
+
+                    if args.output:
+                        export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
+
         else:
             programs = next(result, None)
             if programs:
                 for (lid, prog) in programs.items():
                     print(f"{lid}:\t{program_to_code(prog)}")
+                    print(f"{lid}:\t{program_to_json(prog)}")
             else:
                 print("FAIL")
 
+def export_json(output_file, json_content):
+    f = open(output_file, "w+")
+    f.write(str(json_content))
+    f.close()
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(sys.argv[1:])
