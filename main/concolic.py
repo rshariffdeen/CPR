@@ -183,6 +183,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
+                   "-allow-seed-extension" \
                    "--log-ppc " \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
