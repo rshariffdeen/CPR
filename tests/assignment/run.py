@@ -38,7 +38,7 @@ assert os.path.isfile(ktest_path)
 assert os.path.getsize(ktest_path) > 0
 exit_code = run_concolic_execution(program_name + ".bc", argument_list, second_var_list, True)
 assert exit_code == 0
-klee_file_2 = cwd + "/klee-out-1/test000002.smt2"
+klee_file_2 = cwd + "/klee-out-1/test000001.smt2"
 assert os.path.isfile(klee_file_2)
 assert os.path.getsize(klee_file_2) > 0
 
