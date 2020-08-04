@@ -97,6 +97,29 @@ def generate_new_symbolic_paths(constraint_list):
     return new_path_list
 
 
+def get_signed_value(bit_vector):
+    signed_value = 0
+    for i in range(0, len(bit_vector)):
+        if i == 0:
+            signed_value = int(bit_vector[i])
+        else:
+            signed_value += ((2 << 7) << int(i)) * int(bit_vector[i])
+    return signed_value
+
+
+def extract_bit_vector(expression_str):
+    bit_vector = dict()
+    if "[" in expression_str:
+        token_list = expression_str.split("[")
+        token_list.remove(token_list[0])
+        for token in token_list:
+            index_str, value_str = token.split(" := ")
+            index = int(index_str.split("_")[0])
+            value = int(value_str.split("_")[0])
+            bit_vector[index] = value
+    return bit_vector
+
+
 def generate_new_input(log_path, project_path):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
@@ -120,25 +143,30 @@ def generate_new_input(log_path, project_path):
     list_path_detected.remove(selected_new_path)
     model = get_model(selected_new_path)
     var_list = model.__dict__['z3_model']
-    for var in var_list:
-        var_name = str(var)
-        var_model_str = str(var_list[var])
+    for var in model:
+        var_name = str(var[0])
+        var_model_str = str(var[1])
         if "arg" in var_name:
             gen_arg_list[var_name] = var_model_str
         else:
             gen_var_list[var_name] = var_model_str
 
-    for i in range(0, len(gen_arg_list)):
-        arg_name = "arg0" + str(i)
+    for arg_name in gen_arg_list:
         arg_str = str(gen_arg_list[arg_name])
-        arg_value = arg_str.split(", ")[-1].split(")")[0]
+        arg_value = 0
+        bit_vector = extract_bit_vector(arg_str)
+        if bit_vector:
+            arg_value = get_signed_value(bit_vector)
         print(arg_name, arg_value)
         input_arg_list.append(arg_value)
 
     for var_name in gen_var_list:
         var_str = str(gen_var_list[var_name])
-        var_size = str(int(var_str.split("BitVec(")[1].split(")")[0])/8)
-        var_value = var_str.split(", ")[-1].split(")")[0]
+        var_value = 0
+        var_size = str(int(var_str.split("BV{")[1].split("}")[0]) / 8)
+        bit_vector = extract_bit_vector(var_str)
+        if bit_vector:
+            var_value = get_signed_value(bit_vector)
         print(var_name, var_size, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     return input_arg_list, input_var_list
