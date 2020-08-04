@@ -113,6 +113,8 @@ def extract_bit_vector(expression_str):
         token_list = expression_str.split("[")
         token_list.remove(token_list[0])
         for token in token_list:
+            if ".." in token:
+                continue
             index_str, value_str = token.split(" := ")
             index = int(index_str.split("_")[0])
             value = int(value_str.split("_")[0])
@@ -157,7 +159,7 @@ def generate_new_input(log_path, project_path):
         bit_vector = extract_bit_vector(arg_str)
         if bit_vector:
             arg_value = get_signed_value(bit_vector)
-        print(arg_name, arg_value)
+        print(arg_name, arg_value, arg_str)
         input_arg_list.append(arg_value)
 
     for var_name in gen_var_list:
@@ -167,7 +169,7 @@ def generate_new_input(log_path, project_path):
         bit_vector = extract_bit_vector(var_str)
         if bit_vector:
             var_value = get_signed_value(bit_vector)
-        print(var_name, var_size, var_value)
+        print(var_name, var_size, var_value, var_str)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     return input_arg_list, input_var_list
 
