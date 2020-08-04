@@ -662,7 +662,11 @@ def extract_assigned(tree: ComponentTree) -> List[Component]:
 #TODO: check hole types
 def synthesize(components: List[Component],
                depth: int,
-               specification: Specification) -> Optional[Dict[str, Program]]:
+               specification: Specification,
+               # Optional arguments for concrete patch enumeration
+               concrete_enumeration = False,
+               lower_bound = -10,
+               upper_bound = +10) -> Optional[Dict[str, Program]]:
     lids = {}
     for (tid, (paths, _)) in specification.items():
         for path in paths:
@@ -676,13 +680,15 @@ def synthesize(components: List[Component],
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
-        # result = verify({lid: (tree, {})}, specification)
-        # if result:
-        #     yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
-        for value in range(-10, 11): # TODO hard coded enumeration of concrete values
-           result = verify({lid: (tree, {"a" : value})}, specification)
-           if result:
-               yield {lid: (tree, {"a" : value})}
+        if concrete_enumeration:
+            for value in range(lower_bound, upper_bound):
+                result = verify({lid: (tree, {"a" : value})}, specification) # TODO-YN currently it is not checking for a and does support any other constant
+                if result:
+                    yield {lid: (tree, {"a" : value})}
+        else:
+            result = verify({lid: (tree, {})}, specification)
+            if result:
+                yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
 
 
 def load_specification(spec_files: List[Tuple[Path, Path]]) -> Specification:
@@ -776,6 +782,12 @@ def main(args):
     parser.add_argument('--all',
                         action='store_true',
                         help='generate all patches')
+    parser.add_argument('--all-values',
+                        nargs=1,
+                        type=(lambda a: (int(a.split(':')[0]), int(a.split(':')[1]))),
+                        required=False,
+                        metavar='LOWER_BOUND:UPPER_BOUND',
+                        help='generate all patches with concrete value enumeration within the given range')
     parser.add_argument('--output',
                         nargs='+',
                         metavar='DIR',
@@ -793,14 +805,20 @@ def main(args):
 
     specification = load_specification(spec_files)
 
-    if args.output:
-        if not os.path.exists(args.output[0]):
-            os.makedirs(args.output[0])
-
     components = []
     if args.components:
         comp_files = [Path(f) for f in args.components]
         components = load_components(comp_files)
+
+    if args.output:
+        if not os.path.exists(args.output[0]):
+            os.makedirs(args.output[0])
+        logger.info(f"patches will be stored in: {args.output[0]}")
+
+    if args.all_values:
+        lower_bound = args.all_values[0][0]
+        upper_bound = args.all_values[0][1]
+        logger.info(f"concrete patch mode with valuation in range: [{lower_bound}, {upper_bound}]")
 
     if args.verify:
         program_files = { a[0]: Path(a[1]) for a in args.verify }
@@ -815,13 +833,15 @@ def main(args):
             logger.error("components are not provided")
             exit(1)
         depth = args.depth
-        result = synthesize(components, depth, specification)
-        if args.all:
+        if args.all_values:
+            result = synthesize(components, depth, specification, True, lower_bound, upper_bound)
+        else:
+            result = synthesize(components, depth, specification)
+
+        if args.all or args.all_values:
             for i, v in enumerate(result):
                 for (lid, prog) in v.items():
                     print(f"#{i} {lid}:\t{program_to_code(prog)}")
-                    print(f"#{i} {lid}:\t{program_to_json(prog)}")
-
                     if args.output:
                         export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
 
@@ -830,7 +850,8 @@ def main(args):
             if programs:
                 for (lid, prog) in programs.items():
                     print(f"{lid}:\t{program_to_code(prog)}")
-                    print(f"{lid}:\t{program_to_json(prog)}")
+                    if args.output:
+                        export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
             else:
                 print("FAIL")
 
