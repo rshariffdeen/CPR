@@ -11,6 +11,7 @@ RUN apt-get install -y build-essential \
                        git \
                        cmake \
                        libncurses5-dev \
+                       nano \
                        python-minimal \
                        python-pip \
                        python3 \
