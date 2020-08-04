@@ -103,7 +103,7 @@ def get_signed_value(bit_vector):
         if i == 0:
             signed_value = int(bit_vector[i])
         else:
-            signed_value += ((2 << 7) << int(i)) * int(bit_vector[i])
+            signed_value += ((2 << 7) << (int(i) - 1)) * int(bit_vector[i])
     return signed_value
 
 
