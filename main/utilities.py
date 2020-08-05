@@ -17,7 +17,7 @@ def build_program(program_path):
         build_clean(program_path)
     compile_command = "cd " + program_path + ";"
     compile_command += "export TRIDENT_CC=/concolic-repair/main/trident-cc;" \
-                      "CC=\"$TRIDENT_CC\" make -e;" \
+                      "CC=\"$TRIDENT_CC\" CFLAGS='-g -O0 -static' make -e;" \
                       "extract-bc " + program_name
     process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
