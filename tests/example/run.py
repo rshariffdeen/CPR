@@ -39,7 +39,7 @@ assert os.path.getsize(klee_file_1) > 0
 # assert os.path.getsize(klee_file_2) > 0
 
 synthesis_command = "python3.6 ../../main/synthesis.py \
-          --tests t1.smt2:klee-out-0 t2.smt2:klee-out-1 \
+          --tests t1.smt2:klee-out-0 \
           --components components/*.smt2 ../../components/less-than.smt2 ../../components/constant_a.smt2  \
           --all"
         #   --all-values ' -10:11' --output patches"
