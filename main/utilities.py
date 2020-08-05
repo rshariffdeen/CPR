@@ -15,7 +15,8 @@ def build_program(program_path):
     program_name = program_path.split("/")[-1]
     if os.path.isfile(program_path):
         build_clean(program_path)
-    compile_command = "cd " + program_path + ";"
+    program_loc = program_path.replace(program_name, "")
+    compile_command = "cd " + program_loc + ";"
     compile_command += "export TRIDENT_CC=/concolic-repair/main/trident-cc;" \
                       "CC=\"$TRIDENT_CC\" CFLAGS='-g -O0 -static' make -e;" \
                       "extract-bc " + program_name
