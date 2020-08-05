@@ -226,6 +226,34 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return process.returncode
 
 
+def run_concrete_execution(program, argument_list, second_var_list, print_output=False):
+    """
+    This function will execute the program in concrete mode using the concrete inputs
+        program: the absolute path of the bitcode of the program
+        argument_list : a list containing each argument in the order that should be fed to the program
+        second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
+    """
+    logger.info("running concolic execution")
+    global File_Log_Path
+    input_argument = ""
+    for argument in argument_list:
+        input_argument += " " + str(argument)
+    ktest_path, return_code = generate_ktest(argument_list, second_var_list)
+    klee_command = "klee " \
+                   "--posix-runtime " \
+                   "--libc=uclibc " \
+                   "--write-smt2s " \
+                   "--log-ppc " \
+                   "--external-calls=all " \
+                   + "{0} ".format(program) \
+                   + input_argument
+    if not print_output:
+        klee_command += " > " + File_Log_Path + " 2>&1 "
+    process = subprocess.Popen([klee_command], stderr=subprocess.PIPE, shell=True)
+    (output, error) = process.communicate()
+    return process.returncode
+
+
 def run_concolic_exploration(program, argument_list, second_var_list, root_directory):
     """
     This function will explore all possible paths in a program provided one single test case
