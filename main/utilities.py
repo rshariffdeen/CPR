@@ -15,10 +15,10 @@ def build_program(program_path):
     program_name = program_path.split("/")[-1]
     if os.path.isfile(program_path):
         build_clean(program_path)
-    program_loc = program_path.replace(program_name, "")
+    program_loc = "/".join(program_path.split("/")[:-1])
     compile_command = "cd " + program_loc + ";"
     compile_command += "export TRIDENT_CC=/concolic-repair/main/trident-cc;" \
-                      "CC=\"$TRIDENT_CC\" CFLAGS='-g -O0 -static' make -e;" \
+                      "CC=\"$TRIDENT_CC\" make -e;" \
                       "extract-bc " + program_name
     process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()

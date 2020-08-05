@@ -6,4 +6,4 @@ TRIDENT_RUNTIME_H="$SCRIPT_DIR/../runtime/trident_runtime.h"
 TRIDENT_RUNTIME_LIB="$SCRIPT_DIR/../runtime/"
 KLEE_LIB="/klee/build/lib/"
 
-wllvm -include "$TRIDENT_RUNTIME_H" "$@" -L"$TRIDENT_RUNTIME_LIB" -L"$KLEE_LIB" -ltrident_runtime  -lkleeRuntest
+wllvm -g -O0 -static -include "$TRIDENT_RUNTIME_H" "$@" -L"$TRIDENT_RUNTIME_LIB" -L"$KLEE_LIB" -ltrident_runtime  -lkleeRuntest
