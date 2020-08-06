@@ -9,6 +9,7 @@ from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat
 import pysmt.environment
+from utilities import z3_get_model
 
 logger = logging.getLogger(__name__)
 
@@ -116,13 +117,6 @@ def get_signed_value(bit_vector):
     return signed_value
 
 
-def get_string_value(bit_vector):
-    value_str = ""
-    for i in bit_vector:
-        value_str += chr(int(bit_vector[i]))
-    return value_str
-
-
 def extract_bit_vector(expression_str):
     bit_vector = dict()
     if "[" in expression_str:
@@ -152,16 +146,17 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     input_arg_dict = dict()
     input_arg_list = list()
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
-    constraint_list, current_path = analyse_symbolic_path(ppc_list)
+    constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
-    list_path_explored.append(current_path)
+    list_path_explored = list(set(list_path_explored + current_path_list))
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
-    model = get_model(selected_new_path)
+    model = z3_get_model(selected_new_path)
+
     var_list = model.__dict__['z3_model']
     for var in model:
         var_name = str(var[0])
@@ -178,15 +173,19 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
         bit_vector = extract_bit_vector(arg_str)
         if bit_vector:
             arg_value = get_string_value(bit_vector)
-
-        print(arg_name, arg_value, arg_str)
-        input_arg_dict[arg_index] = arg_value
+        if arg_value:
+            print(arg_name, arg_value, arg_str)
+            input_arg_dict[arg_index] = arg_value
 
     for i in range(0, len(argument_list)):
         if i in input_arg_dict:
             input_arg_list.append(input_arg_dict[i])
         else:
-            input_arg_list.append(random.randint(0, 1000))
+            arg_len = len(str(argument_list[i]))
+            random_value = ""
+            for j in range(0, arg_len):
+                random_value += chr(random.randint(0, 128))
+            input_arg_list.append(random_value)
 
     for var_name in gen_var_list:
         var_str = str(gen_var_list[var_name])

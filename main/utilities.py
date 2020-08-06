@@ -24,3 +24,14 @@ def build_program(program_path):
     (output, error) = process.communicate()
     return int(process.returncode)
 
+
+def z3_get_model(str_formula):
+    str_formula = str_formula.replace("(exit)", "(get-model)\n(exit)")
+    path_script = "/tmp/z3_script"
+    with open(path_script, "w") as script_file:
+        script_file.writelines(str_formula)
+    z3_command = "z3 " + path_script
+    process = subprocess.Popen([z3_command], stderr=subprocess.PIPE, shell=True)
+    (output, error) = process.communicate()
+    print(output)
+
