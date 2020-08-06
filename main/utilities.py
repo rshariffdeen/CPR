@@ -86,14 +86,14 @@ def parse_z3_output(z3_output):
                     if i not in byte_list:
                         byte_list[i] = int(default, 16)
 
-            if line == z3_output[-1]:
-                model[var_name] = byte_list
-
             else:
                 print("Unhandled output")
                 print(str_lambda)
                 print(z3_output)
                 exit(1)
+
+            if line == z3_output[-1]:
+                model[var_name] = byte_list
 
 
     return model
