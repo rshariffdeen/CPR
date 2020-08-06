@@ -77,7 +77,9 @@ def parse_z3_output(z3_output):
                         byte_list[index] = int(value, 16)
 
                     if max_index > 0:
+                        byte_list.pop(max_index)
                         max_index = max_index - 1
+
                     for i in range(0, max_index):
                         if i not in byte_list:
                             byte_list[i] = int(default, 16)
