@@ -145,12 +145,12 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
     constraint_list, current_path = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
+    list_path_explored.append(current_path)
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
-    list_path_explored.append(current_path)
     list_path_detected.remove(selected_new_path)
     model = get_model(selected_new_path)
     var_list = model.__dict__['z3_model']
