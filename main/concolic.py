@@ -110,8 +110,6 @@ def generate_new_symbolic_paths(constraint_list):
 def get_signed_value(bit_vector):
     signed_value = 0
     for i in bit_vector:
-        if i > 1 and i == bit_vector.keys()[-1]:
-            break
         if i == 0:
             signed_value = int(bit_vector[i])
         else:
@@ -123,8 +121,6 @@ def get_str_value(bit_vector):
     str_value = ""
     char_list = dict()
     for i in bit_vector:
-        if i > 1 and i == bit_vector.keys()[-1]:
-            break
         if int(bit_vector[i]) > 127:
             char_list[i] = chr(48)
         else:
