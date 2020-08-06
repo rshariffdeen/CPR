@@ -56,8 +56,9 @@ def parse_z3_output(z3_output):
             str_lambda += line
         if "lambda " in line or "as const " in line:
             collect_lambda = True
-            if line != z3_output[-1]:
-                str_lambda = line
+            str_lambda = line
+        if line == z3_output[-1]:
+            collect_lambda = False
         if not collect_lambda and str_lambda:
             if "const" in str_lambda:
                 str_value = str_lambda.split("#x")[-1].split(")")[0]
