@@ -230,7 +230,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     n_arg = str(len(argument_list))
     ktest_command += " --sym-args " + n_arg
     for argument in argument_list:
-        ktest_command += " " + str(argument)
+        ktest_command += " \"" + str(argument) + "\""
 
     for var in second_var_list:
         ktest_command += " --second-var {0} {1} {2}".format(var['identifier'], var['size'], var['value'])
