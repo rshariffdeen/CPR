@@ -54,7 +54,7 @@ def parse_z3_output(z3_output):
             collect_lambda = False
         if collect_lambda:
             str_lambda += line
-        if "lambda " in line:
+        if "lambda " in line or "as const " in line:
             collect_lambda = True
             str_lambda = line
         if not collect_lambda and str_lambda:
