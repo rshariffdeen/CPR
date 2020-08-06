@@ -2,7 +2,7 @@ import subprocess
 import os
 import sys
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.shortcuts import to_smtlib
+from pysmt.shortcuts import write_smtlib
 
 
 def build_clean(program_path):
@@ -27,13 +27,11 @@ def build_program(program_path):
     return int(process.returncode)
 
 
-def z3_get_model(str_formula):
-    parese_formula = to_smtlib(str_formula)
-    print(parese_formula)
-    str_formula = str_formula.replace("(exit)", "(get-model)\n(exit)")
+def z3_get_model(formula):
     path_script = "/tmp/z3_script"
-    with open(path_script, "w") as script_file:
-        script_file.writelines(str_formula)
+    write_smtlib(formula, path_script)
+    with open(path_script, "a") as script_file:
+        script_file.writelines(["(get-model)\n", "(exit)\n"])
     z3_command = "z3 " + path_script
     process = subprocess.Popen([z3_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
