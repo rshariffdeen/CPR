@@ -117,6 +117,17 @@ def get_signed_value(bit_vector):
     return signed_value
 
 
+def get_str_value(bit_vector):
+    str_value = ""
+    char_list = dict()
+    for i in bit_vector:
+        char_list[i] = chr(bit_vector[i])
+
+    for i, char in sorted(char_list, reverse=True):
+        str_value += char
+    return str_value
+
+
 def extract_bit_vector(expression_str):
     bit_vector = dict()
     if "[" in expression_str:
@@ -157,26 +168,22 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     list_path_detected.remove(selected_new_path)
     model = z3_get_model(selected_new_path)
 
-    var_list = model.__dict__['z3_model']
     for var in model:
         var_name = str(var[0])
-        var_model_str = str(var[1])
+        var_byte_list = str(var[1])
         if "arg" in var_name:
-            gen_arg_list[var_name] = var_model_str
+            gen_arg_list[var_name] = var_byte_list
         else:
-            gen_var_list[var_name] = var_model_str
+            gen_var_list[var_name] = var_byte_list
 
     for arg_name in gen_arg_list:
-        arg_str = str(gen_arg_list[arg_name])
+        bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
-        arg_value = ""
-        bit_vector = extract_bit_vector(arg_str)
-        if bit_vector:
-            arg_value = get_string_value(bit_vector)
-        if arg_value:
-            print(arg_name, arg_value, arg_str)
-            input_arg_dict[arg_index] = arg_value
+        arg_value = get_str_value(bit_vector)
+        print(arg_name, arg_value)
+        input_arg_dict[arg_index] = arg_value
 
+    # fill random values if not generated
     for i in range(0, len(argument_list)):
         if i in input_arg_dict:
             input_arg_list.append(input_arg_dict[i])
