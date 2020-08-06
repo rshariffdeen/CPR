@@ -38,9 +38,9 @@ def z3_get_model(formula):
     (output, error) = process.communicate()
     with open(path_result, "r") as result_file:
         z3_output = result_file.readlines()
-    print(z3_output)
+
     model_byte_list = parse_z3_output(z3_output)
-    print(model_byte_list)
+    return model_byte_list
 
 
 def parse_z3_output(z3_output):
