@@ -124,7 +124,7 @@ def extract_bit_vector(expression_str):
     return bit_vector
 
 
-def generate_new_input(log_path, project_path):
+def generate_new_input(log_path, project_path, argument_list, second_var_list):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -135,6 +135,7 @@ def generate_new_input(log_path, project_path):
     gen_arg_list = dict()
     gen_var_list = dict()
     input_var_list = list()
+    input_arg_dict = dict()
     input_arg_list = list()
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
     constraint_list = analyse_symbolic_path(ppc_list)
@@ -157,12 +158,19 @@ def generate_new_input(log_path, project_path):
 
     for arg_name in gen_arg_list:
         arg_str = str(gen_arg_list[arg_name])
+        arg_index = int(str(arg_name).replace("arg", ""))
         arg_value = 0
         bit_vector = extract_bit_vector(arg_str)
         if bit_vector:
             arg_value = get_signed_value(bit_vector)
         print(arg_name, arg_value, arg_str)
-        input_arg_list.append(arg_value)
+        input_arg_dict[arg_index] = arg_value
+
+    for i in range(0, len(argument_list)):
+        if i in input_arg_dict:
+            input_arg_list.append(input_arg_dict[i])
+        else:
+            input_arg_list.append(random.randint(0, 1000))
 
     for var_name in gen_var_list:
         var_str = str(gen_var_list[var_name])
@@ -173,6 +181,15 @@ def generate_new_input(log_path, project_path):
             var_value = get_signed_value(bit_vector)
         print(var_name, var_size, var_value, var_str)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+
+    for var_name in second_var_list:
+        if var_name not in gen_var_list:
+            var_tuple = second_var_list[var_name]
+            var_size = var_tuple['size']
+            var_value = 0
+            for i in range(0, var_size):
+                var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
+            input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     return input_arg_list, input_var_list
 
 
@@ -272,7 +289,7 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     while list_path_detected or is_initial:
         is_initial = False
         path_count = path_count + 1
-        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, root_directory)
+        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, root_directory, argument_list, second_var_list)
         run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))
