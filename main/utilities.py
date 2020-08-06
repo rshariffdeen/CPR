@@ -29,11 +29,64 @@ def build_program(program_path):
 
 def z3_get_model(formula):
     path_script = "/tmp/z3_script"
+    path_result = "/tmp/z3_output"
     write_smtlib(formula, path_script)
     with open(path_script, "a") as script_file:
         script_file.writelines(["(get-model)\n", "(exit)\n"])
-    z3_command = "z3 " + path_script
+    z3_command = "z3 " + path_script + " > " + path_result
     process = subprocess.Popen([z3_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
-    print(output)
+    with open(path_result, "r") as result_file:
+        z3_output = result_file.readlines()
+    print(z3_output)
+    model_byte_list = parse_z3_output(z3_output)
+    print(model_byte_list)
+
+def parse_z3_output(z3_output):
+    model = dict()
+    collect_lambda = False
+    for line in z3_output:
+        var_name = ""
+        byte_list = dict()
+        str_lambda = ""
+        if "define-fun " in line:
+            var_name = line.split("define-fun ")[1].split(" ()")[0]
+            collect_lambda = False
+        if collect_lambda:
+            str_lambda += line
+        if "lambda " in line:
+            collect_lambda = True
+            str_lambda = line
+        if not collect_lambda and str_lambda:
+            if "const" in str_lambda:
+                str_value = str_lambda.split("#x")[-1].split(")")[0]
+                byte_list = dict()
+                byte_list[0] = int("0x" + str_value, 16)
+            elif "ite" in str_lambda:
+                max_index = 0
+                byte_list = dict()
+                token_list = str_lambda.split("(ite (= x!1 ")
+                for token in token_list[1:]:
+                    if token.count("#x") == 2:
+                        index, value = token.split("#x")
+                    elif token.count("#x") == 3:
+                        index, value, default = token.split("#x")
+                        default = default.split(")")[0]
+                    index = index.replace(")", "")
+                    index = int("0x" + index, 16)
+                    if index > max_index:
+                        max_index = index
+                    value = int("0x" + value, 16)
+                    byte_list[index] = value
+                for i in range(0, max_index):
+                    if i not in byte_list:
+                        byte_list[i] = 0
+
+            else:
+                print("Unhandled output")
+                print(str_lambda)
+                print(z3_output)
+                exit(1)
+
+            model[var_name] = byte_list
 
