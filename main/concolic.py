@@ -121,7 +121,10 @@ def get_str_value(bit_vector):
     str_value = ""
     char_list = dict()
     for i in bit_vector:
-        char_list[i] = chr(bit_vector[i]).encode('utf-8')
+        if int(bit_vector[i]) > 127:
+            char_list[i] = chr(0)
+        else:
+            char_list[i] = chr(bit_vector[i])
 
     for i in sorted(char_list, reverse=True):
         char = char_list[i]
