@@ -60,6 +60,7 @@ def analyse_symbolic_path(ppc_list):
               ppc_list : a dictionary containing the partial path condition at each branch location
     """
     constraint_list = collections.OrderedDict()
+    explored_path_list = list()
     current_path = None
     for control_loc in ppc_list:
         ppc = ppc_list[control_loc]
@@ -76,7 +77,8 @@ def analyse_symbolic_path(ppc_list):
             current_path = constraint
         else:
             current_path = And(current_path, constraint)
-    return constraint_list, current_path
+        explored_path_list.append(current_path)
+    return constraint_list, explored_path_list
 
 
 def generate_new_symbolic_paths(constraint_list):
@@ -112,6 +114,13 @@ def get_signed_value(bit_vector):
         else:
             signed_value += ((2 << 7) << (int(i) - 1)) * int(bit_vector[i])
     return signed_value
+
+
+def get_string_value(bit_vector):
+    value_str = ""
+    for i in bit_vector:
+        value_str += chr(int(bit_vector[i]))
+    return value_str
 
 
 def extract_bit_vector(expression_str):
@@ -165,10 +174,11 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     for arg_name in gen_arg_list:
         arg_str = str(gen_arg_list[arg_name])
         arg_index = int(str(arg_name).replace("arg", ""))
-        arg_value = 0
+        arg_value = ""
         bit_vector = extract_bit_vector(arg_str)
         if bit_vector:
-            arg_value = get_signed_value(bit_vector)
+            arg_value = get_string_value(bit_vector)
+
         print(arg_name, arg_value, arg_str)
         input_arg_dict[arg_index] = arg_value
 
