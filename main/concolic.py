@@ -233,7 +233,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         ktest_command += " \"" + str(argument) + "\""
 
     for var in second_var_list:
-        ktest_command += " --second-var {0} {1} {2}".format(var['identifier'], var['size'], var['value'])
+        ktest_command += " --second-var \"{0}\" {1} {2}".format(var['identifier'], var['size'], var['value'])
     process = subprocess.Popen([ktest_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
     return ktest_path, process.returncode
