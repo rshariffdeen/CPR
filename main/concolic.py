@@ -121,7 +121,7 @@ def get_str_value(bit_vector):
     str_value = ""
     char_list = dict()
     for i in bit_vector:
-        char_list[i] = chr(bit_vector[i])
+        char_list[i] = chr(bit_vector[i]).encode('utf-8')
 
     for i in sorted(char_list, reverse=True):
         char = char_list[i]
