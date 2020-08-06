@@ -174,6 +174,8 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
 
     for var_name in model:
         var_byte_list = model[var_name]
+        if len(var_byte_list) > 1:
+            var_byte_list = var_byte_list[:-1]
         if "arg" in var_name:
             gen_arg_list[var_name] = var_byte_list
         else:
