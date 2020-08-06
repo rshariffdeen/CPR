@@ -47,10 +47,11 @@ def parse_z3_output(z3_output):
     model = dict()
     collect_lambda = False
     var_name = ""
-    old_var_name = ""
     byte_list = dict()
     str_lambda = ""
     for line in z3_output:
+        if "sat" in line or "model" in line:
+            continue
         if "define-fun " in line:
             if str_lambda:
                 if "const" in str_lambda:
