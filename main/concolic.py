@@ -122,7 +122,7 @@ def get_str_value(bit_vector):
     char_list = dict()
     for i in bit_vector:
         if int(bit_vector[i]) > 127:
-            char_list[i] = chr(0)
+            char_list[i] = chr(48)
         else:
             char_list[i] = chr(bit_vector[i])
 
