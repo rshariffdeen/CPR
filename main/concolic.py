@@ -99,12 +99,11 @@ def generate_new_symbolic_paths(constraint_list):
 
 def get_signed_value(bit_vector):
     signed_value = 0
-    for i in range(0, len(bit_vector)):
-        if i in bit_vector.keys():
-            if i == 0:
-                signed_value = int(bit_vector[i])
-            else:
-                signed_value += ((2 << 7) << (int(i) - 1)) * int(bit_vector[i])
+    for i in bit_vector:
+        if i == 0:
+            signed_value = int(bit_vector[i])
+        else:
+            signed_value += ((2 << 7) << (int(i) - 1)) * int(bit_vector[i])
     return signed_value
 
 

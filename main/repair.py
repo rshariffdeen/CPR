@@ -8,6 +8,8 @@ from synthesis import load_components, load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 
+check_counter = 0
+
 def init (cwd, program_name):
    os.chdir(cwd)
    os.system("rm -rf ./patches/*")
@@ -49,7 +51,6 @@ def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete
    return True
 
 
-check_counter = 0
 def checkCoverage(): # TODO
    global check_counter
    if check_counter < 10: # Only for testing purpose. 
