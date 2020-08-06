@@ -68,19 +68,20 @@ def parse_z3_output(z3_output):
                 token_list = str_lambda.split("(ite (= x!1 ")
                 for token in token_list[1:]:
                     if token.count("#x") == 2:
-                        index, value = token.split("#x")
+                        index, value = token.split(") ")
                     elif token.count("#x") == 3:
-                        index, value, default = token.split("#x")
+                        index, value, default = token.split(" ")
+                        index = index.replace(")", "")
                         default = default.split(")")[0]
-                    index = index.replace(")", "")
-                    index = int("0x" + index, 16)
+                    index = index.replace("#", "0")
+                    value = value.replace("#", "0")
+                    index = int(index, 16)
                     if index > max_index:
                         max_index = index
-                    value = int("0x" + value, 16)
-                    byte_list[index] = value
+                    byte_list[index] = int(value, 16)
                 for i in range(0, max_index):
                     if i not in byte_list:
-                        byte_list[i] = 0
+                        byte_list[i] = int(default, 16)
 
             else:
                 print("Unhandled output")
@@ -89,4 +90,5 @@ def parse_z3_output(z3_output):
                 exit(1)
 
             model[var_name] = byte_list
+    return model
 
