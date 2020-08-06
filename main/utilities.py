@@ -89,8 +89,9 @@ def parse_z3_output(z3_output):
                 model[var_name] = byte_list
                 var_name = ""
                 byte_list = dict()
-            var_name = line.split("define-fun ")[1].split(" ()")[0]
-            str_lambda = ""
+            if line != z3_output[-1]:
+                var_name = line.split("define-fun ")[1].split(" ()")[0]
+                str_lambda = ""
 
         else:
             str_lambda += line
