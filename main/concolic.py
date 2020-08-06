@@ -59,8 +59,8 @@ def analyse_symbolic_path(ppc_list):
        the branch conditions added at each location, which can be used to negate as a constraint
               ppc_list : a dictionary containing the partial path condition at each branch location
     """
-    constraint_list = dict()
-    for control_loc in reversed(ppc_list):
+    constraint_list = collections.OrderedDict()
+    for control_loc in ppc_list:
         ppc = ppc_list[control_loc]
         ppc = "".join(ppc)
         parser = SmtLibParser()
