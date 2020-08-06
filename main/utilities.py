@@ -72,7 +72,7 @@ def parse_z3_output(z3_output):
                     elif token.count("#x") == 3:
                         index, value, default = token.split(" ")
                         index = index.replace(")", "")
-                        default = default.split(")")[0]
+                        default = default.split(")")[0].replace("#", "0")
                     index = index.replace("#", "0")
                     value = value.replace("#", "0")
                     index = int(index, 16)
