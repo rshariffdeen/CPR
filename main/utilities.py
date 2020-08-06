@@ -52,7 +52,7 @@ def parse_z3_output(z3_output):
     for line in z3_output:
         if "sat" in line or "model" in line:
             continue
-        if "define-fun " in line:
+        if "define-fun " in line or line == z3_output[-1]:
             if str_lambda:
                 if "const" in str_lambda:
                     str_value = str_lambda.split("#x")[-1].split(")")[0]
