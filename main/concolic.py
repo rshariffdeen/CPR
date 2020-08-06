@@ -123,7 +123,8 @@ def get_str_value(bit_vector):
     for i in bit_vector:
         char_list[i] = chr(bit_vector[i])
 
-    for i, char in sorted(char_list, reverse=True):
+    for i in sorted(char_list, reverse=True):
+        char = char_list[i]
         str_value += char
     return str_value
 
@@ -194,13 +195,12 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
             input_arg_list.append(random_value)
 
     for var_name in gen_var_list:
-        var_str = str(gen_var_list[var_name])
+        bit_vector = gen_var_list[var_name]
         var_value = 0
-        var_size = str(int(var_str.split("BV{")[1].split("}")[0]) / 8)
-        bit_vector = extract_bit_vector(var_str)
+        var_size = len(bit_vector)
         if bit_vector:
             var_value = get_signed_value(bit_vector)
-        print(var_name, var_size, var_value, var_str)
+        print(var_name, var_size, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 
     for var_tuple in second_var_list:
