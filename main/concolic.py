@@ -93,7 +93,8 @@ def generate_new_symbolic_paths(constraint_list):
                                 new_path_list.append(new_path)
                         break
                     new_path = And(new_path, constraint)
-
+                if control_loc == chosen_control_loc:
+                    break
 
     return new_path_list
 
