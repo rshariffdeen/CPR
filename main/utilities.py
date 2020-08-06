@@ -50,6 +50,8 @@ def parse_z3_output(z3_output):
     str_lambda = ""
     for line in z3_output:
         if "define-fun " in line:
+            if var_name:
+                model[var_name] = byte_list
             var_name = line.split("define-fun ")[1].split(" ()")[0]
             collect_lambda = False
         if collect_lambda:
@@ -57,9 +59,8 @@ def parse_z3_output(z3_output):
         if "lambda " in line or "as const " in line:
             collect_lambda = True
             str_lambda = line
-        if line == z3_output[-1]:
-            collect_lambda = False
-        if not collect_lambda and str_lambda:
+
+        if (not collect_lambda and str_lambda) or (line == z3_output[-1]):
             if "const" in str_lambda:
                 str_value = str_lambda.split("#x")[-1].split(")")[0]
                 byte_list = dict()
@@ -85,12 +86,15 @@ def parse_z3_output(z3_output):
                     if i not in byte_list:
                         byte_list[i] = int(default, 16)
 
+            if line == z3_output[-1]:
+                model[var_name] = byte_list
+
             else:
                 print("Unhandled output")
                 print(str_lambda)
                 print(z3_output)
                 exit(1)
 
-            model[var_name] = byte_list
+
     return model
 
