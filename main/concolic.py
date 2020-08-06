@@ -88,11 +88,12 @@ def generate_new_symbolic_paths(constraint_list):
                 constraint_list_at_loc = constraint_list[control_loc]
                 for constraint in constraint_list_at_loc:
                     if constraint == chosen_constraint and control_loc == chosen_control_loc:
-                        continue
+                        if is_sat(new_path):
+                            if new_path not in new_path_list:
+                                new_path_list.append(new_path)
+                        break
                     new_path = And(new_path, constraint)
-            if is_sat(new_path):
-                if new_path not in new_path_list:
-                    new_path_list.append(new_path)
+
 
     return new_path_list
 
