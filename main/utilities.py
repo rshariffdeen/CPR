@@ -45,10 +45,10 @@ def z3_get_model(formula):
 def parse_z3_output(z3_output):
     model = dict()
     collect_lambda = False
+    var_name = ""
+    byte_list = dict()
+    str_lambda = ""
     for line in z3_output:
-        var_name = ""
-        byte_list = dict()
-        str_lambda = ""
         if "define-fun " in line:
             var_name = line.split("define-fun ")[1].split(" ()")[0]
             collect_lambda = False
