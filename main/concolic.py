@@ -168,9 +168,8 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     list_path_detected.remove(selected_new_path)
     model = z3_get_model(selected_new_path)
 
-    for var in model:
-        var_name = str(var[0])
-        var_byte_list = str(var[1])
+    for var_name in model:
+        var_byte_list = model[var_name]
         if "arg" in var_name:
             gen_arg_list[var_name] = var_byte_list
         else:
