@@ -60,6 +60,7 @@ def analyse_symbolic_path(ppc_list):
               ppc_list : a dictionary containing the partial path condition at each branch location
     """
     constraint_list = collections.OrderedDict()
+    current_path = None
     for control_loc in ppc_list:
         ppc = ppc_list[control_loc]
         ppc = "".join(ppc)
@@ -71,7 +72,11 @@ def analyse_symbolic_path(ppc_list):
         if control_loc not in constraint_list:
             constraint_list[control_loc] = list()
         constraint_list[control_loc].append(constraint)
-    return constraint_list
+        if current_path is None:
+            current_path = constraint
+        else:
+            current_path = And(current_path, constraint)
+    return constraint_list, current_path
 
 
 def generate_new_symbolic_paths(constraint_list):
@@ -138,13 +143,14 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     input_arg_dict = dict()
     input_arg_list = list()
     ppc_list, last_path = collect_symbolic_path(log_path, project_path)
-    constraint_list = analyse_symbolic_path(ppc_list)
+    constraint_list, current_path = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
+    list_path_explored.append(current_path)
     list_path_detected.remove(selected_new_path)
     model = get_model(selected_new_path)
     var_list = model.__dict__['z3_model']
@@ -182,12 +188,12 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
         print(var_name, var_size, var_value, var_str)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 
-    for var_name in second_var_list:
+    for var_tuple in second_var_list:
+        var_name = var_tuple['identifier']
         if var_name not in gen_var_list:
-            var_tuple = second_var_list[var_name]
             var_size = var_tuple['size']
             var_value = 0
-            for i in range(0, var_size):
+            for i in range(1, var_size):
                 var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     return input_arg_list, input_var_list
