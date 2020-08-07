@@ -110,7 +110,7 @@ def main():
    while not satisfied and len(P) > 1:
 
       ## Pick new input and patch candidate for next concolic execution step.
-      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, project_path) #TODO (later) patch candidate missing
+      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, project_path, argument_list, second_var_list) #TODO (later) patch candidate missing
       assert gen_arg_list # there should be a concrete input
       print(">> new input: " + str(gen_arg_list)) 
 
