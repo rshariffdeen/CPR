@@ -58,6 +58,9 @@ def parse_z3_output(z3_output):
                     str_value = str_lambda.split("#x")[-1].split(")")[0]
                     byte_list = dict()
                     byte_list[0] = int("0x" + str_value, 16)
+                elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
+                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n", "")
+                    byte_list[0] = int(str_value.replace("#", "0"), 16)
                 elif "ite" in str_lambda:
                     max_index = 0
                     byte_list = dict()
