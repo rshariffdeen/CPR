@@ -76,5 +76,6 @@ upper_bound = 11
 
 result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 list_of_patches = [_ for _ in result]
-print(list_of_patches)
+assert len(list_of_patches) > 0
+print("generated " + str(len(list_of_patches)) + " patches")
 
