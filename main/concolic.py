@@ -208,6 +208,8 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
 
     for var_tuple in second_var_list:
         var_name = var_tuple['identifier']
+        if "angelic" in var_name:
+            continue
         if var_name not in gen_var_list:
             var_size = var_tuple['size']
             var_value = 0
