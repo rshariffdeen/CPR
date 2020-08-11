@@ -204,6 +204,8 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
         if bit_vector:
             var_value = get_signed_value(bit_vector)
         print(var_name, var_size, var_value)
+        if "angelic" in var_name:
+            continue
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 
     for var_tuple in second_var_list:
