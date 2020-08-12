@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append('/concolic-repair/main')
 from concolic import generate_ktest, run_concolic_execution
-from synthesis import load_components, load_specification, synthesize, Program
+from synthesis import load_components, load_specification, synthesize, Program, program_to_formula
 from utilities import build_program
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -78,4 +78,7 @@ result = synthesize(components, depth, specification, concrete_enumeration, lowe
 list_of_patches = [_ for _ in result]
 assert len(list_of_patches) > 0
 print("generated " + str(len(list_of_patches)) + " patches")
+
+for patch in list_of_patches:
+    print(program_to_formula(patch))
 
