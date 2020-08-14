@@ -2,6 +2,7 @@ import logging
 import subprocess
 from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
 import os
+import re
 import collections
 import random
 from six.moves import cStringIO
@@ -201,7 +202,14 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         expr_list = var_expr_map[var_name]['expr_list']
         assert len(expr_list) == 2
         for expression in expr_list:
-            script = parser.get_script(cStringIO(expression))
+            dependent_var_list = set(re.search("\(select (.+?) \(_", expression))
+            str_script = "(set-logic QF_AUFBV )\n" \            
+                         "(declare-fun " + var_name + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
+            for var_d in dependent_var_list:
+                str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
+            str_script += "(assert (= " + var_name + " " + expression + " ))\n"
+            str_script += "(exit)\n"
+            script = parser.get_script(cStringIO(str_script))
             formula = script.get_last_formula()
             if not relationship:
                 relationship = formula
