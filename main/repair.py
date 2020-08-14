@@ -113,7 +113,7 @@ def main():
 
       ## Pick new input and patch candidate for next concolic execution step.
       random_patch_selection = random.choice(P)
-      lid = random_patch_selection.keys()[0]
+      lid = list(random_patch_selection.keys())[0]
       eid = 0
       patch_component = random_patch_selection[lid]
       patch_constraint = program_to_formula(patch_component)

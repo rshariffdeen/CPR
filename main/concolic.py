@@ -198,7 +198,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     parser = SmtLibParser()
     relationship = None
     for var_name in var_expr_map:
-        expr_list = var_expr_map[var_name]
+        expr_list = var_expr_map[var_name]['expr_list']
         assert len(expr_list) == 2
         for expression in expr_list:
             script = parser.get_script(cStringIO(expression))
