@@ -5,7 +5,7 @@ import random
 sys.path.append('/concolic-repair/main')
 from concolic import generate_ktest, run_concolic_execution, run_concrete_execution, generate_new_input
 from utilities import build_program
-from synthesis import load_components, load_specification, synthesize, Program, program_to_formula
+from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
 from pathlib import Path
 from typing import List, Dict, Tuple
 
@@ -112,9 +112,27 @@ def main():
    while not satisfied and len(P) > 1:
 
       ## Pick new input and patch candidate for next concolic execution step.
-      random_patch = random.choice(P)
-      patch_constraint = program_to_formula(random_patch)
-      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_constraint) #TODO (later) patch candidate missing
+      random_patch_selection = random.choice(P)
+      lid = random_patch_selection.keys()[0]
+      eid = 0
+      patch_component = random_patch_selection[lid]
+      patch_constraint = program_to_formula(patch_component)
+
+      program_substitution = {}
+      for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+         kind = ComponentSymbol.check(program_symbol)
+         data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+         if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+         elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+         elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+         else:
+            pass  # FIXME: do I need to handle it somehow?
+      substituted_patch = patch_constraint.substitute(program_substitution)
+
+      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, substituted_patch) #TODO (later) patch candidate missing
       assert gen_arg_list # there should be a concrete input
       print(">> new input: " + str(gen_arg_list)) 
 
