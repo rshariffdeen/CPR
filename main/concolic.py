@@ -20,29 +20,6 @@ File_Ktest_Path = "/tmp/concolic.ktest"
 list_path_explored = list()
 list_path_detected = list()
 
-def collect_symbolic_expressions(trace_file_path):
-    Logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
-    Emitter.normal("\t\t\tcollecting symbolic expressions")
-    var_expr_map = dict()
-    if os.path.exists(trace_file_path):
-        with open(trace_file_path, 'r') as trace_file:
-            for line in trace_file:
-                if '[var-expr]' in line:
-                    line = line.split("[var-expr] ")[-1]
-                    var_name, var_expr = line.split(":")
-                    var_expr = var_expr.replace("\n", "")
-                    if var_name not in var_expr_map.keys():
-                        var_expr_map[var_name] = dict()
-                        var_expr_map[var_name]['expr_list'] = list()
-                    var_expr_map[var_name]['expr_list'] .append(var_expr)
-                if '[var-type]' in line:
-                    line = line.split("[var-type]: ")[-1]
-                    var_name = line.split(":")[0]
-                    var_type = line.split(":")[1]
-                    var_type = var_type.replace("\n", "")
-                    var_expr_map[var_name]['data_type'] = var_type
-    return var_expr_map
-
 
 def collect_symbolic_expression(log_path):
     """
@@ -190,7 +167,7 @@ def extract_bit_vector(expression_str):
     return bit_vector
 
 
-def generate_new_input(log_path, project_path, argument_list, second_var_list):
+def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_constraint=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -203,16 +180,36 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
     input_var_list = list()
     input_arg_dict = dict()
     input_arg_list = list()
-    ppc_list, last_path = collect_symbolic_path(log_path, project_path)
+    ppc_list, last_path = collect_symbolic_path(ppc_log_path, project_path)
+    var_expr_map = collect_symbolic_expression(expr_log_path)
     constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
     list_path_explored = list(set(list_path_explored + current_path_list))
+    if not patch_constraint:
+        patch_constraint = TRUE
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
+
+    # preserve user-input : program variable relationship
+    parser = SmtLibParser()
+    relationship = None
+    for var_name in var_expr_map:
+        expr_list = var_expr_map[var_name]
+        assert len(expr_list) == 2
+        for expression in expr_list:
+            script = parser.get_script(cStringIO(expression))
+            formula = script.get_last_formula()
+            if not relationship:
+                relationship = formula
+            else:
+                relationship = Equals(relationship, formula)
+
+    # add patch constraint and user-input->prog-var relationship
+    selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
     model = z3_get_model(selected_new_path)
 
     for var_name in model:
@@ -247,20 +244,21 @@ def generate_new_input(log_path, project_path, argument_list, second_var_list):
         if bit_vector:
             var_value = get_signed_value(bit_vector)
         print(var_name, var_size, var_value)
-        if "angelic" in var_name:
-            continue
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+
 
     for var_tuple in second_var_list:
         var_name = var_tuple['identifier']
         if "angelic" in var_name:
             continue
         if var_name not in gen_var_list:
+            print("[warning] variable " + var_name + " assigned random value")
             var_size = var_tuple['size']
             var_value = 0
             for i in range(1, var_size):
                 var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+
     return input_arg_list, input_var_list
 
 
@@ -355,12 +353,13 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     global list_path_explored, list_path_detected
     run_concolic_execution(program, argument_list, second_var_list, print_output=False)
     ppc_log_path = root_directory + "/klee-last/ppc.log"
+    expr_log_path = root_directory + "/klee-last/expr.log"
     is_initial = True
     path_count = 1
     while list_path_detected or is_initial:
         is_initial = False
         path_count = path_count + 1
-        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, root_directory, argument_list, second_var_list)
+        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, root_directory, argument_list, second_var_list)
         run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))

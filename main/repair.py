@@ -1,10 +1,11 @@
 import subprocess
 import os
 import sys
+import random
 sys.path.append('/concolic-repair/main')
 from concolic import generate_ktest, run_concolic_execution, run_concrete_execution, generate_new_input
 from utilities import build_program
-from synthesis import load_components, load_specification, synthesize, Program
+from synthesis import load_components, load_specification, synthesize, Program, program_to_formula
 from pathlib import Path
 from typing import List, Dict, Tuple
 
@@ -103,6 +104,7 @@ def main():
    argument_list = [1]
    run_concolic_execution(program + ".bc", argument_list, second_var_list, True)
    ppc_log_path = project_path + "/klee-last/ppc.log"
+   expr_log_path = project_path + "/klee-last/expr.log"
 
    print(">> start repair loop")
 
@@ -110,7 +112,9 @@ def main():
    while not satisfied and len(P) > 1:
 
       ## Pick new input and patch candidate for next concolic execution step.
-      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, project_path, argument_list, second_var_list) #TODO (later) patch candidate missing
+      random_patch = random.choice(P)
+      patch_constraint = program_to_formula(random_patch)
+      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_constraint) #TODO (later) patch candidate missing
       assert gen_arg_list # there should be a concrete input
       print(">> new input: " + str(gen_arg_list)) 
 
