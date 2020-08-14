@@ -20,6 +20,49 @@ File_Ktest_Path = "/tmp/concolic.ktest"
 list_path_explored = list()
 list_path_detected = list()
 
+def collect_symbolic_expressions(trace_file_path):
+    Logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
+    Emitter.normal("\t\t\tcollecting symbolic expressions")
+    var_expr_map = dict()
+    if os.path.exists(trace_file_path):
+        with open(trace_file_path, 'r') as trace_file:
+            for line in trace_file:
+                if '[var-expr]' in line:
+                    line = line.split("[var-expr] ")[-1]
+                    var_name, var_expr = line.split(":")
+                    var_expr = var_expr.replace("\n", "")
+                    if var_name not in var_expr_map.keys():
+                        var_expr_map[var_name] = dict()
+                        var_expr_map[var_name]['expr_list'] = list()
+                    var_expr_map[var_name]['expr_list'] .append(var_expr)
+                if '[var-type]' in line:
+                    line = line.split("[var-type]: ")[-1]
+                    var_name = line.split(":")[0]
+                    var_type = line.split(":")[1]
+                    var_type = var_type.replace("\n", "")
+                    var_expr_map[var_name]['data_type'] = var_type
+    return var_expr_map
+
+
+def collect_symbolic_expression(log_path):
+    """
+       This function will read the output log of a klee concolic execution and extract symbolic expressions
+       of variables of interest
+    """
+    var_expr_map = dict()
+    if os.path.exists(log_path):
+        with open(log_path, 'r') as trace_file:
+            for line in trace_file:
+                if '[klee:expr]' in line:
+                    line = line.split("[klee:expr] ")[-1]
+                    var_name, var_expr = line.split(":")
+                    var_expr = var_expr.replace("\n", "")
+                    if var_name not in var_expr_map.keys():
+                        var_expr_map[var_name] = dict()
+                        var_expr_map[var_name]['expr_list'] = list()
+                    var_expr_map[var_name]['expr_list'].append(var_expr)
+    return var_expr_map
+
 
 def collect_symbolic_path(log_path, project_path):
     """
