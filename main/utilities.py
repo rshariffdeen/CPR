@@ -3,7 +3,8 @@ import os
 import sys
 import re
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, ArrayType, BV32, BV8
+from pysmt.typing import BOOL, BV32, BV8, ArrayType
+from pysmt.shortcuts import write_smtlib, get_model, Symbol
 
 
 def build_clean(program_path):
