@@ -43,7 +43,7 @@ def z3_get_model(formula):
             continue
         sym_var_list[var_name] = dict()
         sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
-        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simpliyf()
+        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simplify()
     print(sym_var_list)
     exit()
     return sym_var_list
