@@ -36,9 +36,11 @@ def z3_get_model(formula):
     with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
     script = "".join(script_lines)
-    var_list = set(re.findall("\(define-fun (.+?) \(\)_", script))
+    var_list = set(re.findall("\(declare-fun (.+?) \(\)_", script))
     sym_var_list = dict()
     for var_name in var_list:
+        if "branch|" in var_name:
+            continue
         sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
         sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simpliyf()
     print(sym_var_list)
