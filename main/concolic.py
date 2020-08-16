@@ -27,18 +27,21 @@ def collect_symbolic_expression(log_path):
        This function will read the output log of a klee concolic execution and extract symbolic expressions
        of variables of interest
     """
-    var_expr_map = dict()
+    var_expr_map = list()
     if os.path.exists(log_path):
         with open(log_path, 'r') as trace_file:
+            expr_pair = None
             for line in trace_file:
                 if '[klee:expr]' in line:
                     line = line.split("[klee:expr] ")[-1]
                     var_name, var_expr = line.split(":")
                     var_expr = var_expr.replace("\n", "")
-                    if var_name not in var_expr_map.keys():
-                        var_expr_map[var_name] = dict()
-                        var_expr_map[var_name]['expr_list'] = list()
-                    var_expr_map[var_name]['expr_list'].append(var_expr)
+                    if "[program-var]" in var_name:
+                        expr_pair = var_expr
+                    elif "[angelic-var]" in var_name:
+                        expr_pair = (expr_pair, var_expr)
+                        if expr_pair not in var_expr_map:
+                            var_expr_map.append(expr_pair)
     return var_expr_map
 
 
@@ -198,23 +201,20 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     # preserve user-input : program variable relationship
     parser = SmtLibParser()
     relationship = None
-    for var_name in var_expr_map:
-        expr_list = var_expr_map[var_name]['expr_list']
-        assert len(expr_list) == 2
-        for expression in expr_list:
-            dependent_var_list = set(re.search("\(select (.+?) \(_", expression))
-            str_script = "(set-logic QF_AUFBV )\n"\
-                         "(declare-fun " + var_name + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
-            for var_d in dependent_var_list:
-                str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
-            str_script += "(assert (= " + var_name + " " + expression + " ))\n"
-            str_script += "(exit)\n"
-            script = parser.get_script(cStringIO(str_script))
-            formula = script.get_last_formula()
-            if not relationship:
-                relationship = formula
-            else:
-                relationship = Equals(relationship, formula)
+    for expr_map in var_expr_map:
+        prog_var_expr = expr_map[0]
+        angelic_var_expr = expr_map[1]
+        prog_dependent_var_list = set(re.findall("\(select (.+?) \(_", prog_var_expr))
+        angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_", angelic_var_expr))
+        dependent_var_list = set(prog_dependent_var_list + angelic_dependent_var_list)
+        str_script = "(set-logic QF_AUFBV )\n"
+        for var_d in dependent_var_list:
+            str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
+        str_script += "(assert (= " + prog_var_expr + " " + angelic_var_expr + " ))\n"
+        str_script += "(exit)\n"
+        script = parser.get_script(cStringIO(str_script))
+        formula = script.get_last_formula()
+        relationship = formula
 
     # add patch constraint and user-input->prog-var relationship
     selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
