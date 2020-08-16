@@ -10,7 +10,7 @@ from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat
 import pysmt.environment
-from utilities import z3_get_model
+from utilities import z3_get_model_cli
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +218,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
 
     # add patch constraint and user-input->prog-var relationship
     selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
-    model = z3_get_model(selected_new_path)
+    model = z3_get_model_cli(selected_new_path)
 
     for var_name in model:
         var_byte_list = model[var_name]
