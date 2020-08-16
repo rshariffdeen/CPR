@@ -34,7 +34,7 @@ def collect_symbolic_expression(log_path):
             for line in trace_file:
                 if '[klee:expr]' in line:
                     line = line.split("[klee:expr] ")[-1]
-                    var_name, var_expr = line.split(":")
+                    var_name, var_expr = line.split(": ")
                     var_expr = var_expr.replace("\n", "")
                     if "[program-var]" in var_name:
                         expr_pair = var_expr
@@ -206,7 +206,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         angelic_var_expr = expr_map[1]
         prog_dependent_var_list = set(re.findall("\(select (.+?) \(_", prog_var_expr))
         angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_", angelic_var_expr))
-        dependent_var_list = set(prog_dependent_var_list + angelic_dependent_var_list)
+        dependent_var_list = set(list(prog_dependent_var_list) + list(angelic_dependent_var_list))
         str_script = "(set-logic QF_AUFBV )\n"
         for var_d in dependent_var_list:
             str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
