@@ -33,7 +33,7 @@ def z3_get_model(formula):
     model = get_model(formula)
     path_script = "/tmp/z3_script"
     write_smtlib(formula, path_script)
-    with open(path_script, "a") as script_file:
+    with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
     script = "".join(script_lines)
     var_list = set(re.findall("\(define-fun (.+?) \(\)_", script))
