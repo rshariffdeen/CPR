@@ -1,8 +1,9 @@
 import subprocess
 import os
 import sys
+import re
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.shortcuts import write_smtlib
+from pysmt.shortcuts import write_smtlib, get_model, Symbol, ArrayType, BV32, BV8
 
 
 def build_clean(program_path):
@@ -28,6 +29,23 @@ def build_program(program_path):
 
 
 def z3_get_model(formula):
+    model = get_model(formula)
+    path_script = "/tmp/z3_script"
+    write_smtlib(formula, path_script)
+    with open(path_script, "a") as script_file:
+        script_lines = script_file.readlines()
+    script = "".join(script_lines)
+    var_list = set(re.findall("\(define-fun (.+?) \(\)_", script))
+    sym_var_list = dict()
+    for var_name in var_list:
+        sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simpliyf()
+    print(sym_var_list)
+    exit()
+    return sym_var_list
+
+
+def z3_get_model_cli(formula):
     path_script = "/tmp/z3_script"
     path_result = "/tmp/z3_output"
     write_smtlib(formula, path_script)
@@ -41,7 +59,6 @@ def z3_get_model(formula):
 
     model_byte_list = parse_z3_output(z3_output)
     return model_byte_list
-
 
 def parse_z3_output(z3_output):
     model = dict()
