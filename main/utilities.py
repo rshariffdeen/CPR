@@ -64,6 +64,7 @@ def z3_get_model_cli(formula):
     model_byte_list = parse_z3_output(z3_output)
     return model_byte_list
 
+
 def parse_z3_output(z3_output):
     model = dict()
     collect_lambda = False
@@ -74,6 +75,8 @@ def parse_z3_output(z3_output):
         if "sat" in line or "model" in line:
             continue
         if "define-fun " in line or line == z3_output[-1]:
+            if "branch|" in line:
+                continue
             if str_lambda:
                 if "const" in str_lambda:
                     str_value = str_lambda.split("#x")[-1].split(")")[0]
