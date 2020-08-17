@@ -2,3 +2,6 @@
 *.bc
 *.a
 .idea
+main/__pycache__/
+logs
+output
