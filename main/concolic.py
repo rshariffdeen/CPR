@@ -204,8 +204,8 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     for expr_map in var_expr_map:
         prog_var_expr = expr_map[0]
         angelic_var_expr = expr_map[1]
-        prog_dependent_var_list = set(re.findall("\(select (.+?) \(_", prog_var_expr))
-        angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_", angelic_var_expr))
+        prog_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", prog_var_expr))
+        angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", angelic_var_expr))
         dependent_var_list = set(list(prog_dependent_var_list) + list(angelic_dependent_var_list))
         str_script = "(set-logic QF_AUFBV )\n"
         for var_d in dependent_var_list:
