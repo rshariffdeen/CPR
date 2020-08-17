@@ -307,6 +307,11 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
+
+    if not list_path_detected:
+        emitter.debug("Count paths explored: " , str(len(list_path_explored)))
+        emitter.debug("Count paths detected: " , str(len(list_path_detected)))
+        return None, None
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
@@ -344,7 +349,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
         arg_value = get_str_value(bit_vector)
-        print(arg_name, arg_value)
+        emitter.debug(arg_name, arg_value)
         input_arg_dict[arg_index] = arg_value
 
     # fill random values if not generated
@@ -366,7 +371,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
             var_value = get_signed_value(bit_vector)
         if "angelic" in var_name:
             continue
-        print(var_name, var_size, var_value)
+        emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 
 
@@ -375,7 +380,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         if "angelic" in var_name:
             continue
         if var_name not in gen_var_list:
-            print("[warning] variable " + var_name + " assigned random value")
+            emitter.warning("\t[warning] variable " + var_name + " assigned random value")
             var_size = var_tuple['size']
             var_value = 0
             for i in range(1, var_size):
@@ -394,7 +399,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     global File_Ktest_Path
 
     logger.info("creating ktest file")
-    emitter.sub_sub_title("generating ktest file")
+    emitter.normal("\tgenerating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
     n_arg = str(len(argument_list))
@@ -427,7 +432,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     for argument in argument_list:
         input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
-    emitter.sub_sub_title("executing klee concolic execution")
+    emitter.normal("\texecuting klee concolic execution")
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
@@ -454,7 +459,7 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic execution")
-    emitter.sub_sub_title("executing klee in concrete mode")
+    emitter.normal("\texecuting klee in concrete mode")
     global File_Log_Path
     current_dir = os.getcwd()
     directory_path = "/".join(str(program).split("/")[:-1])

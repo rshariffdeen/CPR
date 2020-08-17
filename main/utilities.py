@@ -90,7 +90,7 @@ def extract_bit_vector(expression_str):
 
 
 def extract_byte_code(binary_path):
-    emitter.sub_sub_title("extracting bytecode")
+    emitter.normal("\textracting bytecode")
     directory_path = "/".join(binary_path.split("/")[:-1])
     binary_name = binary_path.split("/")[-1]
     extract_command = "cd " + directory_path + ";"

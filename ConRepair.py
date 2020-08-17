@@ -120,73 +120,10 @@ def main(arg_list):
     repair.run(values.CONF_PATH_PROGRAM, values.CONF_NAME_PROGRAM)
     time_info[definitions.KEY_DURATION_REPAIR] = str(time.time() - time_check)
 
-    project_path = "/concolic-repair/tests/example"
-    program = "test"
-
-    assertion = "path_to_assertion_file"  # TODO
-
-    ## Prepare the program under test.
-    init(project_path, program)
-
-    ## Generate all possible solutions by running the synthesizer.
-    P = generate_patch_set(project_path)
-    print("|P|=" + str(len(P)))
-
-    ## This is a dummy call to produce the first results.
-    global list_path_explored, list_path_detected
-    second_var_list = [{"identifier": "x", "value": 1, "size": 4}]
-    argument_list = [1]
-    run_concolic_execution(program + ".bc", argument_list, second_var_list, True)
-    ppc_log_path = project_path + "/klee-last/ppc.log"
-    expr_log_path = project_path + "/klee-last/expr.log"
-
-    print(">> start repair loop")
-
-    satisfied = len(P) <= 1
-    while not satisfied and len(P) > 1:
-
-        ## Pick new input and patch candidate for next concolic execution step.
-        random_patch_selection = random.choice(P)
-        lid = list(random_patch_selection.keys())[0]
-        eid = 0
-        patch_component = random_patch_selection[lid]
-        patch_constraint = program_to_formula(patch_component)
-
-        program_substitution = {}
-        for program_symbol in collect_symbols(patch_constraint, lambda x: True):
-            kind = ComponentSymbol.check(program_symbol)
-            data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
-            if kind == ComponentSymbol.RRETURN:
-                program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
-            elif kind == ComponentSymbol.RVALUE:
-                program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
-            elif kind == ComponentSymbol.LVALUE:
-                program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
-            else:
-                pass  # FIXME: do I need to handle it somehow?
-        substituted_patch = patch_constraint.substitute(program_substitution)
-
-        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
-                                                        second_var_list,
-                                                        substituted_patch)  # TODO (later) patch candidate missing
-        assert gen_arg_list  # there should be a concrete input
-        print(">> new input: " + str(gen_arg_list))
-
-        ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-        exit_code = run_concolic_execution(program + ".bc", gen_arg_list, gen_var_list)
-        assert exit_code == 0
-
-        ## Reduces the set of patch candidates based on the current path constraint
-        P = reduce(P, project_path + "/klee-last/", gen_arg_list, assertion)
-        print("|P|=" + str(len(P)))
-
-        # Checks for the current coverage.
-        satisfied = checkCoverage()
-
-        # Final running time and exit message
-        time_info[definitions.KEY_DURATION_TOTAL] = str(time.time() - start_time)
-        emitter.end(time_info)
-        logger.end(time_info)
+    # Final running time and exit message
+    time_info[definitions.KEY_DURATION_TOTAL] = str(time.time() - start_time)
+    emitter.end(time_info)
+    logger.end(time_info)
 
 
 if __name__ == "__main__":

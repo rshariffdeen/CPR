@@ -6,7 +6,7 @@ TOOL_NAME = "ConRepair"
 DEBUG = False
 ARGUMENT_LIST = []
 SECOND_VAR_LIST = []
-
+SPECIFICATION = ""
 
 # ------------------ Configuration Values ---------------
 CONF_PATH_PROGRAM = ""

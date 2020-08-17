@@ -79,8 +79,12 @@ def run(project_path, program_name):
 
    emitter.sub_title("Evaluating Patch Pool")
    satisfied = len(P) <= 1
-   while not satisfied and len(P) > 1:
+   iteration = 0
+   assertion = values.SPECIFICATION
 
+   while not satisfied and len(P) > 1:
+      iteration = iteration + 1
+      emitter.sub_sub_title("Iteration: " + str(iteration))
       ## Pick new input and patch candidate for next concolic execution step.
       random_patch_selection = random.choice(P)
       lid = list(random_patch_selection.keys())[0]
@@ -104,8 +108,11 @@ def run(project_path, program_name):
       argument_list = values.ARGUMENT_LIST
       second_var_list = values.SECOND_VAR_LIST
       gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, substituted_patch) #TODO (later) patch candidate missing
+      if not gen_arg_list and not gen_var_list:
+         emitter.warning("\t[warning] no more paths to generate new input")
+         break
       assert gen_arg_list # there should be a concrete input
-      print(">> new input: " + str(gen_arg_list)) 
+      # print(">> new input: " + str(gen_arg_list))
 
       ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
       exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
@@ -113,7 +120,7 @@ def run(project_path, program_name):
 
       ## Reduces the set of patch candidates based on the current path constraint
       P = reduce(P, project_path + "/klee-last/", gen_arg_list, assertion)
-      print("|P|=" + str(len(P)))
+      emitter.debug("|P|=", str(len(P)))
 
       # Checks for the current coverage.
       satisfied = checkCoverage()
