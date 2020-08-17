@@ -364,6 +364,8 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         var_size = len(bit_vector)
         if bit_vector:
             var_value = get_signed_value(bit_vector)
+        if "angelic" in var_name:
+            continue
         print(var_name, var_size, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 

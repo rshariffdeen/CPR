@@ -62,6 +62,7 @@ def read_conf_file():
                 error_exit("Test file " + values.CONF_TEST_FILE + " not found")
         elif definitions.CONF_TEST_INPUT in configuration:
             values.CONF_TEST_INPUT = configuration.replace(definitions.CONF_TEST_INPUT, '')
+            values.ARGUMENT_LIST = values.CONF_TEST_INPUT
 
 
 def bootstrap(arg_list):
@@ -92,6 +93,7 @@ def initialize():
     emitter.sub_title("Running initial concolic Execution")
     extract_byte_code(program_path)
     exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
+
     assert exit_code == 0
 
 
