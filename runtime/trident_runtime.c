@@ -186,9 +186,10 @@ int __trident_choice(char* lid, char* typestr,
         sprintf(name, "choice!rvalue!%s!%d!%s", lid, instance, rvals_ids[i]);
         int klee_var;
         klee_make_symbolic(&klee_var, sizeof(klee_var), name);
-        klee_print_expr("[program-var]", rvals[i]);
+        klee_print_expr(rvals_ids[i], rvals[i]);
+//        klee_print_expr("[program-var]", rvals[i]);
         klee_assume(klee_var == rvals[i]);
-        klee_print_expr("[angelic-var]", klee_var);
+//        klee_print_expr("[angelic-var]", klee_var);
     }
 
     bool condition = true;
