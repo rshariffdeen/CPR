@@ -93,7 +93,7 @@ ENV LLVM_COMPILER=clang
 RUN apt-get install -y software-properties-common \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
-    && apt-get install -y python3.6
+    && apt-get install -y python3.6 bear
 
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pylint
 
@@ -114,10 +114,10 @@ COPY components/ components/
 RUN cd runtime && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
-RUN chmod +x /concolic-repair/main/trident-cc
+RUN chmod +x /concolic-repair/tools/trident-cc
 RUN chmod +x /concolic-repair/tests/assignment/run
 RUN chmod +x /concolic-repair/tests/iterations/run
 RUN chmod +x /concolic-repair/tests/multipath/run
 RUN chmod +x /concolic-repair/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
-
+ENV TRIDENT_CC=/concolic-repair/tools/trident-cc

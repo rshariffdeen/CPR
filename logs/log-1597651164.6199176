@@ -1,0 +1,9 @@
+[Start] ConRepair started at 2020-08-17 15:59:24.620415
+[INFO]: Starting ConRepair
+[INFO]: Loading Configurations
+[INFO]: Building Program
+[INFO]: cleaning files
+[COMMAND]: 	[command]:cd /home/rshariffdeen/workspace/concolic-repair/tests/example/; make clean; make distclean; rm compile_commands.json; rm CMakeCache.txt; rm -rf CMakeFiles
+[INFO]: configuring program
+[ERROR]: [Not Found] Configuration Command
+[ERROR]: [Not Found] Configuration Command

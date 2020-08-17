@@ -1,0 +1,11 @@
+[Start] ConRepair started at 2020-08-17 09:10:01.298450
+[INFO]: Starting ConRepair
+[INFO]: Loading Configurations
+[INFO]: Building Program
+[COMMAND]: 	[command]:export TRIDENT_CC=/concolic-repair/main/..//tools/trident-cc
+[INFO]: cleaning files
+[COMMAND]: 	[command]:cd /concolic-repair/tests/example/; make clean; make distclean; rm compile_commands.json; rm CMakeCache.txt; rm -rf CMakeFiles
+[INFO]: configuring program
+[WARNING]: 	[warning] skipping configuration
+[INFO]: building program
+[COMMAND]: 	[command]:cd /concolic-repair/tests/example/;bear make CXX=$TRIDENT_CXX  CC=$TRIDENT_CC  CXXFLAGS="-g -O0"  CFLAGS="-g -O0"  -e

@@ -1,10 +1,55 @@
 import subprocess
 import os
 import sys
-import re
-from pysmt.smtlib.parser import SmtLibParser
-from pysmt.typing import BOOL, BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol
+from main import logger, emitter, values, definitions
+
+
+def execute_command(command, show_output=True):
+    # Print executed command and execute it in console
+    emitter.command(command)
+    command = "{ " + command + " ;} 2> " + definitions.FILE_ERROR_LOG
+    if not show_output:
+        command += " > /dev/null"
+    # print(command)
+    process = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
+    (output, error) = process.communicate()
+    # out is the output of the command, and err is the exit value
+    return int(process.returncode)
+
+
+def error_exit(*args):
+    print("\n")
+    for i in args:
+        logger.error(i)
+        emitter.error(i)
+    raise Exception("Error. Exiting...")
+
+
+def clean_files():
+    # Remove other residual files stored in ./output/
+    logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
+    emitter.information("Removing other residual files...")
+    if os.path.isdir("output"):
+        clean_command = "rm -rf " + definitions.DIRECTORY_OUTPUT
+        execute_command(clean_command)
+
+
+def backup_file(file_path, backup_name):
+    logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
+    backup_command = "cp " + file_path + " " + definitions.DIRECTORY_BACKUP + "/" + backup_name
+    execute_command(backup_command)
+
+
+def restore_file(file_path, backup_name):
+    logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
+    restore_command = "cp " + definitions.DIRECTORY_BACKUP + "/" + backup_name + " " + file_path
+    execute_command(restore_command)
+
+
+def reset_git(source_directory):
+    logger.trace(__name__ + ":" + sys._getframe().f_code.co_name, locals())
+    reset_command = "cd " + source_directory + ";git reset --hard HEAD"
+    execute_command(reset_command)
 
 
 def build_clean(program_path):
@@ -29,104 +74,25 @@ def build_program(program_path):
     return int(process.returncode)
 
 
-def z3_get_model(formula):
-    model = get_model(formula)
-    path_script = "/tmp/z3_script"
-    write_smtlib(formula, path_script)
-    with open(path_script, "r") as script_file:
-        script_lines = script_file.readlines()
-    script = "".join(script_lines)
-    var_list = set(re.findall("\(declare-fun (.+?) \(\)", script))
-    sym_var_list = dict()
-    for var_name in var_list:
-        if "branch|" in var_name:
-            continue
-        sym_var_list[var_name] = dict()
-        sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
-        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simplify()
-    print(sym_var_list)
-    exit()
-    return sym_var_list
-
-
-def z3_get_model_cli(formula):
-    path_script = "/tmp/z3_script"
-    path_result = "/tmp/z3_output"
-    write_smtlib(formula, path_script)
-    with open(path_script, "a") as script_file:
-        script_file.writelines(["(get-model)\n", "(exit)\n"])
-    z3_command = "z3 " + path_script + " > " + path_result
-    process = subprocess.Popen([z3_command], stderr=subprocess.PIPE, shell=True)
-    (output, error) = process.communicate()
-    with open(path_result, "r") as result_file:
-        z3_output = result_file.readlines()
-
-    model_byte_list = parse_z3_output(z3_output)
-    return model_byte_list
-
-
-def parse_z3_output(z3_output):
-    model = dict()
-    collect_lambda = False
-    var_name = ""
-    byte_list = dict()
-    str_lambda = ""
-    for line in z3_output:
-        if "sat" in line or "model" in line:
-            continue
-        if "define-fun " in line or line == z3_output[-1]:
-            if "branch|" in line:
+def extract_bit_vector(expression_str):
+    bit_vector = dict()
+    if "[" in expression_str:
+        token_list = expression_str.split("[")
+        token_list.remove(token_list[0])
+        for token in token_list:
+            if ".." in token:
                 continue
-            if str_lambda:
-                if "const" in str_lambda:
-                    str_value = str_lambda.split("#x")[-1].split(")")[0]
-                    byte_list = dict()
-                    byte_list[0] = int("0x" + str_value, 16)
-                elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
-                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n", "")
-                    byte_list[0] = int(str_value.replace("#", "0"), 16)
-                elif "ite" in str_lambda:
-                    max_index = 0
-                    byte_list = dict()
-                    token_list = str_lambda.split("(ite (= x!1 ")
-                    for token in token_list[1:]:
-                        if token.count("#x") == 2:
-                            index, value = token.split(") ")
-                        elif token.count("#x") == 3:
-                            index, value, default = token.split(" ")
-                            index = index.replace(")", "")
-                            default = default.split(")")[0].replace("#", "0")
-                        index = index.replace("#", "0")
-                        value = value.replace("#", "0")
-                        index = int(index, 16)
-                        if index > max_index:
-                            max_index = index
-                        byte_list[index] = int(value, 16)
+            index_str, value_str = token.split(" := ")
+            index = int(index_str.split("_")[0])
+            value = int(value_str.split("_")[0])
+            bit_vector[index] = value
+    return bit_vector
 
-                    if max_index > 0:
-                        byte_list.pop(max_index)
-                        max_index = max_index - 1
 
-                    for i in range(0, max_index):
-                        if i not in byte_list:
-                            byte_list[i] = int(default, 16)
-
-                else:
-                    print("Unhandled output")
-                    print(str_lambda)
-                    print(z3_output)
-                    exit(1)
-
-            if var_name and byte_list:
-                model[var_name] = byte_list
-                var_name = ""
-                byte_list = dict()
-            if line != z3_output[-1]:
-                var_name = line.split("define-fun ")[1].split(" ()")[0]
-                str_lambda = ""
-
-        else:
-            str_lambda += line
-
-    return model
-
+def extract_byte_code(binary_path):
+    emitter.sub_sub_title("extracting bytecode")
+    directory_path = "/".join(binary_path.split("/")[:-1])
+    binary_name = binary_path.split("/")[-1]
+    extract_command = "cd " + directory_path + ";"
+    extract_command += "extract-bc " + binary_name
+    execute_command(extract_command)

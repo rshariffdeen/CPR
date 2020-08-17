@@ -23,6 +23,7 @@ import pysmt.operators as op
 from funcy import all_fn, any_fn, complement
 
 
+
 logger = logging.getLogger(__name__)
 
 Formula = Union[pysmt.fnode.FNode]

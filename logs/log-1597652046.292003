@@ -1,0 +1,15 @@
+[Start] ConRepair started at 2020-08-17 16:14:06.292553
+[INFO]: Starting ConRepair
+[INFO]: Loading Configurations
+[INFO]: Building Program
+[INFO]: cleaning files
+[COMMAND]: 	[command]:cd /home/rshariffdeen/workspace/concolic-repair/tests/example/; make clean; make distclean; rm compile_commands.json; rm CMakeCache.txt; rm -rf CMakeFiles
+[INFO]: configuring program
+[WARNING]: 	[warning] skipping configuration
+[INFO]: building program
+[COMMAND]: 	[command]:cd /home/rshariffdeen/workspace/concolic-repair/tests/example/;bear make CXX=$TRIDENT_CXX  CC=$TRIDENT_CC  CXXFLAGS=-g -O0  CFLAGS=-g -O0  -e
+[ERROR]: cd /home/rshariffdeen/workspace/concolic-repair/tests/example/;bear make CXX=$TRIDENT_CXX  CC=$TRIDENT_CC  CXXFLAGS=-g -O0  CFLAGS=-g -O0  -e
+[ERROR]: BUILD FAILED!!
+Exit Code: 127
+[ERROR]: BUILD FAILED!!
+Exit Code: 127

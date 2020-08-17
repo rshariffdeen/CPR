@@ -1,0 +1,4 @@
+[Start] ConRepair started at 2020-08-17 15:53:23.168714
+[INFO]: Starting ConRepair
+[INFO]: Loading Configurations
+[COMMAND]: cd /home/rshariffdeen/workspace/concolic-repair/tests/example/; make clean; make distclean; rm compile_commands.json; rm CMakeCache.txt; rm -rf CMakeFiles

@@ -1,5 +1,4 @@
 import logging
-import subprocess
 from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
 import os
 import re
@@ -7,10 +6,13 @@ import collections
 import random
 from six.moves import cStringIO
 from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
-from pysmt.smtlib.parser import SmtLibParser
 from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat
 import pysmt.environment
-from utilities import z3_get_model_cli
+from pysmt.smtlib.parser import SmtLibParser
+from pysmt.typing import BOOL, BV32, BV8, ArrayType
+from pysmt.shortcuts import write_smtlib, get_model, Symbol
+from main.utilities import execute_command
+from main import emitter
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,124 @@ File_Ktest_Path = "/tmp/concolic.ktest"
 
 list_path_explored = list()
 list_path_detected = list()
+
+
+def z3_get_model(formula):
+    """
+           This function will invoke PySMT APIs to solve the provided formula and return the byte list of the model
+           Arguments:
+               formula: smtlib formatted formula
+    """
+    emitter.normal("\textracting z3 model")
+    model = get_model(formula)
+    path_script = "/tmp/z3_script"
+    write_smtlib(formula, path_script)
+    with open(path_script, "r") as script_file:
+        script_lines = script_file.readlines()
+    script = "".join(script_lines)
+    var_list = set(re.findall("\(declare-fun (.+?) \(\)", script))
+    sym_var_list = dict()
+    for var_name in var_list:
+        if "branch|" in var_name:
+            continue
+        sym_var_list[var_name] = dict()
+        sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simplify()
+    print(sym_var_list)
+    exit()
+    return sym_var_list
+
+
+def z3_get_model_cli(formula):
+    """
+           This function will invoke the Z3 Cli interface to solve the provided formula and return the model byte list
+           Arguments:
+               formula: smtlib formatted formula
+    """
+    emitter.normal("\textracting z3 model")
+    path_script = "/tmp/z3_script"
+    path_result = "/tmp/z3_output"
+    write_smtlib(formula, path_script)
+    with open(path_script, "a") as script_file:
+        script_file.writelines(["(get-model)\n", "(exit)\n"])
+    z3_command = "z3 " + path_script + " > " + path_result
+    execute_command(z3_command)
+    with open(path_result, "r") as result_file:
+        z3_output = result_file.readlines()
+
+    model_byte_list = parse_z3_output(z3_output)
+    return model_byte_list
+
+
+def parse_z3_output(z3_output):
+    """
+           This function will read the output log of z3 cli interface and extract/parse the values of the model
+           Arguments:
+               z3_output: string output of the z3 cli invocation
+    """
+    model = dict()
+    collect_lambda = False
+    var_name = ""
+    byte_list = dict()
+    str_lambda = ""
+    for line in z3_output:
+        if "sat" in line or "model" in line:
+            continue
+        if "define-fun " in line or line == z3_output[-1]:
+            if "branch|" in line:
+                continue
+            if str_lambda:
+                if "const" in str_lambda:
+                    str_value = str_lambda.split("#x")[-1].split(")")[0]
+                    byte_list = dict()
+                    byte_list[0] = int("0x" + str_value, 16)
+                elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
+                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n", "")
+                    byte_list[0] = int(str_value.replace("#", "0"), 16)
+                elif "ite" in str_lambda:
+                    max_index = 0
+                    byte_list = dict()
+                    token_list = str_lambda.split("(ite (= x!1 ")
+                    for token in token_list[1:]:
+                        if token.count("#x") == 2:
+                            index, value = token.split(") ")
+                        elif token.count("#x") == 3:
+                            index, value, default = token.split(" ")
+                            index = index.replace(")", "")
+                            default = default.split(")")[0].replace("#", "0")
+                        index = index.replace("#", "0")
+                        value = value.replace("#", "0")
+                        index = int(index, 16)
+                        if index > max_index:
+                            max_index = index
+                        byte_list[index] = int(value, 16)
+
+                    if max_index > 0:
+                        byte_list.pop(max_index)
+                        max_index = max_index - 1
+
+                    for i in range(0, max_index):
+                        if i not in byte_list:
+                            byte_list[i] = int(default, 16)
+
+                else:
+                    print("Unhandled output")
+                    print(str_lambda)
+                    print(z3_output)
+                    exit(1)
+
+            if var_name and byte_list:
+                model[var_name] = byte_list
+                var_name = ""
+                byte_list = dict()
+            if line != z3_output[-1]:
+                var_name = line.split("define-fun ")[1].split(" ()")[0]
+                str_lambda = ""
+
+        else:
+            str_lambda += line
+
+    return model
 
 
 def collect_symbolic_expression(log_path):
@@ -132,6 +252,10 @@ def generate_new_symbolic_paths(constraint_list):
 
 
 def get_signed_value(bit_vector):
+    """
+      This function will generate the signed value for a given byte list
+             bit_vector : list of bytes
+    """
     signed_value = 0
     for i in bit_vector:
         if i == 0:
@@ -142,6 +266,10 @@ def get_signed_value(bit_vector):
 
 
 def get_str_value(bit_vector):
+    """
+      This function will generate the string value for a given byte list
+             bit_vector : list of bytes
+    """
     str_value = ""
     char_list = dict()
     for i in bit_vector:
@@ -154,21 +282,6 @@ def get_str_value(bit_vector):
         char = char_list[i]
         str_value += char
     return str_value
-
-
-def extract_bit_vector(expression_str):
-    bit_vector = dict()
-    if "[" in expression_str:
-        token_list = expression_str.split("[")
-        token_list.remove(token_list[0])
-        for token in token_list:
-            if ".." in token:
-                continue
-            index_str, value_str = token.split(" := ")
-            index = int(index_str.split("_")[0])
-            value = int(value_str.split("_")[0])
-            bit_vector[index] = value
-    return bit_vector
 
 
 def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_constraint=None):
@@ -277,7 +390,9 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     global File_Ktest_Path
+
     logger.info("creating ktest file")
+    emitter.sub_sub_title("generating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
     n_arg = str(len(argument_list))
@@ -287,9 +402,8 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
 
     for var in second_var_list:
         ktest_command += " --second-var \"{0}\" {1} {2}".format(var['identifier'], var['size'], var['value'])
-    process = subprocess.Popen([ktest_command], stderr=subprocess.PIPE, shell=True)
-    (output, error) = process.communicate()
-    return ktest_path, process.returncode
+    return_code = execute_command(ktest_command)
+    return ktest_path, return_code
 
 
 def run_concolic_execution(program, argument_list, second_var_list, print_output=False):
@@ -300,11 +414,18 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic execution")
+
     global File_Log_Path
+    current_dir = os.getcwd()
+    directory_path = "/".join(str(program).split("/")[:-1])
+    emitter.debug("changing directory:", directory_path)
+    os.chdir(directory_path)
+    binary_name = str(program).split("/")[-1]
     input_argument = ""
     for argument in argument_list:
         input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
+    emitter.sub_sub_title("executing klee concolic execution")
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
@@ -313,13 +434,14 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
-                   + "{0} ".format(program) \
+                   + "{0} ".format(binary_name) \
                    + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
-    process = subprocess.Popen([klee_command], stderr=subprocess.PIPE, shell=True)
-    (output, error) = process.communicate()
-    return process.returncode
+    return_code = execute_command(klee_command)
+    emitter.debug("changing directory:", current_dir)
+    os.chdir(current_dir)
+    return return_code
 
 
 def run_concrete_execution(program, argument_list, second_var_list, print_output=False):
@@ -330,24 +452,30 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic execution")
+    emitter.sub_sub_title("executing klee in concrete mode")
     global File_Log_Path
+    current_dir = os.getcwd()
+    directory_path = "/".join(str(program).split("/")[:-1])
+    emitter.debug("changing directory:", directory_path)
+    os.chdir(directory_path)
+    binary_name = str(program).split("/")[-1]
     input_argument = ""
     for argument in argument_list:
         input_argument += " " + str(argument)
-    ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "--log-ppc " \
                    "--external-calls=all " \
-                   + "{0} ".format(program) \
+                   + "{0} ".format(binary_name) \
                    + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
-    process = subprocess.Popen([klee_command], stderr=subprocess.PIPE, shell=True)
-    (output, error) = process.communicate()
-    return process.returncode
+    return_code = execute_command(klee_command)
+    emitter.debug("changing directory:", current_dir)
+    os.chdir(current_dir)
+    return return_code
 
 
 def run_concolic_exploration(program, argument_list, second_var_list, root_directory):

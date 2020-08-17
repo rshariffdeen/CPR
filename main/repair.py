@@ -8,33 +8,9 @@ from utilities import build_program
 from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
 from pathlib import Path
 from typing import List, Dict, Tuple
+from main import emitter, definitions, values
 
 check_counter = 0
-
-def init (cwd, program_name):
-   os.chdir(cwd)
-   os.system("rm -rf ./patches/*")
-   os.system("rm -rf ./klee*")
-
-   program_path = cwd + "/" + program_name
-
-   ## Build the program under test.
-   build_status = build_program(program_path)
-   assert int(build_status) == 0
-   assert os.path.isfile(program_path)
-   assert os.path.getsize(program_path) > 0
-
-   ## Execute klee with this program so to generate the expected results for test cases.
-   argument_list = [1]
-   ktest_path, exit_code = generate_ktest(argument_list, {})
-   assert int(exit_code) == 0
-   assert os.path.isfile(ktest_path)
-   assert os.path.getsize(ktest_path) > 0
-   exit_code = run_concrete_execution(program_name + ".bc", argument_list, {}, True)
-   assert exit_code == 0
-   klee_file_1 = cwd + "/klee-out-0/test000001.smt2"
-   assert os.path.isfile(klee_file_1)
-   assert os.path.getsize(klee_file_1) > 0
 
 
 def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_result: str, concrete_input: [], assertion) -> List[Tuple[str, Program]]: # TODO
@@ -62,12 +38,20 @@ def checkCoverage(): # TODO
 
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
-   comp_files = []
-   comp_files.append(Path("components/x.smt2"))
-   comp_files.append(Path("../../components/less-than.smt2"))
-   comp_files.append(Path("../../components/constant_a.smt2"))
-   components = load_components(comp_files)
+   emitter.sub_title("Generating Patch Pool")
 
+   gen_comp_files = []
+   os.chdir(definitions.DIRECTORY_COMPONENTS)
+   gen_comp_files.append(Path("less-than.smt2"))
+   gen_comp_files.append(Path("constant_a.smt2"))
+   general_components = load_components(gen_comp_files)
+
+   proj_comp_files = []
+   os.chdir(project_path)
+   proj_comp_files.append(Path("components/x.smt2"))
+   project_components = load_components(proj_comp_files)
+
+   components = project_components + general_components
    depth = 3
 
    spec_files = []
@@ -81,33 +65,19 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
    result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
    list_of_patches = [_ for _ in result]
+   emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
    return list_of_patches
 
 
-def main():
-
-   project_path = "/concolic-repair/tests/example"
-   program = "test"
-
-   assertion = "path_to_assertion_file" # TODO
-
-   ## Prepare the program under test.
-   init(project_path, program)
-
+def run(project_path, program_name):
+   emitter.title("Repairing Program")
+   program_path = project_path + "/" + program_name
    ## Generate all possible solutions by running the synthesizer.
    P = generate_patch_set(project_path)
-   print("|P|=" + str(len(P)))
-
-   ## This is a dummy call to produce the first results.
-   global list_path_explored, list_path_detected
-   second_var_list = [{"identifier": "x", "value": 1, "size": 4}]
-   argument_list = [1]
-   run_concolic_execution(program + ".bc", argument_list, second_var_list, True)
    ppc_log_path = project_path + "/klee-last/ppc.log"
    expr_log_path = project_path + "/klee-last/expr.log"
 
-   print(">> start repair loop")
-
+   emitter.sub_title("Evaluating Patch Pool")
    satisfied = len(P) <= 1
    while not satisfied and len(P) > 1:
 
@@ -131,13 +101,14 @@ def main():
          else:
             pass  # FIXME: do I need to handle it somehow?
       substituted_patch = patch_constraint.substitute(program_substitution)
-
+      argument_list = values.ARGUMENT_LIST
+      second_var_list = values.SECOND_VAR_LIST
       gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, substituted_patch) #TODO (later) patch candidate missing
       assert gen_arg_list # there should be a concrete input
       print(">> new input: " + str(gen_arg_list)) 
 
       ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-      exit_code = run_concolic_execution(program + ".bc", gen_arg_list, gen_var_list)
+      exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
       assert exit_code == 0
 
       ## Reduces the set of patch candidates based on the current path constraint
@@ -146,13 +117,6 @@ def main():
 
       # Checks for the current coverage.
       satisfied = checkCoverage()
-
-   print("Finished.")
-
-
-if __name__ == "__main__":
-    main()
-
 
 
 
