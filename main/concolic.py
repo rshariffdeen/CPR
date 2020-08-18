@@ -60,6 +60,11 @@ def z3_get_model(formula):
                 index = int(str(idx).split("_")[0])
                 value = int(str(val).split("_")[0])
                 byte_list[index] = value
+            for i in range(3, -1, -1):
+                if byte_list[i] == 0:
+                    byte_list.pop(i)
+                else:
+                    break
         sym_var_list[var_name] = byte_list
     emitter.debug("model var list", sym_var_list)
     return sym_var_list
@@ -367,10 +372,14 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     for arg_name in gen_arg_list:
         bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
-        arg_value = get_str_value(bit_vector)
+        arg_str = get_str_value(bit_vector)
+        arg_value = get_signed_value(bit_vector) - 48
         # print(arg_name, arg_index, arg_value)
         emitter.debug(arg_name, arg_value)
-        input_arg_dict[arg_index] = arg_value
+        if str(argument_list[arg_index]).isnumeric():
+            input_arg_dict[arg_index] = str(arg_value)
+        else:
+            input_arg_dict[arg_index] = arg_str
 
     # fill random values if not generated
     for i in range(0, len(argument_list)):
@@ -401,7 +410,8 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
             for i in range(1, var_size):
                 var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
-
+    emitter.debug("Generated Arg List", input_arg_list)
+    emitter.debug("Generated Var List", input_var_list)
     return input_arg_list, input_var_list
 
 
