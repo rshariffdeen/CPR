@@ -289,13 +289,13 @@ def get_str_value(bit_vector):
     """
     str_value = ""
     char_list = dict()
-    print(bit_vector)
+    # print(bit_vector)
     for i in bit_vector:
         if int(bit_vector[i]) not in range(48, 127):
             char_list[i] = chr(random.randint(49, 122))
         else:
             char_list[i] = chr(bit_vector[i])
-    print(char_list)
+    # print(char_list)
     for i in sorted(char_list, reverse=True):
         char = char_list[i]
         str_value += char
@@ -368,7 +368,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
         arg_value = get_str_value(bit_vector)
-        print(arg_name, arg_index, arg_value)
+        # print(arg_name, arg_index, arg_value)
         emitter.debug(arg_name, arg_value)
         input_arg_dict[arg_index] = arg_value
 

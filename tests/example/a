@@ -1,0 +1,11 @@
+(set-logic QF_AUFBV )
+(declare-fun arg00 () (Array (_ BitVec 32) (_ BitVec 8) ) )
+(declare-fun choice!angelic!bool!L9!0 () (Array (_ BitVec 32) (_ BitVec 8) ) )
+(declare-fun choice!rvalue!L9!0!x () (Array (_ BitVec 32) (_ BitVec 8) ) )
+(declare-fun model_version () (Array (_ BitVec 32) (_ BitVec 8) ) )
+(declare-fun output!i32!res!0 () (Array (_ BitVec 32) (_ BitVec 8) ) )
+(assert (let ( (?B1 ((_ sign_extend 24)  (select  arg00 (_ bv0 32) ) ) ) ) (let ( (?B2 ((_ extract 7  0)  (bvadd  (_ bv4294967248 32) ?B1 ) ) ) ) (let ( (?B3 ((_ zero_extend 56)  ?B2 ) ) (?B4 ((_ zero_extend 24)  ?B2 ) ) ) (and  (and  (and  (and  (and  (and  (and  (bvsle  (_ bv32 32) ?B1 ) (=  (_ bv1 32) (concat  (select  model_version (_ bv3 32) ) (concat  (select  model_version (_ bv2 32) ) (concat  (select  model_version (_ bv1 32) ) (select  model_version (_ bv0 32) ) ) ) ) ) ) (bvsle  ?B4 (_ bv9 32) ) ) (=  false (bvsle  (_ bv10 32) ?B4 ) ) ) (=  false (bvult  (_ bv9223372036854775807 64) ?B3 ) ) ) (=  (concat  (select  choice!rvalue!L9!0!x (_ bv3 32) ) (concat  (select  choice!rvalue!L9!0!x (_ bv2 32) ) (concat  (select  choice!rvalue!L9!0!x (_ bv1 32) ) (select  choice!rvalue!L9!0!x (_ bv0 32) ) ) ) ) ((_ extract 31  0)  ?B3 ) ) ) (=  (_ bv0 32) (concat  (select  choice!angelic!bool!L9!0 (_ bv3 32) ) (concat  (select  choice!angelic!bool!L9!0 (_ bv2 32) ) (concat  (select  choice!angelic!bool!L9!0 (_ bv1 32) ) (select  choice!angelic!bool!L9!0 (_ bv0 32) ) ) ) ) ) ) (=  (_ bv0 32) (concat  (select  output!i32!res!0 (_ bv3 32) ) (concat  (select  output!i32!res!0 (_ bv2 32) ) (concat  (select  output!i32!res!0 (_ bv1 32) ) (select  output!i32!res!0 (_ bv0 32) ) ) ) ) ) ) ) ) ) )
+(check-sat)
+(get-model)
+(exit)
+
