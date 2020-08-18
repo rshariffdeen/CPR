@@ -2,6 +2,8 @@ import subprocess
 import os
 import sys
 from main import logger, emitter, values, definitions
+from pathlib import Path
+from pysmt.smtlib.parser import SmtLibParser
 
 
 def execute_command(command, show_output=True):
@@ -96,3 +98,18 @@ def extract_byte_code(binary_path):
     extract_command = "cd " + directory_path + ";"
     extract_command += "extract-bc " + binary_name
     execute_command(extract_command)
+
+
+def extract_assertion(spec_file_path):
+    spec_dir_path = "/".join(spec_file_path.split("/")[:-1])
+    spec_file_name = spec_file_path.split("/")[-1]
+    current_dir = os.getcwd()
+    os.chdir(spec_dir_path)
+    emitter.normal("\textracting program specification")
+    smt_parser = SmtLibParser()
+    assertion_formula = None
+    with Path(spec_file_name).open() as f:
+        script = smt_parser.get_script(f)
+        assertion_formula = script.get_last_formula()
+    os.chdir(current_dir)
+    return assertion_formula

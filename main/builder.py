@@ -173,16 +173,16 @@ def build_normal():
 
     emitter.sub_title("Building Program")
     execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
-    clean_project(values.CONF_PATH_PROGRAM)
+    clean_project(values.CONF_PATH_PROJECT)
     CC = "$TRIDENT_CC"
     CXX = "$TRIDENT_CXX"
     C_FLAGS = "-g -O0"
     CXX_FLAGS = "-g -O0"
     LD_FLAGS = ""
-    config_project(values.CONF_PATH_PROGRAM, False, values.CONF_COMMAND_CONFIG)
+    config_project(values.CONF_PATH_PROJECT, False, values.CONF_COMMAND_CONFIG)
     C_FLAGS = "-g -O0"
     CXX_FLAGS = "-g -O0"
-    build_project(values.CONF_PATH_PROGRAM, values.CONF_COMMAND_BUILD)
+    build_project(values.CONF_PATH_PROJECT, values.CONF_COMMAND_BUILD)
 
 
 def remove_fsanitize(build_command):

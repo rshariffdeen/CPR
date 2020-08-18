@@ -1,7 +1,7 @@
 import os
 import time
 from main import emitter, logger, definitions, values, builder, repair
-from main.utilities import error_exit, extract_byte_code
+from main.utilities import error_exit, extract_byte_code, extract_assertion
 from main.concolic import run_concrete_execution, run_concolic_execution
 
 
@@ -49,9 +49,9 @@ def read_conf_file():
 
     for configuration in configuration_list:
         if definitions.CONF_PATH_PROGRAM in configuration:
-            values.CONF_PATH_PROGRAM = configuration.replace(definitions.CONF_PATH_PROGRAM, '')
+            values.CONF_PATH_PROJECT = configuration.replace(definitions.CONF_PATH_PROGRAM, '')
         elif definitions.CONF_NAME_PROGRAM in configuration:
-            values.CONF_NAME_PROGRAM = configuration.replace(definitions.CONF_NAME_PROGRAM, '')
+            values.CONF_PATH_PROGRAM = configuration.replace(definitions.CONF_NAME_PROGRAM, '')
         elif definitions.CONF_COMMAND_BUILD in configuration:
             values.CONF_COMMAND_BUILD = configuration.replace(definitions.CONF_COMMAND_BUILD, '')
         elif definitions.CONF_COMMAND_CONFIG in configuration:
@@ -63,6 +63,10 @@ def read_conf_file():
         elif definitions.CONF_TEST_INPUT in configuration:
             values.CONF_TEST_INPUT = configuration.replace(definitions.CONF_TEST_INPUT, '')
             values.ARGUMENT_LIST = values.CONF_TEST_INPUT
+        elif definitions.CONF_PATH_SPECIFICATION in configuration:
+            values.CONF_PATH_SPECIFICATION = configuration.replace(definitions.CONF_PATH_SPECIFICATION, '')
+            assertion_file_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_SPECIFICATION
+            values.SPECIFICATION = extract_assertion(assertion_file_path)
 
 
 def bootstrap(arg_list):
@@ -74,7 +78,7 @@ def bootstrap(arg_list):
 
 def initialize():
     emitter.title("Initializing Program")
-    program_path = values.CONF_PATH_PROGRAM + "/" + values.CONF_NAME_PROGRAM
+    program_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
     argument_list = values.CONF_TEST_INPUT.split(",")
     emitter.debug("input list in test case:", argument_list)
 
@@ -108,8 +112,8 @@ def main(arg_list):
 
     time_check = time.time()
     builder.build_normal()
-    assert os.path.isfile(values.CONF_PATH_PROGRAM + "/" + values.CONF_NAME_PROGRAM)
-    assert os.path.getsize(values.CONF_PATH_PROGRAM + "/" + values.CONF_NAME_PROGRAM) > 0
+    assert os.path.isfile(values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM)
+    assert os.path.getsize(values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM) > 0
     time_info[definitions.KEY_DURATION_BUILD] = str(time.time() - time_check)
 
     time_check = time.time()
@@ -117,7 +121,7 @@ def main(arg_list):
     time_info[definitions.KEY_DURATION_INITIALIZATION] = str(time.time() - time_check)
 
     time_check = time.time()
-    repair.run(values.CONF_PATH_PROGRAM, values.CONF_NAME_PROGRAM)
+    repair.run(values.CONF_PATH_PROJECT, values.CONF_PATH_PROGRAM)
     time_info[definitions.KEY_DURATION_REPAIR] = str(time.time() - time_check)
 
     # Final running time and exit message
