@@ -11,8 +11,7 @@ import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BOOL, BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
-from main.utilities import execute_command
-from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
+from main.utilities import execute_command, extract_constraints_from_patch
 from main import emitter
 
 logger = logging.getLogger(__name__)
@@ -308,34 +307,6 @@ def get_str_value(bit_vector):
     return str_value
 
 
-def select_patch(patch_list):
-    """
-           This function will randomly select a patch from component patch list and return the patch constraint
-           Arguments:
-               patch_list: list of patches in component form
-    """
-    random_patch_selection = random.choice(patch_list)
-    lid = list(random_patch_selection.keys())[0]
-    eid = 0
-    patch_component = random_patch_selection[lid]
-    patch_constraint = program_to_formula(patch_component)
-
-    program_substitution = {}
-    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
-        kind = ComponentSymbol.check(program_symbol)
-        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
-        if kind == ComponentSymbol.RRETURN:
-            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
-        elif kind == ComponentSymbol.RVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
-        elif kind == ComponentSymbol.LVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
-        else:
-            pass  # FIXME: do I need to handle it somehow?
-    substituted_patch = patch_constraint.substitute(program_substitution)
-    return substituted_patch, random_patch_selection
-
-
 def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
@@ -370,7 +341,8 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     list_path_detected.remove(selected_new_path)
 
     while patch_list:
-        patch_constraint, selected_patch = select_patch(patch_list)
+        selected_patch = random.choice(patch_list)
+        patch_constraint = extract_constraints_from_patch(selected_patch)
         check_sat = And(selected_new_path, patch_constraint)
         if is_sat(check_sat):
             break
@@ -439,7 +411,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         if bit_vector:
             var_value = get_signed_value(bit_vector)
         emitter.debug(var_name, var_value)
-        input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+        input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
     for var_tuple in second_var_list:
         var_name = var_tuple['identifier']
@@ -473,7 +445,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         ktest_command += " \"" + str(argument) + "\""
 
     for var in second_var_list:
-        ktest_command += " --second-var \"{0}\" {1} {2}".format(var['identifier'], var['size'], var['value'])
+        ktest_command += " --second-var \'{0}\' {1} {2}".format(var['identifier'], var['size'], var['value'])
     return_code = execute_command(ktest_command)
     return ktest_path, return_code
 

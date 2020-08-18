@@ -4,11 +4,13 @@ import sys
 import random
 sys.path.append('/concolic-repair/main')
 from concolic import generate_ktest, run_concolic_execution, run_concrete_execution, generate_new_input
-from utilities import build_program
-from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
+from main.utilities import  extract_assertion, extract_constraints_from_patch
+from synthesis import load_components, load_specification, synthesize, Program, program_to_formula,\
+   collect_symbols, RuntimeSymbol, ComponentSymbol, verify
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, definitions, values
+from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, SBV
 
 check_counter = 0
 
@@ -20,12 +22,17 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
    for patch in current_patch_set:
       if check(patch, path_to_concolic_exec_result, concrete_input, assertion):
          updated_patch_set.append(patch)
-   return current_patch_set 
+   return updated_patch_set
 
 
 def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete_input: [], assertion): # TODO
    # checks, e.g., for crash freedom
-   return True
+   path_constraint_file_path = path_to_concolic_exec_result + "/test000001.smt2"
+   path_condition = extract_assertion(path_constraint_file_path)
+   patch_constraint = extract_constraints_from_patch(patch)
+   specification = And(path_condition, And(assertion, patch_constraint))
+   result = is_sat(specification)
+   return result
 
 
 def checkCoverage(): # TODO

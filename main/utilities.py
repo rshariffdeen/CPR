@@ -4,6 +4,7 @@ import sys
 from main import logger, emitter, values, definitions
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
+from main.synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
 
 
 def execute_command(command, show_output=True):
@@ -105,7 +106,7 @@ def extract_assertion(spec_file_path):
     spec_file_name = spec_file_path.split("/")[-1]
     current_dir = os.getcwd()
     os.chdir(spec_dir_path)
-    emitter.normal("\textracting program specification")
+    # emitter.normal("\textracting program specification")
     smt_parser = SmtLibParser()
     assertion_formula = None
     with Path(spec_file_name).open() as f:
@@ -113,3 +114,24 @@ def extract_assertion(spec_file_path):
         assertion_formula = script.get_last_formula()
     os.chdir(current_dir)
     return assertion_formula
+
+
+def extract_constraints_from_patch(patch):
+    lid = list(patch.keys())[0]
+    eid = 0
+    patch_component = patch[lid]
+    patch_constraint = program_to_formula(patch_component)
+    program_substitution = {}
+    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+        kind = ComponentSymbol.check(program_symbol)
+        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+        if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+        elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+        elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+        else:
+            pass  # FIXME: do I need to handle it somehow?
+    substituted_patch = patch_constraint.substitute(program_substitution)
+    return substituted_patch
