@@ -6,7 +6,7 @@ import collections
 import random
 from six.moves import cStringIO
 from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat
+from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, Int
 import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BOOL, BV32, BV8, ArrayType
@@ -32,6 +32,8 @@ def z3_get_model(formula):
     """
     emitter.normal("\textracting z3 model")
     model = get_model(formula)
+    if model is None:
+        return None
     path_script = "/tmp/z3_script"
     write_smtlib(formula, path_script)
     with open(path_script, "r") as script_file:
@@ -40,13 +42,26 @@ def z3_get_model(formula):
     var_list = set(re.findall("\(declare-fun (.+?) \(\)", script))
     sym_var_list = dict()
     for var_name in var_list:
-        if "branch|" in var_name:
+        # sym_var_list[var_name] = dict()
+        sym_def = Symbol(var_name, ArrayType(BV32, BV8))
+        if sym_def not in model:
             continue
-        sym_var_list[var_name] = dict()
-        sym_var_list[var_name]['def'] = Symbol(var_name, ArrayType(BV32, BV8))
-        sym_var_list[var_name]['value'] = model[sym_var_list[var_name]['def']].simplify()
-    print(sym_var_list)
-    exit()
+        x = model[sym_def].simplify()
+        byte_list = dict()
+        value_array_map = x.array_value_assigned_values_map()
+        default_value = int(str(x.array_value_default()).split("_")[0])
+        if not value_array_map:
+            byte_list[0] = default_value
+        else:
+            array_size = 4 #TODO: dynamically calculate the size later
+            for i in range(0, array_size):
+                byte_list[i] = default_value
+            for idx, val in value_array_map.items():
+                index = int(str(idx).split("_")[0])
+                value = int(str(val).split("_")[0])
+                byte_list[index] = value
+        sym_var_list[var_name] = byte_list
+    emitter.debug("model var list", sym_var_list)
     return sym_var_list
 
 
@@ -86,8 +101,6 @@ def parse_z3_output(z3_output):
         if "sat" in line or "model" in line:
             continue
         if "define-fun " in line or line == z3_output[-1]:
-            if "branch|" in line:
-                continue
             if str_lambda:
                 if "const" in str_lambda:
                     str_value = str_lambda.split("#x")[-1].split(")")[0]
@@ -96,6 +109,10 @@ def parse_z3_output(z3_output):
                 elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
                     str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n", "")
                     byte_list[0] = int(str_value.replace("#", "0"), 16)
+                elif "true)" in str_lambda:
+                    byte_list[0] = int("0xff", 16)
+                elif "false)" in str_lambda:
+                    byte_list[0] = int("0x00", 16)
                 elif "ite" in str_lambda:
                     max_index = 0
                     byte_list = dict()
@@ -272,12 +289,13 @@ def get_str_value(bit_vector):
     """
     str_value = ""
     char_list = dict()
+    print(bit_vector)
     for i in bit_vector:
-        if int(bit_vector[i]) > 127:
-            char_list[i] = chr(48)
+        if int(bit_vector[i]) not in range(48, 127):
+            char_list[i] = chr(random.randint(49, 122))
         else:
             char_list[i] = chr(bit_vector[i])
-
+    print(char_list)
     for i in sorted(char_list, reverse=True):
         char = char_list[i]
         str_value += char
@@ -336,8 +354,9 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
 
     # add patch constraint and user-input->prog-var relationship
     selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
-    model = z3_get_model_cli(selected_new_path)
-
+    model = z3_get_model(selected_new_path)
+    if model is None:
+        return None, None
     for var_name in model:
         var_byte_list = model[var_name]
         if "arg" in var_name:
@@ -349,6 +368,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
         arg_value = get_str_value(bit_vector)
+        print(arg_name, arg_index, arg_value)
         emitter.debug(arg_name, arg_value)
         input_arg_dict[arg_index] = arg_value
 
@@ -369,16 +389,11 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         var_size = len(bit_vector)
         if bit_vector:
             var_value = get_signed_value(bit_vector)
-        if "angelic" in var_name:
-            continue
         emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
 
-
     for var_tuple in second_var_list:
         var_name = var_tuple['identifier']
-        if "angelic" in var_name:
-            continue
         if var_name not in gen_var_list:
             emitter.warning("\t[warning] variable " + var_name + " assigned random value")
             var_size = var_tuple['size']
