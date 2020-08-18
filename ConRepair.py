@@ -60,13 +60,20 @@ def read_conf_file():
             values.CONF_TEST_FILE = configuration.replace(definitions.CONF_TEST_FILE, '')
             if not os.path.isfile(values.CONF_TEST_FILE):
                 error_exit("Test file " + values.CONF_TEST_FILE + " not found")
+        elif definitions.CONF_TEST_OUTPUT in configuration:
+            values.CONF_TEST_OUTPUT = configuration.replace(definitions.CONF_TEST_OUTPUT, '').split(",")
         elif definitions.CONF_TEST_INPUT in configuration:
-            values.CONF_TEST_INPUT = configuration.replace(definitions.CONF_TEST_INPUT, '')
-            values.ARGUMENT_LIST = values.CONF_TEST_INPUT
+            values.CONF_TEST_INPUT = configuration.replace(definitions.CONF_TEST_INPUT, '').split(",")
         elif definitions.CONF_PATH_SPECIFICATION in configuration:
             values.CONF_PATH_SPECIFICATION = configuration.replace(definitions.CONF_PATH_SPECIFICATION, '')
             assertion_file_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_SPECIFICATION
             values.SPECIFICATION = extract_assertion(assertion_file_path)
+        elif definitions.CONF_CUSTOM_COMP_LIST in configuration:
+            values.CONF_CUSTOM_COMP_LIST = configuration.replace(definitions.CONF_CUSTOM_COMP_LIST, '').split(",")
+        elif definitions.CONF_GENERAL_COMP_LIST in configuration:
+            values.CONF_GENERAL_COMP_LIST = configuration.replace(definitions.CONF_GENERAL_COMP_LIST, '').split(",")
+        elif definitions.CONF_DEPTH_VALUE in configuration:
+            values.CONF_DEPTH_VALUE = configuration.replace(definitions.CONF_DEPTH_VALUE, '')
 
 
 def bootstrap(arg_list):
@@ -79,26 +86,20 @@ def bootstrap(arg_list):
 def initialize():
     emitter.title("Initializing Program")
     program_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
-    argument_list = values.CONF_TEST_INPUT.split(",")
-    emitter.debug("input list in test case:", argument_list)
+    test_input_list = values.CONF_TEST_INPUT
 
-    # ktest_path, exit_code = generate_ktest(argument_list, {})
-    # assert int(exit_code) == 0
-    # assert os.path.isfile(ktest_path)
-    # assert os.path.getsize(ktest_path) > 0
-    emitter.sub_title("Running initial concrete execution")
-    extract_byte_code(program_path)
-    exit_code = run_concrete_execution(program_path + ".bc", argument_list, {}, True)
-    assert exit_code == 0
-    #
-    # klee_file_1 = cwd + "/klee-out-0/test000001.smt2"
-    # assert os.path.isfile(klee_file_1)
-    # assert os.path.getsize(klee_file_1) > 0
-    emitter.sub_title("Running initial concolic Execution")
-    extract_byte_code(program_path)
-    exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
+    for argument_list in test_input_list:
+        emitter.sub_title("Running initial concrete execution")
+        emitter.debug("input list in test case:", argument_list)
+        values.ARGUMENT_LIST = argument_list
+        extract_byte_code(program_path)
+        exit_code = run_concrete_execution(program_path + ".bc", argument_list, {}, True)
+        assert exit_code == 0
 
-    assert exit_code == 0
+        emitter.sub_title("Running initial concolic Execution")
+        extract_byte_code(program_path)
+        exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
+        assert exit_code == 0
 
 
 def main(arg_list):

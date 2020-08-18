@@ -488,7 +488,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return return_code
 
 
-def run_concrete_execution(program, argument_list, second_var_list, print_output=False):
+def run_concrete_execution(program, argument_list, second_var_list, print_output=False, output_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -506,8 +506,11 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
     input_argument = ""
     for argument in argument_list:
         input_argument += " " + str(argument)
-    klee_command = "klee " \
-                   "--posix-runtime " \
+    if output_dir:
+        klee_command = "klee --output-dir=" + str(output_dir) + " "
+    else:
+        klee_command = "klee "
+    klee_command += "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "--log-ppc " \

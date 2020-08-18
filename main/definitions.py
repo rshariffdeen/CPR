@@ -34,7 +34,11 @@ CONF_COMMAND_BUILD = "build_command:"
 CONF_PATH_SPECIFICATION = "spec_path:"
 CONF_NAME_PROGRAM = "program_name:"
 CONF_TEST_INPUT = "test_input:"
-CONF_TEST_FILE = "test_file"
+CONF_TEST_OUTPUT = "test_output:"
+CONF_TEST_FILE = "test_file:"
+CONF_GENERAL_COMP_LIST = "general_comp_list:"
+CONF_CUSTOM_COMP_LIST = "custom_comp_list:"
+CONF_DEPTH_VALUE = "depth:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
