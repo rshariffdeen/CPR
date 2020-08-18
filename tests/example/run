@@ -4,7 +4,7 @@ PROGRAM=test
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-TRIDENT_CC="$(realpath ../../main/trident-cc)"
+TRIDENT_CC="$(realpath ../../tools/trident-cc)"
 
 if [ -f "$PROGRAM" ]; then
    make clean

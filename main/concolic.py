@@ -12,6 +12,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BOOL, BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command
+from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
 from main import emitter
 
 logger = logging.getLogger(__name__)
@@ -307,7 +308,35 @@ def get_str_value(bit_vector):
     return str_value
 
 
-def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_constraint=None):
+def select_patch(patch_list):
+    """
+           This function will randomly select a patch from component patch list and return the patch constraint
+           Arguments:
+               patch_list: list of patches in component form
+    """
+    random_patch_selection = random.choice(patch_list)
+    lid = list(random_patch_selection.keys())[0]
+    eid = 0
+    patch_component = random_patch_selection[lid]
+    patch_constraint = program_to_formula(patch_component)
+
+    program_substitution = {}
+    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+        kind = ComponentSymbol.check(program_symbol)
+        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+        if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+        elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+        elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+        else:
+            pass  # FIXME: do I need to handle it somehow?
+    substituted_patch = patch_constraint.substitute(program_substitution)
+    return substituted_patch, random_patch_selection
+
+
+def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -325,8 +354,9 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
     list_path_explored = list(set(list_path_explored + current_path_list))
-    if not patch_constraint:
-        patch_constraint = TRUE
+    selected_patch = None
+    patch_constraint = TRUE
+
     for new_path in new_path_list:
         if new_path not in (list_path_detected + list_path_explored):
             list_path_detected.append(new_path)
@@ -334,11 +364,21 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     if not list_path_detected:
         emitter.debug("Count paths explored: " , str(len(list_path_explored)))
         emitter.debug("Count paths detected: " , str(len(list_path_detected)))
-        return None, None
+        return None, None, patch_list
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
 
+    while patch_list:
+        patch_constraint, selected_patch = select_patch(patch_list)
+        check_sat = And(selected_new_path, patch_constraint)
+        if is_sat(check_sat):
+            break
+        else:
+            emitter.debug("Removing Patch", selected_patch)
+            list(patch_list).remove(selected_patch)
+
+    emitter.highlight("\tSelected patch: " + str(selected_patch))
     # preserve user-input : program variable relationship
     parser = SmtLibParser()
     relationship = None
@@ -361,7 +401,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
     model = z3_get_model(selected_new_path)
     if model is None:
-        return None, None
+        return None, None, patch_list
     for var_name in model:
         var_byte_list = model[var_name]
         if "arg" in var_name:
@@ -412,7 +452,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     emitter.debug("Generated Arg List", input_arg_list)
     emitter.debug("Generated Var List", input_var_list)
-    return input_arg_list, input_var_list
+    return input_arg_list, input_var_list, patch_list
 
 
 def generate_ktest(argument_list, second_var_list, print_output=False):

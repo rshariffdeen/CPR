@@ -86,28 +86,9 @@ def run(project_path, program_name):
       iteration = iteration + 1
       emitter.sub_sub_title("Iteration: " + str(iteration))
       ## Pick new input and patch candidate for next concolic execution step.
-      random_patch_selection = random.choice(P)
-      lid = list(random_patch_selection.keys())[0]
-      eid = 0
-      patch_component = random_patch_selection[lid]
-      patch_constraint = program_to_formula(patch_component)
-
-      program_substitution = {}
-      for program_symbol in collect_symbols(patch_constraint, lambda x: True):
-         kind = ComponentSymbol.check(program_symbol)
-         data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
-         if kind == ComponentSymbol.RRETURN:
-            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
-         elif kind == ComponentSymbol.RVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
-         elif kind == ComponentSymbol.LVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
-         else:
-            pass  # FIXME: do I need to handle it somehow?
-      substituted_patch = patch_constraint.substitute(program_substitution)
       argument_list = values.ARGUMENT_LIST
       second_var_list = values.SECOND_VAR_LIST
-      gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, substituted_patch) #TODO (later) patch candidate missing
+      gen_arg_list, gen_var_list, P = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, P) #TODO (later) patch candidate missing
       if not gen_arg_list and not gen_var_list:
          emitter.warning("\t[warning] no more paths to generate new input")
          break

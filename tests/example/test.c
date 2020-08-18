@@ -9,8 +9,10 @@ int main(int argc, char *argv[]) {
   int y = __trident_choice("L9", "bool", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0);
   int res;
   if (y)  {
+      printf("PATH ONE");
       res = 1;
   } else {
+      printf("PATH TWO");
       res = 0;
   }
   return TRIDENT_OUTPUT("res", "i32", res);
