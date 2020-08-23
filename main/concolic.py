@@ -349,8 +349,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         else:
             emitter.debug("Removing Patch", selected_patch)
             list(patch_list).remove(selected_patch)
-
-    emitter.highlight("\tSelected patch: " + str(selected_patch))
+    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
     # preserve user-input : program variable relationship
     parser = SmtLibParser()
     relationship = None

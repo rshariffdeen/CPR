@@ -7,7 +7,7 @@ sys.path.append('/concolic-repair/main')
 from concolic import generate_ktest, run_concolic_execution, run_concrete_execution, generate_new_input
 from main.utilities import extract_assertion, extract_constraints_from_patch
 from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, \
-    collect_symbols, RuntimeSymbol, ComponentSymbol, verify
+    collect_symbols, RuntimeSymbol, ComponentSymbol, verify, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, definitions, values
@@ -89,7 +89,7 @@ def print_patch_list(patch_list):
     for patch in patch_list:
         count = count + 1
         emitter.sub_sub_title("Patch #" + str(count))
-        emitter.patch(str(patch))
+        emitter.emit_patch(patch)
 
 
 def run(project_path, program_name):
