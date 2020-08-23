@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from main import definitions, values, logger
+import textwrap
 
+rows, columns = os.popen('stty size', 'r').read().split()
 
 GREY = '\t\x1b[1;30m'
 RED = '\t\x1b[1;31m'
@@ -17,10 +20,15 @@ PROG_OUTPUT_COLOR = '\t\x1b[0;30;47m'
 STAT_COLOR = '\t\x1b[0;32;47m'
 
 
-def write(print_message, print_color, new_line=True):
+def write(print_message, print_color, new_line=True, prefix=None, indent_level=0):
     if not values.silence_emitter:
-        r = "\033[K" + print_color + str(print_message) + '\x1b[0m'
-        sys.stdout.write(r)
+        message = "\033[K" + print_color + str(print_message) + '\x1b[0m'
+        if prefix:
+            prefix = "\033[K" + print_color + str(prefix) + '\x1b[0m'
+            len_prefix = ((indent_level+1) * 4) + len(prefix)
+            wrapper = textwrap.TextWrapper(initial_indent=prefix, subsequent_indent=' '*len_prefix, width=int(columns))
+            message = wrapper.fill(message)
+        sys.stdout.write(message)
         if new_line:
             r = "\n"
             sys.stdout.write("\n")
@@ -46,17 +54,16 @@ def sub_sub_title(sub_title):
 
 
 def command(message):
-    message = "\t[command] " + message
-    write(message, ROSE)
-    logger.command(message)
+    prefix = "\t\t[command] "
+    write(message, ROSE, prefix=prefix, indent_level=2)
+    logger.command("[command]" + message)
 
 
-def debug(prefix, message):
+def debug(message, info):
     if values.DEBUG:
-        prefix = "\t[debug] " + prefix
-        message = "\t[debug] " + str(message)
-        write(prefix, GREY)
-        write(message, GREY)
+        prefix = "\t\t[debug] "
+        write(message, GREY, prefix=prefix, indent_level=2)
+        write(info, GREY, prefix=prefix, indent_level=2)
     logger.command(message)
 
 
@@ -66,7 +73,17 @@ def normal(message, jump_line=True):
 
 
 def highlight(message, jump_line=True):
-    write(message, WHITE, jump_line)
+    indent_length = message.count("\t")
+    prefix = "\t" * indent_length
+    message = message.replace("\t", "")
+    write(message, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
+
+
+def patch(message, jump_line=True):
+    indent_length = 2
+    prefix = "\t" * indent_length
+    message = message.replace("\t", "")
+    write(message, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
 
 
 def information(message, jump_line=True):

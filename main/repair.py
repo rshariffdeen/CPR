@@ -83,6 +83,15 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     return list_of_patches
 
 
+def print_patch_list(patch_list):
+    count = 0
+    emitter.sub_title("List of Synthesised Patches")
+    for patch in patch_list:
+        count = count + 1
+        emitter.sub_sub_title("Patch #" + str(count))
+        emitter.patch(str(patch))
+
+
 def run(project_path, program_name):
     emitter.title("Repairing Program")
     program_path = project_path + "/" + program_name
@@ -105,7 +114,7 @@ def run(project_path, program_name):
         gen_arg_list, gen_var_list, P = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
                                                            second_var_list, P)  # TODO (later) patch candidate missing
         if not gen_arg_list and not gen_var_list:
-            emitter.warning("\t[warning] no more paths to generate new input")
+            emitter.warning("\t\t[warning] no more paths to generate new input")
             break
         assert gen_arg_list  # there should be a concrete input
         # print(">> new input: " + str(gen_arg_list))
@@ -120,3 +129,4 @@ def run(project_path, program_name):
 
         # Checks for the current coverage.
         satisfied = check_coverage()
+    print_patch_list(P)
