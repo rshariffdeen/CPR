@@ -324,7 +324,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     var_expr_map = collect_symbolic_expression(expr_log_path)
     constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
-    list_path_explored = list(set(list_path_explored + current_path_list))
+    # list_path_explored = list(set(list_path_explored + current_path_list))
     selected_patch = None
     patch_constraint = TRUE
 
