@@ -4,7 +4,7 @@ import sys
 import random
 
 sys.path.append('/concolic-repair/main')
-from concolic import generate_ktest, run_concolic_execution, run_concrete_execution, generate_new_input
+from concolic import extract_var_relationship, run_concolic_execution, collect_symbolic_expression, generate_new_input
 from main.utilities import extract_assertion, extract_constraints_from_patch
 from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, \
     collect_symbols, RuntimeSymbol, ComponentSymbol, verify, program_to_code
@@ -31,9 +31,13 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
 def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete_input: [], assertion):  # TODO
     # checks, e.g., for crash freedom
     path_constraint_file_path = path_to_concolic_exec_result + "/test000001.smt2"
+    expr_log_path = path_to_concolic_exec_result + "/expr.log"
     path_condition = extract_assertion(path_constraint_file_path)
     patch_constraint = extract_constraints_from_patch(patch)
     # test_specification = values.TEST_SPECIFICATION
+    sym_expr_map = collect_symbolic_expression(expr_log_path)
+    var_relationship = extract_var_relationship(sym_expr_map)
+    assertion = And(assertion, var_relationship)
     specification = And(path_condition, And(assertion, patch_constraint))
     result = is_sat(specification)
     return result
