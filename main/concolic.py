@@ -176,7 +176,7 @@ def collect_symbolic_expression(log_path):
             for line in trace_file:
                 if '[klee:expr]' in line:
                     line = line.split("[klee:expr] ")[-1]
-                    var_name, var_expr = line.split(": ")
+                    var_name, var_expr = line.split(" : ")
                     var_expr = var_expr.replace("\n", "")
                     if "[program-var]" in var_name:
                         var_name = var_name.replace("[program-var] ", "")
@@ -315,9 +315,8 @@ def extract_var_relationship(var_expr_map):
     parser = SmtLibParser()
     relationship = None
     for expr_map in var_expr_map:
-        prog_var_name = expr_map[0]
-        prog_var_expr = expr_map[1]
-        angelic_var_expr = expr_map[2]
+        prog_var_name, prog_var_expr = expr_map[0]
+        angelic_var_name, angelic_var_expr = expr_map[1]
         prog_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", prog_var_expr))
         angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", angelic_var_expr))
         dependent_var_list = set(list(prog_dependent_var_list) + list(angelic_dependent_var_list))
@@ -326,7 +325,7 @@ def extract_var_relationship(var_expr_map):
         for var_d in dependent_var_list:
             str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
         str_script += "(assert (= " + prog_var_expr + " " + angelic_var_expr + " ))\n"
-        str_script += "(assert (= " + prog_var_name + " " + prog_var_expr + " ))\n"
+        str_script += "(assert (= " + prog_var_name + " " + angelic_var_name + " ))\n"
         str_script += "(exit)\n"
         script = parser.get_script(cStringIO(str_script))
         formula = script.get_last_formula()
