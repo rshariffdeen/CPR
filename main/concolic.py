@@ -14,8 +14,8 @@ from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
 from main import emitter
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
 File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
@@ -333,23 +333,13 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
             list_path_detected.append(new_path)
 
     if not list_path_detected:
-        emitter.debug("Count paths explored: " , str(len(list_path_explored)))
-        emitter.debug("Count paths detected: " , str(len(list_path_detected)))
+        emitter.debug("Count paths explored: ", str(len(list_path_explored)))
+        emitter.debug("Count paths detected: ", str(len(list_path_detected)))
         return None, None, patch_list
     selected_new_path = random.choice(list_path_detected)
     list_path_explored.append(selected_new_path)
     list_path_detected.remove(selected_new_path)
 
-    while patch_list:
-        selected_patch = random.choice(patch_list)
-        patch_constraint = extract_constraints_from_patch(selected_patch)
-        check_sat = And(selected_new_path, patch_constraint)
-        if is_sat(check_sat):
-            break
-        else:
-            emitter.debug("Removing Patch", selected_patch)
-            list(patch_list).remove(selected_patch)
-    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
     # preserve user-input : program variable relationship
     parser = SmtLibParser()
     relationship = None
@@ -368,8 +358,22 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         formula = script.get_last_formula()
         relationship = formula
 
+    selected_new_path = And(selected_new_path, relationship)
+
+    while patch_list:
+        selected_patch = random.choice(patch_list)
+        patch_constraint = extract_constraints_from_patch(selected_patch)
+        check_sat = And(selected_new_path, patch_constraint)
+        if is_sat(check_sat):
+            break
+        else:
+            emitter.debug("Removing Patch", selected_patch)
+            patch_list.remove(selected_patch)
+    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
+
+
     # add patch constraint and user-input->prog-var relationship
-    selected_new_path = And(selected_new_path, And(patch_constraint, relationship))
+    selected_new_path = And(selected_new_path, patch_constraint)
     model = z3_get_model(selected_new_path)
     if model is None:
         return None, None, patch_list
