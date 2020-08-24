@@ -173,20 +173,19 @@ def collect_symbolic_expression(log_path):
     if os.path.exists(log_path):
         with open(log_path, 'r') as trace_file:
             expr_pair = None
-            prog_var_name = None
             for line in trace_file:
                 if '[klee:expr]' in line:
                     line = line.split("[klee:expr] ")[-1]
                     var_name, var_expr = line.split(": ")
                     var_expr = var_expr.replace("\n", "")
                     if "[program-var]" in var_name:
-                        expr_pair = (prog_var_name, var_expr)
+                        var_name = var_name.replace("[program-var] ", "")
+                        expr_pair = (var_name, var_expr)
                     elif "[angelic-var]" in var_name:
-                        expr_pair = (expr_pair[0], expr_pair[1], var_expr)
+                        var_name = var_name.replace("[angelic-var] ", "")
+                        expr_pair = (expr_pair, (var_name, var_expr))
                         if expr_pair not in var_expr_map:
                             var_expr_map.append(expr_pair)
-                    else:
-                        prog_var_name = var_name.replace("[klee:expr] ", "")
     return var_expr_map
 
 
