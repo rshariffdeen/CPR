@@ -33,8 +33,8 @@ def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete
     path_constraint_file_path = path_to_concolic_exec_result + "/test000001.smt2"
     path_condition = extract_assertion(path_constraint_file_path)
     patch_constraint = extract_constraints_from_patch(patch)
-    test_specification = values.TEST_SPECIFICATION
-    specification = And(path_condition, And(assertion, And(patch_constraint, test_specification)))
+    # test_specification = values.TEST_SPECIFICATION
+    specification = And(path_condition, And(assertion, patch_constraint))
     result = is_sat(specification)
     return result
 
