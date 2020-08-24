@@ -108,6 +108,7 @@ WORKDIR /concolic-repair
 
 COPY main/ main/
 COPY runtime/ runtime/
+COPY tools/  tools/
 COPY tests/ tests/
 COPY components/ components/
 
