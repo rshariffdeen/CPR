@@ -182,7 +182,7 @@ def collect_symbolic_expression(log_path):
                     if "[program-var]" in var_name:
                         expr_pair = (prog_var_name, var_expr)
                     elif "[angelic-var]" in var_name:
-                        expr_pair = (expr_pair, var_expr)
+                        expr_pair = (expr_pair[0], expr_pair[1], var_expr)
                         if expr_pair not in var_expr_map:
                             var_expr_map.append(expr_pair)
                     else:
