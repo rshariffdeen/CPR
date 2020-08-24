@@ -33,7 +33,8 @@ def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete
     path_constraint_file_path = path_to_concolic_exec_result + "/test000001.smt2"
     path_condition = extract_assertion(path_constraint_file_path)
     patch_constraint = extract_constraints_from_patch(patch)
-    specification = And(path_condition, And(assertion, patch_constraint))
+    test_specification = values.TEST_SPECIFICATION
+    specification = And(path_condition, And(assertion, And(patch_constraint, test_specification)))
     result = is_sat(specification)
     return result
 
@@ -71,7 +72,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     for output_spec in test_output_list:
         spec_files.append((Path("t1.smt2"), Path("klee-out-" + str(test_output_list.index(output_spec)))))
     specification = load_specification(spec_files)
-
+    values.TEST_SPECIFICATION = specification
     concrete_enumeration = True
     lower_bound = values.DEFAULT_LOWER_BOUND
     upper_bound = values.DEFAULT_UPPER_BOUND

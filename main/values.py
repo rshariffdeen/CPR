@@ -7,6 +7,8 @@ DEBUG = False
 ARGUMENT_LIST = []
 SECOND_VAR_LIST = []
 SPECIFICATION = ""
+TEST_SPECIFICATION = ""
+
 
 # ------------------ Default Values ---------------
 DEFAULT_DEPTH = 3
