@@ -1,10 +1,8 @@
 import os
-import sys
-sys.path.append('/concolic-repair/main')
-from concolic import extract_var_relationship, run_concolic_execution, generate_new_input
-from reader import collect_symbolic_expression
+from main.concolic import extract_var_relationship, run_concolic_execution, generate_new_input
+from main.reader import collect_symbolic_expression, collect_trace
 from main.utilities import extract_assertion, extract_constraints_from_patch
-from synthesis import load_components, load_specification, synthesize, Program
+from main.synthesis import load_components, load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, definitions, values
@@ -100,7 +98,7 @@ def run(project_path, program_path):
     P = generate_patch_set(project_path)
     ppc_log_path = project_path + "/klee-last/ppc.log"
     expr_log_path = project_path + "/klee-last/expr.log"
-
+    trace_log_path = project_path + "/klee-last/trace.log"
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(P) <= 1
     iteration = 0
@@ -112,6 +110,8 @@ def run(project_path, program_path):
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
+        values.LIST_TRACE = collect_trace(trace_log_path, project_path)
+        print(len(values.LIST_TRACE))
         gen_arg_list, gen_var_list, P = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
                                                            second_var_list, P)  # TODO (later) patch candidate missing
         if not gen_arg_list and not gen_var_list:

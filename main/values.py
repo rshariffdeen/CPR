@@ -9,6 +9,8 @@ SECOND_VAR_LIST = []
 SPECIFICATION = ""
 TEST_SPECIFICATION = ""
 
+LIST_TRACE = []
+
 
 # ------------------ Default Values ---------------
 DEFAULT_DEPTH = 3

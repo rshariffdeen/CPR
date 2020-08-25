@@ -1,12 +1,13 @@
 import os
 import collections
-
+from main import emitter
 
 def collect_symbolic_expression(log_path):
     """
        This function will read the output log of a klee concolic execution and extract symbolic expressions
        of variables of interest
     """
+    emitter.normal("\textracting symbolic expressions")
     var_expr_map = list()
     if os.path.exists(log_path):
         with open(log_path, 'r') as trace_file:
@@ -31,6 +32,7 @@ def collect_symbolic_path(log_path, project_path):
     """
        This function will read the output log of a klee concolic execution and extract the partial path conditions
     """
+    emitter.normal("\textracting path conditions")
     ppc_list = collections.OrderedDict()
     last_sym_path = ""
     if os.path.exists(log_path):
@@ -58,3 +60,24 @@ def collect_symbolic_path(log_path, project_path):
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
     return ppc_list, last_sym_path
+
+
+def collect_trace(file_path, project_path):
+    """
+       This function will read the output log of a klee concolic execution and extract the instruction trace
+    """
+    emitter.normal("\textracting instruction trace")
+    list_trace = list()
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as trace_file:
+            for line in trace_file:
+                if '[klee:trace]' in line:
+                    if project_path in line:
+                        trace_line = str(line.replace("[klee:trace] ", ''))
+                        trace_line = trace_line.strip()
+                        source_path, line_number = trace_line.split(":")
+                        source_path = os.path.abspath(source_path)
+                        trace_line = source_path + ":" + str(line_number)
+                        if (not list_trace) or (list_trace[-1] != trace_line):
+                            list_trace.append(trace_line)
+    return list_trace
