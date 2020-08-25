@@ -381,7 +381,7 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
         else:
             emitter.debug("Removing Patch", selected_patch)
             patch_list.remove(selected_patch)
-    emitter.emit_patch(selected_patch, message="Selected patch: ")
+    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
 
 
     # add patch constraint and user-input->prog-var relationship
