@@ -97,9 +97,8 @@ def print_patch_list(patch_list):
         emitter.emit_patch(patch)
 
 
-def run(project_path, program_name):
+def run(project_path, program_path):
     emitter.title("Repairing Program")
-    program_path = project_path + "/" + program_name
     ## Generate all possible solutions by running the synthesizer.
     P = generate_patch_set(project_path)
     ppc_log_path = project_path + "/klee-last/ppc.log"
