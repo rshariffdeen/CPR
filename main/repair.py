@@ -1,18 +1,14 @@
-import subprocess
 import os
 import sys
-import random
-
 sys.path.append('/concolic-repair/main')
-from concolic import extract_var_relationship, run_concolic_execution, collect_symbolic_expression, generate_new_input
+from concolic import extract_var_relationship, run_concolic_execution, generate_new_input
+from reader import collect_symbolic_expression
 from main.utilities import extract_assertion, extract_constraints_from_patch
-from synthesis import load_components, load_specification, synthesize, Program, program_to_formula, \
-    collect_symbols, RuntimeSymbol, ComponentSymbol, verify, program_to_code
+from synthesis import load_components, load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, definitions, values
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, \
-    SBV
+from pysmt.shortcuts import is_sat, And
 
 check_counter = 0
 
