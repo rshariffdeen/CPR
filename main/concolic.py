@@ -491,6 +491,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--write-smt2s " \
                    "-allow-seed-extension " \
                    "--log-ppc " \
+                   "--log-trace" \
                    "--external-calls=all " \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
