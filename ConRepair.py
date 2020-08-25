@@ -77,6 +77,9 @@ def read_conf_file():
         elif definitions.CONF_DIR_SRC in configuration:
             values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '')
 
+    values.CONF_PATH_PROGRAM = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
+    values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
+
 
 def bootstrap(arg_list):
     emitter.title("Starting " + values.TOOL_NAME)
@@ -87,8 +90,6 @@ def bootstrap(arg_list):
 
 def initialize():
     emitter.title("Initializing Program")
-    values.CONF_PATH_PROGRAM = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
-    values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     program_path = values.CONF_PATH_PROGRAM
     test_input_list = values.CONF_TEST_INPUT
 
