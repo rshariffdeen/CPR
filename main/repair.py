@@ -107,7 +107,6 @@ def run(project_path, program_path):
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
-        print(len(values.LIST_TRACE))
         gen_arg_list, gen_var_list, P = generate_new_input(project_path, argument_list, second_var_list, P)  # TODO (later) patch candidate missing
         if not gen_arg_list and not gen_var_list:
             emitter.warning("\t\t[warning] no more paths to generate new input")
