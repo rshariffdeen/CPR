@@ -12,8 +12,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BOOL, BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
-from main import emitter
-from main.reader import collect_symbolic_expression, collect_symbolic_path
+from main import emitter, values, reader
 
 
 logger = logging.getLogger(__name__)
@@ -278,7 +277,7 @@ def extract_var_relationship(var_expr_map):
     return relationship
 
 
-def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list, second_var_list, patch_list=None):
+def generate_new_input(project_path, argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -291,8 +290,8 @@ def generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
     input_var_list = list()
     input_arg_dict = dict()
     input_arg_list = list()
-    ppc_list, last_path = collect_symbolic_path(ppc_log_path, project_path)
-    var_expr_map = collect_symbolic_expression(expr_log_path)
+    ppc_list = values.LIST_PPC
+    var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
     constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
     new_path_list = generate_new_symbolic_paths(constraint_list)
     # list_path_explored = list(set(list_path_explored + current_path_list))
@@ -443,6 +442,12 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return_code = execute_command(klee_command)
     emitter.debug("changing directory:", current_dir)
     os.chdir(current_dir)
+
+    # collect artifacts
+    ppc_log_path = directory_path + "/klee-last/ppc.log"
+    trace_log_path = directory_path + "/klee-last/trace.log"
+    values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, directory_path)
+    values.LIST_TRACE = reader.collect_trace(trace_log_path, directory_path)
     return return_code
 
 
@@ -493,14 +498,12 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     logger.info("running concolic exploration")
     global list_path_explored, list_path_detected
     run_concolic_execution(program, argument_list, second_var_list, print_output=False)
-    ppc_log_path = root_directory + "/klee-last/ppc.log"
-    expr_log_path = root_directory + "/klee-last/expr.log"
     is_initial = True
     path_count = 1
     while list_path_detected or is_initial:
         is_initial = False
         path_count = path_count + 1
-        gen_arg_list, gen_var_list = generate_new_input(ppc_log_path, expr_log_path, root_directory, argument_list, second_var_list)
+        gen_arg_list, gen_var_list = generate_new_input(root_directory, argument_list, second_var_list)
         run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))

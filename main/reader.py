@@ -7,7 +7,7 @@ def collect_symbolic_expression(log_path):
        This function will read the output log of a klee concolic execution and extract symbolic expressions
        of variables of interest
     """
-    emitter.normal("\textracting symbolic expressions")
+    # emitter.normal("\textracting symbolic expressions")
     var_expr_map = list()
     if os.path.exists(log_path):
         with open(log_path, 'r') as trace_file:

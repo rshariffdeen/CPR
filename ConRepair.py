@@ -92,6 +92,10 @@ def initialize():
     emitter.title("Initializing Program")
     program_path = values.CONF_PATH_PROGRAM
     test_input_list = values.CONF_TEST_INPUT
+    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
+    values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
+    values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
+    values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
 
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")

@@ -96,9 +96,6 @@ def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
     P = generate_patch_set(project_path)
-    ppc_log_path = project_path + "/klee-last/ppc.log"
-    expr_log_path = project_path + "/klee-last/expr.log"
-    trace_log_path = project_path + "/klee-last/trace.log"
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(P) <= 1
     iteration = 0
@@ -110,10 +107,8 @@ def run(project_path, program_path):
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
-        values.LIST_TRACE = collect_trace(trace_log_path, project_path)
         print(len(values.LIST_TRACE))
-        gen_arg_list, gen_var_list, P = generate_new_input(ppc_log_path, expr_log_path, project_path, argument_list,
-                                                           second_var_list, P)  # TODO (later) patch candidate missing
+        gen_arg_list, gen_var_list, P = generate_new_input(project_path, argument_list, second_var_list, P)  # TODO (later) patch candidate missing
         if not gen_arg_list and not gen_var_list:
             emitter.warning("\t\t[warning] no more paths to generate new input")
             break

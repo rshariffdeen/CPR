@@ -9,7 +9,14 @@ SECOND_VAR_LIST = []
 SPECIFICATION = ""
 TEST_SPECIFICATION = ""
 
-LIST_TRACE = []
+LIST_TRACE = None
+LIST_PPC = None
+
+
+# ------------------ File Path Values ---------------
+FILE_TRACE_LOG = ""
+FILE_PPC_LOG = ""
+FILE_EXPR_LOG = ""
 
 
 # ------------------ Default Values ---------------
