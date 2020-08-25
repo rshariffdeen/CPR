@@ -32,3 +32,4 @@ CONF_CUSTOM_COMP_LIST = ""
 CONF_DEPTH_VALUE = ""
 FILE_CONFIGURATION = ""
 silence_emitter = False
+CONF_DIR_SRC = ""
