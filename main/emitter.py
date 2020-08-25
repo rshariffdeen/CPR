@@ -84,7 +84,7 @@ def emit_patch(patch_tree, jump_line=True, message=""):
     output = message
     for (lid, prog) in patch_tree.items():
         code = lid + ": " + (program_to_code(prog))
-    indent_length = 0
+    indent_length = 1
     prefix = "\t" * indent_length
     output = output + code
     write(output, WHITE, jump_line, indent_level=indent_length, prefix=prefix)

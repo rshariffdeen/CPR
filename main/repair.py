@@ -95,7 +95,7 @@ def print_patch_list(patch_list):
         count = count + 1
         emitter.sub_sub_title("Patch #" + str(count))
 
-        emitter.emit_patch(patch,message="\t\t")
+        emitter.emit_patch(patch,message="\t")
 
 
 def run(project_path, program_path):
