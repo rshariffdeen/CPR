@@ -20,9 +20,12 @@ def generate_distance_map():
     loc_bug = values.CONF_BUG_LOCATION
     distance_map = dict()
     for loc in set(values.LIST_TRACE):
+        if loc == loc_bug:
+            continue
         distance = calculate_distance(loc, loc_bug)
         if distance > 0:
             distance_map[loc] = distance
+
     return distance_map
 
 
