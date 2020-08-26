@@ -68,7 +68,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
 
     spec_files = []
     for output_spec in test_output_list:
-        spec_files.append((Path("t1.smt2"), Path("klee-out-" + str(test_output_list.index(output_spec)))))
+        spec_files.append((Path(output_spec), Path("klee-out-" + str(test_output_list.index(output_spec)))))
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = True
@@ -120,7 +120,7 @@ def run(project_path, program_path):
         distance.update_distance_map()
 
         ## Reduces the set of patch candidates based on the current path constraint
-        P = reduce(P, project_path + "/klee-last/", gen_arg_list, assertion)
+        P = reduce(P, Path(project_path + "/klee-last/").resolve(), gen_arg_list, assertion)
         emitter.debug("|P|=", str(len(P)))
 
         # Checks for the current coverage.
