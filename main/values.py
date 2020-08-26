@@ -24,6 +24,7 @@ FILE_EXPR_LOG = ""
 DEFAULT_DEPTH = 3
 DEFAULT_LOWER_BOUND = -10
 DEFAULT_UPPER_BOUND = 11
+DEFAULT_MAX_FORK = 5
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 
@@ -50,3 +51,5 @@ CONF_BUG_LOCATION = ""
 CONF_PATH_POC = ""
 CONF_LOW_BOUND = ""
 CONF_MAX_BOUND = ""
+CONF_MAX_FORK = ""
+

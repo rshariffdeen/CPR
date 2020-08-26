@@ -43,6 +43,9 @@ def initialize():
         values.DEFAULT_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
         values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
+    if values.CONF_MAX_FORK:
+        values.DEFAULT_MAX_FORK = values.DEFAULT_MAX_FORK
+
 
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")

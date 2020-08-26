@@ -6,14 +6,14 @@ import collections
 import random
 from six.moves import cStringIO
 from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, Int
+from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, \
+    Int
 import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BOOL, BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
 from main import emitter, values, reader
-
 
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
@@ -53,7 +53,7 @@ def z3_get_model(formula):
         if not value_array_map:
             byte_list[0] = default_value
         else:
-            array_size = 4 #TODO: dynamically calculate the size later
+            array_size = 4  # TODO: dynamically calculate the size later
             for i in range(0, array_size):
                 byte_list[i] = default_value
             for idx, val in value_array_map.items():
@@ -111,7 +111,8 @@ def parse_z3_output(z3_output):
                     byte_list = dict()
                     byte_list[0] = int("0x" + str_value, 16)
                 elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
-                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n", "")
+                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n",
+                                                                                                                   "")
                     byte_list[0] = int(str_value.replace("#", "0"), 16)
                 elif "true)" in str_lambda:
                     byte_list[0] = int("0xff", 16)
@@ -279,7 +280,8 @@ def extract_var_relationship(var_expr_map):
 
 
 def select_nearest_control_loc():
-    control_loc_dist_map = dict(filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
+    control_loc_dist_map = dict(
+        filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
     min_distance = min(list(control_loc_dist_map.values()))
     loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
     return random.choice(list(set(loc_list) & set(list_path_detected.keys())))
@@ -347,7 +349,6 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             emitter.debug("Removing Patch", selected_patch)
             patch_list.remove(selected_patch)
     emitter.emit_patch(selected_patch, message="\tSelected patch: ")
-
 
     # add patch constraint and user-input->prog-var relationship
     selected_new_path = And(selected_new_path, patch_constraint)
@@ -458,6 +459,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    "--external-calls=all " \
+                   "--max-forks {0}".format(values.DEFAULT_MAX_FORK) \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
                    + input_argument
@@ -498,12 +500,13 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
     else:
         klee_command = "klee "
     klee_command += "--posix-runtime " \
-                   "--libc=uclibc " \
-                   "--write-smt2s " \
-                   "--log-ppc " \
-                   "--external-calls=all " \
-                   + "{0} ".format(binary_name) \
-                   + input_argument
+                    "--libc=uclibc " \
+                    "--write-smt2s " \
+                    "--log-ppc " \
+                    "--external-calls=all " \
+                    "--max-forks {0}".format(values.DEFAULT_MAX_FORK) \
+                    + "{0} ".format(binary_name) \
+                    + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = execute_command(klee_command)

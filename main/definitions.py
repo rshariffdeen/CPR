@@ -44,6 +44,7 @@ CONF_DIR_SRC = "src_directory:"
 CONF_LOC_BUG = "loc_bug:"
 CONF_LOW_BOUND = "low_bound:"
 CONF_MAX_BOUND = "max_bound:"
+CONF_MAX_FORK = "max-fork:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
