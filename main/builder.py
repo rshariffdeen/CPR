@@ -45,7 +45,7 @@ def config_project(project_path, is_llvm, custom_config_command=None):
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
         config_command += "CFLAGS=\"" + C_FLAGS + "\" "
-        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
+        config_command += "CXXFLAGS=\"" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure.ac"):
         config_command = "autoreconf -i;"
@@ -53,7 +53,7 @@ def config_project(project_path, is_llvm, custom_config_command=None):
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
         config_command += "CFLAGS=\"" + C_FLAGS + "\" "
-        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
+        config_command += "CXXFLAGS=\"" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure.in"):
         config_command = "autoreconf -i;"
@@ -61,14 +61,14 @@ def config_project(project_path, is_llvm, custom_config_command=None):
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
         config_command += "CFLAGS=\"" + C_FLAGS + "\" "
-        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
+        config_command += "CXXFLAGS=\"" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure"):
         config_command = "CC=" + CC + " "
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
         config_command += "CFLAGS=\"" + C_FLAGS + "\" "
-        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
+        config_command += "CXXFLAGS=\"" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/CMakeLists.txt"):
         config_command = "cmake -DCMAKE_C_COMPILER=" + CC + " "
