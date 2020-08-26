@@ -494,6 +494,8 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
     binary_name = str(program).split("/")[-1]
     input_argument = ""
     for argument in argument_list:
+        if "$POC" in argument:
+            argument = values.CONF_PATH_POC
         input_argument += " " + str(argument)
     if output_dir:
         klee_command = "klee --output-dir=" + str(output_dir) + " "
