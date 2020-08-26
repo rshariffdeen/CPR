@@ -11,6 +11,8 @@ TEST_SPECIFICATION = ""
 
 LIST_TRACE = None
 LIST_PPC = None
+MAP_LOC_DISTANCE = dict()
+
 
 
 # ------------------ File Path Values ---------------
@@ -23,6 +25,9 @@ FILE_EXPR_LOG = ""
 DEFAULT_DEPTH = 3
 DEFAULT_LOWER_BOUND = -10
 DEFAULT_UPPER_BOUND = 11
+crash_word_list = ["abort", "core dumped", "crashed", "exception"]
+error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
+
 
 # ------------------ Configuration Values ---------------
 CONF_PATH_PROJECT = ""

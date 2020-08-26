@@ -64,7 +64,8 @@ def collect_symbolic_path(log_path, project_path):
 
 def collect_trace(file_path, project_path):
     """
-       This function will read the output log of a klee concolic execution and extract the instruction trace
+       This function will read the output log of a klee concolic execution and
+       extract the instruction trace
     """
     emitter.normal("\textracting instruction trace")
     list_trace = list()
@@ -81,3 +82,72 @@ def collect_trace(file_path, project_path):
                         if (not list_trace) or (list_trace[-1] != trace_line):
                             list_trace.append(trace_line)
     return list_trace
+
+
+def collect_crash_point(trace_file_path):
+    """
+        This function will read the output log of a klee concolic execution and
+        extract the location of the crash instruction
+     """
+    crash_location = ""
+    if os.path.exists(trace_file_path):
+        with open(trace_file_path, 'r') as trace_file:
+            for read_line in trace_file:
+                if "KLEE: ERROR:" in read_line:
+                    read_line = read_line.replace("KLEE: ERROR: ", "")
+                    crash_location = read_line.split(": ")[0]
+                    break
+    return crash_location
+
+
+def collect_exploit_return_code(output_file_path):
+    """
+        This function will read the output log of a program execution
+        and extract the exit code of the program
+    """
+    return_code = ""
+    if os.path.exists(output_file_path):
+        with open(output_file_path, 'r') as output_file:
+            for read_line in output_file.readlines():
+                if "RETURN CODE:" in read_line:
+                    read_line = read_line.replace("RETURN CODE: ", "")
+                    return_code = int(read_line)
+                    break
+    return return_code
+
+
+def collect_exploit_output(output_file_path):
+    """
+        This function will read the output log of a program execution
+        and extract the output text
+    """
+    output = ""
+    if os.path.exists(output_file_path):
+        with open(output_file_path, 'r') as output_file:
+            output = output_file.readlines()
+    return output
+
+
+def collect_stack_info(trace_file_path):
+    """
+        This function will read the output log of a klee concolic execution
+        and extract any stack information avail for error exits
+    """
+    stack_map = dict()
+    if os.path.exists(trace_file_path):
+        with open(trace_file_path, 'r') as trace_file:
+            is_stack = False
+            for read_line in trace_file:
+                if is_stack and '#' in read_line:
+                    if " at " in read_line:
+                        read_line, source_path = str(read_line).split(" at ")
+                        source_path, line_number = source_path.split(":")
+                        function_name = str(read_line.split(" in ")[1]).split(" (")[0]
+                        if source_path not in stack_map.keys():
+                            stack_map[source_path] = dict()
+                        stack_map[source_path][function_name] = line_number.strip()
+                if "Stack:" in read_line:
+                    is_stack = True
+                    continue
+    return stack_map
+

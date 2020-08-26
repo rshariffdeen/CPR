@@ -52,6 +52,7 @@ def initialize():
 
 
 
+
 def main(arg_list):
     create_directories()
     emitter.start()
