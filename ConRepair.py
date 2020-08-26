@@ -39,6 +39,11 @@ def initialize():
     if not values.CONF_BUG_LOCATION:
         values.CONF_BUG_LOCATION = reader.collect_crash_point(values.FILE_TRACE_LOG)
 
+    if values.CONF_MAX_BOUND:
+        values.DEFAULT_UPPER_BOUND = values.CONF_MAX_BOUND
+    if values.CONF_LOW_BOUND:
+        values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
+
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")
         emitter.debug("input list in test case:", argument_list)

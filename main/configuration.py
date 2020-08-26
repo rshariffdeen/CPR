@@ -64,6 +64,10 @@ def read_conf_file():
             values.CONF_BUG_LOCATION = configuration.replace(definitions.CONF_LOC_BUG, '')
         elif definitions.CONF_PATH_POC in configuration:
             values.CONF_PATH_POC = configuration.replace(definitions.CONF_PATH_POC, '')
+        elif definitions.CONF_LOW_BOUND in configuration:
+            values.CONF_LOW_BOUND = int(configuration.replace(definitions.CONF_LOW_BOUND, ''))
+        elif definitions.CONF_MAX_BOUND in configuration:
+            values.CONF_MAX_BOUND = int(configuration.replace(definitions.CONF_MAX_BOUND, ''))
 
     values.CONF_PATH_PROGRAM = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
     values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC

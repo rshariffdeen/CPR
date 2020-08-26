@@ -14,7 +14,6 @@ LIST_PPC = None
 MAP_LOC_DISTANCE = dict()
 
 
-
 # ------------------ File Path Values ---------------
 FILE_TRACE_LOG = ""
 FILE_PPC_LOG = ""
@@ -49,3 +48,5 @@ silence_emitter = False
 CONF_DIR_SRC = ""
 CONF_BUG_LOCATION = ""
 CONF_PATH_POC = ""
+CONF_LOW_BOUND = ""
+CONF_MAX_BOUND = ""
