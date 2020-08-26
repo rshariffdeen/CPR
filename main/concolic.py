@@ -316,7 +316,9 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
 
     for control_loc in generated_path_list:
         generated_path_list_at_loc = generated_path_list[control_loc]
-        detected_path_list_at_loc = list_path_detected[control_loc]
+        detected_path_list_at_loc = list()
+        if control_loc in list_path_detected:
+            detected_path_list_at_loc = list_path_detected[control_loc]
         for generated_path in generated_path_list_at_loc:
             if generated_path not in (detected_path_list_at_loc + list_path_explored):
                 list_path_detected[control_loc].append(generated_path)
