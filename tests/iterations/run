@@ -22,14 +22,14 @@ klee --posix-runtime --libc=uclibc --write-smt2s --output-dir=klee-t1 "${PROGRAM
 #           --components components/*.smt2 \
 #           --depth 2
 
-# python3.6 ../../main/synthesis.py \
-#           --tests t1.smt2:klee-t1 \
-#           --verify L10:patch.smt2
+python3.6 ../../main/synthesis.py \
+           --tests t1.smt2:klee-t1 \
+           --verify L10:patch.smt2
 
-# python3.6 ../../main/synthesis.py \
-#           --tests t1.smt2:klee-t1 \
-#           --components components/*.smt2 ../../components/assignment.smt2 ../../components/addition.smt2 ../../components/constant_a.smt2 \
-#           --verify L10:patch.json
+python3.6 ../../main/synthesis.py \
+           --tests t1.smt2:klee-t1 \
+           --components components/*.smt2 ../../components/assignment.smt2 ../../components/addition.smt2 ../../components/constant_a.smt2 \
+           --verify L10:patch.json
 
 python3.6 ../../main/synthesis.py \
           --tests t1.smt2:klee-t1 \
