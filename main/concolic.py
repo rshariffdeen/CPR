@@ -282,7 +282,7 @@ def select_nearest_control_loc():
     control_loc_dist_map = dict(filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
     min_distance = min(list(control_loc_dist_map.values()))
     loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
-    return random.choice(set(loc_list) & set(list_path_detected.keys()))
+    return random.choice(list(set(loc_list) & set(list_path_detected.keys())))
 
 
 def select_new_path_condition():
