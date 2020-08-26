@@ -48,3 +48,4 @@ FILE_CONFIGURATION = ""
 silence_emitter = False
 CONF_DIR_SRC = ""
 CONF_BUG_LOCATION = ""
+CONF_PATH_POC = ""

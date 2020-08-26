@@ -60,8 +60,10 @@ def read_conf_file():
             values.CONF_DEPTH_VALUE = configuration.replace(definitions.CONF_DEPTH_VALUE, '')
         elif definitions.CONF_DIR_SRC in configuration:
             values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '')
-        elif definitions.CONF_BUG_LOCATION in configuration:
-            values.CONF_BUG_LOCATION = configuration.replace(definitions.CONF_BUG_LOCATION, '')
+        elif definitions.CONF_LOC_BUG in configuration:
+            values.CONF_BUG_LOCATION = configuration.replace(definitions.CONF_LOC_BUG, '')
+        elif definitions.CONF_PATH_POC in configuration:
+            values.CONF_PATH_POC = configuration.replace(definitions.CONF_PATH_POC, '')
 
     values.CONF_PATH_PROGRAM = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_PROGRAM
     values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC

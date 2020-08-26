@@ -29,9 +29,10 @@ FILE_STANDARD_MACRO_LIST = DIRECTORY_DATA + "/standard-macro-list"
 # ------------------- Configuration --------------------
 
 CONF_PATH_PROJECT = "project_path:"
+CONF_PATH_SPECIFICATION = "spec_path:"
+CONF_PATH_POC = "poc_path:"
 CONF_COMMAND_CONFIG = "config_command:"
 CONF_COMMAND_BUILD = "build_command:"
-CONF_PATH_SPECIFICATION = "spec_path:"
 CONF_NAME_PROGRAM = "binary_path:"
 CONF_TEST_INPUT = "test_input:"
 CONF_TEST_OUTPUT = "test_output:"
@@ -40,7 +41,7 @@ CONF_GENERAL_COMP_LIST = "general_comp_list:"
 CONF_CUSTOM_COMP_LIST = "custom_comp_list:"
 CONF_DEPTH_VALUE = "depth:"
 CONF_DIR_SRC = "src_directory:"
-CONF_BUG_LOCATION = "loc_bug:"
+CONF_LOC_BUG = "loc_bug:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
