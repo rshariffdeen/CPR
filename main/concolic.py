@@ -459,7 +459,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    "--external-calls=all " \
-                   "--max-forks {0}".format(values.DEFAULT_MAX_FORK) \
+                   "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
                    + input_argument
@@ -504,7 +504,7 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
                     "--write-smt2s " \
                     "--log-ppc " \
                     "--external-calls=all " \
-                    "--max-forks {0}".format(values.DEFAULT_MAX_FORK) \
+                    "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + "{0} ".format(binary_name) \
                     + input_argument
     if not print_output:
