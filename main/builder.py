@@ -9,8 +9,8 @@ from main import definitions, values, logger, emitter
 
 CC = "$TRIDENT_CC"
 CXX = "$TRIDENT_CXX"
-C_FLAGS = "'-g -O0  -e'"
-CXX_FLAGS = "'-g -O0  -e'"
+C_FLAGS = "-g -O0  -e"
+CXX_FLAGS = "-g -O0  -e"
 LD_FLAGS = ""
 
 
@@ -44,37 +44,37 @@ def config_project(project_path, is_llvm, custom_config_command=None):
         config_command += "CC=" + CC + " "
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
-        config_command += "CFLAGS=" + C_FLAGS + " "
-        config_command += "CXXFLAGS=" + CXX_FLAGS
+        config_command += "CFLAGS=\"" + C_FLAGS + "\" "
+        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure.ac"):
         config_command = "autoreconf -i;"
         config_command += "CC=" + CC + " "
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
-        config_command += "CFLAGS=" + C_FLAGS + " "
-        config_command += "CXXFLAGS=" + CXX_FLAGS
+        config_command += "CFLAGS=\"" + C_FLAGS + "\" "
+        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure.in"):
         config_command = "autoreconf -i;"
         config_command += "CC=" + CC + " "
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
-        config_command += "CFLAGS=" + C_FLAGS + " "
-        config_command += "CXXFLAGS=" + CXX_FLAGS
+        config_command += "CFLAGS=\"" + C_FLAGS + "\" "
+        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/configure"):
         config_command = "CC=" + CC + " "
         config_command += "CXX=" + CXX + " "
         config_command += "./configure "
-        config_command += "CFLAGS=" + C_FLAGS + " "
-        config_command += "CXXFLAGS=" + CXX_FLAGS
+        config_command += "CFLAGS=\"" + C_FLAGS + "\" "
+        config_command += "CXXFLAGS=" + CXX_FLAGS + "\""
 
     elif os.path.exists(project_path + "/CMakeLists.txt"):
         config_command = "cmake -DCMAKE_C_COMPILER=" + CC + " "
         config_command += "-DCMAKE_CPP_COMPILER=" + CXX + " "
-        config_command += "-DCMAKE_C_FLAGS=" + C_FLAGS + " "
-        config_command += "-DCMAKE_CXX_FLAGS=" + CXX_FLAGS + " . "
+        config_command += "-DCMAKE_C_FLAGS=\"" + C_FLAGS + "\" "
+        config_command += "-DCMAKE_CXX_FLAGS=\"" + CXX_FLAGS + "\" . "
 
     if is_llvm:
         config_command = "LLVM_COMPILER=clang;" + config_command
