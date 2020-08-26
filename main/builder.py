@@ -32,9 +32,9 @@ def config_project(project_path, is_llvm, custom_config_command=None):
                     custom_config_command = custom_config_command.replace("clang", "wllvm")
                     custom_config_command = custom_config_command.replace("clang++", "wllvm++")
                 # print(custom_config_command)
-            config_command = "CC=" + CC + " "
-            config_command += "CXX=" + CXX + " "
-            config_command += custom_config_command
+            # config_command = "CC=" + CC + " "
+            # config_command += "CXX=" + CXX + " "
+            config_command = custom_config_command
             if "--cc=" in config_command:
                 config_command = config_command.replace("--cc=clang-7", "--cc=" + CC)
             # print(config_command)
@@ -130,7 +130,7 @@ def apply_flags(build_command):
         cc_old = (build_command.split("CC='")[1]).split("'")[0]
         build_command = build_command.replace(cc_old, CC)
     else:
-        new_command = "make CC=" + CC + " "
+        new_command = "CC=" + CC + " make"
         build_command = build_command.replace("make", new_command)
 
     if "XCXX=" in build_command:
@@ -140,7 +140,7 @@ def apply_flags(build_command):
         cc_old = (build_command.split("CXX='")[1]).split("'")[0]
         build_command = build_command.replace(cc_old, CXX)
     else:
-        new_command = "make CXX=" + CXX + " "
+        new_command = "CXX=" + CXX + " make"
         build_command = build_command.replace("make", new_command)
 
     return build_command
@@ -150,15 +150,15 @@ def build_project(project_path, build_command=None):
     emitter.sub_sub_title("building program")
     dir_command = "cd " + project_path + ";"
     if build_command is None:
-        build_command = "bear make CFLAGS=\"" + C_FLAGS + "\" "
+        build_command = "CC=" + CC + " CXX=" + CXX + " "
+        build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
         build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" > " + definitions.FILE_MAKE_LOG
     else:
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make", "bear make")
         if CC == "wllvm":
             build_command = remove_fsanitize(build_command)
-        if "-j" not in build_command:
-            build_command = apply_flags(build_command)
+        build_command = apply_flags(build_command)
     if not build_command:
         error_exit("[Not Found] Build Command")
     build_command = dir_command + build_command
