@@ -65,7 +65,11 @@ def read_conf_file():
         elif definitions.CONF_PATH_POC in configuration:
             values.CONF_PATH_POC = configuration.replace(definitions.CONF_PATH_POC, '')
             if not os.path.isfile(values.CONF_PATH_POC):
-                error_exit("Test file " + values.CONF_PATH_POC + " not found")
+                poc_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_POC
+                if os.path.isfile(poc_path):
+                    values.CONF_PATH_POC = poc_path
+                else:
+                    error_exit("Test file " + values.CONF_PATH_POC + " not found")
         elif definitions.CONF_LOW_BOUND in configuration:
             values.CONF_LOW_BOUND = int(configuration.replace(definitions.CONF_LOW_BOUND, ''))
         elif definitions.CONF_MAX_BOUND in configuration:
