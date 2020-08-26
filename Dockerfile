@@ -116,9 +116,11 @@ RUN cd runtime && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
 RUN chmod +x /concolic-repair/tools/trident-cc
+RUN chmod +x /concolic-repair/tools/trident-cxx
 RUN chmod +x /concolic-repair/tests/assignment/run
 RUN chmod +x /concolic-repair/tests/iterations/run
 RUN chmod +x /concolic-repair/tests/multipath/run
 RUN chmod +x /concolic-repair/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
 ENV TRIDENT_CC=/concolic-repair/tools/trident-cc
+ENV TRIDENT_CXX=/concolic-repair/tools/trident-cxx
