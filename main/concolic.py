@@ -21,7 +21,7 @@ File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 list_path_explored = list()
-list_path_detected = list()
+list_path_detected = dict()
 
 
 def z3_get_model(formula):
@@ -196,7 +196,7 @@ def generate_new_symbolic_paths(constraint_list):
     This function will generate N number of new paths by negating each branch condition at a given branch location
            constraint_list : a dictionary containing the constraints at each branch location
     """
-    new_path_list = list()
+    new_path_list = dict()
     for chosen_control_loc in constraint_list:
         chosen_constraint_list_at_loc = constraint_list[chosen_control_loc]
         for chosen_constraint in chosen_constraint_list_at_loc:
@@ -206,8 +206,9 @@ def generate_new_symbolic_paths(constraint_list):
                 for constraint in constraint_list_at_loc:
                     if constraint == chosen_constraint and control_loc == chosen_control_loc:
                         if is_sat(new_path):
-                            if new_path not in new_path_list:
-                                new_path_list.append(new_path)
+                            if chosen_control_loc not in new_path_list:
+                                new_path_list[chosen_control_loc] = set()
+                            new_path_list[chosen_control_loc].add(new_path)
                         break
                     new_path = And(new_path, constraint)
                 if control_loc == chosen_control_loc:
@@ -277,7 +278,22 @@ def extract_var_relationship(var_expr_map):
     return relationship
 
 
-def generate_new_input(project_path, argument_list, second_var_list, patch_list=None):
+def select_nearest_control_loc():
+    min_distance = min(list(values.MAP_LOC_DISTANCE.values()))
+    loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, values.MAP_LOC_DISTANCE.items())).keys())
+    return random.choice(set(loc_list) & set(list_path_detected.keys()))
+
+
+def select_new_path_condition():
+    control_loc = select_nearest_control_loc()
+    selected_path = random.choice(list_path_detected[control_loc])
+    list_path_detected[control_loc].remove(selected_path)
+    if not list_path_detected[control_loc]:
+        list_path_detected.pop(control_loc)
+    return selected_path
+
+
+def generate_new_input(argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -293,22 +309,25 @@ def generate_new_input(project_path, argument_list, second_var_list, patch_list=
     ppc_list = values.LIST_PPC
     var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
     constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
-    new_path_list = generate_new_symbolic_paths(constraint_list)
+    generated_path_list = generate_new_symbolic_paths(constraint_list)
     # list_path_explored = list(set(list_path_explored + current_path_list))
     selected_patch = None
     patch_constraint = TRUE
 
-    for new_path in new_path_list:
-        if new_path not in (list_path_detected + list_path_explored):
-            list_path_detected.append(new_path)
+    for control_loc in generated_path_list:
+        generated_path_list_at_loc = generated_path_list[control_loc]
+        detected_path_list_at_loc = list_path_detected[control_loc]
+        for generated_path in generated_path_list_at_loc:
+            if generated_path not in (detected_path_list_at_loc + list_path_explored):
+                list_path_detected[control_loc].append(generated_path)
 
     if not list_path_detected:
         emitter.debug("Count paths explored: ", str(len(list_path_explored)))
         emitter.debug("Count paths detected: ", str(len(list_path_detected)))
         return None, None, patch_list
-    selected_new_path = random.choice(list_path_detected)
+
+    selected_new_path = select_new_path_condition()
     list_path_explored.append(selected_new_path)
-    list_path_detected.remove(selected_new_path)
 
     relationship = extract_var_relationship(var_expr_map)
     selected_new_path = And(selected_new_path, relationship)
@@ -503,7 +522,7 @@ def run_concolic_exploration(program, argument_list, second_var_list, root_direc
     while list_path_detected or is_initial:
         is_initial = False
         path_count = path_count + 1
-        gen_arg_list, gen_var_list = generate_new_input(root_directory, argument_list, second_var_list)
+        gen_arg_list, gen_var_list = generate_new_input(argument_list, second_var_list)
         run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))
