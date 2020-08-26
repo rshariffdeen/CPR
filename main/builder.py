@@ -173,6 +173,7 @@ def build_normal():
 
     emitter.sub_title("Building Program")
     execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
+    execute_command("export TRIDENT_CXX=" + definitions.DIRECTORY_TOOLS + "/trident-cxx")
     clean_project(values.CONF_DIR_SRC)
     CC = "$TRIDENT_CC"
     CXX = "$TRIDENT_CXX"

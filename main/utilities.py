@@ -70,7 +70,7 @@ def build_program(program_path):
     program_loc = "/".join(program_path.split("/")[:-1])
     compile_command = "cd " + program_loc + ";"
     compile_command += "export TRIDENT_CC=/concolic-repair/main/trident-cc;" \
-                      "CC=\"$TRIDENT_CC\" make -e;" \
+                      "CC=\"$TRIDENT_CC\" CXX=\"$TRIDENT_CXX\" make -e;" \
                       "extract-bc " + program_name
     process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()
