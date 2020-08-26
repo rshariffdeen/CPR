@@ -130,7 +130,7 @@ def apply_flags(build_command):
         cc_old = (build_command.split("CC='")[1]).split("'")[0]
         build_command = build_command.replace(cc_old, CC)
     else:
-        new_command = "CC=" + CC + " make"
+        new_command = "make CC=" + CC + " "
         build_command = build_command.replace("make", new_command)
 
     if "XCXX=" in build_command:
@@ -140,7 +140,7 @@ def apply_flags(build_command):
         cc_old = (build_command.split("CXX='")[1]).split("'")[0]
         build_command = build_command.replace(cc_old, CXX)
     else:
-        new_command = "CXX=" + CXX + " make"
+        new_command = "make CXX=" + CXX + " "
         build_command = build_command.replace("make", new_command)
 
     return build_command
@@ -154,11 +154,11 @@ def build_project(project_path, build_command=None):
         build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
         build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" > " + definitions.FILE_MAKE_LOG
     else:
+        if not os.path.isfile(project_path + "/compile_commands.json"):
+            build_command = build_command.replace("make", "bear make")
         if CC == "wllvm":
             build_command = remove_fsanitize(build_command)
         build_command = apply_flags(build_command)
-        if not os.path.isfile(project_path + "/compile_commands.json"):
-            build_command = build_command.replace("make", "bear make")
     if not build_command:
         error_exit("[Not Found] Build Command")
     build_command = dir_command + build_command
