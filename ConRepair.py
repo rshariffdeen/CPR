@@ -1,6 +1,6 @@
 import os
 import time
-from main import emitter, logger, definitions, values, builder, repair, configuration
+from main import emitter, logger, definitions, values, builder, repair, configuration, reader, distance
 from main.utilities import extract_byte_code
 from main.concolic import run_concrete_execution, run_concolic_execution
 
@@ -35,6 +35,10 @@ def initialize():
     values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
 
+    # set location of bug/crash
+    if not values.CONF_BUG_LOCATION:
+        values.CONF_BUG_LOCATION = reader.collect_crash_point(values.FILE_TRACE_LOG)
+
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")
         emitter.debug("input list in test case:", argument_list)
@@ -48,9 +52,7 @@ def initialize():
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
 
-
-
-
+        distance.update_distance_map()
 
 
 def main(arg_list):

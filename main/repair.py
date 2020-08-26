@@ -1,11 +1,11 @@
 import os
 from main.concolic import extract_var_relationship, run_concolic_execution, generate_new_input
-from main.reader import collect_symbolic_expression, collect_trace
+from main.reader import collect_symbolic_expression
 from main.utilities import extract_assertion, extract_constraints_from_patch
 from main.synthesis import load_components, load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, definitions, values
+from main import emitter, definitions, values, distance
 from pysmt.shortcuts import is_sat, And
 
 check_counter = 0
@@ -117,6 +117,7 @@ def run(project_path, program_path):
         ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
         exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
+        distance.update_distance_map()
 
         ## Reduces the set of patch candidates based on the current path constraint
         P = reduce(P, project_path + "/klee-last/", gen_arg_list, assertion)

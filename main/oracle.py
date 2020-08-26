@@ -36,3 +36,8 @@ def is_loc_on_sanitizer(source_path, line_number, suspicious_lines):
     if source_loc in suspicious_lines.keys():
         return True
     return False
+
+
+def is_loc_in_trace(source_loc):
+    return source_loc in values.LIST_TRACE
+
