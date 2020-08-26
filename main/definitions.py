@@ -40,6 +40,7 @@ CONF_GENERAL_COMP_LIST = "general_comp_list:"
 CONF_CUSTOM_COMP_LIST = "custom_comp_list:"
 CONF_DEPTH_VALUE = "depth:"
 CONF_DIR_SRC = "src_directory:"
+CONF_BUG_LOCATION = "loc_bug:"
 
 
 # ----------------- KEY DEFINITIONS -------------------

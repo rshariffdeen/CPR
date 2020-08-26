@@ -42,3 +42,4 @@ CONF_DEPTH_VALUE = ""
 FILE_CONFIGURATION = ""
 silence_emitter = False
 CONF_DIR_SRC = ""
+CONF_BUG_LOCATION = ""
