@@ -477,7 +477,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return return_code
 
 
-def run_concrete_execution(program, argument_list, second_var_list, print_output=False, output_dir=None):
+def run_concrete_execution(program, argument_str, second_var_list, print_output=False, output_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -493,6 +493,7 @@ def run_concrete_execution(program, argument_list, second_var_list, print_output
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
+    argument_list = str(argument_str).split(" ")
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC
