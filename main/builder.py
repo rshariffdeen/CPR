@@ -9,8 +9,8 @@ from main import definitions, values, logger, emitter
 
 CC = "$TRIDENT_CC"
 CXX = "$TRIDENT_CXX"
-C_FLAGS = "-g -O0  -e"
-CXX_FLAGS = "-g -O0  -e"
+C_FLAGS = "-g -O0  -static -e"
+CXX_FLAGS = "-g -O0 -static -e"
 LD_FLAGS = ""
 
 
