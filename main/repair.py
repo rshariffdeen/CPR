@@ -5,7 +5,7 @@ from main.utilities import extract_assertion, extract_constraints_from_patch
 from main.synthesis import load_components, load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, definitions, values, distance
+from main import emitter, definitions, values, distance, oracle
 from pysmt.shortcuts import is_sat, And
 
 check_counter = 0
@@ -121,6 +121,11 @@ def run(project_path, program_path):
         ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
         exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
+
+        # check if new path hits fault location and patch location
+        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH) or not oracle.is_loc_in_trace(values.CONF_BUG_LOCATION):
+            continue
+
         distance.update_distance_map()
 
         ## Reduces the set of patch candidates based on the current path constraint

@@ -62,6 +62,8 @@ def read_conf_file():
             values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '')
         elif definitions.CONF_LOC_BUG in configuration:
             values.CONF_BUG_LOCATION = configuration.replace(definitions.CONF_LOC_BUG, '')
+        elif definitions.CONF_LOC_PATCH in configuration:
+            values.CONF_LOC_PATCH = configuration.replace(definitions.CONF_LOC_PATCH, '')
         elif definitions.CONF_PATH_POC in configuration:
             values.CONF_PATH_POC = configuration.replace(definitions.CONF_PATH_POC, '')
             if not os.path.isfile(values.CONF_PATH_POC):
