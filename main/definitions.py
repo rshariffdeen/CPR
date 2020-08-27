@@ -4,7 +4,7 @@ import os
 
 # ------------------- Directories --------------------
 
-DIRECTORY_ROOT = "/".join(os.path.realpath(__file__).split("/")[:-1]) + "/../"
+DIRECTORY_ROOT = "/".join(os.path.realpath(__file__).split("/")[:-2])
 DIRECTORY_RUNTIME = DIRECTORY_ROOT + "/runtime"
 DIRECTORY_LOG = DIRECTORY_ROOT + "/logs"
 DIRECTORY_OUTPUT_BASE = DIRECTORY_ROOT + "/output"
