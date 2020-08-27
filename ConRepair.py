@@ -32,7 +32,7 @@ def load_component_list():
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
         for comp_file in component_file_list:
             if ".smt2" in comp_file:
-                gen_comp_files.append(comp_file)
+                gen_comp_files.append(Path(comp_file))
     general_components = synthesis.load_components(gen_comp_files)
 
     proj_comp_files = []
