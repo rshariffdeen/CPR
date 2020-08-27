@@ -501,10 +501,12 @@ class Klee:
 
 
 def parse_assertion_symbol(symbol: Formula) -> SymbolData:
-    assertion_symbol_regexp = re.compile(r'^(\w+)!(\d+)$')
-    m = re.search(assertion_symbol_regexp, symbol.symbol_name())
-    # TODO: support bool type?
-    return SymbolData(type=TridentType.I32, name=m.group(1), eid=int(m.group(2)))
+    # assertion_symbol_regexp = re.compile(r'^(\w+)!(\d+)$')
+    # m = re.search(assertion_symbol_regexp, symbol.symbol_name())
+    # # TODO: support bool type?
+    # return SymbolData(type=TridentType.I32, name=m.group(1), eid=int(m.group(2)))
+    symbol_name, symbol_eid = str(symbol).split("!")
+    return SymbolData(type=TridentType.I32, name=symbol_name, eid=int(symbol_eid))
 
 
 # Returns mapping from lids (location IDs) to corresponding type
