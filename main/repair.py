@@ -67,7 +67,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
         depth = int(values.CONF_DEPTH_VALUE)
 
     spec_files = []
-    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM).split("/")[:-1]
+    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + str(test_output_list.index(output_spec)))
