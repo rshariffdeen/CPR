@@ -79,5 +79,8 @@ def read_conf_file():
         elif definitions.CONF_TAG_ID in configuration:
             values.CONF_TAG_ID = int(configuration.replace(definitions.CONF_TAG_ID, ''))
 
+    if not values.CONF_TAG_ID:
+        emitter.error("[NOT FOUND] Tag ID ")
+        exit()
     values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
