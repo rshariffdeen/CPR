@@ -35,7 +35,8 @@ def initialize():
     values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
-    os.mkdir(definitions.DIRECTORY_OUTPUT)
+    if not os.path.isdir(definitions.DIRECTORY_OUTPUT):
+        os.mkdir(definitions.DIRECTORY_OUTPUT)
 
 
     # set location of bug/crash
