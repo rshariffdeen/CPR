@@ -33,7 +33,6 @@ def bootstrap(arg_list):
     if not os.path.isdir(definitions.DIRECTORY_OUTPUT):
         os.mkdir(definitions.DIRECTORY_OUTPUT)
 
-
     # set location of bug/crash
     if not values.CONF_BUG_LOCATION:
         values.CONF_BUG_LOCATION = reader.collect_crash_point(values.FILE_TRACE_LOG)
@@ -57,7 +56,7 @@ def initialize():
         if "$POC" in argument_list:
             argument_list.replace("$POC", values.CONF_PATH_POC)
         extract_byte_code(program_path)
-        exit_code = run_concrete_execution(program_path + ".bc", argument_list, {}, True)
+        exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
 
         emitter.sub_title("Running initial concolic Execution")
