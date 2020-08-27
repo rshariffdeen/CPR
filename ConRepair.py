@@ -25,11 +25,6 @@ def bootstrap(arg_list):
     configuration.read_conf(arg_list)
     configuration.read_conf_file()
 
-
-def initialize():
-    emitter.title("Initializing Program")
-    program_path = values.CONF_PATH_PROGRAM
-    test_input_list = values.CONF_TEST_INPUT
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
     values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
@@ -50,6 +45,11 @@ def initialize():
     if values.CONF_MAX_FORK:
         values.DEFAULT_MAX_FORK = values.DEFAULT_MAX_FORK
 
+
+def initialize():
+    emitter.title("Initializing Program")
+    program_path = values.CONF_PATH_PROGRAM
+    test_input_list = values.CONF_TEST_INPUT
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")
         emitter.debug("input list in test case:", argument_list)
@@ -64,7 +64,6 @@ def initialize():
         extract_byte_code(program_path)
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
-
         distance.update_distance_map()
 
 
