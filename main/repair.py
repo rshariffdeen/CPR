@@ -49,19 +49,7 @@ def check_coverage():  # TODO
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     emitter.sub_title("Generating Patch Pool")
     test_output_list = values.CONF_TEST_OUTPUT
-    gen_comp_files = []
-    os.chdir(definitions.DIRECTORY_COMPONENTS)
-    for component_name in values.CONF_GENERAL_COMP_LIST:
-        gen_comp_files.append(Path(component_name))
-    general_components = load_components(gen_comp_files)
-
-    proj_comp_files = []
-    os.chdir(project_path)
-    for component_name in values.CONF_CUSTOM_COMP_LIST:
-        proj_comp_files.append(Path(component_name))
-    project_components = load_components(proj_comp_files)
-
-    components = project_components + general_components
+    components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
     if values.CONF_DEPTH_VALUE.isnumeric():
         depth = int(values.CONF_DEPTH_VALUE)

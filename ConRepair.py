@@ -1,6 +1,8 @@
 import os
 import time
-from main import emitter, logger, definitions, values, builder, repair, configuration, reader, distance
+from pathlib import Path
+from main import emitter, logger, definitions, values, builder, repair, \
+    configuration, reader, distance, synthesis
 from main.utilities import extract_byte_code
 from main.concolic import run_concrete_execution, run_concolic_execution
 
@@ -17,6 +19,22 @@ def create_directories():
 
     if not os.path.isdir(definitions.DIRECTORY_TMP):
         os.makedirs(definitions.DIRECTORY_TMP)
+
+
+def load_component_list():
+    emitter.normal("loading custom/general components")
+    gen_comp_files = []
+    os.chdir(definitions.DIRECTORY_COMPONENTS)
+    for component_name in values.CONF_GENERAL_COMP_LIST:
+        gen_comp_files.append(Path(component_name))
+    general_components = synthesis.load_components(gen_comp_files)
+
+    proj_comp_files = []
+    os.chdir(values.CONF_PATH_PROJECT)
+    for component_name in values.CONF_CUSTOM_COMP_LIST:
+        proj_comp_files.append(Path(component_name))
+    project_components = synthesis.load_components(proj_comp_files)
+    values.LIST_COMPONENTS = project_components + general_components
 
 
 def bootstrap(arg_list):
@@ -43,6 +61,8 @@ def bootstrap(arg_list):
         values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
     if values.CONF_MAX_FORK:
         values.DEFAULT_MAX_FORK = values.DEFAULT_MAX_FORK
+
+    load_component_list()
 
 
 def initialize():
