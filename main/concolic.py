@@ -445,6 +445,7 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
     current_dir = os.getcwd()
     directory_path = "/".join(str(program).split("/")[:-1])
     emitter.debug("changing directory:", directory_path)
+    project_path = values.CONF_PATH_PROJECT
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
@@ -479,8 +480,8 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
     # collect artifacts
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
-    values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, directory_path)
-    values.LIST_TRACE = reader.collect_trace(trace_log_path, directory_path)
+    values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, project_path)
+    values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     return return_code
 
 
