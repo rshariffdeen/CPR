@@ -420,10 +420,11 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     emitter.normal("\tgenerating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
-    n_arg = str(len(argument_list))
-    ktest_command += " --sym-args " + n_arg
     for argument in argument_list:
-        ktest_command += " \"" + str(argument) + "\""
+        if "$POC" in argument:
+            ktest_command += " --sym-file " + values.CONF_PATH_POC
+        else:
+            ktest_command += " --sym-arg \"" + str(argument) + "\""
 
     for var in second_var_list:
         ktest_command += " --second-var \'{0}\' {1} {2}".format(var['identifier'], var['size'], var['value'])
@@ -431,7 +432,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     return ktest_path, return_code
 
 
-def run_concolic_execution(program, argument_list, second_var_list, print_output=False):
+def run_concolic_execution(program, argument_str, second_var_list, print_output=False):
     """
     This function will execute the program in concolic mode using the generated ktest file
         program: the absolute path of the bitcode of the program
@@ -447,8 +448,14 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
+    argument_list = str(argument_str).split(" ")
     for argument in argument_list:
-        input_argument += " --sym-arg " + str(len(str(argument)))
+        if "$POC" in argument:
+            concrete_file = open(values.CONF_PATH_POC, 'rb')
+            bit_size = os.fstat(concrete_file.fileno()).st_size
+            input_argument += " A --sym-files 1 " + str(bit_size) + " "
+        else:
+            input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     emitter.normal("\texecuting klee concolic execution")
     klee_command = "klee " \
@@ -477,7 +484,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return return_code
 
 
-def run_concrete_execution(program, argument_str, second_var_list, print_output=False, output_dir=None):
+def run_concrete_execution(program, argument_str, print_output=False, output_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -518,7 +525,7 @@ def run_concrete_execution(program, argument_str, second_var_list, print_output=
     return return_code
 
 
-def run_concolic_exploration(program, argument_list, second_var_list, root_directory):
+def run_concolic_exploration(program, argument_list, second_var_list):
     """
     This function will explore all possible paths in a program provided one single test case
         program: the absolute path of the bitcode of the program

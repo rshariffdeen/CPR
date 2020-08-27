@@ -18,6 +18,8 @@ MAP_LOC_DISTANCE = dict()
 FILE_TRACE_LOG = ""
 FILE_PPC_LOG = ""
 FILE_EXPR_LOG = ""
+FILE_POC_SYM = ""
+FILE_POC_GEN = ""
 
 
 # ------------------ Default Values ---------------
@@ -52,4 +54,4 @@ CONF_PATH_POC = ""
 CONF_LOW_BOUND = ""
 CONF_MAX_BOUND = ""
 CONF_MAX_FORK = ""
-
+CONF_TAG_ID = ""

@@ -76,7 +76,8 @@ def read_conf_file():
             values.CONF_MAX_BOUND = int(configuration.replace(definitions.CONF_MAX_BOUND, ''))
         elif definitions.CONF_MAX_FORK in configuration:
             values.CONF_MAX_FORK = int(configuration.replace(definitions.CONF_MAX_FORK, ''))
-
+        elif definitions.CONF_TAG_ID in configuration:
+            values.CONF_TAG_ID = int(configuration.replace(definitions.CONF_TAG_ID, ''))
 
     values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM

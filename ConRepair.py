@@ -34,6 +34,9 @@ def initialize():
     values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
     values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
+    definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
+    os.mkdir(definitions.DIRECTORY_OUTPUT)
+
 
     # set location of bug/crash
     if not values.CONF_BUG_LOCATION:
@@ -45,7 +48,6 @@ def initialize():
         values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
     if values.CONF_MAX_FORK:
         values.DEFAULT_MAX_FORK = values.DEFAULT_MAX_FORK
-
 
     for argument_list in test_input_list:
         emitter.sub_title("Running initial concrete execution")
