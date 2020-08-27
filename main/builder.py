@@ -181,8 +181,11 @@ def build_normal():
     CXX_FLAGS = "-g -O0"
     LD_FLAGS = ""
     config_project(values.CONF_DIR_SRC, False, values.CONF_COMMAND_CONFIG)
-    C_FLAGS = "-g -O0 -static"
-    CXX_FLAGS = "-g -O0 -static"
+    C_FLAGS = "-g -O0 "
+    CXX_FLAGS = "-g -O0 "
+    if values.CONF_STATIC:
+        C_FLAGS += " -static"
+        CXX_FLAGS += " -static"
     build_project(values.CONF_DIR_SRC, values.CONF_COMMAND_BUILD)
 
 

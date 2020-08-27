@@ -78,6 +78,10 @@ def read_conf_file():
             values.CONF_MAX_FORK = int(configuration.replace(definitions.CONF_MAX_FORK, ''))
         elif definitions.CONF_TAG_ID in configuration:
             values.CONF_TAG_ID = configuration.replace(definitions.CONF_TAG_ID, '')
+        elif definitions.CONF_STATIC in configuration:
+            conf_text = configuration.replace(definitions.CONF_STATIC, '')
+            if "true" in str(conf_text).lower():
+                values.CONF_STATIC = True
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

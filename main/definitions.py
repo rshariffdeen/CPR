@@ -46,7 +46,7 @@ CONF_LOW_BOUND = "low_bound:"
 CONF_MAX_BOUND = "max_bound:"
 CONF_MAX_FORK = "max-fork:"
 CONF_TAG_ID = "tag_id:"
-
+CONF_STATIC = "static:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
