@@ -77,6 +77,9 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
 def print_patch_list(patch_list):
     count = 0
     emitter.sub_title("List of Synthesised Patches")
+    if not patch_list:
+        emitter.warning("\t[warning] unable to generate any patch")
+        return
     for patch in patch_list:
         count = count + 1
         emitter.sub_sub_title("Patch #" + str(count))
