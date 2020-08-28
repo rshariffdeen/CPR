@@ -200,7 +200,7 @@ def generate_symbolic_paths(ppc_list):
         if result[0]:
             if control_loc not in path_list:
                 path_list[control_loc] = list()
-            count = count + 1
+                path_count = path_count + 1
             path_list[control_loc].append(result[2])
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " new paths")
