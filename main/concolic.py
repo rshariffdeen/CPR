@@ -192,7 +192,9 @@ def generate_symbolic_paths(ppc_list):
               ppc_list : a dictionary containing the partial path condition at each branch location
               returns a list of new partial path conditions
     """
+    emitter.normal("\tgenerating new paths")
     path_list = dict()
+    path_count = 0
     for control_loc in ppc_list:
         ppc_list_at_loc = ppc_list[control_loc]
         for ppc in ppc_list_at_loc:
@@ -200,9 +202,10 @@ def generate_symbolic_paths(ppc_list):
             if result[0]:
                 if control_loc not in path_list:
                     path_list[control_loc] = list()
+                count = count + 1
                 path_list[control_loc].append(result[2])
+    emitter.highlight("\t\tgenerated " + str(path_count) + " new paths")
     return path_list
-
 
 
 # def generate_new_symbolic_paths(constraint_list):
@@ -313,9 +316,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     input_var_list = list()
     input_arg_dict = dict()
     input_arg_list = list()
-    ppc_list = values.LIST_PPC
+    generated_path_list = values.LIST_GENERATED_PATH
     var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
-    generated_path_list, current_path_list = generate_symbolic_paths(ppc_list)
 
     # generated_path_list = generate_new_symbolic_paths(constraint_list)
     # list_path_explored = list(set(list_path_explored + current_path_list))
@@ -489,6 +491,8 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
     trace_log_path = directory_path + "/klee-last/trace.log"
     values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, project_path)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
+    ppc_list = values.LIST_PPC
+    values.LIST_GENERATED_PATH = generate_symbolic_paths(ppc_list)
     return return_code
 
 

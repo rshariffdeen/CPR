@@ -76,7 +76,7 @@ def initialize():
     program_path = values.CONF_PATH_PROGRAM
     test_input_list = values.CONF_TEST_INPUT
     for argument_list in test_input_list:
-        emitter.sub_title("Running initial concrete execution")
+        emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:", argument_list)
         values.ARGUMENT_LIST = argument_list
         if "$POC" in argument_list:
@@ -85,7 +85,7 @@ def initialize():
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
 
-        emitter.sub_title("Running initial concolic Execution")
+        emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         extract_byte_code(program_path)
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
