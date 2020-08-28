@@ -163,27 +163,6 @@ def parse_z3_output(z3_output):
     return model
 
 
-def check_path_feasibility(chosen_control_loc, ppc):
-    """
-    This function will check if a selected path is feasible
-           ppc : partial path conditoin at chosen control loc
-           chosen_control_loc: branch location selected for flip
-           returns satisfiability of the negated path
-    """
-    parser = SmtLibParser()
-    script = parser.get_script(cStringIO(ppc))
-    formula = script.get_last_formula()
-    prefix = formula.arg(0)
-    constraint = formula.arg(1)
-    new_path = And(prefix, Not(constraint))
-    # print(control_loc, constraint)
-    if is_sat(new_path):
-        return True, chosen_control_loc, new_path
-    else:
-        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
-        return False, chosen_control_loc, new_path
-
-
 def generate_symbolic_paths(ppc_list):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
@@ -194,7 +173,7 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = dict()
     path_count = 0
-    result_list = parallel.generate_symbolic_paths_parallel(ppc_list, check_path_feasibility)
+    result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         control_loc = result[1]
         if result[0]:

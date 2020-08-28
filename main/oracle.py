@@ -1,5 +1,8 @@
 import sys
-from main import definitions, values
+from main import definitions, values, emitter
+from pysmt.shortcuts import is_sat, Not, And
+from pysmt.smtlib.parser import SmtLibParser
+from six.moves import cStringIO
 
 
 def did_program_crash(program_output):
@@ -40,4 +43,25 @@ def is_loc_on_sanitizer(source_path, line_number, suspicious_lines):
 
 def is_loc_in_trace(source_loc):
     return source_loc in values.LIST_TRACE
+
+
+def check_path_feasibility(chosen_control_loc, ppc):
+    """
+    This function will check if a selected path is feasible
+           ppc : partial path conditoin at chosen control loc
+           chosen_control_loc: branch location selected for flip
+           returns satisfiability of the negated path
+    """
+    parser = SmtLibParser()
+    script = parser.get_script(cStringIO(ppc))
+    formula = script.get_last_formula()
+    prefix = formula.arg(0)
+    constraint = formula.arg(1)
+    new_path = And(prefix, Not(constraint))
+    # print(control_loc, constraint)
+    if is_sat(new_path):
+        return True, chosen_control_loc, new_path
+    else:
+        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
+        return False, chosen_control_loc, new_path
 
