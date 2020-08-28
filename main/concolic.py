@@ -338,8 +338,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
 
     selected_new_path, selected_control_loc = select_new_path_condition()
     list_path_explored.append(selected_new_path)
-    emitter.highlight("Selected control location: " + selected_control_loc)
-    emitter.highlight("Selected path: " + selected_new_path)
+    emitter.highlight("\tSelected control location: " + selected_control_loc)
+    emitter.highlight("\tSelected path: " + str(selected_new_path))
 
     relationship = extract_var_relationship(var_expr_map)
     selected_new_path = And(selected_new_path, relationship)
