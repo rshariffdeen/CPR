@@ -15,6 +15,9 @@ LIST_GENERATED_PATH = None
 LIST_COMPONENTS = None
 MAP_LOC_DISTANCE = dict()
 
+PREFIX_PPC_STR = ""
+PREFIX_PPC_FORMULA = None
+
 
 # ------------------ File Path Values ---------------
 FILE_TRACE_LOG = ""

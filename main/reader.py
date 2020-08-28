@@ -28,9 +28,41 @@ def collect_symbolic_expression(log_path):
     return var_expr_map
 
 
+def collect_symbolic_path_prefix(log_path, project_path):
+    """
+       This function will read the output log of a klee concolic execution and
+       extract the prefix of partial path condition that should be omitted in path generation
+    """
+    emitter.normal("\textracting prefix of path condition")
+    prefix_ppc = ""
+    if os.path.exists(log_path):
+        source_path = ""
+        path_condition = ""
+        with open(log_path, 'r') as trace_file:
+            for line in trace_file:
+                if '[path:ppc]' in line:
+                    if project_path not in line:
+                        source_path = str(line.replace("[path:ppc]", '')).split(" : ")[0]
+                        source_path = source_path.strip()
+                        source_path = os.path.abspath(source_path)
+                        path_condition = str(line.replace("[path:ppc]", '')).split(" : ")[1]
+                        continue
+                    if project_path in line:
+                        break
+                if source_path:
+                    if "(exit)" not in line:
+                        path_condition = path_condition + line
+                    else:
+                        prefix_ppc = path_condition
+                        source_path = ""
+                        path_condition = ""
+    return prefix_ppc
+
+
 def collect_symbolic_path(log_path, project_path):
     """
-       This function will read the output log of a klee concolic execution and extract the partial path conditions
+       This function will read the output log of a klee concolic execution and
+       extract the partial path conditions
     """
     emitter.normal("\textracting path conditions")
     ppc_list = collections.OrderedDict()

@@ -56,13 +56,15 @@ def check_path_feasibility(chosen_control_loc, ppc):
     script = parser.get_script(cStringIO(ppc))
     formula = script.get_last_formula()
     prefix = formula.arg(0)
-    # prefix_constraint_list = list()
-    # while prefix.is_and():
-    #     prefix_constraint_list.append(prefix.arg(1))
-    #     prefix = prefix.arg(0)
-    #
-    # for p in prefix_constraint_list:
-    #     prefix = And(prefix, p)
+    prefix_constraint_list = list()
+    while prefix.is_and():
+        prefix_constraint_list.append(prefix.arg(1))
+        prefix = prefix.arg(0)
+        if prefix == values.PREFIX_PPC_FORMULA:
+            break
+
+    for p in prefix_constraint_list:
+        prefix = And(prefix, p)
 
     constraint = formula.arg(1)
     new_path = And(prefix, Not(constraint))

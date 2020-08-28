@@ -163,6 +163,13 @@ def parse_z3_output(z3_output):
     return model
 
 
+def generate_formula(ppc):
+    parser = SmtLibParser()
+    script = parser.get_script(cStringIO(ppc))
+    formula = script.get_last_formula()
+    return formula
+
+
 def generate_symbolic_paths(ppc_list):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
@@ -468,6 +475,8 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
     values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, project_path)
+    values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
+    values.PREFIX_PPC_FORMULA = generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     ppc_list = values.LIST_PPC
     values.LIST_GENERATED_PATH = generate_symbolic_paths(ppc_list)
