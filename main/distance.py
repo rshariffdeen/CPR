@@ -1,4 +1,5 @@
 from main import definitions, values, emitter
+import multiprocessing as mp
 
 
 def calculate_distance(loc_a, loc_b):

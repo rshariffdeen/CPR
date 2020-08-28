@@ -296,7 +296,7 @@ def select_new_path_condition():
     list_path_detected[control_loc].remove(selected_path)
     if not list_path_detected[control_loc]:
         list_path_detected.pop(control_loc)
-    return selected_path
+    return selected_path, control_loc
 
 
 def generate_new_input(argument_list, second_var_list, patch_list=None):
@@ -336,8 +336,10 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         emitter.debug("Count paths detected: ", str(len(list_path_detected)))
         return None, None, patch_list
 
-    selected_new_path = select_new_path_condition()
+    selected_new_path, selected_control_loc = select_new_path_condition()
     list_path_explored.append(selected_new_path)
+    emitter.highlight("Selected control location: " + selected_control_loc)
+    emitter.highlight("Selected path: " + selected_new_path)
 
     relationship = extract_var_relationship(var_expr_map)
     selected_new_path = And(selected_new_path, relationship)
