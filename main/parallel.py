@@ -11,8 +11,9 @@ def collect_result(result):
 
 
 def generate_symbolic_paths_parallel(ppc_list):
-    global pool
+    global pool, results
     emitter.normal("\t\tstarting parallel computing")
+    results = []
     pool = mp.Pool(mp.cpu_count())
     for control_loc in ppc_list:
         ppc_list_at_loc = ppc_list[control_loc]
