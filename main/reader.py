@@ -53,7 +53,7 @@ def collect_symbolic_path(log_path, project_path):
                     else:
                         if source_path not in ppc_list.keys():
                             ppc_list[source_path] = list()
-                        ppc_list[source_path].append((path_condition))
+                        ppc_list[source_path].append(path_condition)
                         last_sym_path = path_condition
                         source_path = ""
                         path_condition = ""

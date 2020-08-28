@@ -5,15 +5,15 @@ import re
 import collections
 import random
 from six.moves import cStringIO
-from pysmt.shortcuts import get_model, Solver, And, Not, is_sat
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, \
-    Int
+from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.typing import BOOL, BV32, BV8, ArrayType
+from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
 from main import emitter, values, reader
+import multiprocessing as mp
+
 
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
@@ -164,13 +164,14 @@ def parse_z3_output(z3_output):
     return model
 
 
-def analyse_symbolic_path(ppc_list):
+def generate_symbolic_paths(ppc_list):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
-       the branch conditions added at each location, which can be used to negate as a constraint
+       the branch conditions added at each location, negate the constraint to create a new path
               ppc_list : a dictionary containing the partial path condition at each branch location
+              returns a list of new partial path conditions
     """
-    constraint_list = collections.OrderedDict()
+    path_list = dict()
     explored_path_list = list()
     current_path = None
     for control_loc in ppc_list:
@@ -179,46 +180,61 @@ def analyse_symbolic_path(ppc_list):
         parser = SmtLibParser()
         script = parser.get_script(cStringIO(ppc))
         formula = script.get_last_formula()
+        prefix = formula.arg(0)
         constraint = formula.arg(1)
+        new_path = And(prefix, Not(constraint))
         # print(control_loc, constraint)
-        if control_loc not in constraint_list:
-            constraint_list[control_loc] = list()
-        constraint_list[control_loc].append(constraint)
+        if control_loc not in path_list:
+            path_list[control_loc] = list()
+        if is_sat(new_path):
+            path_list[control_loc].append(new_path)
+        else:
+            emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
+
         if current_path is None:
             current_path = constraint
         else:
             current_path = And(current_path, constraint)
         explored_path_list.append(current_path)
-    return constraint_list, explored_path_list
+    return path_list, explored_path_list
 
-
-def generate_new_symbolic_paths(constraint_list):
-    """
-    This function will generate N number of new paths by negating each branch condition at a given branch location
-           constraint_list : a dictionary containing the constraints at each branch location
-    """
-    new_path_list = dict()
-    for chosen_control_loc in constraint_list:
-        chosen_constraint_list_at_loc = constraint_list[chosen_control_loc]
-        for chosen_constraint in chosen_constraint_list_at_loc:
-            new_path = Not(chosen_constraint)
-            for control_loc in constraint_list:
-                constraint_list_at_loc = constraint_list[control_loc]
-                for constraint in constraint_list_at_loc:
-                    if constraint == chosen_constraint and control_loc == chosen_control_loc:
-                        if is_sat(new_path):
-                            if chosen_control_loc not in new_path_list:
-                                new_path_list[chosen_control_loc] = set()
-                            new_path_list[chosen_control_loc].add(new_path)
-                        else:
-                            emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
-
-                        break
-                    new_path = And(new_path, constraint)
-                if control_loc == chosen_control_loc:
-                    break
-
-    return new_path_list
+#
+# def check_path_feasibility(constraint_list, chosen_control_loc, chosen_constraint):
+#     """
+#     This function will check if a selected path is feasible
+#            constraint_list : a dictionary containing the constraints at each branch location
+#            chosen_control_loc: branch location selected for flip
+#            chosen_constraint: constraint at branch loc for flip
+#     """
+#     new_path = Not(chosen_constraint)
+#     for control_loc in constraint_list:
+#         constraint_list_at_loc = constraint_list[control_loc]
+#         for constraint in constraint_list_at_loc:
+#             if constraint == chosen_constraint and control_loc == chosen_control_loc:
+#                 if is_sat(new_path):
+#                     return True, chosen_control_loc, new_path
+#                 else:
+#                     emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
+#                     return False, chosen_control_loc, new_path
+#             new_path = And(new_path, constraint)
+#     return False, chosen_control_loc, new_path
+#
+#
+# def generate_new_symbolic_paths(constraint_list):
+#     """
+#     This function will generate N number of new paths by negating each branch condition at a given branch location
+#            constraint_list : a dictionary containing the constraints at each branch location
+#     """
+#     new_path_list = dict()
+#     for chosen_control_loc in constraint_list:
+#         chosen_constraint_list_at_loc = constraint_list[chosen_control_loc]
+#         for chosen_constraint in chosen_constraint_list_at_loc:
+#
+#     if check_path_feasibility(new_path):
+#         if chosen_control_loc not in new_path_list:
+#             new_path_list[chosen_control_loc] = set()
+#         new_path_list[chosen_control_loc].add(new_path)
+#     return new_path_list
 
 
 def get_signed_value(bit_vector):
@@ -314,8 +330,9 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     input_arg_list = list()
     ppc_list = values.LIST_PPC
     var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
-    constraint_list, current_path_list = analyse_symbolic_path(ppc_list)
-    generated_path_list = generate_new_symbolic_paths(constraint_list)
+    generated_path_list, current_path_list = generate_symbolic_paths(ppc_list)
+
+    # generated_path_list = generate_new_symbolic_paths(constraint_list)
     # list_path_explored = list(set(list_path_explored + current_path_list))
     selected_patch = None
     patch_constraint = TRUE
