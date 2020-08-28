@@ -194,7 +194,7 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = dict()
     path_count = 0
-    result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
+    result_list = parallel.generate_symbolic_paths_parallel(ppc_list, check_path_feasibility)
     for result in result_list:
         control_loc = result[1]
         if result[0]:
