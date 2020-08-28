@@ -103,7 +103,10 @@ def run(project_path, program_path):
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
         gen_arg_list, gen_var_list, P = generate_new_input(argument_list, second_var_list, P)  # TODO (later) patch candidate missing
-        if not gen_arg_list and not gen_var_list:
+        if not P:
+            emitter.warning("\t\t[warning] unable to generate a patch")
+            break
+        elif not gen_arg_list and not gen_var_list:
             emitter.warning("\t\t[warning] no more paths to generate new input")
             break
         assert gen_arg_list  # there should be a concrete input
