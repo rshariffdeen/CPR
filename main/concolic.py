@@ -210,6 +210,9 @@ def generate_new_symbolic_paths(constraint_list):
                             if chosen_control_loc not in new_path_list:
                                 new_path_list[chosen_control_loc] = set()
                             new_path_list[chosen_control_loc].add(new_path)
+                        else:
+                            emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
+
                         break
                     new_path = And(new_path, constraint)
                 if control_loc == chosen_control_loc:
