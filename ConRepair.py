@@ -2,8 +2,8 @@ import os
 import time
 from pathlib import Path
 from main import emitter, logger, definitions, values, builder, repair, \
-    configuration, reader, distance, synthesis
-from main.utilities import extract_byte_code
+    configuration, reader, distance, synthesis, parallel
+from main.utilities import extract_byte_code, error_exit
 from main.concolic import run_concrete_execution, run_concolic_execution
 
 
@@ -123,4 +123,8 @@ def main(arg_list):
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except KeyboardInterrupt as e:
+        parallel.pool.terminate()
+        error_exit("Program Interrupted by User")
