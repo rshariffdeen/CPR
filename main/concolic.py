@@ -11,8 +11,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
-from main import emitter, values, reader
-import multiprocessing as mp
+from main import emitter, values, reader, parallel
 
 
 logger = logging.getLogger(__name__)
@@ -195,15 +194,15 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = dict()
     path_count = 0
-    for control_loc in ppc_list:
-        ppc_list_at_loc = ppc_list[control_loc]
-        for ppc in ppc_list_at_loc:
-            result = check_path_feasibility(control_loc, ppc)
-            if result[0]:
-                if control_loc not in path_list:
-                    path_list[control_loc] = list()
-                count = count + 1
-                path_list[control_loc].append(result[2])
+    result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
+    for result in result_list:
+        control_loc = result[1]
+        if result[0]:
+            if control_loc not in path_list:
+                path_list[control_loc] = list()
+            count = count + 1
+            path_list[control_loc].append(result[2])
+
     emitter.highlight("\t\tgenerated " + str(path_count) + " new paths")
     return path_list
 
