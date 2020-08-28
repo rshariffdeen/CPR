@@ -11,14 +11,14 @@ def collect_result(result):
 
 
 def generate_symbolic_paths_parallel(ppc_list, compute_func):
-    emitter.debug("\tstarting parallel computing")
+    emitter.normal("\t\tstarting parallel computing")
     for control_loc in ppc_list:
         ppc_list_at_loc = ppc_list[control_loc]
         for ppc in ppc_list_at_loc:
             pool.apply_async(compute_func, args=(control_loc, ppc), callback=collect_result)
 
     pool.close()
-    emitter.debug("\twaiting for thread completion")
+    emitter.normal("\t\twaiting for thread completion")
     pool.join()
     return results
 
