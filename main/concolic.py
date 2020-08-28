@@ -164,6 +164,27 @@ def parse_z3_output(z3_output):
     return model
 
 
+def check_path_feasibility(chosen_control_loc, ppc):
+    """
+    This function will check if a selected path is feasible
+           ppc : partial path conditoin at chosen control loc
+           chosen_control_loc: branch location selected for flip
+           returns satisfiability of the negated path
+    """
+    parser = SmtLibParser()
+    script = parser.get_script(cStringIO(ppc))
+    formula = script.get_last_formula()
+    prefix = formula.arg(0)
+    constraint = formula.arg(1)
+    new_path = And(prefix, Not(constraint))
+    # print(control_loc, constraint)
+    if is_sat(new_path):
+        return True, chosen_control_loc, new_path
+    else:
+        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
+        return False, chosen_control_loc, new_path
+
+
 def generate_symbolic_paths(ppc_list):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
@@ -172,54 +193,18 @@ def generate_symbolic_paths(ppc_list):
               returns a list of new partial path conditions
     """
     path_list = dict()
-    explored_path_list = list()
-    current_path = None
     for control_loc in ppc_list:
-        ppc = ppc_list[control_loc]
-        ppc = "".join(ppc)
-        parser = SmtLibParser()
-        script = parser.get_script(cStringIO(ppc))
-        formula = script.get_last_formula()
-        prefix = formula.arg(0)
-        constraint = formula.arg(1)
-        new_path = And(prefix, Not(constraint))
-        # print(control_loc, constraint)
-        if control_loc not in path_list:
-            path_list[control_loc] = list()
-        if is_sat(new_path):
-            path_list[control_loc].append(new_path)
-        else:
-            emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
+        ppc_list_at_loc = ppc_list[control_loc]
+        for ppc in ppc_list_at_loc:
+            result = check_path_feasibility(control_loc, ppc)
+            if result[0]:
+                if control_loc not in path_list:
+                    path_list[control_loc] = list()
+                path_list[control_loc].append(result[2])
+    return path_list
 
-        if current_path is None:
-            current_path = constraint
-        else:
-            current_path = And(current_path, constraint)
-        explored_path_list.append(current_path)
-    return path_list, explored_path_list
 
-#
-# def check_path_feasibility(constraint_list, chosen_control_loc, chosen_constraint):
-#     """
-#     This function will check if a selected path is feasible
-#            constraint_list : a dictionary containing the constraints at each branch location
-#            chosen_control_loc: branch location selected for flip
-#            chosen_constraint: constraint at branch loc for flip
-#     """
-#     new_path = Not(chosen_constraint)
-#     for control_loc in constraint_list:
-#         constraint_list_at_loc = constraint_list[control_loc]
-#         for constraint in constraint_list_at_loc:
-#             if constraint == chosen_constraint and control_loc == chosen_control_loc:
-#                 if is_sat(new_path):
-#                     return True, chosen_control_loc, new_path
-#                 else:
-#                     emitter.debug("Path is not satisfiable at " + str(control_loc), new_path)
-#                     return False, chosen_control_loc, new_path
-#             new_path = And(new_path, constraint)
-#     return False, chosen_control_loc, new_path
-#
-#
+
 # def generate_new_symbolic_paths(constraint_list):
 #     """
 #     This function will generate N number of new paths by negating each branch condition at a given branch location
