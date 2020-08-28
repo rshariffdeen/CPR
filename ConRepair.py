@@ -127,4 +127,5 @@ if __name__ == "__main__":
         main(sys.argv[1:])
     except KeyboardInterrupt as e:
         parallel.pool.terminate()
+        os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
         error_exit("Program Interrupted by User")
