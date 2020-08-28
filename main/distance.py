@@ -2,8 +2,15 @@ from main import definitions, values, emitter
 
 
 def calculate_distance(loc_a, loc_b):
-    min_distance = 10000
+    min_distance = 10000000
     count = -1
+
+    if loc_a not in values.LIST_TRACE:
+        return min_distance
+
+    if loc_b not in values.LIST_TRACE:
+        return min_distance
+
     for loc in values.LIST_TRACE:
         if count >= 0:
             count = count + 1
