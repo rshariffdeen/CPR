@@ -287,7 +287,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
            log_path : log file for the previous concolic execution that captures PPC
            project_path: project path is the root directory of the program to filter PPC from libraries
     """
-    logger.info("creating new path for concolic execution")
+    logger.info("generating new input for new path")
     global list_path_explored, list_path_detected
     gen_arg_list = dict()
     gen_var_list = dict()
@@ -445,7 +445,7 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
         else:
             input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
-    emitter.normal("\texecuting klee concolic execution")
+    emitter.normal("\texecuting klee in concolic mode")
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
