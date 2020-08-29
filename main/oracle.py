@@ -62,8 +62,8 @@ def check_path_feasibility(chosen_control_loc, ppc):
         prefix = prefix.arg(0)
         if prefix == values.PREFIX_PPC_FORMULA:
             break
-
-    for p in prefix_constraint_list:
+    prefix = prefix_constraint_list[0]
+    for p in prefix_constraint_list[1:]:
         prefix = And(prefix, p)
 
     constraint = formula.arg(1)
