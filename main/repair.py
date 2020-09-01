@@ -100,6 +100,7 @@ def run(project_path, program_path):
 
     while not satisfied and len(P) > 1:
         iteration = iteration + 1
+        values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST

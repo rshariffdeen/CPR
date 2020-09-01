@@ -11,7 +11,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command, extract_constraints_from_patch
-from main import emitter, values, reader, parallel
+from main import emitter, values, reader, parallel, definitions
 
 
 logger = logging.getLogger(__name__)
@@ -310,6 +310,15 @@ def select_new_path_condition():
     return selected_path, control_loc
 
 
+def generate_binary_file(byte_array):
+    byte_list = []
+    for i in range(0, len(byte_array)):
+        byte_list.append(byte_array[i])
+    values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO)
+    with open(values.FILE_POC_GEN, "wb") as new_input_file:
+        new_input_file.write(bytearray(byte_list))
+
+
 def generate_new_input(argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
@@ -411,12 +420,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         var_value = 0
         var_size = len(bit_vector)
         if var_name in ["A-data", "A-data-stat"]:
-            var_value = get_byte_string(bit_vector)
-            input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+            if var_name == "A-data":
+                generate_binary_file(bit_vector)
+            continue
         if bit_vector:
             var_value = get_signed_value(bit_vector)
-        if var_name not in ["A-data", "A-data-stat"]:
-            emitter.debug(var_name, var_value)
+        emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
     for var_tuple in second_var_list:
@@ -447,7 +456,10 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
     for argument in argument_list:
         if "$POC" in argument:
-            ktest_command += " --sym-file " + values.CONF_PATH_POC
+            binary_file_path = values.CONF_PATH_POC
+            if values.FILE_POC_GEN:
+                binary_file_path = values.FILE_POC_GEN
+            ktest_command += " --sym-file " + binary_file_path
         else:
             ktest_command += " --sym-arg \"" + str(argument) + "\""
 
