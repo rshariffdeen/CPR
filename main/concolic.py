@@ -52,14 +52,17 @@ def z3_get_model(formula):
         if not value_array_map:
             byte_list[0] = default_value
         else:
-            array_size = 4  # TODO: dynamically calculate the size later
-            for i in range(0, array_size):
-                byte_list[i] = default_value
             for idx, val in value_array_map.items():
                 index = int(str(idx).split("_")[0])
                 value = int(str(val).split("_")[0])
                 byte_list[index] = value
-            for i in range(3, -1, -1):
+
+            array_size = max(list(byte_list.keys())) + 1  # TODO: this could be wrong calculation
+            for i in range(0, array_size):
+                if not byte_list[i]:
+                    byte_list[i] = default_value
+
+            for i in range(array_size - 1, -1, -1):
                 if byte_list[i] == 0:
                     byte_list.pop(i)
                 else:
@@ -238,7 +241,7 @@ def get_str_value(bit_vector):
         else:
             char_list[i] = chr(bit_vector[i])
     # print(char_list)
-    for i in sorted(char_list, reverse=True):
+    for i in sorted(char_list):
         char = char_list[i]
         str_value += char
     return str_value
