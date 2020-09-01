@@ -58,8 +58,8 @@ def bootstrap(arg_list):
         os.mkdir(definitions.DIRECTORY_OUTPUT)
 
     # set location of bug/crash
-    if not values.CONF_BUG_LOCATION:
-        values.CONF_BUG_LOCATION = reader.collect_crash_point(values.FILE_TRACE_LOG)
+    if not values.CONF_LOC_BUG:
+        values.CONF_LOC_BUG = reader.collect_crash_point(values.FILE_TRACE_LOG)
 
     if values.CONF_MAX_BOUND:
         values.DEFAULT_UPPER_BOUND = values.CONF_MAX_BOUND

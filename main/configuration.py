@@ -61,7 +61,7 @@ def read_conf_file():
         elif definitions.CONF_DIR_SRC in configuration:
             values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '')
         elif definitions.CONF_LOC_BUG in configuration:
-            values.CONF_BUG_LOCATION = configuration.replace(definitions.CONF_LOC_BUG, '')
+            values.CONF_LOC_BUG = configuration.replace(definitions.CONF_LOC_BUG, '')
         elif definitions.CONF_LOC_PATCH in configuration:
             values.CONF_LOC_PATCH = configuration.replace(definitions.CONF_LOC_PATCH, '')
         elif definitions.CONF_PATH_POC in configuration:

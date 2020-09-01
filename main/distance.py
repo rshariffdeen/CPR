@@ -25,7 +25,7 @@ def calculate_distance(loc_a, loc_b):
 
 
 def generate_distance_map():
-    loc_bug = values.CONF_BUG_LOCATION
+    loc_bug = values.CONF_LOC_BUG
     distance_map = dict()
     for loc in set(values.LIST_TRACE):
         if loc == loc_bug:
