@@ -375,28 +375,31 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         else:
             gen_var_list[var_name] = var_byte_list
 
-    for arg_name in gen_arg_list:
-        bit_vector = gen_arg_list[arg_name]
-        arg_index = int(str(arg_name).replace("arg", ""))
-        arg_str = get_str_value(bit_vector)
-        arg_value = get_signed_value(bit_vector) - 48
-        # print(arg_name, arg_index, arg_value)
-        emitter.debug(arg_name, arg_value)
-        if str(argument_list[arg_index]).isnumeric():
-            input_arg_dict[arg_index] = str(arg_value)
-        else:
-            input_arg_dict[arg_index] = arg_str
+    if values.CONF_PATH_POC:
+        input_arg_list = argument_list
+    else:
+        for arg_name in gen_arg_list:
+            bit_vector = gen_arg_list[arg_name]
+            arg_index = int(str(arg_name).replace("arg", ""))
+            arg_str = get_str_value(bit_vector)
+            arg_value = get_signed_value(bit_vector) - 48
+            # print(arg_name, arg_index, arg_value)
+            emitter.debug(arg_name, arg_value)
+            if str(argument_list[arg_index]).isnumeric():
+                input_arg_dict[arg_index] = str(arg_value)
+            else:
+                input_arg_dict[arg_index] = arg_str
 
-    # fill random values if not generated
-    for i in range(0, len(argument_list)):
-        if i in input_arg_dict:
-            input_arg_list.append(input_arg_dict[i])
-        else:
-            arg_len = len(str(argument_list[i]))
-            random_value = ""
-            for j in range(0, arg_len):
-                random_value += chr(random.randint(0, 128))
-            input_arg_list.append(random_value)
+        # fill random values if not generated
+        for i in range(0, len(argument_list)):
+            if i in input_arg_dict:
+                input_arg_list.append(input_arg_dict[i])
+            else:
+                arg_len = len(str(argument_list[i]))
+                random_value = ""
+                for j in range(0, arg_len):
+                    random_value += chr(random.randint(0, 128))
+                input_arg_list.append(random_value)
 
     for var_name in gen_var_list:
         bit_vector = gen_var_list[var_name]
