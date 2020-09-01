@@ -409,7 +409,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
         if bit_vector:
             var_value = get_signed_value(bit_vector)
-        emitter.debug(var_name, var_value)
+        if var_name not in ["A-data", "A-data-stat"]:
+            emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
     for var_tuple in second_var_list:
