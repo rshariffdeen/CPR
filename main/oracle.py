@@ -58,11 +58,12 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     prefix = formula.arg(0)
     prefix_constraint_list = list()
     while prefix.is_and():
+        if prefix == values.PREFIX_PPC_FORMULA:
+            break
         if str(prefix.arg(1).serialize()) not in values.LIST_KLEE_ASSUMPTIONS:
             prefix_constraint_list.append(prefix.arg(1))
         prefix = prefix.arg(0)
-        if prefix == values.PREFIX_PPC_FORMULA:
-            break
+
     prefix = None
     if prefix_constraint_list:
         prefix = prefix_constraint_list[0]

@@ -41,7 +41,7 @@ def collect_symbolic_path_prefix(log_path, project_path):
         with open(log_path, 'r') as trace_file:
             for line in trace_file:
                 if '[path:ppc]' in line:
-                    if project_path in line or definitions.DIRECTORY_RUNTIME in line:
+                    if project_path in line:
                         break
                     else:
                         source_path = str(line.replace("[path:ppc]", '')).split(" : ")[0]
