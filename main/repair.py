@@ -120,7 +120,7 @@ def run(project_path, program_path):
         assert exit_code == 0
 
         # check if new path hits fault location and patch location
-        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH) or not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+        if not (oracle.is_loc_in_trace(values.CONF_LOC_PATCH) or oracle.is_loc_in_trace(values.CONF_LOC_BUG)):
             continue
 
         distance.update_distance_map()
