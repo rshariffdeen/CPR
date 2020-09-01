@@ -59,7 +59,7 @@ def z3_get_model(formula):
 
             array_size = max(list(byte_list.keys())) + 1  # TODO: this could be wrong calculation
             for i in range(0, array_size):
-                if not byte_list[i]:
+                if i not in byte_list:
                     byte_list[i] = default_value
 
             for i in range(array_size - 1, -1, -1):
