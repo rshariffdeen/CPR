@@ -212,8 +212,8 @@ def generate_symbolic_paths(ppc_list):
 
 def get_signed_value(bit_vector):
     """
-      This function will generate the signed value for a given byte list
-             bit_vector : list of bytes
+      This function will generate the signed value for a given bit list
+             bit_vector : list of bits
     """
     signed_value = 0
     for i in bit_vector:
@@ -226,8 +226,8 @@ def get_signed_value(bit_vector):
 
 def get_str_value(bit_vector):
     """
-      This function will generate the string value for a given byte list
-             bit_vector : list of bytes
+      This function will generate the string value for a given bit list
+             bit_vector : list of bits
     """
     str_value = ""
     char_list = dict()
@@ -237,6 +237,23 @@ def get_str_value(bit_vector):
             char_list[i] = chr(random.randint(49, 122))
         else:
             char_list[i] = chr(bit_vector[i])
+    # print(char_list)
+    for i in sorted(char_list, reverse=True):
+        char = char_list[i]
+        str_value += char
+    return str_value
+
+
+def get_byte_string(bit_vector):
+    """
+      This function will generate the byte string for a given bit list
+             bit_vector : list of bits
+    """
+    str_value = ""
+    char_list = dict()
+    # print(bit_vector)
+    for i in bit_vector:
+        char_list[i] = chr(bit_vector[i])
     # print(char_list)
     for i in sorted(char_list, reverse=True):
         char = char_list[i]
@@ -301,6 +318,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     input_var_list = list()
     input_arg_dict = dict()
     input_arg_list = list()
+    # input_file_byte_list = list()
+    # input_file_stat_byte_list = list()
     generated_path_list = values.LIST_GENERATED_PATH
     var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
 
@@ -383,6 +402,9 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         bit_vector = gen_var_list[var_name]
         var_value = 0
         var_size = len(bit_vector)
+        if var_name in ["A-data", "A-data-stat"]:
+            var_value = get_byte_string(bit_vector)
+            input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
         if bit_vector:
             var_value = get_signed_value(bit_vector)
         emitter.debug(var_name, var_value)
