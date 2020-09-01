@@ -233,8 +233,8 @@ def get_str_value(bit_vector):
     char_list = dict()
     # print(bit_vector)
     for i in bit_vector:
-        if int(bit_vector[i]) not in range(48, 127):
-            char_list[i] = chr(random.randint(49, 122))
+        if int(bit_vector[i]) not in range(32, 127):
+            char_list[i] = chr(random.randint(33, 122))
         else:
             char_list[i] = chr(bit_vector[i])
     # print(char_list)
@@ -381,11 +381,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         arg_str = get_str_value(bit_vector)
         arg_value = get_signed_value(bit_vector) - 48
         # print(arg_name, arg_index, arg_value)
-        emitter.debug(arg_name, arg_value)
         if str(argument_list[arg_index]).isnumeric():
             input_arg_dict[arg_index] = str(arg_value)
+            emitter.debug(arg_name, arg_value)
         else:
             input_arg_dict[arg_index] = arg_str
+            emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
     for i in range(0, len(argument_list)):
@@ -423,7 +424,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
                 var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
             input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     emitter.debug("Generated Arg List", input_arg_list)
-    emitter.debug("Generated Var List", input_var_list)
+    # emitter.debug("Generated Var List", input_var_list)
     return input_arg_list, input_var_list, patch_list
 
 
