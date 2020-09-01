@@ -313,9 +313,9 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         generated_path_list_at_loc = generated_path_list[control_loc]
         if control_loc not in list_path_detected:
             list_path_detected[control_loc] = list()
-        detected_path_list_at_loc = [lambda x: str(x) in list_path_detected[control_loc]]
+        detected_path_list_at_loc = [lambda x: str(x.serialize()) in list_path_detected[control_loc]]
         for generated_path in generated_path_list_at_loc:
-            if str(generated_path) not in (detected_path_list_at_loc + list_path_explored):
+            if str(generated_path.serialize()) not in (detected_path_list_at_loc + list_path_explored):
                 list_path_detected[control_loc].append(generated_path)
         if not list_path_detected[control_loc]:
             list_path_detected.pop(control_loc)
@@ -326,7 +326,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         return None, None, patch_list
 
     selected_new_path, selected_control_loc = select_new_path_condition()
-    list_path_explored.append(str(selected_new_path))
+    list_path_explored.append(str(selected_new_path.serialize()))
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
