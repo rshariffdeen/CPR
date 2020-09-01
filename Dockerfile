@@ -124,3 +124,12 @@ RUN chmod +x /concolic-repair/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
 ENV TRIDENT_CC=/concolic-repair/tools/trident-cc
 ENV TRIDENT_CXX=/concolic-repair/tools/trident-cxx
+
+
+# install experiment dependencies
+RUN apt-get install -y  \
+    autopoint \
+    bison \
+    gettext \
+    gperf \
+    texinfo

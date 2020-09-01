@@ -9,7 +9,10 @@ commit_id=8d34b45
 mkdir -p $dir_name
 cd $dir_name
 git clone $project_url src
+cd $dir_name/src
 git checkout $commit_id
 
+./bootstrap
+FORCE_UNSAFE_CONFIGURE=1 ./configure
 
 

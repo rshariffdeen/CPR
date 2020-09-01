@@ -58,7 +58,8 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     prefix = formula.arg(0)
     prefix_constraint_list = list()
     while prefix.is_and():
-        prefix_constraint_list.append(prefix.arg(1))
+        if str(prefix.arg(1).serialize()) not in values.LIST_KLEE_ASSUMPTIONS:
+            prefix_constraint_list.append(prefix.arg(1))
         prefix = prefix.arg(0)
         if prefix == values.PREFIX_PPC_FORMULA:
             break
@@ -67,6 +68,9 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         prefix = And(prefix, p)
 
     constraint = formula.arg(1)
+    if definitions.DIRECTORY_RUNTIME in chosen_control_loc:
+        values.LIST_KLEE_ASSUMPTIONS.append(str(constraint.serialize()))
+
     new_path = And(prefix, Not(constraint))
     # print(control_loc, constraint)
     if is_sat(new_path):
