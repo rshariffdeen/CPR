@@ -87,6 +87,7 @@ def initialize():
 
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         extract_byte_code(program_path)
+        argument_list = str(argument_list).split(" ")
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
         distance.update_distance_map()

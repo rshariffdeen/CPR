@@ -430,7 +430,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     return ktest_path, return_code
 
 
-def run_concolic_execution(program, argument_str, second_var_list, print_output=False):
+def run_concolic_execution(program, argument_list, second_var_list, print_output=False):
     """
     This function will execute the program in concolic mode using the generated ktest file
         program: the absolute path of the bitcode of the program
@@ -447,7 +447,7 @@ def run_concolic_execution(program, argument_str, second_var_list, print_output=
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
-    argument_list = str(argument_str).split(" ")
+    # argument_list = str(argument_str).split(" ")
     for argument in argument_list:
         if "$POC" in argument:
             concrete_file = open(values.CONF_PATH_POC, 'rb')
