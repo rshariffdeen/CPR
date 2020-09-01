@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
   int res;
   if (y)  {
       printf("PATH ONE");
-      res = 1;
+      res = x + 1;
   } else {
       printf("PATH TWO");
-      res = 0;
+      res = x - 1;
   }
   return TRIDENT_OUTPUT("res", "i32", res);
 }
