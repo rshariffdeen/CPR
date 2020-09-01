@@ -84,6 +84,12 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_STATIC, '')
             if "true" in str(conf_text).lower():
                 values.CONF_STATIC = True
+        elif definitions.CONF_FLAG_ASAN in configuration:
+            values.CONF_FLAG_ASAN = configuration.replace(definitions.CONF_FLAG_ASAN, '')
+        elif definitions.CONF_FLAGS_C in configuration:
+            values.CONF_FLAGS_C = configuration.replace(definitions.CONF_FLAGS_C, '')
+        elif definitions.CONF_FLAGS_CXX in configuration:
+            values.CONF_FLAGS_CXX = configuration.replace(definitions.CONF_FLAGS_CXX, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

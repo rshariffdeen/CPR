@@ -19,6 +19,8 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
     for patch in current_patch_set:
         if check(patch, path_to_concolic_exec_result, concrete_input, assertion):
             updated_patch_set.append(patch)
+        else:
+            emitter.debug("Removing Patch", patch)
     return updated_patch_set
 
 

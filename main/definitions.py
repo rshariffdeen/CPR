@@ -48,6 +48,9 @@ CONF_MAX_BOUND = "max_bound:"
 CONF_MAX_FORK = "max-fork:"
 CONF_TAG_ID = "tag_id:"
 CONF_STATIC = "static:"
+CONF_FLAG_ASAN = "flag_asan:"
+CONF_FLAGS_C = "flag_c:"
+CONF_FLAGS_CXX = "flag_cxx:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
