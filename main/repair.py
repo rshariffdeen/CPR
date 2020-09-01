@@ -124,9 +124,9 @@ def run(project_path, program_path):
             continue
 
         distance.update_distance_map()
-
+        binary_dir_path = "/".join(program_path.split("/")[:-1])
         ## Reduces the set of patch candidates based on the current path constraint
-        P = reduce(P, Path(project_path + "/klee-last/").resolve(), gen_arg_list, assertion)
+        P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), gen_arg_list, assertion)
         emitter.debug("|P|=", str(len(P)))
 
         # Checks for the current coverage.
