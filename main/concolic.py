@@ -330,8 +330,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
-    # relationship = extract_var_relationship(var_expr_map)
-    # selected_new_path = And(selected_new_path, relationship)
+    relationship = extract_var_relationship(var_expr_map)
+    selected_new_path = And(selected_new_path, relationship)
 
     while patch_list:
         selected_patch = random.choice(patch_list)
