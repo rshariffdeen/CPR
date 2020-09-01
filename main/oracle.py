@@ -45,7 +45,7 @@ def is_loc_in_trace(source_loc):
     return source_loc in values.LIST_TRACE
 
 
-def check_path_feasibility(chosen_control_loc, ppc):
+def check_path_feasibility(chosen_control_loc, ppc, lock):
     """
     This function will check if a selected path is feasible
            ppc : partial path conditoin at chosen control loc
@@ -72,6 +72,7 @@ def check_path_feasibility(chosen_control_loc, ppc):
     if is_sat(new_path):
         return True, chosen_control_loc, new_path
     else:
-        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
+        with lock:
+            emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
         return False, chosen_control_loc, new_path
 
