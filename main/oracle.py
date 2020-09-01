@@ -80,7 +80,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     if is_sat(new_path):
         return True, chosen_control_loc, new_path
     else:
-        with lock:
-            emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
+        #with lock:
+        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
         return False, chosen_control_loc, new_path
 

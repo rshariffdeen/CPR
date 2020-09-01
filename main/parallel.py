@@ -15,7 +15,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     emitter.normal("\t\tstarting parallel computing")
     results = []
     pool = mp.Pool(mp.cpu_count())
-    lock = mp.Lock()
+    lock = None
     for control_loc in ppc_list:
         if definitions.DIRECTORY_RUNTIME in control_loc:
             continue
