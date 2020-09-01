@@ -248,9 +248,11 @@ def extract_var_relationship(var_expr_map):
     # preserve user-input : program variable relationship
     # include program variable names for program specification
     parser = SmtLibParser()
+    values.LIST_RELATIONSHIP_VAR = []
     relationship = None
     for expr_map in var_expr_map:
         prog_var_name, prog_var_expr = expr_map[0]
+        values.LIST_RELATIONSHIP_VAR.append(prog_var_name)
         angelic_var_name, angelic_var_expr = expr_map[1]
         prog_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", prog_var_expr))
         angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", angelic_var_expr))
@@ -383,6 +385,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         bit_vector = gen_var_list[var_name]
         var_value = 0
         var_size = len(bit_vector)
+        if var_name in values.LIST_RELATIONSHIP_VAR:
+            continue
         if bit_vector:
             var_value = get_signed_value(bit_vector)
         emitter.debug(var_name, var_value)
