@@ -56,8 +56,10 @@ def z3_get_model(formula):
                 index = int(str(idx).split("_")[0])
                 value = int(str(val).split("_")[0])
                 byte_list[index] = value
-
-            array_size = max(list(byte_list.keys())) + 1  # TODO: this could be wrong calculation
+            max_index = max(list(byte_list.keys()))
+            array_size = max_index + 1  # TODO: this could be wrong calculation
+            if max_index == 0:
+                array_size = 2
             for i in range(0, array_size):
                 if i not in byte_list:
                     byte_list[i] = default_value
