@@ -26,8 +26,8 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
 
 def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete_input: [], assertion):  # TODO
     # checks, e.g., for crash freedom
-    path_constraint_file_path = path_to_concolic_exec_result + "/test000001.smt2"
-    expr_log_path = path_to_concolic_exec_result + "/expr.log"
+    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
+    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extract_assertion(path_constraint_file_path)
     patch_constraint = extract_constraints_from_patch(patch)
     # test_specification = values.TEST_SPECIFICATION
