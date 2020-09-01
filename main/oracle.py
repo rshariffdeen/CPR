@@ -70,7 +70,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     #     for p in prefix_constraint_list[1:]:
     #         prefix = And(prefix, p)
     #
-    # constraint = formula.arg(1)
+    constraint = formula.arg(1)
     # if definitions.DIRECTORY_RUNTIME in chosen_control_loc:
     #     values.LIST_KLEE_ASSUMPTIONS.append(str(constraint.serialize()))
     new_path = Not(constraint)
