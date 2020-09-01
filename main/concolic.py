@@ -375,31 +375,30 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         else:
             gen_var_list[var_name] = var_byte_list
 
-    if values.CONF_PATH_POC:
-        input_arg_list = argument_list
-    else:
-        for arg_name in gen_arg_list:
-            bit_vector = gen_arg_list[arg_name]
-            arg_index = int(str(arg_name).replace("arg", ""))
-            arg_str = get_str_value(bit_vector)
-            arg_value = get_signed_value(bit_vector) - 48
-            # print(arg_name, arg_index, arg_value)
-            emitter.debug(arg_name, arg_value)
-            if str(argument_list[arg_index]).isnumeric():
-                input_arg_dict[arg_index] = str(arg_value)
-            else:
-                input_arg_dict[arg_index] = arg_str
+    for arg_name in gen_arg_list:
+        bit_vector = gen_arg_list[arg_name]
+        arg_index = int(str(arg_name).replace("arg", ""))
+        arg_str = get_str_value(bit_vector)
+        arg_value = get_signed_value(bit_vector) - 48
+        # print(arg_name, arg_index, arg_value)
+        emitter.debug(arg_name, arg_value)
+        if str(argument_list[arg_index]).isnumeric():
+            input_arg_dict[arg_index] = str(arg_value)
+        else:
+            input_arg_dict[arg_index] = arg_str
 
-        # fill random values if not generated
-        for i in range(0, len(argument_list)):
-            if i in input_arg_dict:
-                input_arg_list.append(input_arg_dict[i])
-            else:
-                arg_len = len(str(argument_list[i]))
-                random_value = ""
-                for j in range(0, arg_len):
-                    random_value += chr(random.randint(0, 128))
-                input_arg_list.append(random_value)
+    # fill random values if not generated
+    for i in range(0, len(argument_list)):
+        if "$POC" in str(argument_list[i]):
+            input_arg_list.append(str(argument_list[i]))
+        elif i in input_arg_dict:
+            input_arg_list.append(input_arg_dict[i])
+        else:
+            arg_len = len(str(argument_list[i]))
+            random_value = ""
+            for j in range(0, arg_len):
+                random_value += chr(random.randint(0, 128))
+            input_arg_list.append(random_value)
 
     for var_name in gen_var_list:
         bit_vector = gen_var_list[var_name]
@@ -508,7 +507,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return return_code
 
 
-def run_concrete_execution(program, argument_str, print_output=False, output_dir=None):
+def run_concrete_execution(program, argument_list, print_output=False, output_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -524,7 +523,6 @@ def run_concrete_execution(program, argument_str, print_output=False, output_dir
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
-    argument_list = str(argument_str).split(" ")
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC

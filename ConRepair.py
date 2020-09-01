@@ -78,16 +78,13 @@ def initialize():
     for argument_list in test_input_list:
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:", argument_list)
+        argument_list = str(argument_list).split(" ")
         values.ARGUMENT_LIST = argument_list
-        if "$POC" in argument_list:
-            argument_list.replace("$POC", values.CONF_PATH_POC)
         extract_byte_code(program_path)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
-
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         extract_byte_code(program_path)
-        argument_list = str(argument_list).split(" ")
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
         distance.update_distance_map()
