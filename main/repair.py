@@ -15,12 +15,13 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
+    emitter.normal("\tupdating patch pool")
     updated_patch_set = []
     for patch in current_patch_set:
         if check(patch, path_to_concolic_exec_result, concrete_input, assertion):
             updated_patch_set.append(patch)
         else:
-            emitter.emit_patch(patch, message="\t\tRemoving Patch")
+            emitter.emit_patch(patch, message="\t\tRemoving Patch: ")
     return updated_patch_set
 
 

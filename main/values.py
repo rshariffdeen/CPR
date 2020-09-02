@@ -29,6 +29,7 @@ FILE_PPC_LOG = ""
 FILE_EXPR_LOG = ""
 FILE_POC_SYM = ""
 FILE_POC_GEN = ""
+FILE_MESSAGE_LOG = ""
 
 
 # ------------------ Default Values ---------------

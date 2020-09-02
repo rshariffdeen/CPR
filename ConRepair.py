@@ -53,13 +53,10 @@ def bootstrap(arg_list):
     values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
     values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
+    values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
     if not os.path.isdir(definitions.DIRECTORY_OUTPUT):
         os.mkdir(definitions.DIRECTORY_OUTPUT)
-
-    # set location of bug/crash
-    if not values.CONF_LOC_BUG:
-        values.CONF_LOC_BUG = reader.collect_crash_point(values.FILE_TRACE_LOG)
 
     if values.CONF_MAX_BOUND:
         values.DEFAULT_UPPER_BOUND = values.CONF_MAX_BOUND
@@ -83,6 +80,11 @@ def initialize():
         extract_byte_code(program_path)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
+        # set location of bug/crash
+        if not values.CONF_LOC_BUG:
+            values.CONF_LOC_BUG = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
+            if values.CONF_LOC_BUG:
+                values.IS_CRASH = True
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         extract_byte_code(program_path)
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)

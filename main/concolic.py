@@ -194,7 +194,7 @@ def generate_symbolic_paths(ppc_list):
                 path_count = path_count + 1
             path_list[control_loc].append(result[2])
 
-    emitter.highlight("\t\tgenerated " + str(path_count) + " new paths")
+    emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list
 
 
@@ -341,6 +341,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     # list_path_explored = list(set(list_path_explored + current_path_list))
     selected_patch = None
     patch_constraint = TRUE
+    new_path_count = 0
 
     for control_loc in generated_path_list:
         generated_path_list_at_loc = generated_path_list[control_loc]
@@ -350,8 +351,11 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         for generated_path in generated_path_list_at_loc:
             if str(generated_path.serialize()) not in (detected_path_list_at_loc + list_path_explored):
                 list_path_detected[control_loc].append(generated_path)
+                new_path_count = new_path_count + 1
         if not list_path_detected[control_loc]:
             list_path_detected.pop(control_loc)
+
+    emitter.highlight("\t\tidentified " + str(new_path_count) + " new path(s)")
 
     if not list_path_detected:
         emitter.debug("Count paths explored: ", str(len(list_path_explored)))

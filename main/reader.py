@@ -2,6 +2,7 @@ import os
 import collections
 from main import emitter, definitions
 
+
 def collect_symbolic_expression(log_path):
     """
        This function will read the output log of a klee concolic execution and extract symbolic expressions
