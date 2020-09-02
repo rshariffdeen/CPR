@@ -1,4 +1,4 @@
-from main import definitions, values, emitter, extractor
+from main import definitions, values, emitter
 from pysmt.shortcuts import is_sat, Not, And
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
@@ -87,15 +87,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         return False, chosen_control_loc, new_path
 
 
-def check_patch_feasibility(patch: Dict[str, Program], path_to_concolic_exec_result: str, assertion):  # TODO
-    # checks, e.g., for crash freedom
-    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
-    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
-    path_condition = extractor.extract_assertion(path_constraint_file_path)
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
-    # test_specification = values.TEST_SPECIFICATION
-    sym_expr_map = collect_symbolic_expression(expr_log_path)
-    var_relationship = extractor.extract_var_relationship(sym_expr_map)
+def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
     assertion = And(assertion, var_relationship)
     specification = And(path_condition, And(assertion, patch_constraint))
 
@@ -109,4 +101,4 @@ def check_patch_feasibility(patch: Dict[str, Program], path_to_concolic_exec_res
     else:
         result = is_sat(specification)
 
-    return result, patch
+    return result, index

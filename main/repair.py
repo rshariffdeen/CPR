@@ -14,7 +14,7 @@ def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_re
     # Iterate over patches and check if they still hold based on path constraint.
     emitter.normal("\tupdating patch pool")
     updated_patch_set = []
-    result_list = parallel.validate_patches_parallel(current_patch_set,path_to_concolic_exec_result, assertion)
+    result_list = parallel.validate_patches_parallel(current_patch_set, path_to_concolic_exec_result, assertion)
     for result in result_list:
         is_valid, patch = result
         if is_valid:
