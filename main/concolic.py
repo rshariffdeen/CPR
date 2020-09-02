@@ -20,6 +20,7 @@ File_Ktest_Path = "/tmp/concolic.ktest"
 
 list_path_explored = list()
 list_path_detected = dict()
+count_discovered = 0
 
 
 def z3_get_model(formula):
@@ -298,7 +299,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
            project_path: project path is the root directory of the program to filter PPC from libraries
     """
     logger.info("generating new input for new path")
-    global list_path_explored, list_path_detected
+    global list_path_explored, list_path_detected, count_discovered
     gen_arg_list = dict()
     gen_var_list = dict()
     input_var_list = list()
@@ -327,7 +328,9 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         if not list_path_detected[control_loc]:
             list_path_detected.pop(control_loc)
 
+    count_discovered = count_discovered + new_path_count
     emitter.highlight("\tidentified " + str(new_path_count) + " new path(s)")
+    emitter.highlight("\ttotal discovered: " + str(count_discovered) + " path(s)")
 
     if not list_path_detected:
         emitter.debug("Count paths explored: ", str(len(list_path_explored)))
