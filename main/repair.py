@@ -20,6 +20,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
         if is_valid:
             updated_patch_set.append(patch_list[index])
         else:
+            # emitter.debug("Removing Patch", patch_list[index])
             emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
 
     return updated_patch_set

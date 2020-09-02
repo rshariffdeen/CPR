@@ -349,7 +349,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         if is_sat(check_sat):
             break
         else:
-            emitter.debug("Removing Patch", selected_patch)
+            # emitter.debug("Removing Patch", selected_patch)
+            emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
             patch_list.remove(selected_patch)
     emitter.emit_patch(selected_patch, message="\tSelected patch: ")
 
@@ -465,7 +466,10 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # argument_list = str(argument_str).split(" ")
     for argument in argument_list:
         if "$POC" in argument:
-            concrete_file = open(values.CONF_PATH_POC, 'rb')
+            file_path = values.CONF_PATH_POC
+            if values.FILE_POC_GEN:
+                file_path = values.FILE_POC_GEN
+            concrete_file = open(file_path, 'rb')
             bit_size = os.fstat(concrete_file.fileno()).st_size
             input_argument += " A --sym-files 1 " + str(bit_size) + " "
         else:
