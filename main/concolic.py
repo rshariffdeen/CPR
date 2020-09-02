@@ -2,7 +2,6 @@ import logging
 from typing import Union
 import os
 import re
-import collections
 import random
 from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -10,8 +9,8 @@ import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
-from main.utilities import execute_command, extract_constraints_from_patch
-from main import emitter, values, reader, parallel, definitions
+from main.utilities import execute_command
+from main import emitter, values, reader, parallel, definitions, extractor
 
 
 logger = logging.getLogger(__name__)
@@ -266,33 +265,6 @@ def get_byte_string(bit_vector):
     return str_value
 
 
-def extract_var_relationship(var_expr_map):
-    # preserve user-input : program variable relationship
-    # include program variable names for program specification
-    parser = SmtLibParser()
-    relationship = None
-    for expr_map in var_expr_map:
-        prog_var_name, prog_var_expr = expr_map[0]
-        angelic_var_name, angelic_var_expr = expr_map[1]
-        prog_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", prog_var_expr))
-        angelic_dependent_var_list = set(re.findall("\(select (.+?) \(_ ", angelic_var_expr))
-        dependent_var_list = set(list(prog_dependent_var_list) + list(angelic_dependent_var_list))
-        str_script = "(set-logic QF_AUFBV )\n"
-        str_script += "(declare-fun " + prog_var_name + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
-        for var_d in dependent_var_list:
-            str_script += "(declare-fun " + var_d + " () (Array (_ BitVec 32) (_ BitVec 8) ) )\n"
-        str_script += "(assert (= " + prog_var_expr + " " + angelic_var_expr + " ))\n"
-        str_script += "(assert (= " + prog_var_name + " " + angelic_var_name + " ))\n"
-        str_script += "(exit)\n"
-        script = parser.get_script(cStringIO(str_script))
-        formula = script.get_last_formula()
-        if not relationship:
-            relationship = formula
-        else:
-            relationship = And(relationship, formula)
-    return relationship
-
-
 def select_nearest_control_loc():
     control_loc_dist_map = dict(
         filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
@@ -367,12 +339,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
-    relationship = extract_var_relationship(var_expr_map)
+    relationship = extractor.extract_var_relationship(var_expr_map)
     selected_new_path = And(selected_new_path, relationship)
 
     while patch_list:
         selected_patch = random.choice(patch_list)
-        patch_constraint = extract_constraints_from_patch(selected_patch)
+        patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
         check_sat = And(selected_new_path, patch_constraint)
         if is_sat(check_sat):
             break

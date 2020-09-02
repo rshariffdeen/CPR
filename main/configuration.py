@@ -1,6 +1,6 @@
 import os
-from main import emitter, definitions, values
-from main.utilities import error_exit, extract_assertion
+from main import emitter, definitions, values, extractor
+from main.utilities import error_exit
 
 
 def read_conf(arg_list):
@@ -51,7 +51,7 @@ def read_conf_file():
         elif definitions.CONF_PATH_SPECIFICATION in configuration:
             values.CONF_PATH_SPECIFICATION = configuration.replace(definitions.CONF_PATH_SPECIFICATION, '')
             assertion_file_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_SPECIFICATION
-            values.SPECIFICATION = extract_assertion(assertion_file_path)
+            values.SPECIFICATION = extractor.extract_assertion(assertion_file_path)
         elif definitions.CONF_CUSTOM_COMP_LIST in configuration:
             values.CONF_CUSTOM_COMP_LIST = configuration.replace(definitions.CONF_CUSTOM_COMP_LIST, '').split(",")
         elif definitions.CONF_GENERAL_COMP_LIST in configuration:
