@@ -1,53 +1,28 @@
-import os
-from main.concolic import extract_var_relationship, run_concolic_execution, generate_new_input
-from main.reader import collect_symbolic_expression
-from main.utilities import extract_assertion, extract_constraints_from_patch
+from main.concolic import run_concolic_execution, generate_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, definitions, values, distance, oracle
-from pysmt.shortcuts import is_sat, And, Not
+from main import emitter, values, distance, oracle, parallel
+
 
 check_counter = 0
 
 
-def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_result: str, concrete_input: [],
+def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_result: str,
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     emitter.normal("\tupdating patch pool")
     updated_patch_set = []
-    for patch in current_patch_set:
-        if check(patch, path_to_concolic_exec_result, concrete_input, assertion):
+    result_list = parallel.validate_patches_parallel(current_patch_set,path_to_concolic_exec_result, assertion)
+    for result in result_list:
+        is_valid, patch = result
+        if is_valid:
             updated_patch_set.append(patch)
         else:
             emitter.emit_patch(patch, message="\t\tRemoving Patch: ")
+
     return updated_patch_set
-
-
-def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete_input: [], assertion):  # TODO
-    # checks, e.g., for crash freedom
-    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
-    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
-    path_condition = extract_assertion(path_constraint_file_path)
-    patch_constraint = extract_constraints_from_patch(patch)
-    # test_specification = values.TEST_SPECIFICATION
-    sym_expr_map = collect_symbolic_expression(expr_log_path)
-    var_relationship = extract_var_relationship(sym_expr_map)
-    assertion = And(assertion, var_relationship)
-    specification = And(path_condition, And(assertion, patch_constraint))
-
-    if values.IS_CRASH:
-        if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-            specification = And(path_condition, And(Not(assertion), patch_constraint))
-            result = not is_sat(specification)
-        else:
-            specification = And(path_condition, patch_constraint)
-            result = is_sat(specification)
-    else:
-        result = is_sat(specification)
-
-    return result
 
 
 def check_coverage():  # TODO
@@ -139,7 +114,7 @@ def run(project_path, program_path):
         distance.update_distance_map()
         binary_dir_path = "/".join(program_path.split("/")[:-1])
         ## Reduces the set of patch candidates based on the current path constraint
-        P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), gen_arg_list, assertion)
+        P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.debug("|P|=", str(len(P)))
 
         # Checks for the current coverage.

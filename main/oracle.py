@@ -1,8 +1,12 @@
-import sys
 from main import definitions, values, emitter
 from pysmt.shortcuts import is_sat, Not, And
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
+from main.concolic import extract_var_relationship
+from main.reader import collect_symbolic_expression
+from main.utilities import extract_assertion, extract_constraints_from_patch
+from main.synthesis import Program
+from typing import Dict
 
 
 def did_program_crash(program_output):
@@ -84,3 +88,27 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
         return False, chosen_control_loc, new_path
 
+
+def check_patch_feasibility(patch: Dict[str, Program], path_to_concolic_exec_result: str, assertion):  # TODO
+    # checks, e.g., for crash freedom
+    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
+    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
+    path_condition = extract_assertion(path_constraint_file_path)
+    patch_constraint = extract_constraints_from_patch(patch)
+    # test_specification = values.TEST_SPECIFICATION
+    sym_expr_map = collect_symbolic_expression(expr_log_path)
+    var_relationship = extract_var_relationship(sym_expr_map)
+    assertion = And(assertion, var_relationship)
+    specification = And(path_condition, And(assertion, patch_constraint))
+
+    if values.IS_CRASH:
+        if is_loc_in_trace(values.CONF_LOC_BUG):
+            specification = And(path_condition, And(Not(assertion), patch_constraint))
+            result = not is_sat(specification)
+        else:
+            specification = And(path_condition, patch_constraint)
+            result = is_sat(specification)
+    else:
+        result = is_sat(specification)
+
+    return result, patch

@@ -28,3 +28,17 @@ def generate_symbolic_paths_parallel(ppc_list):
     pool.join()
     return results
 
+
+def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion):
+    global pool, results
+    emitter.normal("\t\tstarting parallel computing")
+    results = []
+    pool = mp.Pool(mp.cpu_count())
+    lock = None
+    for patch in patch_list:
+        pool.apply_async(oracle.check_patch_feasibility, args=(patch, path_to_concolic_exec_result, assertion), callback=collect_result)
+
+    pool.close()
+    emitter.normal("\t\twaiting for thread completion")
+    pool.join()
+    return results
