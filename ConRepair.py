@@ -2,8 +2,8 @@ import os
 import time
 from pathlib import Path
 from main import emitter, logger, definitions, values, builder, repair, \
-    configuration, reader, distance, synthesis, parallel
-from main.utilities import extract_byte_code, error_exit
+    configuration, reader, distance, synthesis, parallel, extractor
+from main.utilities import error_exit
 from main.concolic import run_concrete_execution, run_concolic_execution
 
 
@@ -77,7 +77,7 @@ def initialize():
         emitter.debug("input list in test case:", argument_list)
         argument_list = str(argument_list).split(" ")
         values.ARGUMENT_LIST = argument_list
-        extract_byte_code(program_path)
+        extractor.extract_byte_code(program_path)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
         # set location of bug/crash
@@ -86,7 +86,6 @@ def initialize():
             if values.CONF_LOC_BUG:
                 values.IS_CRASH = True
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
-        extract_byte_code(program_path)
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
         distance.update_distance_map()
