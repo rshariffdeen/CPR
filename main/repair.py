@@ -8,19 +8,19 @@ from main import emitter, values, distance, oracle, parallel
 check_counter = 0
 
 
-def reduce(current_patch_set: List[Dict[str, Program]], path_to_concolic_exec_result: str,
+def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: str,
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     emitter.normal("\tupdating patch pool")
     updated_patch_set = []
-    result_list = parallel.validate_patches_parallel(current_patch_set, path_to_concolic_exec_result, assertion)
+    result_list = parallel.validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion)
     for result in result_list:
-        is_valid, patch = result
+        is_valid, index = result
         if is_valid:
-            updated_patch_set.append(patch)
+            updated_patch_set.append(patch_list[index])
         else:
-            emitter.emit_patch(patch, message="\t\tRemoving Patch: ")
+            emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
 
     return updated_patch_set
 
