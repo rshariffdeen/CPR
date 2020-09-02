@@ -2,11 +2,11 @@ import os
 from main.concolic import extract_var_relationship, run_concolic_execution, generate_new_input
 from main.reader import collect_symbolic_expression
 from main.utilities import extract_assertion, extract_constraints_from_patch
-from main.synthesis import load_components, load_specification, synthesize, Program
+from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, definitions, values, distance, oracle
-from pysmt.shortcuts import is_sat, And
+from pysmt.shortcuts import is_sat, And, Not
 
 check_counter = 0
 
@@ -35,7 +35,17 @@ def check(patch: Dict[str, Program], path_to_concolic_exec_result: str, concrete
     var_relationship = extract_var_relationship(sym_expr_map)
     assertion = And(assertion, var_relationship)
     specification = And(path_condition, And(assertion, patch_constraint))
-    result = is_sat(specification)
+
+    if values.IS_CRASH:
+        if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            specification = And(path_condition, And(Not(assertion), patch_constraint))
+            result = not is_sat(specification)
+        else:
+            specification = And(path_condition, patch_constraint)
+            result = is_sat(specification)
+    else:
+        result = is_sat(specification)
+
     return result
 
 
@@ -119,8 +129,10 @@ def run(project_path, program_path):
         exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
 
-        # check if new path hits fault location and patch location
-        if not (oracle.is_loc_in_trace(values.CONF_LOC_PATCH) or oracle.is_loc_in_trace(values.CONF_LOC_BUG)):
+        # check if new path hits patch location / fault location
+        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            continue
+        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             continue
 
         distance.update_distance_map()
