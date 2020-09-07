@@ -165,4 +165,4 @@ def help():
     write("Usage: python3.6 ConRepair.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_DEBUG + "\t| " + "enable debugging information", RED)
-
+    write("\t" + definitions.ARG_DISABLE_DISTANCE_CAL + "\t| " + "disable distance calculation (default=enabled)", RED)

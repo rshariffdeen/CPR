@@ -95,7 +95,6 @@ def read_conf_file():
             if "true" in str(distance_setting).lower():
                 values.IS_DISABLE_DISTANCE_CAL = True
 
-
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
         exit()
