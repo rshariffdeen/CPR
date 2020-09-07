@@ -106,11 +106,12 @@ def run(project_path, program_path):
         exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
 
-        # check if new path hits patch location / fault location
-        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            continue
-        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-            continue
+        if not values.IS_DISABLE_DISTANCE_CAL:
+            # check if new path hits patch location / fault location
+            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                continue
+            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                continue
 
         distance.update_distance_map()
         binary_dir_path = "/".join(program_path.split("/")[:-1])
