@@ -65,6 +65,7 @@ KEY_DURATION_REPAIR = "repair"
 # ---------------- ARGUMENTS ---------------------------
 ARG_CONF_FILE = "--conf="
 ARG_DEBUG = "--debug"
+ARG_DISABLE_DISTANCE_CAL = "--disable-dist-cal"
 
 
 # ----------------- TOOLS --------------------------------

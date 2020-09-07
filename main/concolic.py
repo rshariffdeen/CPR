@@ -479,14 +479,17 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
             input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     emitter.normal("\texecuting klee in concolic mode")
+    collect_trace_flag = "--log-trace "
+    if values.IS_DISABLE_DISTANCE_CAL:
+        collect_trace_flag = " "
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "-allow-seed-extension " \
                    "--log-ppc " \
-                   "--log-trace " \
-                   "--external-calls=all " \
+                   "{0}".format(collect_trace_flag) \
+                   + "--external-calls=all " \
                    "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \

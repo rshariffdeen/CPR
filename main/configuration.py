@@ -90,6 +90,11 @@ def read_conf_file():
             values.CONF_FLAGS_C = configuration.replace(definitions.CONF_FLAGS_C, '')
         elif definitions.CONF_FLAGS_CXX in configuration:
             values.CONF_FLAGS_CXX = configuration.replace(definitions.CONF_FLAGS_CXX, '')
+        elif definitions.ARG_DISABLE_DISTANCE_CAL in configuration:
+            distance_setting = configuration.replace(definitions.ARG_DISABLE_DISTANCE_CAL, '')
+            if "true" in str(distance_setting).lower():
+                values.IS_DISABLE_DISTANCE_CAL = True
+
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
