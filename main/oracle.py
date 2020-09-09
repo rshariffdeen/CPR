@@ -77,6 +77,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     #     values.LIST_KLEE_ASSUMPTIONS.append(str(constraint.serialize()))
     new_path = And(prefix, Not(constraint))
     # print(control_loc, constraint)
+    assert str(new_path.serialize()) != str(formula.serialize())
     if is_sat(new_path):
         return True, chosen_control_loc, new_path
     else:

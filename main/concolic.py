@@ -221,7 +221,7 @@ def get_signed_value(bit_vector):
              bit_vector : list of bits
     """
     signed_value = 0
-    for i in bit_vector:
+    for i in sorted(bit_vector.keys()):
         if i == 0:
             signed_value = int(bit_vector[i])
         else:
@@ -413,15 +413,15 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
-    for var_tuple in second_var_list:
-        var_name = var_tuple['identifier']
-        if var_name not in gen_var_list:
-            emitter.warning("\t[warning] variable " + var_name + " assigned random value")
-            var_size = var_tuple['size']
-            var_value = 0
-            for i in range(1, var_size):
-                var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
-            input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
+    # for var_tuple in second_var_list:
+    #     var_name = var_tuple['identifier']
+    #     if var_name not in gen_var_list:
+    #         emitter.warning("\t[warning] variable " + var_name + " assigned random value")
+    #         var_size = var_tuple['size']
+    #         var_value = 0
+    #         for i in range(1, var_size):
+    #             var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
+    #         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     emitter.debug("Generated Arg List", input_arg_list)
     # emitter.debug("Generated Var List", input_var_list)
     return input_arg_list, input_var_list, patch_list
