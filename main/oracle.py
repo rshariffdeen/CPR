@@ -88,16 +88,18 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
     assertion = And(assertion, var_relationship)
-    specification = And(path_condition, And(assertion, patch_constraint))
+    specification = And(path_condition, patch_constraint)
 
     if values.IS_CRASH:
         if is_loc_in_trace(values.CONF_LOC_BUG):
-            specification = And(path_condition, And(Not(assertion), patch_constraint))
-            result = not is_sat(specification)
+            exist_valid_instance = is_sat(And(specification, assertion))
+            exist_invalid_instance = is_sat(And(specification, Not(assertion)))
+            result = exist_valid_instance and not exist_invalid_instance
         else:
-            specification = And(path_condition, patch_constraint)
             result = is_sat(specification)
     else:
-        result = is_sat(specification)
+        exist_valid_instance = is_sat(And(specification, assertion))
+        exist_invalid_instance = is_sat(And(specification, Not(assertion)))
+        result = exist_valid_instance and not exist_invalid_instance
 
     return result, index
