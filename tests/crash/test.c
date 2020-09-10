@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   if (__trident_choice("L9", "bool", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
-  y = x + 1;
+  y = x - 1;
   TRIDENT_OUTPUT("y", "i32", y);
   res = 1000 / y;
   return 0;
