@@ -85,6 +85,7 @@ def initialize():
             values.CONF_LOC_BUG = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
             if values.CONF_LOC_BUG:
                 values.IS_CRASH = True
+                emitter.warning("\t[note] identified crash location: " + str(values.CONF_LOC_BUG))
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
