@@ -3,8 +3,8 @@ from pysmt.shortcuts import is_sat, Not, And
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
 from main.reader import collect_symbolic_expression
-from main.synthesis import Program
-from typing import Dict
+from main.synthesis import Program, Component, Specification, extract_lids, ComponentSymbol, Formula, VerificationSuccess, program_to_formula, collect_symbols, extract_eids
+from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
 
 
 def did_program_crash(program_output):
@@ -110,3 +110,72 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
             result = is_sat(specification)
 
     return result, index
+
+
+# def verify_patch(programs: Union[Dict[str, Program], Dict[str, Formula]],
+#            specification: Specification) -> Optional[VerificationSuccess]:
+#     """Check if programs satisfy specification
+#     """
+#     vc = TRUE()
+#
+#     program_semantics = { lid:(program if isinstance(program, Formula) else program_to_formula(program))
+#                           for (lid, program) in programs.items() }
+#     free_variables = [v for p in program_semantics.values() for v in collect_symbols(p, ComponentSymbol.is_const)]
+#
+#     for tid in specification.keys():
+#         test_vc = FALSE()
+#
+#         (paths, assertion) = specification[tid]
+#
+#         for path in paths:
+#             lids = extract_lids(path).keys()
+#
+#             assert len(lids) == 1
+#             lid = list(lids)[0]
+#             eids = extract_eids(path, lid)
+#
+#             assert eids == set(range(len(eids)))
+#             path_vc = path
+#
+#             program = program_semantics[lid]
+#
+#             for eid in eids:
+#                 program_substitution = {}
+#                 for program_symbol in collect_symbols(program, lambda x: True):
+#                     kind = ComponentSymbol.check(program_symbol)
+#                     data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+#                     if kind == ComponentSymbol.RRETURN:
+#                         program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+#                     elif kind == ComponentSymbol.RVALUE:
+#                         program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+#                     elif kind == ComponentSymbol.LVALUE:
+#                         program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+#                     else:
+#                         pass #FIXME: do I need to handle it somehow?
+#                 bound_program = program.substitute(program_substitution)
+#                 is_branch = any_fn(ComponentSymbol.is_rbranch, ComponentSymbol.is_lbranch)
+#                 exe_inst_program = Instance.of_formula(bound_program, eid, Instance.EXECUTION, is_branch)
+#                 path_vc = And(path_vc, exe_inst_program)
+#
+#             test_vc = Or(test_vc, path_vc)
+#
+#         assertion_substitution = {}
+#         for assertion_symbol in collect_symbols(assertion, lambda x: True):
+#             symbol_data = parse_assertion_symbol(assertion_symbol)
+#             assertion_substitution[assertion_symbol] = RuntimeSymbol.output(symbol_data)
+#         bound_assertion = assertion.substitute(assertion_substitution)
+#         test_vc = And(test_vc, bound_assertion)
+#         is_special_nonconst = any_fn(RuntimeSymbol.is_special, all_fn(ComponentSymbol.is_special, complement(ComponentSymbol.is_const)))
+#         instantiated_test_vc = Instance.of_formula(test_vc, tid, Instance.TEST, is_special_nonconst)
+#
+#         vc = And(vc, instantiated_test_vc)
+#
+#         # print(get_model(vc))
+#         # dump(vc, "vc.smt2")
+#
+#     model = get_model(vc)
+#     if model is None:
+#         return None
+#     else:
+#         return VerificationSuccess({v:model[v].bv_signed_value() for v in free_variables})
+
