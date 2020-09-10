@@ -56,7 +56,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     lower_bound = values.DEFAULT_LOWER_BOUND
     upper_bound = values.DEFAULT_UPPER_BOUND
 
-    result = parallel.generate_patch_pool(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+    result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
