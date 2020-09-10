@@ -103,7 +103,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     else:
         if values.IS_CRASH:
             if is_loc_in_trace(values.CONF_LOC_BUG):
-                result = False
+                result = not is_sat(specification)
             else:
                 result = is_sat(specification)
         else:

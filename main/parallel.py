@@ -2,6 +2,7 @@ import multiprocessing as mp
 from main import emitter, oracle, definitions, extractor, reader
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
+from pysmt.shortcuts import is_sat, Not, And, TRUE
 
 
 pool = mp.Pool(mp.cpu_count())
@@ -56,8 +57,8 @@ def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertio
 
     # test_specification = values.TEST_SPECIFICATION
     sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
-    var_relationship = extractor.extract_var_relationship(sym_expr_map)
-
+    # var_relationship = extractor.extract_var_relationship(sym_expr_map)
+    var_relationship = TRUE
     for patch in patch_list:
         patch_constraint = extractor.extract_constraints_from_patch(patch)
         index = list(patch_list).index(patch)
