@@ -503,7 +503,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "-allow-seed-extension " \
-                   "-named-seed-matching" \
+                   "-named-seed-matching " \
                    "--log-ppc " \
                    "{0}".format(collect_trace_flag) \
                    + "--external-calls=all " \
