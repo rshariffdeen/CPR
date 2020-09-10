@@ -5,30 +5,30 @@ from main.synthesis import Component, enumerate_trees, Specification, Program, e
 
 
 pool = mp.Pool(mp.cpu_count())
-results = []
+result_list = []
 
 
 def collect_result(result):
-    global results
-    results.append(result)
+    global result_list
+    result_list.append(result)
 
 
 def collect_patch(patch):
-    global results
+    global result_list
     result, program = patch
     if result:
         for (lid, x) in program.items():
             tree, constant = x
             if constant:
-                result.append({lid: (tree, constant)})
+                result_list.append({lid: (tree, constant)})
             else:
-                results.append({lid: (tree, {ComponentSymbol.parse(f).name: v for (f, v) in result.constants.items()})})
+                result_list.append({lid: (tree, {ComponentSymbol.parse(f).name: v for (f, v) in result.constants.items()})})
 
 
 def generate_symbolic_paths_parallel(ppc_list):
-    global pool, results
+    global pool, result_list
     emitter.normal("\t\tstarting parallel computing")
-    results = []
+    result_list = []
     pool = mp.Pool(mp.cpu_count())
     lock = None
     for control_loc in ppc_list:
@@ -41,13 +41,13 @@ def generate_symbolic_paths_parallel(ppc_list):
     pool.close()
     emitter.normal("\t\twaiting for thread completion")
     pool.join()
-    return results
+    return result_list
 
 
 def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion):
-    global pool, results
+    global pool, result_list
     emitter.normal("\t\tstarting parallel computing")
-    results = []
+    result_list = []
     pool = mp.Pool(mp.cpu_count())
     lock = None
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
@@ -66,7 +66,7 @@ def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertio
     pool.close()
     emitter.normal("\t\twaiting for thread completion")
     pool.join()
-    return results
+    return result_list
 
 
 def generate_patch_pool(components: List[Component],
@@ -84,9 +84,9 @@ def generate_patch_pool(components: List[Component],
     assert len(lids) == 1
     (lid, typ) = list(lids.items())[0]
 
-    global pool, results
+    global pool, result_list
     emitter.normal("\t\tstarting parallel computing")
-    results = []
+    result_list = []
     pool = mp.Pool(mp.cpu_count())
 
     for tree in enumerate_trees(components, depth, typ, False, True):
@@ -95,6 +95,8 @@ def generate_patch_pool(components: List[Component],
             continue
         if concrete_enumeration:
             for value_a in range(lower_bound, upper_bound):
+                # result = verify_parallel({lid: (tree, {"a": value_a})}, specification)
+                # collect_patch(result)
                 pool.apply_async(verify_parallel,
                                  args=({lid: (tree, {"a": value_a})}, specification),
                                  callback=collect_patch)
@@ -106,4 +108,4 @@ def generate_patch_pool(components: List[Component],
     pool.close()
     emitter.normal("\t\twaiting for thread completion")
     pool.join()
-    return results
+    return result_list
