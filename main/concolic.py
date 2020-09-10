@@ -285,7 +285,11 @@ def select_nearest_control_loc():
 def select_new_path_condition():
     control_loc = select_nearest_control_loc()
     if values.CONF_SELECTION_STRATEGY == "deterministic":
-        selected_path = list_path_detected[control_loc][-1]
+        path_list_at_loc = list_path_detected[control_loc]
+        str_path_list = [str(x.serialize()) for x in path_list_at_loc]
+        sorted_path_list = sorted(str_path_list, key=len)
+        index_of_selected_path = str_path_list.index(sorted_path_list[-1])
+        selected_path = list_path_detected[control_loc][index_of_selected_path]
     else:
         selected_path = random.choice(list_path_detected[control_loc])
 
