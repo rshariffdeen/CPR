@@ -129,7 +129,9 @@ ENV TRIDENT_CXX=/concolic-repair/tools/trident-cxx
 # install experiment dependencies
 RUN apt-get install -y  \
     autopoint \
+    automake \
     bison \
     gettext \
     gperf \
+    libtool \
     texinfo
