@@ -69,3 +69,4 @@ CONF_MAX_FORK = ""
 CONF_TAG_ID = ""
 CONF_STATIC = False
 CONF_LOC_PATCH = ""
+CONF_SELECTION_STRATEGY = "deterministic"

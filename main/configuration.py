@@ -92,6 +92,8 @@ def read_conf_file():
             values.CONF_FLAGS_C = configuration.replace(definitions.CONF_FLAGS_C, '')
         elif definitions.CONF_FLAGS_CXX in configuration:
             values.CONF_FLAGS_CXX = configuration.replace(definitions.CONF_FLAGS_CXX, '')
+        elif definitions.CONF_SELECTION_STRATEGY in configuration:
+            values.CONF_SELECTION_STRATEGY = configuration.replace(definitions.CONF_SELECTION_STRATEGY, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

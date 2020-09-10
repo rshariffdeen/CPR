@@ -51,6 +51,7 @@ CONF_STATIC = "static:"
 CONF_FLAG_ASAN = "flag_asan:"
 CONF_FLAGS_C = "flag_c:"
 CONF_FLAGS_CXX = "flag_cxx:"
+CONF_SELECTION_STRATEGY = "strategy:"
 
 
 # ----------------- KEY DEFINITIONS -------------------

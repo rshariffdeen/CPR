@@ -275,13 +275,20 @@ def select_nearest_control_loc():
             filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
         min_distance = min(list(control_loc_dist_map.values()))
         loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
-        selection = random.choice(list(set(loc_list) & set(list_path_detected.keys())))
+        if values.CONF_SELECTION_STRATEGY == "deterministic":
+            selection = list(set(loc_list) & set(list_path_detected.keys()))[0]
+        else:
+            selection = random.choice(list(set(loc_list) & set(list_path_detected.keys())))
     return selection
 
 
 def select_new_path_condition():
     control_loc = select_nearest_control_loc()
-    selected_path = random.choice(list_path_detected[control_loc])
+    if values.CONF_SELECTION_STRATEGY == "deterministic":
+        selected_path = list_path_detected[control_loc][0]
+    else:
+        selected_path = random.choice(list_path_detected[control_loc])
+
     list_path_detected[control_loc].remove(selected_path)
     if not list_path_detected[control_loc]:
         list_path_detected.pop(control_loc)
@@ -351,7 +358,10 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     selected_new_path = And(selected_new_path, relationship)
 
     while patch_list:
-        selected_patch = random.choice(patch_list)
+        if values.CONF_SELECTION_STRATEGY == "deterministic":
+            selected_patch = patch_list[0]
+        else:
+            selected_patch = random.choice(patch_list)
         patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
         check_sat = And(selected_new_path, patch_constraint)
         if is_sat(check_sat):
