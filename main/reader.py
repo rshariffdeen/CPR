@@ -1,6 +1,6 @@
 import os
 import collections
-from main import emitter, definitions
+from main import emitter, definitions, values
 
 
 def collect_symbolic_expression(log_path):
@@ -115,6 +115,12 @@ def collect_trace(file_path, project_path):
                         trace_line = source_path + ":" + str(line_number)
                         if (not list_trace) or (list_trace[-1] != trace_line):
                             list_trace.append(trace_line)
+    if values.CONF_LOC_PATCH:
+        if values.CONF_LOC_PATCH in list_trace:
+            emitter.warning("\t\t[note] patch location detected in trace")
+    if values.CONF_LOC_BUG:
+        if values.CONF_LOC_BUG in list_trace:
+            emitter.warning("\t\t[note] fault location detected in trace")
     return list_trace
 
 
