@@ -106,6 +106,9 @@ def run(project_path, program_path):
         exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
 
+        # Checks for the current coverage.
+        satisfied = check_coverage()
+
         if not values.IS_DISABLE_DISTANCE_CAL:
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -119,6 +122,4 @@ def run(project_path, program_path):
         P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.debug("|P|=", str(len(P)))
 
-        # Checks for the current coverage.
-        satisfied = check_coverage()
     print_patch_list(P)
