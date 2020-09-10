@@ -3,6 +3,7 @@ from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, values, distance, oracle, parallel
+import time
 
 
 check_counter = 0
@@ -79,7 +80,9 @@ def print_patch_list(patch_list):
 def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
+    time_check = time.time()
     P = generate_patch_set(project_path)
+    values.TIME_TO_GENERATE = str(time.time() - time_check)
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(P) <= 1
     iteration = 0

@@ -68,6 +68,7 @@ def end(time_duration):
     output("Startup: " + time_duration[definitions.KEY_DURATION_BOOTSTRAP] + " seconds")
     output("Build: " + time_duration[definitions.KEY_DURATION_BUILD] + " seconds")
     output("Initialization: " + time_duration[definitions.KEY_DURATION_INITIALIZATION] + " seconds")
+    output("Generation: " + values.TIME_TO_GENERATE + " seconds")
     output("Repair: " + time_duration[definitions.KEY_DURATION_REPAIR] + " seconds")
     output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " seconds\n")
     copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_OUTPUT + "/main-log")
