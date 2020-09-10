@@ -13,5 +13,5 @@ int main(int argc, char *argv[]) {
   y = x + 1;
   TRIDENT_OUTPUT("y", "i32", y);
   res = 1000 / y;
-  return ;
+  return 0;
 }
