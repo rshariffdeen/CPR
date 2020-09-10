@@ -285,7 +285,7 @@ def select_nearest_control_loc():
 def select_new_path_condition():
     control_loc = select_nearest_control_loc()
     if values.CONF_SELECTION_STRATEGY == "deterministic":
-        selected_path = list_path_detected[control_loc][0]
+        selected_path = list_path_detected[control_loc][-1]
     else:
         selected_path = random.choice(list_path_detected[control_loc])
 
