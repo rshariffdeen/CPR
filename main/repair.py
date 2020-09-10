@@ -87,6 +87,11 @@ def run(project_path, program_path):
     satisfied = len(P) <= 1
     iteration = 0
     assertion = values.SPECIFICATION
+    test_output_list = values.CONF_TEST_OUTPUT
+    binary_dir_path = "/".join(program_path.split("/")[:-1])
+    for output_spec in test_output_list:
+        test_index = str((int(test_output_list.index(output_spec)) * 2) + 1)
+        P = reduce(P, Path(binary_dir_path + "/klee-out-" + str(test_index) + "/").resolve(), assertion)
 
     while not satisfied and len(P) > 1:
         iteration = iteration + 1
@@ -120,7 +125,6 @@ def run(project_path, program_path):
                 continue
 
         distance.update_distance_map()
-        binary_dir_path = "/".join(program_path.split("/")[:-1])
         ## Reduces the set of patch candidates based on the current path constraint
         P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.debug("|P|=", str(len(P)))
