@@ -682,11 +682,16 @@ def synthesize(components: List[Component],
         if len(assigned) != len(set(assigned)):
             continue
         if concrete_enumeration:
+
             for value_a in range(lower_bound, upper_bound):
-                for value_b in range(lower_bound, upper_bound):
-                    result = verify({lid: (tree, {"a": value_a, "b": value_b})}, specification) # TODO-YN currently it is not checking for a and does support any other constant
-                    if result:
-                        yield {lid: (tree, {"a": value_a, "b": value_b})}
+                result = verify({lid: (tree, {"a": value_a})},
+                                specification)  # TODO-YN currently it is not checking for a and does support any other constant
+                if result:
+                    yield {lid: (tree, {"a": value_a})}
+                # for value_b in range(lower_bound, upper_bound):
+                #     result = verify({lid: (tree, {"a": value_a, "b": value_b})}, specification) # TODO-YN currently it is not checking for a and does support any other constant
+                #     if result:
+                #         yield {lid: (tree, {"a": value_a, "b": value_b})}
         else:
             result = verify({lid: (tree, {})}, specification)
             if result:
