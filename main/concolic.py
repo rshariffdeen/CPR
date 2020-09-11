@@ -376,7 +376,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         selected_patch = random.choice(patch_list)
 
     emitter.emit_patch(selected_patch, message="\tSelected patch: ")
-
+    patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
     # add patch constraint and user-input->prog-var relationship
     selected_new_path = And(selected_new_path, patch_constraint)
     model = z3_get_model(selected_new_path)
