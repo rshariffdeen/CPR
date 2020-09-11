@@ -362,14 +362,16 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     # relationship = TRUE
     # selected_new_path = And(selected_new_path, relationship)
     result_list = parallel.validate_input_generation(patch_list, selected_new_path)
+    filtered_patch_list = list()
     for result in result_list:
         is_valid, index = result
-        if not is_valid:
+        selected_patch = patch_list[index]
+        if is_valid:
+            filtered_patch_list.append(selected_patch)
+        else:
             # emitter.debug("Removing Patch", selected_patch)
-            selected_patch = patch_list[index]
             emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
-            patch_list.remove(selected_patch)
-
+    patch_list = filtered_patch_list
     if values.CONF_SELECTION_STRATEGY == "deterministic":
         selected_patch = patch_list[0]
     else:
