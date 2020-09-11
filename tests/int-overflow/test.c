@@ -6,12 +6,13 @@
 
 int main(int argc, char *argv[]) {
   int x = atoi(argv[1]);
-  int res, y;
-  if (__trident_choice("L9", "bool", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0))  {
+  int y = atoi(argv[2]);
+  int res;
+  if (__trident_choice("L9", "bool", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
-  y = x - 1;
+
   TRIDENT_OUTPUT("y", "i32", y);
-  res = 1000 / y;
+  res = x * y;
   return 0;
 }
