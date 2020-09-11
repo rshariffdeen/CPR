@@ -40,6 +40,7 @@ DEFAULT_DEPTH = 3
 DEFAULT_LOWER_BOUND = -10
 DEFAULT_UPPER_BOUND = 11
 DEFAULT_MAX_FORK = 5
+DEFAULT_GEN_SEARCH_LIMIT = 40
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 

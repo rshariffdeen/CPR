@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from main import emitter, oracle, definitions, extractor, reader
+from main import emitter, oracle, definitions, extractor, reader, values
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -32,12 +32,18 @@ def generate_symbolic_paths_parallel(ppc_list):
     result_list = []
     pool = mp.Pool(mp.cpu_count())
     lock = None
+    count = 0
     for control_loc in ppc_list:
         if definitions.DIRECTORY_RUNTIME in control_loc:
             continue
         ppc_list_at_loc = ppc_list[control_loc]
         for ppc in ppc_list_at_loc:
+            count = count + 1
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
             pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
+        if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+            break
 
     pool.close()
     emitter.normal("\t\twaiting for thread completion")
