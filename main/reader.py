@@ -93,6 +93,7 @@ def collect_symbolic_path(log_path, project_path):
                         path_condition = ""
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
+    ppc_list = collections.OrderedDict(reversed(list(ppc_list.items())))
     return ppc_list, last_sym_path
 
 
