@@ -361,11 +361,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     # relationship = extractor.extract_var_relationship(var_expr_map)
     # relationship = TRUE
     # selected_new_path = And(selected_new_path, relationship)
-    for selected_patch in patch_list:
-        patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
-        check_sat = And(selected_new_path, patch_constraint)
-        if not is_sat(check_sat):
+    result_list = parallel.validate_input_generation(patch_list, selected_new_path)
+    for result in result_list:
+        is_valid, index = result
+        if not is_valid:
             # emitter.debug("Removing Patch", selected_patch)
+            selected_patch = patch_list[index]
             emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
             patch_list.remove(selected_patch)
 

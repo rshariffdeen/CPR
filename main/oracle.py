@@ -112,6 +112,12 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     return result, index
 
 
+def check_input_feasibility(index, patch_constraint, new_path):
+    check_sat = And(new_path, patch_constraint)
+    result = is_sat(check_sat)
+    return result, index
+
+
 # def verify_patch(programs: Union[Dict[str, Program], Dict[str, Formula]],
 #            specification: Specification) -> Optional[VerificationSuccess]:
 #     """Check if programs satisfy specification

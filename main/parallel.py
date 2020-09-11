@@ -70,6 +70,22 @@ def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertio
     return result_list
 
 
+def validate_input_generation(patch_list, new_path):
+    global pool, result_list
+    emitter.normal("\t\tstarting parallel computing")
+    result_list = []
+    pool = mp.Pool(mp.cpu_count())
+    lock = None
+    for patch in patch_list:
+        patch_constraint = extractor.extract_constraints_from_patch(patch)
+        index = list(patch_list).index(patch)
+        pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result)
+    pool.close()
+    emitter.normal("\t\twaiting for thread completion")
+    pool.join()
+    return result_list
+
+
 def generate_patch_pool(components: List[Component],
                depth: int,
                specification: Specification,
