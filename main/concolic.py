@@ -368,14 +368,14 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         selected_patch = patch_list[index]
         if is_valid:
             filtered_patch_list.append(selected_patch)
-        else:
-            # emitter.debug("Removing Patch", selected_patch)
-            emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
-    patch_list = filtered_patch_list
+    #     else:
+    #         # emitter.debug("Removing Patch", selected_patch)
+    #         emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
+    # patch_list = filtered_patch_list
     if values.CONF_SELECTION_STRATEGY == "deterministic":
-        selected_patch = patch_list[0]
+        selected_patch = filtered_patch_list[0]
     else:
-        selected_patch = random.choice(patch_list)
+        selected_patch = random.choice(filtered_patch_list)
 
     emitter.emit_patch(selected_patch, message="\tSelected patch: ")
     patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
