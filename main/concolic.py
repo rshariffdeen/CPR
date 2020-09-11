@@ -361,20 +361,19 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     # relationship = extractor.extract_var_relationship(var_expr_map)
     # relationship = TRUE
     # selected_new_path = And(selected_new_path, relationship)
-
-    while patch_list:
-        if values.CONF_SELECTION_STRATEGY == "deterministic":
-            selected_patch = patch_list[0]
-        else:
-            selected_patch = random.choice(patch_list)
+    for selected_patch in patch_list:
         patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
         check_sat = And(selected_new_path, patch_constraint)
-        if is_sat(check_sat):
-            break
-        else:
+        if not is_sat(check_sat):
             # emitter.debug("Removing Patch", selected_patch)
             emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
             patch_list.remove(selected_patch)
+
+    if values.CONF_SELECTION_STRATEGY == "deterministic":
+        selected_patch = patch_list[0]
+    else:
+        selected_patch = random.choice(patch_list)
+
     emitter.emit_patch(selected_patch, message="\tSelected patch: ")
 
     # add patch constraint and user-input->prog-var relationship
