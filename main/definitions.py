@@ -51,7 +51,8 @@ CONF_STATIC = "static:"
 CONF_FLAG_ASAN = "flag_asan:"
 CONF_FLAGS_C = "flag_c:"
 CONF_FLAGS_CXX = "flag_cxx:"
-CONF_SELECTION_STRATEGY = "strategy:"
+CONF_SELECTION_STRATEGY = "select_strategy:"
+CONF_DISTANCE_METRIC = "dist_metric:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
@@ -66,7 +67,9 @@ KEY_DURATION_REPAIR = "repair"
 # ---------------- ARGUMENTS ---------------------------
 ARG_CONF_FILE = "--conf="
 ARG_DEBUG = "--debug"
-ARG_DISABLE_DISTANCE_CAL = "--disable-dist-cal"
+ARG_DISABLE_DISTANCE_CAL = "--dist-cal="
+ARG_DIST_METRIC = "--dist-metric="
+ARG_SELECTION_METHOD = "--selection="
 
 
 # ----------------- TOOLS --------------------------------

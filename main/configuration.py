@@ -13,6 +13,12 @@ def read_conf(arg_list):
                 values.FILE_CONFIGURATION = str(arg).replace(definitions.ARG_CONF_FILE, '')
             elif definitions.ARG_DISABLE_DISTANCE_CAL in arg:
                 values.IS_DISABLE_DISTANCE_CAL = True
+            elif definitions.ARG_DIST_METRIC in arg:
+                option = int(arg.replace(definitions.ARG_DIST_METRIC, ''))
+                values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
+            elif definitions.ARG_SELECTION_METHOD in arg:
+                option = int(arg.replace(definitions.ARG_SELECTION_METHOD, ''))
+                values.CONF_SELECTION_STRATEGY = values.OPTIONS_SELECT_METHOD[option]
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.help()
@@ -94,6 +100,8 @@ def read_conf_file():
             values.CONF_FLAGS_CXX = configuration.replace(definitions.CONF_FLAGS_CXX, '')
         elif definitions.CONF_SELECTION_STRATEGY in configuration:
             values.CONF_SELECTION_STRATEGY = configuration.replace(definitions.CONF_SELECTION_STRATEGY, '')
+        elif definitions.CONF_DISTANCE_METRIC in configuration:
+            values.CONF_DISTANCE_METRIC = configuration.replace(definitions.CONF_DISTANCE_METRIC, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

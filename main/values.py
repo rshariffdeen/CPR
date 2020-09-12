@@ -45,6 +45,11 @@ crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 
 
+# ---------------- Option Values ---------------------
+OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
+OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
+
+
 # ------------------ Configuration Values ---------------
 CONF_PATH_PROJECT = ""
 CONF_PATH_SPECIFICATION = ""
@@ -72,3 +77,4 @@ CONF_TAG_ID = ""
 CONF_STATIC = False
 CONF_LOC_PATCH = ""
 CONF_SELECTION_STRATEGY = "deterministic"
+CONF_DISTANCE_METRIC = "control-loc"
