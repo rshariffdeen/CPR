@@ -268,17 +268,14 @@ def get_byte_string(bit_vector):
 
 def select_nearest_control_loc():
     selection = None
-    if values.IS_DISABLE_DISTANCE_CAL:
-        selection = random.choice(list(list_path_detected.keys()))
+    control_loc_dist_map = dict(
+        filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
+    min_distance = min(list(control_loc_dist_map.values()))
+    loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
+    if values.CONF_SELECTION_STRATEGY == "deterministic":
+        selection = list(set(loc_list) & set(list_path_detected.keys()))[0]
     else:
-        control_loc_dist_map = dict(
-            filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
-        min_distance = min(list(control_loc_dist_map.values()))
-        loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
-        if values.CONF_SELECTION_STRATEGY == "deterministic":
-            selection = list(set(loc_list) & set(list_path_detected.keys()))[0]
-        else:
-            selection = random.choice(list(set(loc_list) & set(list_path_detected.keys())))
+        selection = random.choice(list(set(loc_list) & set(list_path_detected.keys())))
     return selection
 
 
@@ -502,9 +499,9 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
             input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     emitter.normal("\texecuting klee in concolic mode")
-    collect_trace_flag = "--log-trace "
-    if values.IS_DISABLE_DISTANCE_CAL:
-        collect_trace_flag = " "
+    hit_location_flag = " "
+    if values.OPTIONS_DIST_METRIC == "control-loc":
+        hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + " "
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
@@ -512,9 +509,10 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "-allow-seed-extension " \
                    "-named-seed-matching " \
                    "--log-ppc " \
-                   "{0}".format(collect_trace_flag) \
+                   "--log-trace " \
                    + "--external-calls=all " \
-                   "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
+                   + "{0}".format(hit_location_flag) \
+                   + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
                    + input_argument

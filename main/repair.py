@@ -114,12 +114,11 @@ def run(project_path, program_path):
         # Checks for the current coverage.
         satisfied = check_coverage()
 
-        if not values.IS_DISABLE_DISTANCE_CAL:
-            # check if new path hits patch location / fault location
-            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                continue
+        # check if new path hits patch location / fault location
+        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            continue
+        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            continue
 
         distance.update_distance_map()
         ## Reduces the set of patch candidates based on the current path constraint
