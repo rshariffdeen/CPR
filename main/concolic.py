@@ -283,11 +283,14 @@ def select_new_path_condition():
         path_list_at_patch_loc = [(p[1], p[2]) for p in list_path_detected if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
-            selected_path = (max(path_list_at_patch_loc, key=lambda item: item[1]))[0]
+            selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[1]))
+            selected_path = selected_pair[0]
+            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1])
         else:
             selected_pair = max(list_path_detected, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
+        list_path_detected.remove(selected_pair)
     else:
         control_loc = select_nearest_control_loc()
         if values.CONF_SELECTION_STRATEGY == "deterministic":
