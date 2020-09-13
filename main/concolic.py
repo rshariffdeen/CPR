@@ -504,7 +504,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     emitter.normal("\texecuting klee in concolic mode")
     hit_location_flag = " "
-    if values.OPTIONS_DIST_METRIC == "control-loc":
+    if values.CONF_DISTANCE_METRIC == "control-loc":
         hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + " "
     klee_command = "klee " \
                    "--posix-runtime " \
