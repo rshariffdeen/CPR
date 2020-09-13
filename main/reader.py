@@ -67,7 +67,7 @@ def collect_symbolic_path(log_path, project_path):
        extract the partial path conditions
     """
     emitter.normal("\textracting path conditions")
-    ppc_list = collections.OrderedDict()
+    ppc_list = list()
     last_sym_path = ""
     if os.path.exists(log_path):
         source_path = ""
@@ -85,16 +85,13 @@ def collect_symbolic_path(log_path, project_path):
                     if "(exit)" not in line:
                         path_condition = path_condition + line
                     else:
-                        if source_path not in ppc_list.keys():
-                            ppc_list[source_path] = list()
-                        ppc_list[source_path].append(path_condition)
+                        ppc_list.append((source_path, path_condition))
                         last_sym_path = path_condition
                         source_path = ""
                         path_condition = ""
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
-    ppc_list = collections.OrderedDict(reversed(list(ppc_list.items())))
-    return ppc_list, last_sym_path
+    return ppc_list.reverse(), last_sym_path
 
 
 def collect_trace(file_path, project_path):

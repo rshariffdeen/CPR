@@ -10,7 +10,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command
-from main import emitter, values, reader, parallel, definitions, extractor
+from main import emitter, values, reader, parallel, definitions, extractor, oracle
 
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,8 @@ File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 list_path_explored = list()
-list_path_detected = dict()
+list_path_observed = list()
+list_path_detected = list()
 count_discovered = 0
 
 
@@ -183,16 +184,13 @@ def generate_symbolic_paths(ppc_list):
               returns a list of new partial path conditions
     """
     emitter.normal("\tgenerating new paths")
-    path_list = dict()
+    path_list = list()
     path_count = 0
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
-        control_loc = result[1]
         if result[0]:
-            if control_loc not in path_list:
-                path_list[control_loc] = list()
             path_count = path_count + 1
-            path_list[control_loc].append(result[2])
+            path_list.append((result[1], result[2]))
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list
@@ -280,19 +278,30 @@ def select_nearest_control_loc():
 
 
 def select_new_path_condition():
-    control_loc = select_nearest_control_loc()
-    if values.CONF_SELECTION_STRATEGY == "deterministic":
-        path_list_at_loc = list_path_detected[control_loc]
-        str_path_list = [str(x.serialize()) for x in path_list_at_loc]
-        sorted_path_list = sorted(str_path_list, key=len)
-        index_of_selected_path = str_path_list.index(sorted_path_list[-1])
-        selected_path = list_path_detected[control_loc][index_of_selected_path]
+    global list_path_detected
+    if values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
+        path_list_at_patch_loc = [(p[1], p[2]) for p in list_path_detected if p[0] == values.CONF_LOC_PATCH]
+        if path_list_at_patch_loc:
+            control_loc = values.CONF_LOC_PATCH
+            selected_path = (max(path_list_at_patch_loc, key=lambda item: item[1]))[0]
+        else:
+            selected_pair = max(list_path_detected, key=lambda item: item[2])
+            selected_path = selected_pair[1]
+            control_loc = selected_pair[0]
     else:
-        selected_path = random.choice(list_path_detected[control_loc])
+        control_loc = select_nearest_control_loc()
+        if values.CONF_SELECTION_STRATEGY == "deterministic":
+            path_list_at_loc = list_path_detected[control_loc]
+            str_path_list = [str(x.serialize()) for x in path_list_at_loc]
+            sorted_path_list = sorted(str_path_list, key=len)
+            index_of_selected_path = str_path_list.index(sorted_path_list[-1])
+            selected_path = list_path_detected[control_loc][index_of_selected_path]
+        else:
+            selected_path = random.choice(list_path_detected[control_loc])
 
-    list_path_detected[control_loc].remove(selected_path)
-    if not list_path_detected[control_loc]:
-        list_path_detected.pop(control_loc)
+        list_path_detected[control_loc].remove(selected_path)
+        if not list_path_detected[control_loc]:
+            list_path_detected.pop(control_loc)
     return selected_path, control_loc
 
 
@@ -330,17 +339,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     patch_constraint = TRUE
     new_path_count = 0
 
-    for control_loc in generated_path_list:
-        generated_path_list_at_loc = generated_path_list[control_loc]
-        if control_loc not in list_path_detected:
-            list_path_detected[control_loc] = list()
-        detected_path_list_at_loc = [str(x.serialize()) for x in list_path_detected[control_loc]]
-        for generated_path in generated_path_list_at_loc:
-            if str(generated_path.serialize()) not in (detected_path_list_at_loc + list_path_explored):
-                list_path_detected[control_loc].append(generated_path)
+    if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+        for control_loc, generated_path, ppc_len in generated_path_list:
+            if str(generated_path.serialize()) not in (list_path_observed + list_path_explored):
+                list_path_detected.append((control_loc, generated_path, ppc_len))
+                list_path_observed.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
-        if not list_path_detected[control_loc]:
-            list_path_detected.pop(control_loc)
 
     count_discovered = count_discovered + new_path_count
     emitter.highlight("\tidentified " + str(new_path_count) + " new path(s)")
@@ -530,7 +534,8 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     values.PREFIX_PPC_FORMULA = generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     ppc_list = values.LIST_PPC
-    values.LIST_GENERATED_PATH = generate_symbolic_paths(ppc_list)
+    if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+        values.LIST_GENERATED_PATH = generate_symbolic_paths(ppc_list)
     return return_code
 
 

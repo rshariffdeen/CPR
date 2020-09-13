@@ -33,15 +33,13 @@ def generate_symbolic_paths_parallel(ppc_list):
     pool = mp.Pool(mp.cpu_count())
     lock = None
     count = 0
-    for control_loc in ppc_list:
+    for control_loc, ppc in ppc_list:
         if definitions.DIRECTORY_RUNTIME in control_loc:
             continue
-        ppc_list_at_loc = ppc_list[control_loc]
-        for ppc in ppc_list_at_loc:
-            count = count + 1
-            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-                break
-            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
+        count = count + 1
+        if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+            break
+        pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
         if count == values.DEFAULT_GEN_SEARCH_LIMIT:
             break
 

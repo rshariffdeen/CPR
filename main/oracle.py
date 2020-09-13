@@ -79,11 +79,12 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     # print(control_loc, constraint)
     assert str(new_path.serialize()) != str(formula.serialize())
     if is_sat(new_path):
-        return True, chosen_control_loc, new_path
+        ppc_len = len(str(new_path.serialize()))
+        return True, chosen_control_loc, new_path, ppc_len
     else:
         #with lock:
         emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
-        return False, chosen_control_loc, new_path
+        return False, chosen_control_loc, new_path, 0
 
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
