@@ -33,7 +33,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     pool = mp.Pool(mp.cpu_count())
     lock = None
     count = 0
-    for control_loc, ppc in ppc_list:
+    for control_loc, ppc in ppc_list.reverse():
         if definitions.DIRECTORY_RUNTIME in control_loc:
             continue
         count = count + 1

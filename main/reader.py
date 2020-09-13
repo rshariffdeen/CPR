@@ -91,7 +91,7 @@ def collect_symbolic_path(log_path, project_path):
                         path_condition = ""
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
-    return ppc_list.reverse(), last_sym_path
+    return ppc_list, last_sym_path
 
 
 def collect_trace(file_path, project_path):
