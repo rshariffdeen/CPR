@@ -57,9 +57,13 @@ def z3_get_model(formula):
                 index = int(str(idx).split("_")[0])
                 value = int(str(val).split("_")[0])
                 byte_list[index] = value
-            # max_index = max(list(byte_list.keys()))
-            # array_size = max_index + 1  # TODO: this could be wrong calculation
-            array_size = int(values.LIST_BIT_LENGTH[var_name])
+
+            max_index = max(list(byte_list.keys()))
+            if var_name in values.LIST_BIT_LENGTH:
+                array_size = values.LIST_BIT_LENGTH[var_name]
+            else:
+                array_size = max_index + 1  # TODO: this could be wrong calculation
+
             if max_index == 0:
                 array_size = 2
             for i in range(0, array_size):
