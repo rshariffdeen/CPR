@@ -199,9 +199,9 @@ def read_bit_length(log_file_path):
             var_length = 0
             for line in line_list:
                 if "name:" in line:
-                    var_name = line.split("name: ").strip().replace("'", "")
+                    var_name = line.split("name: ")[-1].strip().replace("'", "")
                 elif "size:" in line:
-                    var_length = int(line.split("size: ").strip().replace("'", ""))
+                    var_length = int(line.split("size: ")[-1].strip().replace("'", ""))
 
                 if var_name and var_length > 0:
                     bit_length_list[var_name] = var_length
