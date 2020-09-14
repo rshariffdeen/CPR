@@ -13,6 +13,7 @@ cd src
 git checkout $commit_id
 
 ./bootstrap
+FORCE_UNSAFE_CONFIGURE=1 ./configure
 
 
 cd $current_dir
