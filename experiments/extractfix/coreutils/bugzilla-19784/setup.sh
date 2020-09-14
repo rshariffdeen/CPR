@@ -12,6 +12,7 @@ git clone $project_url src
 cd src
 git checkout $commit_id
 
+./bootstrap
 
 
 cd $current_dir

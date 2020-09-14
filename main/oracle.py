@@ -92,15 +92,13 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     if assertion:
         if values.IS_CRASH:
             if is_loc_in_trace(values.CONF_LOC_BUG):
-                exist_valid_instance = is_sat(And(specification, assertion))
-                universal_quantification = is_sat(Not(And(specification, assertion)))
-                result = exist_valid_instance and universal_quantification
+                universal_quantification = is_sat(And(specification, Not(assertion)))
+                result = not universal_quantification
             else:
                 result = is_sat(specification)
         else:
-            exist_valid_instance = is_sat(And(specification, assertion))
-            exist_invalid_instance = is_sat(And(specification, Not(assertion)))
-            result = exist_valid_instance and not exist_invalid_instance
+            universal_quantification = is_sat(And(specification, Not(assertion)))
+            result = not universal_quantification
     else:
         if values.IS_CRASH:
             if is_loc_in_trace(values.CONF_LOC_BUG):
