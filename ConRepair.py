@@ -41,6 +41,7 @@ def load_component_list():
     os.chdir(values.CONF_PATH_PROJECT)
     for component_name in values.CONF_CUSTOM_COMP_LIST:
         proj_comp_files.append(Path(component_name))
+        emitter.debug("\tloading component: " + str(component_name))
     project_components = synthesis.load_components(proj_comp_files)
     values.LIST_COMPONENTS = project_components + general_components
 
