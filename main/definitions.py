@@ -72,6 +72,7 @@ ARG_DISABLE_DISTANCE_CAL = "--dist-cal="
 ARG_DIST_METRIC = "--dist-metric="
 ARG_SELECTION_METHOD = "--selection="
 ARG_PATCH_TYPE = "--patch-type="
+ARG_SKIP_BUILD = "--skip-build"
 
 
 # ----------------- TOOLS --------------------------------

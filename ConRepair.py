@@ -105,9 +105,10 @@ def main(arg_list):
     time_info[definitions.KEY_DURATION_BOOTSTRAP] = str(time.time() - time_check)
 
     time_check = time.time()
-    builder.build_normal()
-    assert os.path.isfile(values.CONF_PATH_PROGRAM)
-    assert os.path.getsize(values.CONF_PATH_PROGRAM) > 0
+    if not values.CONF_SKIP_BUILD:
+        builder.build_normal()
+        assert os.path.isfile(values.CONF_PATH_PROGRAM)
+        assert os.path.getsize(values.CONF_PATH_PROGRAM) > 0
     time_info[definitions.KEY_DURATION_BUILD] = str(time.time() - time_check)
 
     time_check = time.time()
