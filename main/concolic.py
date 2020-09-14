@@ -60,7 +60,7 @@ def z3_get_model(formula):
 
             max_index = max(list(byte_list.keys()))
             if var_name in values.LIST_BIT_LENGTH:
-                array_size = values.LIST_BIT_LENGTH[var_name]
+                array_size = values.LIST_BIT_LENGTH[var_name] - 1
             else:
                 array_size = max_index + 1  # TODO: this could be wrong calculation
 
