@@ -20,7 +20,7 @@ git commit -m "instrument trident"
 
 
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static'
+FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
 
 
 cd $current_dir
