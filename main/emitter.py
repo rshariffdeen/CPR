@@ -169,3 +169,4 @@ def help():
     write("\t" + definitions.ARG_DISABLE_DISTANCE_CAL + "\t| " + "disable distance calculation (default=enabled)", RED)
     write("\t" + definitions.ARG_SELECTION_METHOD + "\t| " + "selection strategy [0: deterministic, 1: random] (default=0)", RED)
     write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", RED)
+    write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "distance metric [0: concrete, 1: abstract] (default=0)", RED)
