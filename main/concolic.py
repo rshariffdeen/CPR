@@ -380,7 +380,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     if not filtered_patch_list:
         emitter.debug("Count paths explored: ", str(len(list_path_explored)))
         emitter.debug("Count paths detected: ", str(len(list_path_detected)))
-        return None, None, patch_list
+        return None, None, {}
 
     if values.CONF_SELECTION_STRATEGY == "deterministic":
         selected_patch = filtered_patch_list[0]
