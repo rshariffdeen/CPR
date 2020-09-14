@@ -366,31 +366,31 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     # relationship = extractor.extract_var_relationship(var_expr_map)
     # relationship = TRUE
     # selected_new_path = And(selected_new_path, relationship)
-    result_list = parallel.validate_input_generation(patch_list, selected_new_path)
-    filtered_patch_list = list()
-    for result in result_list:
-        is_valid, index = result
-        selected_patch = patch_list[index]
-        if is_valid:
-            filtered_patch_list.append(selected_patch)
-    #     else:
-    #         # emitter.debug("Removing Patch", selected_patch)
-    #         emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
-    # patch_list = filtered_patch_list
-    if not filtered_patch_list:
-        emitter.debug("Count paths explored: ", str(len(list_path_explored)))
-        emitter.debug("Count paths detected: ", str(len(list_path_detected)))
-        return None, None, {}
+    # result_list = parallel.validate_input_generation(patch_list, selected_new_path)
+    # filtered_patch_list = list()
+    # for result in result_list:
+    #     is_valid, index = result
+    #     selected_patch = patch_list[index]
+    #     if is_valid:
+    #         filtered_patch_list.append(selected_patch)
+    # #     else:
+    # #         # emitter.debug("Removing Patch", selected_patch)
+    # #         emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
+    # # patch_list = filtered_patch_list
+    # if not filtered_patch_list:
+    #     emitter.debug("Count paths explored: ", str(len(list_path_explored)))
+    #     emitter.debug("Count paths detected: ", str(len(list_path_detected)))
+    #     return None, None, {}
 
-    if values.CONF_SELECTION_STRATEGY == "deterministic":
-        selected_patch = filtered_patch_list[0]
-    else:
-        selected_patch = random.choice(filtered_patch_list)
+    # if values.CONF_SELECTION_STRATEGY == "deterministic":
+    #     selected_patch = filtered_patch_list[0]
+    # else:
+    #     selected_patch = random.choice(filtered_patch_list)
 
-    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
-    patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
+    # emitter.emit_patch(selected_patch, message="\tSelected patch: ")
+    # patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
     # add patch constraint and user-input->prog-var relationship
-    selected_new_path = And(selected_new_path, patch_constraint)
+    # selected_new_path = And(selected_new_path, patch_constraint)
     model = z3_get_model(selected_new_path)
     if model is None:
         return None, None, patch_list
