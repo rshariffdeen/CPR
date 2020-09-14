@@ -60,7 +60,7 @@ def z3_get_model(formula):
 
             max_index = max(list(byte_list.keys()))
             if var_name in values.LIST_BIT_LENGTH:
-                array_size = values.LIST_BIT_LENGTH[var_name] + 1
+                array_size = values.LIST_BIT_LENGTH[var_name]
             else:
                 array_size = max_index + 1  # TODO: this could be wrong calculation
 
@@ -517,10 +517,13 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
     ktest_log_file = "/tmp/ktest.log"
     ktest_command = "ktest-tool " + ktest_path + " > " + ktest_log_file
+    execute_command(ktest_command)
     bit_length_list = reader.read_bit_length(ktest_log_file)
     if values.LIST_BIT_LENGTH:
         for var in bit_length_list:
-            if values.LIST_BIT_LENGTH[var] < bit_length_list[var]:
+            if var in values.LIST_BIT_LENGTH and values.LIST_BIT_LENGTH[var] < bit_length_list[var]:
+                values.LIST_BIT_LENGTH[var] = bit_length_list[var]
+            else:
                 values.LIST_BIT_LENGTH[var] = bit_length_list[var]
     else:
         values.LIST_BIT_LENGTH = bit_length_list
