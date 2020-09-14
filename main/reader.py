@@ -189,3 +189,23 @@ def collect_stack_info(trace_file_path):
                     continue
     return stack_map
 
+
+def read_bit_length(log_file_path):
+    bit_length_list = dict()
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as log_file:
+            line_list = log_file.readlines()
+            var_name = ""
+            var_length = 0
+            for line in line_list:
+                if "name:" in line:
+                    var_name = line.split("name: ").strip().replace("'", "")
+                elif "size:" in line:
+                    var_length = int(line.split("size: ").strip().replace("'", ""))
+
+                if var_name and var_length > 0:
+                    bit_length_list[var_name] = var_length
+                    var_name = ""
+                    var_length = 0
+
+    return bit_length_list

@@ -57,8 +57,9 @@ def z3_get_model(formula):
                 index = int(str(idx).split("_")[0])
                 value = int(str(val).split("_")[0])
                 byte_list[index] = value
-            max_index = max(list(byte_list.keys()))
-            array_size = max_index + 1  # TODO: this could be wrong calculation
+            # max_index = max(list(byte_list.keys()))
+            # array_size = max_index + 1  # TODO: this could be wrong calculation
+            array_size = int(values.LIST_BIT_LENGTH[var_name])
             if max_index == 0:
                 array_size = 2
             for i in range(0, array_size):
@@ -510,6 +511,15 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         else:
             input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generate_ktest(argument_list, second_var_list)
+    ktest_log_file = "/tmp/ktest.log"
+    ktest_command = "ktest-tool " + ktest_path + " > " + ktest_log_file
+    bit_length_list = reader.read_bit_length(ktest_log_file)
+    if values.LIST_BIT_LENGTH:
+        for var in bit_length_list:
+            if values.LIST_BIT_LENGTH[var] < bit_length_list[var]:
+                values.LIST_BIT_LENGTH[var] = bit_length_list[var]
+    else:
+        values.LIST_BIT_LENGTH = bit_length_list
     emitter.normal("\texecuting klee in concolic mode")
     hit_location_flag = " "
     if values.CONF_DISTANCE_METRIC == "control-loc":
