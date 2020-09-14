@@ -1,2 +1,2 @@
-(declare-const cmpt->hstep!0 (_ BitVec 32))
-(assert (= false (bvsle cmpt->hstep!0 (_ bv0 32) )))
+(declare-const i!0 (_ BitVec 32))
+(assert (= false (= i!0 (_ bv3 32) )))
