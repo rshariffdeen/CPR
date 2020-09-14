@@ -53,6 +53,7 @@ CONF_FLAGS_C = "flag_c:"
 CONF_FLAGS_CXX = "flag_cxx:"
 CONF_SELECTION_STRATEGY = "select_strategy:"
 CONF_DISTANCE_METRIC = "dist_metric:"
+CONF_PATCH_TYPE = "patch_type:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
@@ -70,6 +71,7 @@ ARG_DEBUG = "--debug"
 ARG_DISABLE_DISTANCE_CAL = "--dist-cal="
 ARG_DIST_METRIC = "--dist-metric="
 ARG_SELECTION_METHOD = "--selection="
+ARG_PATCH_TYPE = "--patch-type="
 
 
 # ----------------- TOOLS --------------------------------

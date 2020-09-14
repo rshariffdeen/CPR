@@ -53,7 +53,9 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
         spec_files.append((output_spec_path, klee_spec_path))
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
-    concrete_enumeration = True
+    concrete_enumeration = False
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+        concrete_enumeration = True
     lower_bound = values.DEFAULT_LOWER_BOUND
     upper_bound = values.DEFAULT_UPPER_BOUND
 

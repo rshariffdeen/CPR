@@ -18,7 +18,18 @@ def read_conf(arg_list):
                 values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
             elif definitions.ARG_SELECTION_METHOD in arg:
                 option = int(arg.replace(definitions.ARG_SELECTION_METHOD, ''))
+                if option not in values.OPTIONS_SELECT_METHOD:
+                    emitter.error("Invalid option for " + definitions.ARG_SELECTION_METHOD.replace("=", "") + " : " + arg)
+                    emitter.help()
+                    exit()
                 values.CONF_SELECTION_STRATEGY = values.OPTIONS_SELECT_METHOD[option]
+            elif definitions.ARG_PATCH_TYPE in arg:
+                option = int(arg.replace(definitions.ARG_PATCH_TYPE, ''))
+                if option not in values.OPTIONS_PATCH_TYPE:
+                    emitter.error("Invalid option for " + definitions.ARG_PATCH_TYPE.replace("=", "") + " : " + arg)
+                    emitter.help()
+                    exit()
+                values.CONF_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[option]
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.help()
@@ -102,6 +113,8 @@ def read_conf_file():
             values.CONF_SELECTION_STRATEGY = configuration.replace(definitions.CONF_SELECTION_STRATEGY, '')
         elif definitions.CONF_DISTANCE_METRIC in configuration:
             values.CONF_DISTANCE_METRIC = configuration.replace(definitions.CONF_DISTANCE_METRIC, '')
+        elif definitions.CONF_PATCH_TYPE in configuration:
+            values.CONF_PATCH_TYPE = configuration.replace(definitions.CONF_PATCH_TYPE, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

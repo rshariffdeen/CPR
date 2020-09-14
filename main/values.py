@@ -48,6 +48,7 @@ error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflo
 # ---------------- Option Values ---------------------
 OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
 OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
+OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
 
 
 # ------------------ Configuration Values ---------------
@@ -78,3 +79,4 @@ CONF_STATIC = False
 CONF_LOC_PATCH = ""
 CONF_SELECTION_STRATEGY = "deterministic"
 CONF_DISTANCE_METRIC = "control-loc"
+CONF_PATCH_TYPE = "concrete"
