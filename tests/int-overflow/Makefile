@@ -1,4 +1,9 @@
 PROGRAM=test
+CC=$(TRIDENT_CC)
+CFLAGS=-g -O0 -ftrapv
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 all: $(PROGRAM)
 
