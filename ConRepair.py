@@ -28,11 +28,13 @@ def load_component_list():
     if values.CONF_GENERAL_COMP_LIST:
         for component_name in values.CONF_GENERAL_COMP_LIST:
             gen_comp_files.append(Path(component_name))
+            emitter.debug("\tloading component: " + str(component_name))
     else:
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
         for comp_file in component_file_list:
             if ".smt2" in comp_file:
                 gen_comp_files.append(Path(comp_file))
+                emitter.debug("\tloading component: " + str(comp_file))
     general_components = synthesis.load_components(gen_comp_files)
 
     proj_comp_files = []
