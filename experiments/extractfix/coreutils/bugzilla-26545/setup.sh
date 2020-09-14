@@ -5,14 +5,20 @@ dir_name=$1/extractfix/$project_name/$bug_id
 project_url=https://github.com/coreutils/coreutils.git
 commit_id=8d34b45
 
-
+current_dir=$PWD
 mkdir -p $dir_name
 cd $dir_name
 git clone $project_url src
-cd $dir_name/src
+cd src
 git checkout $commit_id
 
 ./bootstrap
 FORCE_UNSAFE_CONFIGURE=1 ./configure
 
+cd $current_dir
+cp repair.conf $dir_name
+cp spec.smt2 $dir_name
+cp t1.smt2 $dir_name
+cp -rf components $dir_name
+cp exploit.j2k $dir_name
 
