@@ -521,8 +521,9 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     bit_length_list = reader.read_bit_length(ktest_log_file)
     if values.LIST_BIT_LENGTH:
         for var in bit_length_list:
-            if var in values.LIST_BIT_LENGTH and values.LIST_BIT_LENGTH[var] < bit_length_list[var]:
-                values.LIST_BIT_LENGTH[var] = bit_length_list[var]
+            if var in values.LIST_BIT_LENGTH:
+                if values.LIST_BIT_LENGTH[var] < bit_length_list[var]:
+                    values.LIST_BIT_LENGTH[var] = bit_length_list[var]
             else:
                 values.LIST_BIT_LENGTH[var] = bit_length_list[var]
     else:
