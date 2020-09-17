@@ -82,6 +82,13 @@ def print_patch_list(patch_list):
 def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
+
+    emitter.debug("\tconfiguration.is_crash:" + str(values.IS_CRASH))
+    emitter.debug("\tconfiguration.assertion:" + str(values.SPECIFICATION))
+    emitter.debug("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
+    emitter.debug("\tconfiguration.max_bound:" + str(values.CONF_MAX_BOUND))
+    emitter.debug("\tconfiguration.low_bound:" + str(values.CONF_LOW_BOUND))
+
     time_check = time.time()
     P = generate_patch_set(project_path)
     values.TIME_TO_GENERATE = str(time.time() - time_check)
