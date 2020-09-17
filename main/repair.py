@@ -37,13 +37,15 @@ def check_coverage():  # TODO
 
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
-    emitter.sub_title("Generating Patch Pool")
+
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
 
     if values.CONF_SKIP_GEN:
+        emitter.sub_title("Loading Patch Pool")
         list_of_patches = reader.read_pickle(definitions.FILE_PATCH_SET)
         return list_of_patches
 
+    emitter.sub_title("Generating Patch Pool")
     test_output_list = values.CONF_TEST_OUTPUT
     components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
