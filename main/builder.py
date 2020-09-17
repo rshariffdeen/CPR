@@ -153,8 +153,11 @@ def build_project(project_path, build_command=None):
     dir_command = "cd " + project_path + ";"
     if build_command is None:
         build_command = "CC=" + CC + " CXX=" + CXX + " "
-        build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
-        build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" > " + definitions.FILE_MAKE_LOG
+        if values.CONF_BUILD_FLAGS == "disable":
+            build_command += "bear make -j`nproc` > " + definitions.FILE_MAKE_LOG
+        else:
+            build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
+            build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > " + definitions.FILE_MAKE_LOG
     else:
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make", "bear make")
