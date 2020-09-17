@@ -90,6 +90,8 @@ def config_project(project_path, is_llvm, custom_config_command=None):
 
 
 def apply_flags(build_command):
+    if values.CONF_BUILD_FLAGS == "disable":
+        return build_command
     c_flags = C_FLAGS
     if "XCFLAGS=" in build_command:
         c_flags_old = (build_command.split("XCFLAGS='")[1]).split("'")[0]

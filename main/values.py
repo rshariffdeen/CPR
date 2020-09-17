@@ -83,3 +83,4 @@ CONF_DISTANCE_METRIC = "control-loc"
 CONF_PATCH_TYPE = "concrete"
 CONF_SKIP_BUILD = False
 CONF_SKIP_GEN = False
+CONF_BUILD_FLAGS = ""

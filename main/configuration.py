@@ -119,6 +119,8 @@ def read_conf_file():
             values.CONF_DISTANCE_METRIC = configuration.replace(definitions.CONF_DISTANCE_METRIC, '')
         elif definitions.CONF_PATCH_TYPE in configuration:
             values.CONF_PATCH_TYPE = configuration.replace(definitions.CONF_PATCH_TYPE, '')
+        elif definitions.CONF_BUILD_FLAGS in configuration:
+            values.CONF_BUILD_FLAGS = configuration.replace(definitions.CONF_BUILD_FLAGS, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
