@@ -24,6 +24,7 @@ FILE_MAKE_LOG = DIRECTORY_LOG + "/log-make"
 FILE_COMMAND_LOG = DIRECTORY_LOG + "/log-command"
 FILE_STANDARD_FUNCTION_LIST = DIRECTORY_DATA + "/standard-function-list"
 FILE_STANDARD_MACRO_LIST = DIRECTORY_DATA + "/standard-macro-list"
+FILE_PATCH_SET = ""
 
 
 # ------------------- Configuration --------------------
@@ -73,6 +74,7 @@ ARG_DIST_METRIC = "--dist-metric="
 ARG_SELECTION_METHOD = "--selection="
 ARG_PATCH_TYPE = "--patch-type="
 ARG_SKIP_BUILD = "--skip-build"
+ARG_SKIP_GENERATION = "--skip-gen"
 
 
 # ----------------- TOOLS --------------------------------

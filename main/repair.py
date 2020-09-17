@@ -2,7 +2,7 @@ from main.concolic import run_concolic_execution, generate_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, values, distance, oracle, parallel
+from main import emitter, values, distance, oracle, parallel, definitions, writer, reader
 import time
 
 
@@ -38,6 +38,12 @@ def check_coverage():  # TODO
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     emitter.sub_title("Generating Patch Pool")
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
+
+    if values.CONF_SKIP_GEN:
+        list_of_patches = reader.read_pickle(definitions.FILE_PATCH_SET)
+        return list_of_patches
+
     test_output_list = values.CONF_TEST_OUTPUT
     components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
@@ -62,6 +68,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
+    writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     return list_of_patches
 
