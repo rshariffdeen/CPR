@@ -32,6 +32,8 @@ def read_conf(arg_list):
                 values.CONF_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[option]
             elif definitions.ARG_SKIP_BUILD in arg:
                 values.CONF_SKIP_BUILD = True
+            elif definitions.ARG_SKIP_GENERATION in arg:
+                values.CONF_SKIP_GEN = True
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.help()
