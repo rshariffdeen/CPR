@@ -70,11 +70,12 @@ def z3_get_model(formula):
                 if i not in byte_list:
                     byte_list[i] = default_value
 
-            for i in range(array_size - 1, -1, -1):
-                if byte_list[i] == 0:
-                    byte_list.pop(i)
-                else:
-                    break
+            if var_name not in ["A-data", "A-data-stat"]:
+                for i in range(array_size - 1, -1, -1):
+                    if byte_list[i] == 0:
+                        byte_list.pop(i)
+                    else:
+                        break
         sym_var_list[var_name] = byte_list
     emitter.debug("model var list", sym_var_list)
     return sym_var_list
