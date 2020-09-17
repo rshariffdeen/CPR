@@ -43,6 +43,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     if values.CONF_SKIP_GEN:
         emitter.sub_title("Loading Patch Pool")
         list_of_patches = reader.read_pickle(definitions.FILE_PATCH_SET)
+        emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
         return list_of_patches
 
     emitter.sub_title("Generating Patch Pool")
