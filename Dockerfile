@@ -131,6 +131,7 @@ RUN apt-get install -y  \
     autopoint \
     automake \
     bison \
+    flex \
     gettext \
     gperf \
     libtool \
