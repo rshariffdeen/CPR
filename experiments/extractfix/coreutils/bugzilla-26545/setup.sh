@@ -20,6 +20,7 @@ git commit -m "instrument trident"
 
 ./bootstrap
 FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
+make -j32
 
 cd $current_dir
 cp repair.conf $dir_name
