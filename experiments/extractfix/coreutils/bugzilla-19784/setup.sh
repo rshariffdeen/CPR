@@ -13,7 +13,7 @@ cd src
 git checkout $commit_id
 
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 ./configure
+FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
 
 
 cd $current_dir

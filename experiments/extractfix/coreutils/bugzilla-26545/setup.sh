@@ -19,6 +19,7 @@ git add src/shred.c
 git commit -m "instrument trident"
 
 ./bootstrap
+FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
 
 cd $current_dir
 cp repair.conf $dir_name
