@@ -544,6 +544,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    + "--external-calls=all " \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
+                   + values.CONF_KLEE_FLAGS + " " \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
                    + input_argument
@@ -596,6 +597,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--log-ppc " \
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
+                    + values.CONF_KLEE_FLAGS + " " \
                     + "{0} ".format(binary_name) \
                     + input_argument
     if not print_output:

@@ -56,6 +56,7 @@ CONF_SELECTION_STRATEGY = "select_strategy:"
 CONF_DISTANCE_METRIC = "dist_metric:"
 CONF_PATCH_TYPE = "patch_type:"
 CONF_BUILD_FLAGS = "build_flags:"
+CONF_KLEE_FLAGS = "klee_flags:"
 
 
 # ----------------- KEY DEFINITIONS -------------------

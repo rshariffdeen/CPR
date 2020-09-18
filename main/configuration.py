@@ -121,6 +121,8 @@ def read_conf_file():
             values.CONF_PATCH_TYPE = configuration.replace(definitions.CONF_PATCH_TYPE, '')
         elif definitions.CONF_BUILD_FLAGS in configuration:
             values.CONF_BUILD_FLAGS = configuration.replace(definitions.CONF_BUILD_FLAGS, '')
+        elif definitions.CONF_KLEE_FLAGS in configuration:
+            values.CONF_KLEE_FLAGS = configuration.replace(definitions.CONF_KLEE_FLAGS, '')
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
