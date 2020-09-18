@@ -347,7 +347,7 @@ def soft_restore_project(project_path):
 def clean_project(project_path, binary_path):
     emitter.sub_sub_title("cleaning files")
     binary_dir_path = "/".join(str(binary_path).split("/")[:-1])
-    clean_command = "cd " + project_path + "; make clean; make distclean"
+    clean_command = "cd " + project_path + "; make clean"
     clean_command += "; rm compile_commands.json"
     clean_command += "; rm CMakeCache.txt"
     clean_command += "; rm -rf CMakeFiles"
