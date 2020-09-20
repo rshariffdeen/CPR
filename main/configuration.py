@@ -109,6 +109,8 @@ def read_conf_file():
             values.CONF_MAX_BOUND = int(configuration.replace(definitions.CONF_MAX_BOUND, ''))
         elif definitions.CONF_MAX_FORK in configuration:
             values.CONF_MAX_FORK = int(configuration.replace(definitions.CONF_MAX_FORK, ''))
+        elif definitions.CONF_GEN_SEARCH_LIMIT in configuration:
+            values.CONF_GEN_SEARCH_LIMIT = int(configuration.replace(definitions.CONF_GEN_SEARCH_LIMIT, ''))
         elif definitions.CONF_TAG_ID in configuration:
             values.CONF_TAG_ID = configuration.replace(definitions.CONF_TAG_ID, '')
         elif definitions.CONF_STATIC in configuration:

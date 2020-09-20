@@ -66,7 +66,9 @@ def bootstrap(arg_list):
     if values.CONF_LOW_BOUND:
         values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
     if values.CONF_MAX_FORK:
-        values.DEFAULT_MAX_FORK = values.DEFAULT_MAX_FORK
+        values.DEFAULT_MAX_FORK = values.CONF_MAX_FORK
+    if values.CONF_GEN_SEARCH_LIMIT:
+        values.DEFAULT_GEN_SEARCH_LIMIT = values.CONF_GEN_SEARCH_LIMIT
 
     load_component_list()
 
