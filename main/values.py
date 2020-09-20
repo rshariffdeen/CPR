@@ -50,6 +50,7 @@ error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflo
 OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
 OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
 OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
+OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}
 
 
 # ------------------ Configuration Values ---------------
@@ -87,3 +88,4 @@ CONF_SKIP_BUILD = False
 CONF_SKIP_GEN = False
 CONF_BUILD_FLAGS = ""
 CONF_KLEE_FLAGS = ""
+CONF_OPERATION_MODE = "semi-parallel"

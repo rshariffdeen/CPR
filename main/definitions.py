@@ -57,6 +57,7 @@ CONF_DISTANCE_METRIC = "dist_metric:"
 CONF_PATCH_TYPE = "patch_type:"
 CONF_BUILD_FLAGS = "build_flags:"
 CONF_KLEE_FLAGS = "klee_flags:"
+CONF_OPERATION_MODE = "mode:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
@@ -74,6 +75,7 @@ ARG_DEBUG = "--debug"
 ARG_DISABLE_DISTANCE_CAL = "--dist-cal="
 ARG_DIST_METRIC = "--dist-metric="
 ARG_SELECTION_METHOD = "--selection="
+ARG_OPERATION_MODE = "--mode="
 ARG_PATCH_TYPE = "--patch-type="
 ARG_SKIP_BUILD = "--skip-build"
 ARG_SKIP_GENERATION = "--skip-gen"

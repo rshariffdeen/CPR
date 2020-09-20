@@ -23,6 +23,14 @@ def read_conf(arg_list):
                     emitter.help()
                     exit()
                 values.CONF_SELECTION_STRATEGY = values.OPTIONS_SELECT_METHOD[option]
+            elif definitions.ARG_OPERATION_MODE in arg:
+                option = int(arg.replace(definitions.ARG_OPERATION_MODE, ''))
+                if option not in values.OPTIONS_OPERATION_MODE:
+                    emitter.error(
+                        "Invalid option for " + definitions.ARG_OPERATION_MODE.replace("=", "") + " : " + arg)
+                    emitter.help()
+                    exit()
+                values.CONF_OPERATION_MODE = values.OPTIONS_OPERATION_MODE[option]
             elif definitions.ARG_PATCH_TYPE in arg:
                 option = int(arg.replace(definitions.ARG_PATCH_TYPE, ''))
                 if option not in values.OPTIONS_PATCH_TYPE:
@@ -115,10 +123,20 @@ def read_conf_file():
             values.CONF_FLAGS_CXX = configuration.replace(definitions.CONF_FLAGS_CXX, '')
         elif definitions.CONF_SELECTION_STRATEGY in configuration:
             values.CONF_SELECTION_STRATEGY = configuration.replace(definitions.CONF_SELECTION_STRATEGY, '')
+            if values.CONF_SELECTION_STRATEGY not in values.OPTIONS_SELECT_METHOD:
+                error_exit("Invalid configuration for " + definitions.CONF_SELECTION_STRATEGY)
         elif definitions.CONF_DISTANCE_METRIC in configuration:
             values.CONF_DISTANCE_METRIC = configuration.replace(definitions.CONF_DISTANCE_METRIC, '')
+            if values.CONF_DISTANCE_METRIC not in values.OPTIONS_DIST_METRIC:
+                error_exit("Invalid configuration for " + definitions.CONF_DISTANCE_METRIC)
         elif definitions.CONF_PATCH_TYPE in configuration:
             values.CONF_PATCH_TYPE = configuration.replace(definitions.CONF_PATCH_TYPE, '')
+            if values.CONF_PATCH_TYPE not in values.OPTIONS_PATCH_TYPE:
+                error_exit("Invalid configuration for " + definitions.CONF_PATCH_TYPE)
+        elif definitions.CONF_OPERATION_MODE in configuration:
+            values.CONF_OPERATION_MODE = configuration.replace(definitions.CONF_OPERATION_MODE, '')
+            if values.CONF_OPERATION_MODE not in values.OPTIONS_OPERATION_MODE:
+                error_exit("Invalid configuration for " + definitions.CONF_OPERATION_MODE)
         elif definitions.CONF_BUILD_FLAGS in configuration:
             values.CONF_BUILD_FLAGS = configuration.replace(definitions.CONF_BUILD_FLAGS, '')
         elif definitions.CONF_KLEE_FLAGS in configuration:

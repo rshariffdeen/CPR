@@ -28,34 +28,41 @@ def collect_patch(patch):
 
 def generate_symbolic_paths_parallel(ppc_list):
     global pool, result_list
-    emitter.normal("\t\tstarting parallel computing")
     result_list = []
-    pool = mp.Pool(mp.cpu_count())
     lock = None
     count = 0
     ppc_list.reverse()
-    for control_loc, ppc in ppc_list:
-        if definitions.DIRECTORY_RUNTIME in control_loc:
-            continue
-        count = count + 1
-        if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-            break
-        pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
-        if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-            break
-
-    pool.close()
-    emitter.normal("\t\twaiting for thread completion")
-    pool.join()
+    if values.CONF_OPERATION_MODE in ["sequential"]:
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_RUNTIME in control_loc:
+                continue
+            count = count + 1
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+            result_list.append(oracle.check_path_feasibility(control_loc, ppc, lock))
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_RUNTIME in control_loc:
+                continue
+            count = count + 1
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+        pool.close()
+        emitter.normal("\t\twaiting for thread completion")
+        pool.join()
     return result_list
 
 
 def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion):
     global pool, result_list
-    emitter.normal("\t\tstarting parallel computing")
     result_list = []
-    pool = mp.Pool(mp.cpu_count())
-    lock = None
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)
@@ -64,30 +71,44 @@ def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertio
     sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
     # var_relationship = extractor.extract_var_relationship(sym_expr_map)
     var_relationship = TRUE
-    for patch in patch_list:
-        patch_constraint = extractor.extract_constraints_from_patch(patch)
-        index = list(patch_list).index(patch)
-        pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_constraint, path_condition, index), callback=collect_result)
-
-    pool.close()
-    emitter.normal("\t\twaiting for thread completion")
-    pool.join()
+    if values.CONF_OPERATION_MODE in ["sequential"]:
+        for patch in patch_list:
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
+            index = list(patch_list).index(patch)
+            result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index))
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        lock = None
+        for patch in patch_list:
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
+            index = list(patch_list).index(patch)
+            pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_constraint, path_condition, index), callback=collect_result)
+        pool.close()
+        emitter.normal("\t\twaiting for thread completion")
+        pool.join()
     return result_list
 
 
 def validate_input_generation(patch_list, new_path):
     global pool, result_list
-    emitter.normal("\t\tstarting parallel computing")
     result_list = []
-    pool = mp.Pool(mp.cpu_count())
-    lock = None
-    for patch in patch_list:
-        patch_constraint = extractor.extract_constraints_from_patch(patch)
-        index = list(patch_list).index(patch)
-        pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result)
-    pool.close()
-    emitter.normal("\t\twaiting for thread completion")
-    pool.join()
+    if values.CONF_OPERATION_MODE in ["sequential"]:
+        for patch in patch_list:
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
+            index = list(patch_list).index(patch)
+            result_list.append(oracle.check_input_feasibility(index, patch_constraint, new_path))
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        lock = None
+        for patch in patch_list:
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
+            index = list(patch_list).index(patch)
+            pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result)
+        pool.close()
+        emitter.normal("\t\twaiting for thread completion")
+        pool.join()
     return result_list
 
 
