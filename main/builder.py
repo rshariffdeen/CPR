@@ -154,19 +154,20 @@ def build_project(project_path, build_command=None):
     if build_command is None:
         build_command = "CC=" + CC + " CXX=" + CXX + " "
         if values.CONF_BUILD_FLAGS == "disable":
-            build_command += "bear make -j`nproc` > " + definitions.FILE_MAKE_LOG
+            build_command += "bear make -j`nproc`  "
         else:
             build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
-            build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > " + definitions.FILE_MAKE_LOG
+            build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > "
     else:
         if not os.path.isfile(project_path + "/compile_commands.json"):
-            build_command = build_command.replace("make ", "bear make ") + " > " + definitions.FILE_MAKE_LOG
+            build_command = build_command.replace("make ", "bear make ")
         if CC == "wllvm":
             build_command = remove_fsanitize(build_command)
-        build_command = apply_flags(build_command)
+        # build_command = apply_flags(build_command)
     if not build_command:
         error_exit("[Not Found] Build Command")
     build_command = dir_command + build_command
+    build_command = build_command + " > " + definitions.FILE_MAKE_LOG
     ret_code = execute_command(build_command)
     if int(ret_code) != 0:
         emitter.error(build_command)
