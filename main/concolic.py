@@ -596,7 +596,6 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--libc=uclibc " \
                     "--write-smt2s " \
                     "--log-ppc " \
-                    "--resolve-path "\
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + "--link-llvm-lib={0} ".format(definitions.FILE_TRIDENT_LIB_BCA) \
