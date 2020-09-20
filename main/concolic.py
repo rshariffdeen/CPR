@@ -339,6 +339,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     input_arg_list = list()
     # input_file_byte_list = list()
     # input_file_stat_byte_list = list()
+    if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+        values.LIST_GENERATED_PATH = generate_symbolic_paths(values.LIST_PPC)
     generated_path_list = values.LIST_GENERATED_PATH
     var_expr_map = reader.collect_symbolic_expression(values.FILE_EXPR_LOG)
 
@@ -563,8 +565,6 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     values.PREFIX_PPC_FORMULA = generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     ppc_list = values.LIST_PPC
-    if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-        values.LIST_GENERATED_PATH = generate_symbolic_paths(ppc_list)
     return return_code
 
 
