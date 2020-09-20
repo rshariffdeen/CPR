@@ -186,7 +186,7 @@ def build_normal():
     CXX_FLAGS = "-g -O0"
     LD_FLAGS = ""
     config_project(values.CONF_DIR_SRC, False, values.CONF_COMMAND_CONFIG)
-    C_FLAGS = "-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest' "
+    C_FLAGS = "-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest"
     CXX_FLAGS = C_FLAGS
     if values.CONF_STATIC:
         C_FLAGS += " -static"
