@@ -71,13 +71,15 @@ FILE_CONFIGURATION = ""
 silence_emitter = False
 CONF_DIR_SRC = ""
 CONF_LOC_BUG = ""
+CONF_LOC_CRASH = ""
+CONF_LOC_PATCH = ""
 CONF_PATH_POC = ""
 CONF_LOW_BOUND = ""
 CONF_MAX_BOUND = ""
 CONF_MAX_FORK = ""
 CONF_TAG_ID = ""
 CONF_STATIC = False
-CONF_LOC_PATCH = ""
+
 CONF_SELECTION_STRATEGY = "deterministic"
 CONF_DISTANCE_METRIC = "control-loc"
 CONF_PATCH_TYPE = "concrete"
