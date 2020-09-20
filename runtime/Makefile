@@ -11,13 +11,13 @@ all: trident_runtime.o libtrident_runtime.a libtrident_runtime.so libtrident_run
 	wllvm -g -fPIC -O0 -c -o $@ $< $(CFLAGS)
 
 libtrident_runtime.so: $(OBJ_KLEE)
-    wllvm -fPIC -shared -o $@ $(OBJ_KLEE)
+	wllvm -fPIC -shared -o $@ $(OBJ_KLEE)
 
 libtrident_runtime.a: $(OBJ_KLEE)
 	llvm-ar rcs $@ $(OBJ_KLEE)
 
 libtrident_runtime.bca:
-    extract-bc libtrident_runtime.a
+	extract-bc libtrident_runtime.a
 
 clean:
 	rm -f *.o
