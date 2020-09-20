@@ -12,9 +12,6 @@ git clone $project_url src
 cd src
 git checkout $commit_id
 
-./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=wllvm CXX=wllvm++ ./configure
-make -j32
 
 sed -i '292i TRIDENT_OUTPUT("i", "i32", i);\n' src/shred.c
 sed -i '290d' src/shred.c
@@ -22,7 +19,9 @@ sed -i '290i for(i = 3; i < size || (__trident_choice("L290", "bool", (int[]){si
 git add src/shred.c
 git commit -m "instrument trident"
 
-
+./bootstrap
+FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
+make -j32
 
 cd $current_dir
 cp repair.conf $dir_name
