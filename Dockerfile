@@ -136,4 +136,5 @@ RUN apt-get install -y  \
     gettext \
     gperf \
     libtool \
-    texinfo
+    texinfo \
+    yasm
