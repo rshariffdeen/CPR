@@ -542,6 +542,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    + "--external-calls=all " \
+                   + "--link-llvm-lib={0} ".format(definitions.FILE_TRIDENT_LIB_BCA) \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + values.CONF_KLEE_FLAGS + " " \
@@ -597,6 +598,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--log-ppc " \
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
+                    + "--link-llvm-lib={0} ".format(definitions.FILE_TRIDENT_LIB_BCA) \
                     + values.CONF_KLEE_FLAGS + " " \
                     + "{0} ".format(binary_name) \
                     + input_argument
