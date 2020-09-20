@@ -159,6 +159,7 @@ def end(time_info):
     statistics("Initialization: " + time_info[definitions.KEY_DURATION_INITIALIZATION] + " seconds")
     statistics("Generation: " + values.TIME_TO_GENERATE + " seconds")
     statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " seconds")
+    statistics("Iteration Count: " + str(values.ITERATION_NO))
     success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " seconds\n")
 
 
