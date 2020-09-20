@@ -136,5 +136,6 @@ RUN apt-get install -y  \
     gettext \
     gperf \
     libtool \
+    nasm \
     texinfo \
     yasm
