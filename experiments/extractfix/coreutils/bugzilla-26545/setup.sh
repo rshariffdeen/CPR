@@ -12,10 +12,9 @@ git clone $project_url src
 cd src
 git checkout $commit_id
 
-
 sed -i '292i TRIDENT_OUTPUT("i", "i32", i);\n' src/shred.c
 sed -i '290d' src/shred.c
-sed -i '290i for(i = 3; i < size && (__trident_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)); i *= 2)' src/shred.c
+sed -i '290i for(i = 3; (__trident_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)); i *= 2)' src/shred.c
 git add src/shred.c
 git commit -m "instrument trident"
 
@@ -29,4 +28,3 @@ cp spec.smt2 $dir_name
 cp t1.smt2 $dir_name
 cp -rf components $dir_name
 cp exploit.txt $dir_name
-
