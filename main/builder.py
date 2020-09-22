@@ -159,6 +159,7 @@ def build_project(project_path, build_command=None):
             build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
             build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > "
     else:
+        build_command = "CC=" + CC + " CXX=" + CXX + " " + build_command
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make ", "bear make ")
         if CC == "wllvm":
