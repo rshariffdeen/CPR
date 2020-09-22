@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import eventlet
 from main import emitter, oracle, definitions, extractor, reader, values
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
@@ -51,7 +52,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
-            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
+            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result).get(timeout=60)
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
         pool.close()
