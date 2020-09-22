@@ -93,6 +93,7 @@ def apply_flags(build_command):
     if values.CONF_BUILD_FLAGS == "disable":
         return build_command
     c_flags = C_FLAGS
+    ld_flags = LD_FLAGS
     if "XCFLAGS=" in build_command:
         c_flags_old = (build_command.split("XCFLAGS='")[1]).split("'")[0]
         if "-fPIC" in c_flags_old:
@@ -107,7 +108,15 @@ def apply_flags(build_command):
         build_command = build_command.replace(c_flags_old, c_flags_new)
     else:
         new_command = "make CFLAGS=\"" + c_flags + "\" "
-        build_command = build_command.replace("make", new_command)
+        build_command = build_command.replace("make ", new_command)
+
+    if "LDFLAGS=" in build_command:
+        ld_flags_old = (build_command.split("LDFLAGS='")[1]).split("'")[0]
+        ld_flags_new = ld_flags.replace("'", "") + " " + ld_flags_old
+        build_command = build_command.replace(ld_flags_old, ld_flags_new)
+    else:
+        new_command = "make LDFLAGS=\"" + ld_flags + "\" "
+        build_command = build_command.replace("make ", new_command)
 
     if "XCXXFLAGS=" in build_command:
         c_flags_old = (build_command.split("XCXXFLAGS='")[1]).split("'")[0]
@@ -123,7 +132,7 @@ def apply_flags(build_command):
         build_command = build_command.replace(c_flags_old, c_flags_new)
     else:
         new_command = "make CXXFLAGS=\"" + c_flags + "\" "
-        build_command = build_command.replace("make", new_command)
+        build_command = build_command.replace("make ", new_command)
 
     if "XCC=" in build_command:
         cc_old = (build_command.split("XCC='")[1]).split("'")[0]
@@ -152,14 +161,14 @@ def build_project(project_path, build_command=None):
     emitter.sub_sub_title("building program")
     dir_command = "cd " + project_path + ";"
     if build_command is None:
-        build_command = "CC=" + CC + " CXX=" + CXX + " LDFLAGS=" + LD_FLAGS + " "
+        build_command = "CC=" + CC + " CXX=" + CXX + " "
         if values.CONF_BUILD_FLAGS == "disable":
             build_command += "bear make -j`nproc`  "
         else:
             build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
-            build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > "
+            build_command += "CXXFLAGS=\"" + CXX_FLAGS + " LDFLAGS=" + LD_FLAGS + "\" -j`nproc` > "
     else:
-        build_command = "CC=" + CC + " CXX=" + CXX + " LDFLAGS=" + LD_FLAGS + " "
+        build_command = "CC=" + CC + " CXX=" + CXX + build_command
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make ", "bear make ")
         if CC == "wllvm":
