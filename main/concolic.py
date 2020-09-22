@@ -328,8 +328,8 @@ def generate_binary_file(byte_array):
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)
             byte = poc_file.read(1)
-    for i in range(0, len(byte_array)):
-        byte_list[i] = byte_array[i]
+    for index, value in byte_array:
+        byte_list[index] = value
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
 
