@@ -3,6 +3,7 @@ from typing import Union
 import os
 import re
 import random
+import struct
 from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
@@ -322,7 +323,8 @@ def generate_binary_file(byte_array):
     with open(values.CONF_PATH_POC, "rb") as poc_file:
         byte =poc_file.read(1)
         while byte:
-            byte_list.append(byte)
+            number = int(struct.unpack('>B', byte)[0])
+            byte_list.append(number)
             byte = poc_file.read(1)
     for i in range(0, len(byte_array)):
         byte_list[i] = byte_array[i]
