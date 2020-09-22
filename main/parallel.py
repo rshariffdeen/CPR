@@ -32,7 +32,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     lock = None
     count = 0
     ppc_list.reverse()
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_RUNTIME in control_loc:
                 continue
