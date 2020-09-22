@@ -137,5 +137,6 @@ RUN apt-get install -y  \
     gperf \
     libtool \
     nasm \
+    pkg-config \
     texinfo \
     yasm
