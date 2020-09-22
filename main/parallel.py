@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import eventlet
 from main import emitter, oracle, definitions, extractor, reader, values
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
@@ -45,18 +46,15 @@ def generate_symbolic_paths_parallel(ppc_list):
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
-        thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_RUNTIME in control_loc:
                 continue
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
-            thread_list.append(pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock)))
+            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
-        for thread in thread_list:
-            result_list.append(thread.get(timeout=60))
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()

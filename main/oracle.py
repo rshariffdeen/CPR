@@ -2,10 +2,7 @@ from main import definitions, values, emitter
 from pysmt.shortcuts import is_sat, Not, And
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
-from main.reader import collect_symbolic_expression
-from main.synthesis import Program, Component, Specification, extract_lids, ComponentSymbol, Formula, VerificationSuccess, program_to_formula, collect_symbols, extract_eids
-from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
-
+from main.utilities import timeout
 
 def did_program_crash(program_output):
     if any(crash_word in str(program_output).lower() for crash_word in definitions.crash_word_list):
@@ -78,7 +75,11 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     new_path = And(prefix, Not(constraint))
     # print(control_loc, constraint)
     assert str(new_path.serialize()) != str(formula.serialize())
-    if is_sat(new_path):
+    result = False
+    with timeout(60):
+        result = is_sat(new_path)
+
+    if result:
         ppc_len = len(str(new_path.serialize()))
         return True, chosen_control_loc, new_path, ppc_len
     else:
