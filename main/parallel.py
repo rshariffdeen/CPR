@@ -1,5 +1,4 @@
 import multiprocessing as mp
-import eventlet
 from main import emitter, oracle, definitions, extractor, reader, values
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
