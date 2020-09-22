@@ -426,7 +426,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     for i in range(0, len(argument_list)):
         if "$POC" in str(argument_list[i]):
             input_arg_list.append(str(argument_list[i]))
-        elif i in input_arg_dict:
+
+        if i in input_arg_dict:
             input_arg_list.append(input_arg_dict[i])
         else:
             arg_len = len(str(argument_list[i]))
