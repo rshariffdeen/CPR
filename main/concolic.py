@@ -70,9 +70,11 @@ def z3_get_model(formula):
 
             if max_index == 0:
                 array_size = 2
-            for i in range(0, array_size):
-                if i not in byte_list:
-                    byte_list[i] = default_value
+
+            if var_name not in ["A-data"]:
+                for i in range(0, array_size):
+                    if i not in byte_list:
+                        byte_list[i] = default_value
 
             if var_name not in ["A-data", "A-data-stat"]:
                 for i in range(array_size - 1, -1, -1):
