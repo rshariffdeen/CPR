@@ -37,8 +37,6 @@ def generate_symbolic_paths_parallel(ppc_list):
             if definitions.DIRECTORY_RUNTIME in control_loc:
                 continue
             count = count + 1
-            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-                break
             result_list.append(oracle.check_path_feasibility(control_loc, ppc, lock))
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
@@ -49,8 +47,6 @@ def generate_symbolic_paths_parallel(ppc_list):
             if definitions.DIRECTORY_RUNTIME in control_loc:
                 continue
             count = count + 1
-            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-                break
             pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
