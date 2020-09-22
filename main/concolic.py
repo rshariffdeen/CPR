@@ -423,7 +423,10 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
-    for i in range(0, len(argument_list)):
+    length = len(argument_list)
+    if length > 1 and "$POC" in argument_list:
+        length = length - 1
+    for i in range(0, length):
         if "$POC" in str(argument_list[i]):
             input_arg_list.append(str(argument_list[i]))
 
