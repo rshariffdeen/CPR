@@ -11,7 +11,7 @@ CC = "$TRIDENT_CC"
 CXX = "$TRIDENT_CXX"
 C_FLAGS = "-g -O0  -static -e"
 CXX_FLAGS = "-g -O0 -static -e"
-LD_FLAGS = ""
+LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime -ltrident_proxy -lkleeRuntest"
 
 
 def config_project(project_path, is_llvm, custom_config_command=None):
@@ -152,19 +152,19 @@ def build_project(project_path, build_command=None):
     emitter.sub_sub_title("building program")
     dir_command = "cd " + project_path + ";"
     if build_command is None:
-        build_command = "CC=" + CC + " CXX=" + CXX + " "
+        build_command = "CC=" + CC + " CXX=" + CXX + " LDFLAGS=" + LD_FLAGS + " "
         if values.CONF_BUILD_FLAGS == "disable":
             build_command += "bear make -j`nproc`  "
         else:
             build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
             build_command += "CXXFLAGS=\"" + CXX_FLAGS + "\" -j`nproc` > "
     else:
-        build_command = "CC=" + CC + " CXX=" + CXX + " " + build_command
+        build_command = "CC=" + CC + " CXX=" + CXX + " LDFLAGS=" + LD_FLAGS + " "
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make ", "bear make ")
         if CC == "wllvm":
             build_command = remove_fsanitize(build_command)
-        # build_command = apply_flags(build_command)
+        build_command = apply_flags(build_command)
     if not build_command:
         error_exit("[Not Found] Build Command")
     build_command = dir_command + build_command
@@ -186,9 +186,9 @@ def build_normal():
     CXX = "$TRIDENT_CXX"
     C_FLAGS = "-g -O0"
     CXX_FLAGS = "-g -O0"
-    LD_FLAGS = ""
     config_project(values.CONF_DIR_SRC, False, values.CONF_COMMAND_CONFIG)
     C_FLAGS = "-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest"
+    LDFLAGS = "-L/concolic-repair/lib -ltrident_runtime -ltrident_proxy -lkleeRuntest"
     CXX_FLAGS = C_FLAGS
     if values.CONF_STATIC:
         C_FLAGS += " -static"
