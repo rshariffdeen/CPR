@@ -61,8 +61,8 @@ def z3_get_model(formula):
             max_index = max(list(byte_list.keys()))
             if var_name in values.LIST_BIT_LENGTH:
                 array_size = values.LIST_BIT_LENGTH[var_name] - 1
-                if var_name in ["A-data", "A-data-stat"]:
-                    array_size = values.LIST_BIT_LENGTH[var_name]
+                if var_name in ["A-data"]:
+                    array_size = max_index
 
             else:
                 array_size = max_index + 1  # TODO: this could be wrong calculation
@@ -319,10 +319,16 @@ def select_new_path_condition():
 
 def generate_binary_file(byte_array):
     byte_list = []
+    with open(values.CONF_PATH_POC, "rb") as poc_file:
+        byte =poc_file.read(1)
+        while byte:
+            byte_list.append(byte)
+            byte = poc_file.read(1)
     for i in range(0, len(byte_array)):
-        byte_list.append(byte_array[i])
+        byte_list[i] = byte_array[i]
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
+
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
         new_input_file.write(bytearray(byte_list))
 
