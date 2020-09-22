@@ -3,12 +3,19 @@ CFLAGS=-I $(KLEE_INCLUDE_PATH)
 
 DEP = trident_runtime.h
 SRC = trident_runtime.c
+PROXY = trident_proxy.c
 OBJ_KLEE = $(SRC:%.c=%.o)
 
-all: trident_runtime.o libtrident_runtime.a libtrident_runtime.so libtrident_runtime.bca
+all: trident_runtime.o libtrident_runtime.a libtrident_runtime.so libtrident_runtime.bca libtrident_proxy.so libtrident_proxy.a
 
 %.o: %.c $(DEP)
 	wllvm -g -fPIC -O0 -c -o $@ $< $(CFLAGS)
+
+libtrident_proxy.so: $(PROXY)
+	wllvm -fPIC -shared -o $@ $(PROXY)
+
+libtrident_proxy.a: $(PROXY)
+	llvm-ar rcs $@ $(PROXY)
 
 libtrident_runtime.so: $(OBJ_KLEE)
 	wllvm -fPIC -shared -o $@ $(OBJ_KLEE)
