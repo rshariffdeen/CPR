@@ -42,6 +42,8 @@ def read_conf(arg_list):
                 values.CONF_SKIP_BUILD = True
             elif definitions.ARG_SKIP_GENERATION in arg:
                 values.CONF_SKIP_GEN = True
+            elif definitions.ARG_SKIP_TEST in arg:
+                values.CONF_SKIP_TEST = True
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.help()

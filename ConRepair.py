@@ -114,7 +114,8 @@ def main(arg_list):
     time_info[definitions.KEY_DURATION_BUILD] = str(time.time() - time_check)
 
     time_check = time.time()
-    initialize()
+    if not values.CONF_SKIP_TEST:
+        initialize()
     time_info[definitions.KEY_DURATION_INITIALIZATION] = str(time.time() - time_check)
 
     time_check = time.time()

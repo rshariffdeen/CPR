@@ -80,6 +80,7 @@ ARG_OPERATION_MODE = "--mode="
 ARG_PATCH_TYPE = "--patch-type="
 ARG_SKIP_BUILD = "--skip-build"
 ARG_SKIP_GENERATION = "--skip-gen"
+ARG_SKIP_TEST = "--skip-test"
 
 
 # ----------------- TOOLS --------------------------------

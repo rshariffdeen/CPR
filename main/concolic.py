@@ -3,6 +3,7 @@ from typing import Union
 import os
 import re
 import random
+import struct
 from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
@@ -61,14 +62,19 @@ def z3_get_model(formula):
             max_index = max(list(byte_list.keys()))
             if var_name in values.LIST_BIT_LENGTH:
                 array_size = values.LIST_BIT_LENGTH[var_name] - 1
+                if var_name in ["A-data"]:
+                    array_size = max_index
+
             else:
                 array_size = max_index + 1  # TODO: this could be wrong calculation
 
             if max_index == 0:
                 array_size = 2
-            for i in range(0, array_size):
-                if i not in byte_list:
-                    byte_list[i] = default_value
+
+            if var_name not in ["A-data"]:
+                for i in range(0, array_size):
+                    if i not in byte_list:
+                        byte_list[i] = default_value
 
             if var_name not in ["A-data", "A-data-stat"]:
                 for i in range(array_size - 1, -1, -1):
@@ -316,10 +322,17 @@ def select_new_path_condition():
 
 def generate_binary_file(byte_array):
     byte_list = []
-    for i in range(0, len(byte_array)):
-        byte_list.append(byte_array[i])
+    with open(values.CONF_PATH_POC, "rb") as poc_file:
+        byte =poc_file.read(1)
+        while byte:
+            number = int(struct.unpack('>B', byte)[0])
+            byte_list.append(number)
+            byte = poc_file.read(1)
+    for index in byte_array:
+        byte_list[index] = byte_array[index]
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
+
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
         new_input_file.write(bytearray(byte_list))
 
@@ -423,10 +436,14 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
-    for i in range(0, len(argument_list)):
+    length = len(argument_list)
+    if length > 1 and "$POC" in argument_list:
+        length = length - 1
+    for i in range(0, length):
         if "$POC" in str(argument_list[i]):
             input_arg_list.append(str(argument_list[i]))
-        elif i in input_arg_dict:
+
+        if i in input_arg_dict:
             input_arg_list.append(input_arg_dict[i])
         else:
             arg_len = len(str(argument_list[i]))
