@@ -1,5 +1,5 @@
 from main import definitions, values, emitter
-from pysmt.shortcuts import is_sat, Not, And
+from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
 from main.utilities import timeout
@@ -77,7 +77,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     with timeout(60):
-        result = is_sat(new_path)
+        result = not is_unsat(new_path)
 
     if result:
         ppc_len = len(str(new_path.serialize()))
