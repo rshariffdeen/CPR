@@ -75,7 +75,7 @@ def bootstrap(arg_list):
     if values.CONF_STACK_SIZE:
         values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
 
-    sys.setrecursionlimit(values.CONF_STACK_SIZE)
+    sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
     load_component_list()
 
 
