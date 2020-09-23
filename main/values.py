@@ -43,6 +43,7 @@ DEFAULT_LOWER_BOUND = -10
 DEFAULT_UPPER_BOUND = 11
 DEFAULT_MAX_FORK = 5
 DEFAULT_GEN_SEARCH_LIMIT = 40
+DEFAULT_STACK_SIZE = 1500
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 
@@ -92,3 +93,4 @@ CONF_SKIP_TEST = False
 CONF_BUILD_FLAGS = ""
 CONF_KLEE_FLAGS = ""
 CONF_OPERATION_MODE = "semi-parallel"
+CONF_STACK_SIZE = ""

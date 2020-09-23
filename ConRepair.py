@@ -50,8 +50,6 @@ def bootstrap(arg_list):
     emitter.title("Starting " + values.TOOL_NAME)
     emitter.sub_title("Loading Configurations")
 
-    sys.setrecursionlimit(1500)
-
     configuration.read_conf(arg_list)
     configuration.read_conf_file()
 
@@ -74,7 +72,10 @@ def bootstrap(arg_list):
         values.DEFAULT_GEN_SEARCH_LIMIT = values.CONF_GEN_SEARCH_LIMIT
     if values.CONF_ITERATION_LIMIT:
         values.DEFAULT_ITERATION_LIMIT = values.CONF_ITERATION_LIMIT
+    if values.CONF_STACK_SIZE:
+        values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
 
+    sys.setrecursionlimit(values.CONF_STACK_SIZE)
     load_component_list()
 
 

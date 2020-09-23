@@ -60,6 +60,7 @@ CONF_BUILD_FLAGS = "build_flags:"
 CONF_KLEE_FLAGS = "klee_flags:"
 CONF_OPERATION_MODE = "mode:"
 CONF_ITERATION_LIMIT = "iterations:"
+CONF_STACK_SIZE = "stack_size:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
