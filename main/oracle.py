@@ -4,6 +4,10 @@ from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
 from main.utilities import timeout
 from multiprocessing import Pool, TimeoutError
+import sys
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("ignore")
 
 
 def did_program_crash(program_output):
