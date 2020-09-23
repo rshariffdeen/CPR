@@ -3,6 +3,8 @@ from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
 from main.utilities import timeout
+from multiprocessing import Pool, TimeoutError
+
 
 def did_program_crash(program_output):
     if any(crash_word in str(program_output).lower() for crash_word in definitions.crash_word_list):
@@ -76,8 +78,16 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     # print(control_loc, constraint)
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
+    pool = Pool(2)
     with timeout(60):
-        result = not is_unsat(new_path)
+        kwargs = {"formula": new_path, "solver_name": "z3"}
+        sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
+        unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
+        if sat_result:
+            result = True
+        if unsat_result:
+            result = False
+    pool.close()
 
     if result:
         ppc_len = len(str(new_path.serialize()))
