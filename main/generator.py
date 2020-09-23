@@ -41,6 +41,6 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
-    writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
+    # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     return list_of_patches
