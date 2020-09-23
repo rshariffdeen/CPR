@@ -311,11 +311,12 @@ def select_new_path_condition():
         if values.CONF_SELECTION_STRATEGY == "deterministic":
             selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
-            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1])
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1])
         else:
-            selected_pair = (random.choice(list_path_detected, key=lambda item: item[2]))
+            selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1])
         list_path_detected.remove(selected_pair)
 
     return selected_path, control_loc
