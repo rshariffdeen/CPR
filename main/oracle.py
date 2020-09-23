@@ -83,14 +83,14 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     pool = Pool(2)
-    with timeout(60):
-        kwargs = {"formula": new_path, "solver_name": "z3"}
-        sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
-        unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
-        if sat_result:
-            result = sat_result
-        if unsat_result:
-            result = not unsat_result
+
+    kwargs = {"formula": new_path, "solver_name": "z3"}
+    sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
+    unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
+    if sat_result:
+        result = sat_result
+    if unsat_result:
+        result = not unsat_result
     pool.close()
 
     if result:
