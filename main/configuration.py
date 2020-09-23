@@ -131,7 +131,7 @@ def read_conf_file():
                 error_exit("Invalid configuration for " + definitions.CONF_SELECTION_STRATEGY)
         elif definitions.CONF_DISTANCE_METRIC in configuration:
             values.CONF_DISTANCE_METRIC = configuration.replace(definitions.CONF_DISTANCE_METRIC, '')
-            if values.CONF_DISTANCE_METRIC not in values.OPTIONS_DIST_METRIC:
+            if values.CONF_DISTANCE_METRIC not in values.OPTIONS_DIST_METRIC.values():
                 error_exit("Invalid configuration for " + definitions.CONF_DISTANCE_METRIC)
         elif definitions.CONF_PATCH_TYPE in configuration:
             values.CONF_PATCH_TYPE = configuration.replace(definitions.CONF_PATCH_TYPE, '')
