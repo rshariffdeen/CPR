@@ -104,6 +104,7 @@ RUN pysmt-install --z3 --confirm-agreement
 
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install six
+RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install numpy
 WORKDIR /concolic-repair
 
 COPY main/ main/
