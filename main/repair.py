@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, values, distance, oracle, parallel, generator
 import time
-
+import sys
 
 check_counter = 1
 
@@ -58,6 +58,7 @@ def run(project_path, program_path):
     emitter.debug("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     emitter.debug("\tconfiguration.max_bound:" + str(values.CONF_MAX_BOUND))
     emitter.debug("\tconfiguration.low_bound:" + str(values.CONF_LOW_BOUND))
+    emitter.debug("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
 
     time_check = time.time()
     P = generator.generate_patch_set(project_path)
