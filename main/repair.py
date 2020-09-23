@@ -56,8 +56,8 @@ def run(project_path, program_path):
     emitter.debug("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     emitter.debug("\tconfiguration.assertion:" + str(values.SPECIFICATION))
     emitter.debug("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.debug("\tconfiguration.max_bound:" + str(values.CONF_MAX_BOUND))
-    emitter.debug("\tconfiguration.low_bound:" + str(values.CONF_LOW_BOUND))
+    emitter.debug("\tconfiguration.max_bound:" + str(values.DEFAULT_UPPER_BOUND))
+    emitter.debug("\tconfiguration.low_bound:" + str(values.DEFAULT_LOWER_BOUND))
     emitter.debug("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
 
     time_check = time.time()
