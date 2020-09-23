@@ -145,6 +145,8 @@ def read_conf_file():
             values.CONF_BUILD_FLAGS = configuration.replace(definitions.CONF_BUILD_FLAGS, '')
         elif definitions.CONF_KLEE_FLAGS in configuration:
             values.CONF_KLEE_FLAGS = configuration.replace(definitions.CONF_KLEE_FLAGS, '')
+        elif definitions.CONF_ITERATION_LIMIT in configuration:
+            values.CONF_ITERATION_LIMIT = int(configuration.replace(definitions.CONF_ITERATION_LIMIT, ''))
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

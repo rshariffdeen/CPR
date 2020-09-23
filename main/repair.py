@@ -6,7 +6,7 @@ from main import emitter, values, distance, oracle, parallel, generator
 import time
 
 
-check_counter = 0
+check_counter = 1
 
 
 def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: str,
@@ -29,7 +29,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
 
 def check_coverage():  # TODO
     global check_counter
-    if check_counter < 10:  # Only for testing purpose.
+    if check_counter < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
         check_counter += 1
         return False
     else:
