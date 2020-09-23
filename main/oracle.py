@@ -84,9 +84,9 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
         unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
         if sat_result:
-            result = True
+            result = sat_result
         if unsat_result:
-            result = False
+            result = not unsat_result
     pool.close()
 
     if result:
