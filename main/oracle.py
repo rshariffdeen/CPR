@@ -85,8 +85,15 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     pool = Pool(2)
 
     kwargs = {"formula": new_path, "solver_name": "z3"}
-    sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
-    unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
+    try:
+        sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
+    except TimeoutError:
+        sat_result = None
+    try:
+        unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
+    except TimeoutError:
+        unsat_result = None
+
     if sat_result:
         result = sat_result
     if unsat_result:
