@@ -12,6 +12,7 @@ from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle
+import numpy
 
 
 logger = logging.getLogger(__name__)
@@ -278,14 +279,15 @@ def get_byte_string(bit_vector):
 
 def select_nearest_control_loc():
     selection = None
+    control_loc_list = numpy.array(list_path_detected)[:, 0]
     control_loc_dist_map = dict(
-        filter(lambda elem: elem[0] in list_path_detected.keys(), values.MAP_LOC_DISTANCE.items()))
+        filter(lambda elem: elem[0] in control_loc_list, values.MAP_LOC_DISTANCE.items()))
     min_distance = min(list(control_loc_dist_map.values()))
     loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
     if values.CONF_SELECTION_STRATEGY == "deterministic":
-        selection = list(set(loc_list) & set(list_path_detected.keys()))[0]
+        selection = list(set(loc_list) & set(control_loc_list))[0]
     else:
-        selection = random.choice(list(set(loc_list) & set(list_path_detected.keys())))
+        selection = random.choice(list(set(loc_list) & set(control_loc_list)))
     return selection
 
 
@@ -305,18 +307,17 @@ def select_new_path_condition():
         list_path_detected.remove(selected_pair)
     else:
         control_loc = select_nearest_control_loc()
+        path_list_at_loc = [(p[1], p[2]) for p in list_path_detected if p[0] == control_loc]
         if values.CONF_SELECTION_STRATEGY == "deterministic":
-            path_list_at_loc = list_path_detected[control_loc]
-            str_path_list = [str(x.serialize()) for x in path_list_at_loc]
-            sorted_path_list = sorted(str_path_list, key=len)
-            index_of_selected_path = str_path_list.index(sorted_path_list[-1])
-            selected_path = list_path_detected[control_loc][index_of_selected_path]
+            selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
+            selected_path = selected_pair[0]
+            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1])
         else:
-            selected_path = random.choice(list_path_detected[control_loc])
+            selected_pair = (random.choice(list_path_detected, key=lambda item: item[2]))
+            selected_path = selected_pair[1]
+            control_loc = selected_pair[0]
+        list_path_detected.remove(selected_pair)
 
-        list_path_detected[control_loc].remove(selected_path)
-        if not list_path_detected[control_loc]:
-            list_path_detected.pop(control_loc)
     return selected_path, control_loc
 
 
