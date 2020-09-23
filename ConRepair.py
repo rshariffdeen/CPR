@@ -49,6 +49,9 @@ def load_component_list():
 def bootstrap(arg_list):
     emitter.title("Starting " + values.TOOL_NAME)
     emitter.sub_title("Loading Configurations")
+
+    sys.setrecursionlimit(1500)
+
     configuration.read_conf(arg_list)
     configuration.read_conf_file()
 
