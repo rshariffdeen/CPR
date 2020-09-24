@@ -441,7 +441,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     offset = 0
     for arg in argument_list:
         index = list(argument_list).index(arg) - offset
-        if "$POC" in str(argument_list[index]):
+        if "$POC" in arg:
             input_arg_list.append(str(argument_list[index]))
             offset = 1
         elif index in input_arg_dict:
