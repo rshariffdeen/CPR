@@ -85,7 +85,8 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     if chosen_control_loc != values.CONF_LOC_PATCH:
         pool = Pool(2)
         kwargs = {"formula": new_path, "solver_name": "z3"}
-
+        sat_result = None
+        unsat_result = None
         try:
             unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(5)
         except TimeoutError:
@@ -97,10 +98,10 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
             except TimeoutError:
                 sat_result = None
 
-        if sat_result:
-            result = sat_result
         if unsat_result:
             result = not unsat_result
+        if sat_result:
+            result = sat_result
         pool.close()
 
     else:
