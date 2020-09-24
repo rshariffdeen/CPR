@@ -85,14 +85,17 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     if chosen_control_loc != values.CONF_LOC_PATCH:
         pool = Pool(2)
         kwargs = {"formula": new_path, "solver_name": "z3"}
+
         try:
-            sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
-        except TimeoutError:
-            sat_result = None
-        try:
-            unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(10)
+            unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(5)
         except TimeoutError:
             unsat_result = None
+
+        if unsat_result is None:
+            try:
+                sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
+            except TimeoutError:
+                sat_result = None
 
         if sat_result:
             result = sat_result
