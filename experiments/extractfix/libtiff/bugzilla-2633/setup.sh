@@ -14,7 +14,7 @@ git checkout $commit_id
 
 
 ./autogen.sh
-CC=wllvm CXX=wllvm++ ./configure --enable-static --disable-shared
+CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared
 CC=wllvm CXX=wllvm++ make -j32
 
 sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
@@ -30,11 +30,10 @@ git commit -m 'remove longjmp calls'
 
 make CFLAGS="-ltrident_proxy -L/concolic-repair/lib" -j32
 
-sed -i '2900i TRIDENT_OUTPUT("obs", "i32", t2p->tiff_datasize - count - 2 );' tools/tiff2pdf.c
-sed -i '2898d' tools/tiff2pdf.c
-sed -i '2898i if(__trident_choice("L1634", "bool", (int[]){count}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0)) {' tools/tiff2pdf.c
-sed -i '36i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' tools/tiff2pdf.c
-git add tools/tiff2pdf.c
+sed -i '2470i TRIDENT_OUTPUT("obs", "i32", tf_bytesperrow - nc);' tools/tiff2ps.c
+sed -i '2441i if(__trident_choice("L1634", "bool", (int[]){es}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0)) return;' tools/tiff2ps.c
+sed -i '44i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' tools/tiff2ps.c
+git add tools/tiff2ps.c
 git commit -m "instrument trident"
 
 
