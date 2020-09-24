@@ -88,13 +88,13 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         sat_result = None
         unsat_result = None
         try:
-            unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(5)
+            unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_UNSAT)
         except TimeoutError:
             unsat_result = None
 
         if unsat_result is None:
             try:
-                sat_result = pool.apply_async(is_sat, kwds=kwargs).get(10)
+                sat_result = pool.apply_async(is_sat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_SAT)
             except TimeoutError:
                 sat_result = None
 
