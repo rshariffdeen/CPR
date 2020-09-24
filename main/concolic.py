@@ -438,17 +438,15 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
-    length = len(argument_list)
-    if length > 1 and "$POC" in argument_list:
-        length = length - 1
-    for i in range(0, length):
-        if "$POC" in str(argument_list[i]):
-            input_arg_list.append(str(argument_list[i]))
+    for arg in argument_list:
+        index = list(argument_list).index(arg)
+        if "$POC" in str(argument_list[index]):
+            input_arg_list.append(str(argument_list[index]))
 
-        if i in input_arg_dict:
-            input_arg_list.append(input_arg_dict[i])
+        if index in input_arg_dict:
+            input_arg_list.append(input_arg_dict[index])
         else:
-            arg_len = len(str(argument_list[i]))
+            arg_len = len(str(argument_list[index]))
             random_value = ""
             for j in range(0, arg_len):
                 random_value += chr(random.randint(0, 128))
@@ -477,7 +475,7 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
     #             var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
     #         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
     emitter.debug("Generated Arg List", input_arg_list)
-    # emitter.debug("Generated Var List", input_var_list)
+    emitter.debug("Generated Var List", input_var_list)
     return input_arg_list, input_var_list, patch_list
 
 
