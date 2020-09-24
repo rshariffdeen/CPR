@@ -46,6 +46,7 @@ DEFAULT_GEN_SEARCH_LIMIT = 40
 DEFAULT_STACK_SIZE = 1500
 DEFAULT_TIMEOUT_UNSAT = 10
 DEFAULT_TIMEOUT_SAT = 10
+DEFAULT_TIMEOUT_KLEE = 300
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 

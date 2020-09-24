@@ -562,6 +562,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    + "--external-calls=all " \
+                   + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + values.CONF_KLEE_FLAGS + " " \
