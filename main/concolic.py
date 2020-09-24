@@ -438,10 +438,12 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
             emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
+    offset = 0
     for arg in argument_list:
-        index = list(argument_list).index(arg)
+        index = list(argument_list).index(arg) - offset
         if "$POC" in str(argument_list[index]):
             input_arg_list.append(str(argument_list[index]))
+            offset = 1
         elif index in input_arg_dict:
             input_arg_list.append(input_arg_dict[index])
         else:
