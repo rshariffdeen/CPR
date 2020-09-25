@@ -136,6 +136,8 @@ RUN apt-get install -y  \
     flex \
     gettext \
     gperf \
+    libfreetype6 \
+    libfreetype6-dev \
     libtool \
     libxml-dev \
     nasm \
