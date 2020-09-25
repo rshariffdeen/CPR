@@ -137,6 +137,7 @@ RUN apt-get install -y  \
     gettext \
     gperf \
     libtool \
+    libxml-dev \
     nasm \
     pkg-config \
     texinfo \
