@@ -28,9 +28,6 @@ sed -i '35i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) v
 git add libopenjpeg/j2k.c
 git commit -m "instrument trident"
 
-make CXX=$TRIDENT_CXX  CC=$TRIDENT_CC CXXFLAGS="-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest -static" \
-CFLAGS="-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest -static" -j32
-
 
 cd $current_dir
 cp repair.conf $dir_name
