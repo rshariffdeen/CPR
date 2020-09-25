@@ -149,6 +149,8 @@ def read_conf_file():
             values.CONF_ITERATION_LIMIT = int(configuration.replace(definitions.CONF_ITERATION_LIMIT, ''))
         elif definitions.CONF_STACK_SIZE in configuration:
             values.CONF_STACK_SIZE = int(configuration.replace(definitions.CONF_STACK_SIZE, ''))
+        elif definitions.CONF_MASK_ARG in configuration:
+            values.CONF_MASK_ARG = configuration.replace(definitions.CONF_MASK_ARG, '').split(",")
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

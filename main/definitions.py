@@ -61,6 +61,7 @@ CONF_KLEE_FLAGS = "klee_flags:"
 CONF_OPERATION_MODE = "mode:"
 CONF_ITERATION_LIMIT = "iterations:"
 CONF_STACK_SIZE = "stack_size:"
+CONF_MASK_ARG = "mask_arg:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
