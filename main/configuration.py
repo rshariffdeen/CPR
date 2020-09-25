@@ -119,6 +119,10 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_STATIC, '')
             if "true" in str(conf_text).lower():
                 values.CONF_STATIC = True
+        elif definitions.CONF_IS_CPP in configuration:
+            conf_text = configuration.replace(definitions.CONF_IS_CPP, '')
+            if "true" in str(conf_text).lower():
+                values.CONF_IS_CPP = True
         elif definitions.CONF_FLAG_ASAN in configuration:
             values.CONF_FLAG_ASAN = configuration.replace(definitions.CONF_FLAG_ASAN, '')
         elif definitions.CONF_FLAGS_C in configuration:

@@ -62,6 +62,7 @@ CONF_OPERATION_MODE = "mode:"
 CONF_ITERATION_LIMIT = "iterations:"
 CONF_STACK_SIZE = "stack_size:"
 CONF_MASK_ARG = "mask_arg:"
+CONF_IS_CPP = "is_cpp:"
 
 
 # ----------------- KEY DEFINITIONS -------------------

@@ -156,8 +156,9 @@ def apply_flags(build_command):
         cc_old = (build_command.split("CXX='")[1]).split("'")[0]
         build_command = build_command.replace(cc_old, CXX)
     else:
-        new_command = "make CXX=" + CXX + " "
-        build_command = build_command.replace("make", new_command)
+        if values.CONF_IS_CPP:
+            new_command = "make CXX=" + CXX + " "
+            build_command = build_command.replace("make", new_command)
 
     return build_command
 
