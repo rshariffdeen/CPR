@@ -109,16 +109,18 @@ def apply_flags(build_command):
         c_flags_new = c_flags.replace("'", "") + " " + c_flags_old
         build_command = build_command.replace(c_flags_old, c_flags_new)
     else:
-        new_command = "make CFLAGS=\"" + c_flags + "\" "
-        build_command = build_command.replace("make ", new_command)
+        if c_flags:
+            new_command = "make CFLAGS=\"" + c_flags + "\" "
+            build_command = build_command.replace("make ", new_command)
 
     if "LDFLAGS=" in build_command:
         ld_flags_old = (build_command.split("LDFLAGS='")[1]).split("'")[0]
         ld_flags_new = ld_flags.replace("'", "") + " " + ld_flags_old
         build_command = build_command.replace(ld_flags_old, ld_flags_new)
     else:
-        new_command = "make LDFLAGS=\"" + ld_flags + "\" "
-        build_command = build_command.replace("make ", new_command)
+        if ld_flags:
+            new_command = "make LDFLAGS=\"" + ld_flags + "\" "
+            build_command = build_command.replace("make ", new_command)
 
     if "XCXXFLAGS=" in build_command:
         c_flags_old = (build_command.split("XCXXFLAGS='")[1]).split("'")[0]
@@ -133,8 +135,9 @@ def apply_flags(build_command):
         c_flags_new = c_flags.replace("'", "") + " " + c_flags_old
         build_command = build_command.replace(c_flags_old, c_flags_new)
     else:
-        new_command = "make CXXFLAGS=\"" + c_flags + "\" "
-        build_command = build_command.replace("make ", new_command)
+        if c_flags:
+            new_command = "make CXXFLAGS=\"" + c_flags + "\" "
+            build_command = build_command.replace("make ", new_command)
 
     if "XCC=" in build_command:
         cc_old = (build_command.split("XCC='")[1]).split("'")[0]
