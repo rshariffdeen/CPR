@@ -14,7 +14,7 @@ git checkout $commit_id
 
 
 autoreconf -i
-CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0 -static' CXXFLAGS="$CFLAGS"
+CC=wllvm CXX=wllvm++ ./configure --enable-static --disable-shared CFLAGS='-g -O0 ' CXXFLAGS="$CFLAGS"
 make -j32
 
 opj_file=applications/codec/j2k_to_image.c

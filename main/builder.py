@@ -17,15 +17,17 @@ LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime  -lkleeRuntest"
 def config_project(project_path, is_llvm, custom_config_command=None):
     emitter.sub_sub_title("configuring program")
     dir_command = "cd " + project_path + ";"
-    if os.path.exists(project_path + "/" + "aclocal.m4"):
-        pre_config_command = "rm aclocal.m4;aclocal"
-        execute_command(pre_config_command)
+   
     config_command = None
     if custom_config_command is not None:
         if custom_config_command == "skip":
             emitter.warning("\t[warning] skipping configuration")
             return
         else:
+            if os.path.exists(project_path + "/" + "aclocal.m4"):
+                pre_config_command = "rm aclocal.m4;aclocal"
+                execute_command(pre_config_command)
+                
             if CC == "wllvm":
                 custom_config_command = remove_fsanitize(custom_config_command)
                 if "cmake" in custom_config_command:
