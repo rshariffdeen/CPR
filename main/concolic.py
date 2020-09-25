@@ -444,6 +444,8 @@ def generate_new_input(argument_list, second_var_list, patch_list=None):
         if "$POC" in arg:
             input_arg_list.append(str(argument_list[index]))
             offset = 1
+        elif str(index) in values.CONF_MASK_ARG:
+            input_arg_list.append(arg)
         elif index in input_arg_dict:
             input_arg_list.append(input_arg_dict[index])
         else:
