@@ -11,7 +11,7 @@ CC = "$TRIDENT_CC"
 CXX = "$TRIDENT_CXX"
 C_FLAGS = "-g -O0  -static -e"
 CXX_FLAGS = "-g -O0 -static -e"
-LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime -ltrident_proxy -lkleeRuntest"
+LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime  -lkleeRuntest"
 
 
 def config_project(project_path, is_llvm, custom_config_command=None):
@@ -195,8 +195,8 @@ def build_normal():
     C_FLAGS = "-g -O0"
     CXX_FLAGS = "-g -O0"
     config_project(values.CONF_DIR_SRC, False, values.CONF_COMMAND_CONFIG)
-    C_FLAGS = "-g -I /concolic-repair/runtime -L/concolic-repair/runtime -ltrident_runtime -lkleeRuntest"
-    LDFLAGS = "-L/concolic-repair/lib -ltrident_runtime -ltrident_proxy -lkleeRuntest"
+    C_FLAGS = ""
+    LD_FLAGS = ""
     CXX_FLAGS = C_FLAGS
     if values.CONF_STATIC:
         C_FLAGS += " -static"
