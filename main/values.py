@@ -99,3 +99,4 @@ CONF_OPERATION_MODE = "semi-parallel"
 CONF_STACK_SIZE = ""
 CONF_MASK_ARG = ""
 CONF_IS_CPP = False
+CONF_IS_CRASH = False

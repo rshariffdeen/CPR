@@ -119,6 +119,10 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_STATIC, '')
             if "true" in str(conf_text).lower():
                 values.CONF_STATIC = True
+        elif definitions.CONF_IS_CRASH in configuration:
+            conf_text = configuration.replace(definitions.CONF_IS_CRASH, '')
+            if "true" in str(conf_text).lower():
+                values.CONF_IS_CRASH = True
         elif definitions.CONF_IS_CPP in configuration:
             conf_text = configuration.replace(definitions.CONF_IS_CPP, '')
             if "true" in str(conf_text).lower():
