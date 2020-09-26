@@ -565,7 +565,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    + "--external-calls=all " \
-                   + "--link-llvm-lib ={0} " .format(runtime_lib_path) \
+                   + "--link-llvm-lib={0} " .format(runtime_lib_path) \
                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
@@ -622,7 +622,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
-                    + "--link-llvm-lib ={0} ".format(runtime_lib_path) \
+                    + "--link-llvm-lib={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument
     if not print_output:
