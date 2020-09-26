@@ -50,11 +50,12 @@ def is_loc_in_trace(source_loc):
     return source_loc in values.LIST_TRACE
 
 
-def check_sat(formula):
+def check_sat(formula, default_value):
     pool = Pool(2)
     kwargs = {"formula": formula, "solver_name": "z3"}
     sat_result = None
     unsat_result = None
+    result = default_value
     try:
         unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_UNSAT)
     except TimeoutError:
@@ -107,7 +108,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     if chosen_control_loc != values.CONF_LOC_PATCH:
-        result = check_sat(new_path)
+        result = check_sat(new_path, False)
     else:
         result = not is_unsat(new_path)
 
@@ -124,12 +125,12 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     specification = And(path_condition, patch_constraint)
     if assertion:
         if is_loc_in_trace(values.CONF_LOC_BUG):
-            universal_quantification = check_sat(And(specification, Not(assertion)))
+            universal_quantification = check_sat(And(specification, Not(assertion)), True)
             result = not universal_quantification
         else:
-            result = check_sat(specification)
+            result = check_sat(specification, True)
     else:
-        result = check_sat(specification)
+        result = check_sat(specification, True)
 
     return result, index
 
