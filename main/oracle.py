@@ -100,12 +100,12 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     specification = And(path_condition, patch_constraint)
     if assertion:
         if is_loc_in_trace(values.CONF_LOC_BUG):
-            universal_quantification = is_unsat(And(specification, Not(assertion)), True)
+            universal_quantification = is_unsat(And(specification, Not(assertion)))
             result = universal_quantification
         else:
-            result = is_sat(specification, True)
+            result = is_sat(specification)
     else:
-        result = is_sat(specification, True)
+        result = is_sat(specification)
 
     return result, index
 
