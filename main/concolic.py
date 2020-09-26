@@ -606,6 +606,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
+    runtime_lib_path = definitions.DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC
@@ -621,6 +622,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
+                    + "--link-lvm-lib ={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument
     if not print_output:
