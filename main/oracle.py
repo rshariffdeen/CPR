@@ -50,6 +50,31 @@ def is_loc_in_trace(source_loc):
     return source_loc in values.LIST_TRACE
 
 
+def check_sat(formula, default_value):
+    pool = Pool(2)
+    kwargs = {"formula": formula, "solver_name": "z3"}
+    sat_result = None
+    unsat_result = None
+    result = default_value
+    try:
+        unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_UNSAT)
+    except TimeoutError:
+        unsat_result = None
+
+    if unsat_result is None:
+        try:
+            sat_result = pool.apply_async(is_sat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_SAT)
+        except TimeoutError:
+            sat_result = None
+
+    if unsat_result:
+        result = not unsat_result
+    if sat_result:
+        result = sat_result
+    pool.close()
+    return result
+
+
 def check_path_feasibility(chosen_control_loc, ppc, lock):
     """
     This function will check if a selected path is feasible
@@ -83,9 +108,9 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     if chosen_control_loc != values.CONF_LOC_PATCH:
-        result = not is_unsat(new_path, False)
+        result = check_sat(new_path, False)
     else:
-        result = is_sat(new_path)
+        result = not is_unsat(new_path)
 
     if result:
         ppc_len = len(str(new_path.serialize()))
@@ -100,12 +125,12 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     specification = And(path_condition, patch_constraint)
     if assertion:
         if is_loc_in_trace(values.CONF_LOC_BUG):
-            universal_quantification = is_unsat(And(specification, Not(assertion)), True)
-            result = universal_quantification
+            universal_quantification = check_sat(And(specification, Not(assertion)), True)
+            result = not universal_quantification
         else:
-            result = is_sat(specification, True)
+            result = check_sat(specification, True)
     else:
-        result = is_sat(specification, True)
+        result = check_sat(specification, True)
 
     return result, index
 
