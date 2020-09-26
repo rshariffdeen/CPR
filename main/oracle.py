@@ -109,7 +109,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     if chosen_control_loc != values.CONF_LOC_PATCH:
         result = check_sat(new_path)
     else:
-        result = check_sat(new_path)
+        result = not is_unsat(new_path)
 
     if result:
         ppc_len = len(str(new_path.serialize()))
@@ -127,7 +127,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
             universal_quantification = check_sat(And(specification, Not(assertion)))
             result = not universal_quantification
         else:
-            result = is_sat(specification)
+            result = check_sat(specification)
     else:
         result = check_sat(specification)
 
