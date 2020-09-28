@@ -83,27 +83,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     if chosen_control_loc != values.CONF_LOC_PATCH:
-        pool = Pool(2)
-        kwargs = {"formula": new_path, "solver_name": "z3"}
-        sat_result = None
-        unsat_result = None
-        try:
-            unsat_result = pool.apply_async(is_unsat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_UNSAT)
-        except TimeoutError:
-            unsat_result = None
-
-        if unsat_result is None:
-            try:
-                sat_result = pool.apply_async(is_sat, kwds=kwargs).get(values.DEFAULT_TIMEOUT_SAT)
-            except TimeoutError:
-                sat_result = None
-
-        if unsat_result:
-            result = not unsat_result
-        if sat_result:
-            result = sat_result
-        pool.close()
-
+        result = not is_unsat(new_path, False)
     else:
         result = is_sat(new_path)
 
@@ -119,23 +99,13 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
     specification = And(path_condition, patch_constraint)
     if assertion:
-        if values.IS_CRASH:
-            if is_loc_in_trace(values.CONF_LOC_BUG):
-                universal_quantification = is_sat(And(specification, Not(assertion)))
-                result = not universal_quantification
-            else:
-                result = is_sat(specification)
-        else:
-            universal_quantification = is_sat(And(specification, Not(assertion)))
-            result = not universal_quantification
-    else:
-        if values.IS_CRASH:
-            if is_loc_in_trace(values.CONF_LOC_BUG):
-                result = not is_sat(specification)
-            else:
-                result = is_sat(specification)
+        if is_loc_in_trace(values.CONF_LOC_BUG):
+            universal_quantification = is_unsat(And(specification, Not(assertion)))
+            result = universal_quantification
         else:
             result = is_sat(specification)
+    else:
+        result = is_sat(specification)
 
     return result, index
 

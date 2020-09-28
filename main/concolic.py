@@ -553,6 +553,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         values.LIST_BIT_LENGTH = bit_length_list
     emitter.normal("\texecuting klee in concolic mode")
     hit_location_flag = " "
+    runtime_lib_path = definitions.DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
     if values.CONF_DISTANCE_METRIC == "control-loc":
         hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + " "
     klee_command = "klee " \
@@ -564,6 +565,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "--log-ppc " \
                    "--log-trace " \
                    + "--external-calls=all " \
+                   + "--link-llvm-lib={0} " .format(runtime_lib_path) \
                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
@@ -604,6 +606,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
+    runtime_lib_path = definitions.DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC
@@ -619,6 +622,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
+                    + "--link-llvm-lib={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument
     if not print_output:
