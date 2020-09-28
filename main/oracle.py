@@ -83,7 +83,7 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
     assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     if chosen_control_loc != values.CONF_LOC_PATCH:
-        result = not is_unsat(new_path, False)
+        result = not is_unsat(new_path)
     else:
         result = is_sat(new_path)
 
