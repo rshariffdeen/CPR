@@ -62,6 +62,7 @@ def run(project_path, program_path):
 
     time_check = time.time()
     P = generator.generate_patch_set(project_path)
+    values.COUNT_PATCH_START = len(P)
     values.TIME_TO_GENERATE = str(time.time() - time_check)
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(P) <= 1
@@ -106,3 +107,4 @@ def run(project_path, program_path):
         emitter.debug("|P|=", str(len(P)))
 
     print_patch_list(P)
+    values.COUNT_PATCH_END = len(P)

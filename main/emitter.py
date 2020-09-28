@@ -160,6 +160,10 @@ def end(time_info):
     statistics("Generation: " + values.TIME_TO_GENERATE + " seconds")
     statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " seconds")
     statistics("Iteration Count: " + str(values.ITERATION_NO))
+    statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
+    statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
+    statistics("Component Count: " + str(values.COUNT_COMPONENTS))
+    statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " seconds\n")
 
 

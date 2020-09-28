@@ -44,6 +44,7 @@ def load_component_list():
         emitter.debug("\tloading component: " + str(component_name))
     project_components = synthesis.load_components(proj_comp_files)
     values.LIST_COMPONENTS = project_components + general_components
+    values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
 
 
 def bootstrap(arg_list):

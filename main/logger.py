@@ -71,6 +71,10 @@ def end(time_duration):
     output("Generation: " + values.TIME_TO_GENERATE + " seconds")
     output("Repair: " + time_duration[definitions.KEY_DURATION_REPAIR] + " seconds")
     output("Iteration Count: " + str(values.ITERATION_NO))
+    output("Patch Start Count: " + str(values.COUNT_PATCH_START))
+    output("Patch End Count: " + str(values.COUNT_PATCH_END))
+    output("Component Count: " + str(values.COUNT_COMPONENTS))
+    output("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " seconds\n")
     copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_OUTPUT + "/main-log")
 
