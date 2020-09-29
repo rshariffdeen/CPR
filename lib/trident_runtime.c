@@ -238,5 +238,6 @@ int __trident_output(char* id, char* typestr, int value){
     int klee_var;
     klee_make_symbolic(&klee_var, sizeof(klee_var), name);
     klee_assume(klee_var == value);
+    klee_print_expr(name, klee_var);
     return value;
 }
