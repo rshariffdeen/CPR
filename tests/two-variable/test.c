@@ -12,7 +12,11 @@ int main(int argc, char *argv[]) {
   if (__trident_choice("L9", "bool", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
-  b = y * x;
+
+  if (x > 0)
+    b = y * x;
+  else
+    b = 2;
   TRIDENT_OUTPUT("obs", "i32", b);
   res = 200/b;
   return 0;
