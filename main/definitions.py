@@ -5,7 +5,7 @@ import os
 # ------------------- Directories --------------------
 
 DIRECTORY_ROOT = "/".join(os.path.realpath(__file__).split("/")[:-2])
-DIRECTORY_RUNTIME = DIRECTORY_ROOT + "/runtime"
+DIRECTORY_LIB = DIRECTORY_ROOT + "/lib"
 DIRECTORY_LOG = DIRECTORY_ROOT + "/logs"
 DIRECTORY_OUTPUT_BASE = DIRECTORY_ROOT + "/output"
 DIRECTORY_COMPONENTS = DIRECTORY_ROOT + "/components"
@@ -25,7 +25,7 @@ FILE_COMMAND_LOG = DIRECTORY_LOG + "/log-command"
 FILE_STANDARD_FUNCTION_LIST = DIRECTORY_DATA + "/standard-function-list"
 FILE_STANDARD_MACRO_LIST = DIRECTORY_DATA + "/standard-macro-list"
 FILE_PATCH_SET = ""
-FILE_TRIDENT_LIB_BCA = DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
+FILE_TRIDENT_LIB_BCA = DIRECTORY_LIB + "/libtrident_runtime.bca"
 
 # ------------------- Configuration --------------------
 

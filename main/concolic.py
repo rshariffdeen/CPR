@@ -553,7 +553,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         values.LIST_BIT_LENGTH = bit_length_list
     emitter.normal("\texecuting klee in concolic mode")
     hit_location_flag = " "
-    runtime_lib_path = definitions.DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
+    runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     if values.CONF_DISTANCE_METRIC == "control-loc":
         hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + " "
     klee_command = "klee " \
@@ -606,7 +606,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
-    runtime_lib_path = definitions.DIRECTORY_RUNTIME + "/libtrident_runtime.bca"
+    runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC

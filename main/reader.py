@@ -93,7 +93,7 @@ def collect_symbolic_path(log_path, project_path):
         with open(log_path, 'r') as trace_file:
             for line in trace_file:
                 if '[path:ppc]' in line:
-                    if project_path in line or definitions.DIRECTORY_RUNTIME in line:
+                    if project_path in line or definitions.DIRECTORY_LIB in line:
                         source_path = str(line.replace("[path:ppc]", '')).split(" : ")[0]
                         source_path = source_path.strip()
                         source_path = os.path.abspath(source_path)
