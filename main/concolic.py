@@ -563,6 +563,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    "-allow-seed-extension " \
                    "-named-seed-matching " \
                    "--log-ppc " \
+                   "--resolve-path " \
                    "--log-trace " \
                    + "--external-calls=all " \
                    + "--link-llvm-lib={0} " .format(runtime_lib_path) \
