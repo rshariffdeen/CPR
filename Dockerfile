@@ -139,7 +139,7 @@ RUN apt-get install -y  \
     libfreetype6 \
     libfreetype6-dev \
     libtool \
-    libxml-dev \
+    libxml2-dev \
     nasm \
     pkg-config \
     texinfo \
