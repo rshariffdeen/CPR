@@ -1,9 +1,12 @@
-from main.concolic import run_concolic_execution, generate_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, values, distance, oracle, parallel, definitions, writer, reader
-import time
+from main import definitions, values, emitter
+from pysmt.shortcuts import is_sat, Not, And, is_unsat
+from pysmt.smtlib.parser import SmtLibParser
+from six.moves import cStringIO
+
 
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
@@ -44,3 +47,21 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     return list_of_patches
+
+
+def generate_flipped_path(ppc):
+    """
+    This function will check if a selected path is feasible
+           ppc : partial path conditoin at chosen control loc
+           chosen_control_loc: branch location selected for flip
+           returns satisfiability of the negated path
+    """
+    parser = SmtLibParser()
+    script = parser.get_script(cStringIO(ppc))
+    formula = script.get_last_formula()
+    prefix = formula.arg(0)
+    constraint = formula.arg(1)
+    new_path = And(prefix, Not(constraint))
+
+    assert str(new_path.serialize()) != str(formula.serialize())
+    return new_path

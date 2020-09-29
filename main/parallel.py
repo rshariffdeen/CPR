@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from main import emitter, oracle, definitions, extractor, reader, values
+from main import emitter, oracle, definitions, extractor, reader, values, generator
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -29,6 +29,8 @@ def collect_patch(patch):
 def generate_symbolic_paths_parallel(ppc_list):
     global pool, result_list
     result_list = []
+    path_list = []
+    filtered_list = []
     lock = None
     count = 0
     ppc_list.reverse()
@@ -37,7 +39,10 @@ def generate_symbolic_paths_parallel(ppc_list):
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
             count = count + 1
-            result_list.append(oracle.check_path_feasibility(control_loc, ppc, lock))
+            new_path = generator.generate_flipped_path(ppc)
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
     else:
@@ -47,13 +52,21 @@ def generate_symbolic_paths_parallel(ppc_list):
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
             count = count + 1
-            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, ppc, lock), callback=collect_result)
+            new_path = generator.generate_flipped_path(ppc)
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
-    return result_list
+
+    for result in result_list:
+        is_feasible, index = result
+        if is_feasible:
+            filtered_list.append(path_list[index])
+    return filtered_list
 
 
 def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion):

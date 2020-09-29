@@ -2,8 +2,7 @@ from main import definitions, values, emitter
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
-from main.utilities import timeout
-from multiprocessing import Pool, TimeoutError
+
 import sys
 if not sys.warnoptions:
     import warnings
@@ -50,37 +49,13 @@ def is_loc_in_trace(source_loc):
     return source_loc in values.LIST_TRACE
 
 
-def check_path_feasibility(chosen_control_loc, ppc, lock):
+def check_path_feasibility(chosen_control_loc, new_path, index):
     """
     This function will check if a selected path is feasible
            ppc : partial path conditoin at chosen control loc
            chosen_control_loc: branch location selected for flip
            returns satisfiability of the negated path
     """
-    parser = SmtLibParser()
-    script = parser.get_script(cStringIO(ppc))
-    formula = script.get_last_formula()
-    prefix = formula.arg(0)
-    # prefix_constraint_list = list()
-    # while prefix.is_and():
-    #     if prefix == values.PREFIX_PPC_FORMULA:
-    #         break
-    #     if str(prefix.arg(1).serialize()) not in values.LIST_KLEE_ASSUMPTIONS:
-    #         prefix_constraint_list.append(prefix.arg(1))
-    #     prefix = prefix.arg(0)
-    #
-    # prefix = None
-    # if prefix_constraint_list:
-    #     prefix = prefix_constraint_list[0]
-    #     for p in prefix_constraint_list[1:]:
-    #         prefix = And(prefix, p)
-    #
-    constraint = formula.arg(1)
-    # if definitions.DIRECTORY_RUNTIME in chosen_control_loc:
-    #     values.LIST_KLEE_ASSUMPTIONS.append(str(constraint.serialize()))
-    new_path = And(prefix, Not(constraint))
-    # print(control_loc, constraint)
-    assert str(new_path.serialize()) != str(formula.serialize())
     result = False
     if chosen_control_loc != values.CONF_LOC_PATCH:
         result = not is_unsat(new_path)
@@ -88,12 +63,10 @@ def check_path_feasibility(chosen_control_loc, ppc, lock):
         result = is_sat(new_path)
 
     if result:
-        ppc_len = len(str(new_path.serialize()))
-        return True, chosen_control_loc, new_path, ppc_len
+        return True, index
     else:
-        #with lock:
         emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
-        return False, chosen_control_loc, new_path, 0
+        return False, index
 
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
