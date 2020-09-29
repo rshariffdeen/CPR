@@ -61,7 +61,7 @@ def generate_symbolic_paths_parallel(ppc_list):
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
-
+    assert(len(result_list) == len(path_list))
     for result in result_list:
         is_feasible, index = result
         if is_feasible:

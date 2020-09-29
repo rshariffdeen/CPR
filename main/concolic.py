@@ -201,9 +201,8 @@ def generate_symbolic_paths(ppc_list):
     path_count = 0
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
-        if result[0]:
-            path_count = path_count + 1
-            path_list.append((result[1], result[2], result[3]))
+        path_count = path_count + 1
+        path_list.append((result[1], result[2], result[3]))
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list
