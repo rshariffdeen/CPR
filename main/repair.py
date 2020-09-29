@@ -16,6 +16,8 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     emitter.normal("\tupdating patch pool")
     updated_patch_set = []
     result_list = parallel.validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion)
+    if not result_list:
+        emitter.warning("\tsomething went wrong with patch validation")
     for result in result_list:
         is_valid, index = result
         if is_valid:
