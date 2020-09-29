@@ -108,12 +108,12 @@ RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install numpy
 WORKDIR /concolic-repair
 
 COPY main/ main/
-COPY runtime/ runtime/
+COPY lib/ lib/
 COPY tools/  tools/
 COPY tests/ tests/
 COPY components/ components/
 
-RUN cd runtime && KLEE_INCLUDE_PATH=/klee/source/include make
+RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
 RUN chmod +x /concolic-repair/tools/trident-cc
