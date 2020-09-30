@@ -87,6 +87,8 @@ def initialize():
     extractor.extract_byte_code(program_path)
     test_input_list = values.CONF_TEST_INPUT
     second_var_list = dict()
+    directory_path = "/".join(str(program_path).split("/")[:-1])
+    klee_out_dir = directory_path + "/klee-last"
     for argument_list in test_input_list:
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:", argument_list)
@@ -101,17 +103,15 @@ def initialize():
                 values.IS_CRASH = True
                 emitter.warning("\t[note] identified crash location: " + str(values.CONF_LOC_CRASH))
         if values.IS_CRASH:
-            directory_path = "/".join(str(program_path).split("/")[:-1])
-            klee_out_dir = directory_path + "/klee-last"
             arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
-            values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
             for var_name in var_list:
                 if "angelic" in var_name:
                     second_var_list[var_name] = var_list[var_name]
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
-
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
         assert exit_code == 0
+        if values.IS_CRASH:
+            values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
         distance.update_distance_map()
 
 
