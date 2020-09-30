@@ -1,4 +1,4 @@
-from main.concolic import run_concolic_execution, generate_new_input
+from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -80,7 +80,9 @@ def run(project_path, program_path):
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
-        gen_arg_list, gen_var_list, P = generate_new_input(argument_list, second_var_list, P)  # TODO (later) patch candidate missing
+        if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+        gen_arg_list, gen_var_list, P = select_new_input(argument_list, second_var_list, P)  # TODO (later) patch candidate missing
         if not P:
             emitter.warning("\t\t[warning] unable to generate a patch")
             break

@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 import signal
+import random
 from contextlib import contextmanager
 from main import logger, emitter, values, definitions
 
@@ -91,3 +92,54 @@ def timeout(time):
 
 def raise_timeout(signum, frame):
     raise TimeoutError
+
+
+def get_signed_value(bit_vector):
+    """
+      This function will generate the signed value for a given bit list
+             bit_vector : list of bits
+    """
+    signed_value = 0
+    for i in sorted(bit_vector.keys()):
+        if i == 0:
+            signed_value = int(bit_vector[i])
+        else:
+            signed_value += ((2 << 7) << (int(i) - 1)) * int(bit_vector[i])
+    return signed_value
+
+
+def get_str_value(bit_vector):
+    """
+      This function will generate the string value for a given bit list
+             bit_vector : list of bits
+    """
+    str_value = ""
+    char_list = dict()
+    # print(bit_vector)
+    for i in bit_vector:
+        if int(bit_vector[i]) not in range(32, 127):
+            char_list[i] = chr(random.randint(33, 122))
+        else:
+            char_list[i] = chr(bit_vector[i])
+    # print(char_list)
+    for i in sorted(char_list):
+        char = char_list[i]
+        str_value += char
+    return str_value
+
+
+def get_byte_string(bit_vector):
+    """
+      This function will generate the byte string for a given bit list
+             bit_vector : list of bits
+    """
+    str_value = ""
+    char_list = dict()
+    # print(bit_vector)
+    for i in bit_vector:
+        char_list[i] = chr(bit_vector[i])
+    # print(char_list)
+    for i in sorted(char_list, reverse=True):
+        char = char_list[i]
+        str_value += char
+    return str_value

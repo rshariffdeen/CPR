@@ -84,13 +84,13 @@ def bootstrap(arg_list):
 def initialize():
     emitter.title("Initializing Program")
     program_path = values.CONF_PATH_PROGRAM
+    extractor.extract_byte_code(program_path)
     test_input_list = values.CONF_TEST_INPUT
     for argument_list in test_input_list:
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:", argument_list)
         argument_list = str(argument_list).split(" ")
         values.ARGUMENT_LIST = argument_list
-        extractor.extract_byte_code(program_path)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
         # set location of bug/crash
@@ -100,6 +100,7 @@ def initialize():
                 values.IS_CRASH = True
                 emitter.warning("\t[note] identified crash location: " + str(values.CONF_LOC_CRASH))
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
+
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
         assert exit_code == 0
         distance.update_distance_map()
