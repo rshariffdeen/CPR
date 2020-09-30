@@ -137,6 +137,9 @@ def collect_trace(file_path, project_path):
     if values.CONF_LOC_BUG:
         if values.CONF_LOC_BUG in list_trace:
             emitter.warning("\t\t[note] fault location detected in trace")
+    if values.CONF_LOC_CRASH:
+        if values.CONF_LOC_CRASH in list_trace:
+            emitter.warning("\t\t[note] crash location detected in trace")
     return list_trace
 
 
