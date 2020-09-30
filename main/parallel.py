@@ -38,10 +38,10 @@ def generate_symbolic_paths_parallel(ppc_list):
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
-            count = count + 1
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             if new_path_str not in values.LIST_PATH_CHECK:
+                count = count + 1
                 values.LIST_PATH_CHECK.append(new_path_str)
                 ppc_len = len(str(new_path.serialize()))
                 path_list.append((control_loc, new_path, ppc_len))
@@ -54,10 +54,11 @@ def generate_symbolic_paths_parallel(ppc_list):
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
-            count = count + 1
+
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             if new_path_str not in values.LIST_PATH_CHECK:
+                count = count + 1
                 values.LIST_PATH_CHECK.append(new_path_str)
                 ppc_len = len(str(new_path.serialize()))
                 path_list.append((control_loc, new_path, ppc_len))
