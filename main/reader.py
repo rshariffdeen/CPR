@@ -1,6 +1,7 @@
 import os
 import json
 import pickle
+import re
 from main import emitter, definitions, values
 
 
@@ -161,6 +162,16 @@ def collect_concretized_bytes(log_path):
                         index = int(read_line.split("[")[1].replace("]",""))
                         concretized_info["A-data"].add(index)
     return concretized_info
+
+
+def collect_bytes_from_smt2(file_path):
+    index_list = list()
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as smt2_file:
+            str_txt = smt2_file.readlines()
+        str_txt = "".join(str_txt)
+        index_list = list(set(re.findall("\(select  A-data \(\_ bv(.+?) 32\) ", str_txt)))
+    return index_list
 
 
 def collect_crash_point(trace_file_path):
