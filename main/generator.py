@@ -74,7 +74,7 @@ def generate_flipped_path(ppc):
     return new_path
 
 
-def generate_ktest_for_crash(klee_out_dir):
+def generate_angelic_val_for_crash(klee_out_dir):
     file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if os.path.isfile(os.path.join(klee_out_dir,f))]
     error_file_path = None
     for file_name in file_list:

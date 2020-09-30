@@ -2,7 +2,7 @@ import os
 import time
 from pathlib import Path
 from main import emitter, logger, definitions, values, builder, repair, \
-    configuration, reader, distance, synthesis, parallel, extractor
+    configuration, reader, distance, synthesis, parallel, extractor, generator
 from main.utilities import error_exit
 from main.concolic import run_concrete_execution, run_concolic_execution
 
@@ -86,6 +86,7 @@ def initialize():
     program_path = values.CONF_PATH_PROGRAM
     extractor.extract_byte_code(program_path)
     test_input_list = values.CONF_TEST_INPUT
+    second_var_list = dict()
     for argument_list in test_input_list:
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:", argument_list)
@@ -99,9 +100,16 @@ def initialize():
             if values.CONF_LOC_CRASH:
                 values.IS_CRASH = True
                 emitter.warning("\t[note] identified crash location: " + str(values.CONF_LOC_CRASH))
+        if values.IS_CRASH:
+            directory_path = "/".join(str(program_path).split("/")[:-1])
+            klee_out_dir = directory_path + "/klee-last"
+            arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
+            for var_name in var_list:
+                if "angelic" in var_name:
+                    second_var_list[var_name] = var_list[var_name]
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
 
-        exit_code = run_concolic_execution(program_path + ".bc", argument_list, {}, True)
+        exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
         assert exit_code == 0
         distance.update_distance_map()
 

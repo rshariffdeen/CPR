@@ -285,9 +285,6 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     return_code = execute_command(klee_command)
     emitter.debug("changing directory:", current_dir)
     os.chdir(current_dir)
-    klee_out_dir = directory_path + "/klee-last"
-    x, y = generator.generate_ktest_for_crash(klee_out_dir)
-    print(x,y)
     return return_code
 
 
