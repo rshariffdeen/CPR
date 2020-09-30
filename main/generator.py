@@ -86,6 +86,20 @@ def generate_angelic_val_for_crash(klee_out_dir):
     return input_arg_list, input_var_list
 
 
+def generate_mask_bytes(klee_out_dir):
+    file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if
+                 os.path.isfile(os.path.join(klee_out_dir, f))]
+    error_file_path = None
+    mask_byte_list = list()
+    for file_name in file_list:
+        if ".err" in file_name:
+            error_file_path = file_name.split(".")[0] + ".smt2"
+            break
+    sym_path = extractor.extract_assertion(error_file_path)
+    help(sym_path)
+    return mask_byte_list
+
+
 def generate_model(formula):
     """
            This function will invoke PySMT APIs to solve the provided formula and return the byte list of the model
