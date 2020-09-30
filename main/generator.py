@@ -264,7 +264,7 @@ def generate_binary_file(byte_array):
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)
             byte = poc_file.read(1)
-
+    emitter.debug("Masked Byte List", values.MASK_BYTE_LIST)
     for index in byte_array:
         if index not in values.MASK_BYTE_LIST:
             byte_list[index] = byte_array[index]
