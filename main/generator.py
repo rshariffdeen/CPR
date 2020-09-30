@@ -352,7 +352,6 @@ def generate_symbolic_paths(ppc_list):
     return path_list
 
 
-
 def generate_ktest(argument_list, second_var_list, print_output=False):
     """
     This function will generate the ktest file provided the argument list and second order variable list
@@ -361,7 +360,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     """
     global File_Ktest_Path
 
-    logger.info("creating ktest file")
+    logger.log("creating ktest file")
     emitter.normal("\tgenerating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
