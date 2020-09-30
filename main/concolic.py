@@ -210,7 +210,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     hit_location_flag = " "
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     if values.CONF_DISTANCE_METRIC == "control-loc":
-        hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + " "
+        hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
