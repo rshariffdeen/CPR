@@ -86,7 +86,7 @@ def initialize():
     program_path = values.CONF_PATH_PROGRAM
     extractor.extract_byte_code(program_path)
     test_input_list = values.CONF_TEST_INPUT
-    second_var_list = dict()
+    second_var_list = list()
     directory_path = "/".join(str(program_path).split("/")[:-1])
     klee_out_dir = directory_path + "/klee-last"
     for argument_list in test_input_list:
@@ -107,7 +107,7 @@ def initialize():
             for var in var_list:
                 var_name = var["identifier"]
                 if "angelic" in var_name:
-                    second_var_list[var_name] = var_list[var_name]
+                    second_var_list.append(var)
         emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
         exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
         assert exit_code == 0
