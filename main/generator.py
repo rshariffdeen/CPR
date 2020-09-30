@@ -13,6 +13,8 @@ import re
 import struct
 import random
 
+File_Log_Path = "/tmp/log_sym_path"
+File_Ktest_Path = "/tmp/concolic.ktest"
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
 

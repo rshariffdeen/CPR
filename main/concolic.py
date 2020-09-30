@@ -18,7 +18,7 @@ import numpy
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
 File_Log_Path = "/tmp/log_sym_path"
-File_Ktest_Path = "/tmp/concolic.ktest"
+
 
 list_path_explored = list()
 list_path_observed = list()
