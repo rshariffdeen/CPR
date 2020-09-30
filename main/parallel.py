@@ -38,33 +38,34 @@ def generate_symbolic_paths_parallel(ppc_list):
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
+            count = count + 1
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             if new_path_str not in values.LIST_PATH_CHECK:
-                count = count + 1
                 values.LIST_PATH_CHECK.append(new_path_str)
                 ppc_len = len(str(new_path.serialize()))
                 path_list.append((control_loc, new_path, ppc_len))
                 result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
-                if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-                    break
+
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
-
+            count = count + 1
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             if new_path_str not in values.LIST_PATH_CHECK:
-                count = count + 1
                 values.LIST_PATH_CHECK.append(new_path_str)
                 ppc_len = len(str(new_path.serialize()))
                 path_list.append((control_loc, new_path, ppc_len))
                 pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
-                if count == values.DEFAULT_GEN_SEARCH_LIMIT:
-                    break
+
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
