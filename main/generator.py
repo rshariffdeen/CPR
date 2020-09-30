@@ -87,16 +87,14 @@ def generate_angelic_val_for_crash(klee_out_dir):
 
 
 def generate_mask_bytes(klee_out_dir):
-    file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if
-                 os.path.isfile(os.path.join(klee_out_dir, f))]
-    error_file_path = None
     mask_byte_list = list()
-    for file_name in file_list:
-        if ".err" in file_name:
-            error_file_path = file_name.split(".")[0] + ".smt2"
-            break
-    sym_path = extractor.extract_assertion(error_file_path)
-    help(sym_path)
+    log_path = klee_out_dir + "/concrete.log"
+    byte_list = reader.collect_concretized_bytes(log_path)
+    influence_byte_list = list(byte_list["A-data"])
+    byte_length = os.path.getsize(values.CONF_PATH_POC)
+    for i in range(0, byte_length):
+        if i not in influence_byte_list:
+            mask_byte_list.append(i)
     return mask_byte_list
 
 
@@ -186,10 +184,10 @@ def generate_new_input(sym_path, argument_list):
         # print(arg_name, arg_index, arg_value)
         if str(argument_list[arg_index]).isnumeric():
             input_arg_dict[arg_index] = str(arg_value)
-            emitter.debug(arg_name, arg_value)
+            # emitter.debug(arg_name, arg_value)
         else:
             input_arg_dict[arg_index] = arg_str
-            emitter.debug(arg_name, arg_str)
+            # emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
     offset = 0
@@ -219,7 +217,7 @@ def generate_new_input(sym_path, argument_list):
             continue
         if bit_vector:
             var_value = utilities.get_signed_value(bit_vector)
-        emitter.debug(var_name, var_value)
+        # emitter.debug(var_name, var_value)
         input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
     # for var_tuple in second_var_list:
@@ -265,8 +263,10 @@ def generate_binary_file(byte_array):
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)
             byte = poc_file.read(1)
+
     for index in byte_array:
-        byte_list[index] = byte_array[index]
+        if index not in values.MASK_BYTE_LIST:
+            byte_list[index] = byte_array[index]
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
 

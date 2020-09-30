@@ -148,6 +148,21 @@ def collect_trace(file_path, project_path):
     return list_trace
 
 
+def collect_concretized_bytes(log_path):
+    concretized_info = dict()
+    if os.path.exists(log_path):
+        with open(log_path, 'r') as trace_file:
+            for read_line in trace_file:
+                if "[concretizing]" in read_line:
+                    read_line = read_line.replace("[concretizing] ", "")
+                    if "A-data" in read_line:
+                        if "A-data" not in concretized_info:
+                            concretized_info["A-data"] = set()
+                        index = int(read_line.split("[")[1].replace("]",""))
+                        concretized_info["A-data"].add(index)
+    return concretized_info
+
+
 def collect_crash_point(trace_file_path):
     """
         This function will read the output log of a klee concolic execution and
