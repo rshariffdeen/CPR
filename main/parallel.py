@@ -43,10 +43,10 @@ def generate_symbolic_paths_parallel(ppc_list):
                 break
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                ppc_len = len(str(new_path.serialize()))
-                path_list.append((control_loc, new_path, ppc_len))
                 result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
 
     else:
@@ -60,10 +60,10 @@ def generate_symbolic_paths_parallel(ppc_list):
                 break
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                ppc_len = len(str(new_path.serialize()))
-                path_list.append((control_loc, new_path, ppc_len))
                 pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
 
         pool.close()
