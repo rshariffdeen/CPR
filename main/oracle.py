@@ -76,7 +76,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
             universal_quantification = is_unsat(And(specification, Not(assertion)))
             result = universal_quantification
         else:
-            result = is_unsat(And(specification, assertion))
+            result = is_sat(specification)
     else:
         result = is_sat(specification)
 
