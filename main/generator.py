@@ -90,12 +90,13 @@ def generate_mask_bytes(klee_out_dir):
     mask_byte_list = list()
     log_path = klee_out_dir + "/concrete.log"
     byte_list = reader.collect_concretized_bytes(log_path)
-    influence_byte_list = list(byte_list["A-data"])
-    emitter.debug("Influencing Byte List", influence_byte_list)
-    byte_length = os.path.getsize(values.CONF_PATH_POC)
-    for i in range(0, byte_length):
-        if i not in influence_byte_list:
-            mask_byte_list.append(i)
+    if "A-data" in byte_list:
+        influence_byte_list = list(byte_list["A-data"])
+        emitter.debug("Influencing Byte List", influence_byte_list)
+        byte_length = os.path.getsize(values.CONF_PATH_POC)
+        for i in range(0, byte_length):
+            if i not in influence_byte_list:
+                mask_byte_list.append(i)
     return mask_byte_list
 
 
