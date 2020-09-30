@@ -28,8 +28,8 @@ with open(file_path_b, "rb") as file_b:
 
 diff_list = list()
 for index in byte_list_a:
-    if byte_list_a[index_a] != byte_list_b[index_a]:
-        diff_list.append(index_a)
+    if byte_list_a[index] != byte_list_b[index]:
+        diff_list.append(index)
 
 print(diff_list)
 
