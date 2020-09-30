@@ -171,7 +171,7 @@ def collect_bytes_from_smt2(file_path):
             str_txt = smt2_file.readlines()
         str_txt = "".join(str_txt)
         index_list = list(set(re.findall("\(select  A-data \(\_ bv(.+?) 32\) ", str_txt)))
-    return index_list
+    return sorted(index_list)
 
 
 def collect_crash_point(trace_file_path):

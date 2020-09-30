@@ -95,14 +95,14 @@ def generate_mask_bytes(klee_out_dir):
     emitter.debug("Control Byte List", control_byte_list)
     fixed_byte_list = list()
     if "A-data" in concretized_byte_list:
-        influence_byte_list = list(concretized_byte_list["A-data"])
+        influence_byte_list = sorted(list(concretized_byte_list["A-data"]))
         emitter.debug("Influencing Byte List", influence_byte_list)
     fixed_byte_list = control_byte_list
     byte_length = os.path.getsize(values.CONF_PATH_POC)
     for i in range(0, byte_length):
         if i not in fixed_byte_list:
             mask_byte_list.append(i)
-    return mask_byte_list
+    return sorted(mask_byte_list)
 
 
 def generate_model(formula):
