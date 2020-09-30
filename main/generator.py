@@ -258,6 +258,7 @@ def generate_model_cli(formula):
 
 def generate_binary_file(byte_array):
     byte_list = []
+    modified_index_list = []
     with open(values.CONF_PATH_POC, "rb") as poc_file:
         byte =poc_file.read(1)
         while byte:
@@ -268,6 +269,8 @@ def generate_binary_file(byte_array):
     for index in byte_array:
         if index not in values.MASK_BYTE_LIST:
             byte_list[index] = byte_array[index]
+            modified_index_list.append(index)
+    emitter.debug("Modified Byte List", modified_index_list)
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
 
