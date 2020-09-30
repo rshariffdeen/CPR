@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
-import pysmt.environment
+import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
@@ -75,8 +75,13 @@ def generate_flipped_path(ppc):
 
 
 def generate_ktest_for_crash(klee_out_dir):
-    path_file = klee_out_dir + ""
-    sym_path = extractor.extract_assertion(path_file)
+    file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if os.path.isfile(os.path.join(klee_out_dir,f))]
+    error_file_path = None
+    for file_name in file_list:
+        if ".err" in file_name:
+            error_file_path = file_name.split(".")[0] + ".smt2"
+            break
+    sym_path = extractor.extract_assertion(error_file_path)
     input_arg_list, input_var_list = generate_new_input(sym_path, values.ARGUMENT_LIST)
     return input_arg_list, input_var_list
 
