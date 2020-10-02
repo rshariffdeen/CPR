@@ -71,23 +71,21 @@ def check_path_feasibility(chosen_control_loc, new_path, index):
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
     specification = And(path_condition, patch_constraint)
+    result = True
     if assertion:
         if is_loc_in_trace(values.CONF_LOC_BUG):
-            universal_quantification = is_unsat(And(specification, Not(assertion)))
-            if universal_quantification:
-                existential_quantification = is_sat(And(specification, assertion))
-                if existential_quantification:
-                    specification = And(Not(path_condition), patch_constraint)
-                    is_over_approximation = is_sat(And(specification, assertion))
-                    result = universal_quantification and existential_quantification and not is_over_approximation
-                else:
+            if is_sat(specification):
+                universal_quantification = is_unsat(And(specification, Not(assertion)))
+                if universal_quantification:
+                    specification = And(path_condition, Not(patch_constraint))
+                    existential_quantification = is_unsat(And(specification, assertion))
                     result = universal_quantification and existential_quantification
+                else:
+                    result = False
             else:
-                result = universal_quantification
-        else:
-            result = is_sat(specification)
-    else:
-        result = is_sat(specification)
+                specification = And(path_condition, Not(patch_constraint))
+                existential_quantification = is_unsat(And(specification, assertion))
+                result = existential_quantification
 
     return result, index
 
