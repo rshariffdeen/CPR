@@ -92,8 +92,6 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                 result = universal_quantification
         else:
             result = is_sat(specification)
-    else:
-        result = is_sat(specification)
 
     return result, index
 
