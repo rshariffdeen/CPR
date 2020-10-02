@@ -79,7 +79,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                 if existential_quantification:
                     specification = And(Not(path_condition), patch_constraint)
                     is_over_approximation = is_sat(And(specification, assertion))
-                    result = universal_quantification and existential_quantification and not is_over_approximation
+                    result = universal_quantification and existential_quantification
                 else:
                     result = universal_quantification and existential_quantification
             else:
