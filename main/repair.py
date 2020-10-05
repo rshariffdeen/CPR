@@ -63,7 +63,8 @@ def rank_patches(patch_list):
             score_list.append(patch_score)
             filtered_list.append(patch)
     ranked_list = [x for _, x in sorted(zip(score_list, filtered_list))]
-    return ranked_list.reverse()
+    ranked_list.reverse()
+    return ranked_list
 
 
 def run(project_path, program_path):
