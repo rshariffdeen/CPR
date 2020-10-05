@@ -410,3 +410,29 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     return_code = execute_command(ktest_command)
     return ktest_path, return_code
 
+
+def generate_path_for_negation():
+    constraint_list = []
+    parser = SmtLibParser()
+
+    for control_loc, sym_path in values.LIST_PPC:
+        if control_loc == values.CONF_LOC_PATCH:
+            script = parser.get_script(cStringIO(sym_path))
+            formula = script.get_last_formula()
+            patch_constraint = formula.arg(1)
+            constraint_list.append(patch_constraint.serialize())
+
+    last_sym_path = values.LAST_PPC_FORMULA
+    script = parser.get_script(cStringIO(last_sym_path))
+    formula = script.get_last_formula()
+    negated_path = None
+    while constraint_list:
+        constraint = formula.arg(1)
+        constraint_str = constraint.serialize()
+        if constraint_str in constraint_list:
+            constraint_list.remove(constraint_str)
+            constraint = Not(constraint)
+        if negated_path is None:
+            negated_path = constraint
+        else:
+            negated_path = And(negated_path, constraint)

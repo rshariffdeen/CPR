@@ -30,7 +30,8 @@ LIST_PATH_CHECK = []
 
 PREFIX_PPC_STR = ""
 PREFIX_PPC_FORMULA = None
-
+NEGATED_PPC_FORMULA = None
+LAST_PPC_FORMULA = None
 
 # ------------------ File Path Values ---------------
 FILE_TRACE_LOG = ""

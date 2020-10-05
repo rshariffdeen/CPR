@@ -237,11 +237,11 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # collect artifacts
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
-    values.LIST_PPC, last_path = reader.collect_symbolic_path(ppc_log_path, project_path)
+    values.LIST_PPC, values.LAST_PPC_FORMULA = reader.collect_symbolic_path(ppc_log_path, project_path)
     values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
-    ppc_list = values.LIST_PPC
+    values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
     return return_code
 
 
