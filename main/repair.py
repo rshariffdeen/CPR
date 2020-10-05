@@ -2,9 +2,12 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, values, distance, oracle, parallel, generator
+from main import emitter, values, distance, oracle, parallel, generator, extractor
 import time
 import sys
+import base64
+import hashlib
+
 
 check_counter = 1
 
@@ -51,6 +54,20 @@ def print_patch_list(patch_list):
         emitter.emit_patch(patch, message="\t\t")
 
 
+def rank_patches(patch_list):
+    filtered_list = []
+    score_list = []
+    for patch in patch_list:
+        patch_constraint = extractor.extract_constraints_from_patch(patch)
+        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()))[:10]
+        patch_score = values.LIST_PATCH_SCORE[patch_index]
+        if patch_score > 1:
+            score_list.append(patch_score)
+            filtered_list.append(patch)
+    ranked_list = [x for _, x in sorted(zip(filtered_list, score_list))]
+    return ranked_list.reverse()
+
+
 def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
@@ -64,6 +81,12 @@ def run(project_path, program_path):
 
     time_check = time.time()
     P = generator.generate_patch_set(project_path)
+    for patch in P:
+        patch_constraint = extractor.extract_constraints_from_patch(patch)
+        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()))[:10]
+        if patch_index in values.LIST_PATCH_SCORE:
+            emitter.warning("\tcollision detected in patch score map")
+        values.LIST_PATCH_SCORE[patch_index] = 0
     values.COUNT_PATCH_START = len(P)
     values.TIME_TO_GENERATE = str(time.time() - time_check)
     emitter.sub_title("Evaluating Patch Pool")
