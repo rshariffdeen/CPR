@@ -241,7 +241,10 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
-    values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
+    if oracle.is_loc_in_trace(values.CONF_LOC_BUG) and oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+        values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
+    else:
+        values.NEGATED_PPC_FORMULA = None
     return return_code
 
 
