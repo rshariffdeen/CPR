@@ -59,7 +59,7 @@ def rank_patches(patch_list):
     score_list = []
     for patch in patch_list:
         patch_constraint = extractor.extract_constraints_from_patch(patch)
-        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()))[:10]
+        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()).digest())[:10]
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         if patch_score > 1:
             score_list.append(patch_score)
@@ -83,7 +83,7 @@ def run(project_path, program_path):
     P = generator.generate_patch_set(project_path)
     for patch in P:
         patch_constraint = extractor.extract_constraints_from_patch(patch)
-        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()))[:10]
+        patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()).digest())[:10]
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")
         values.LIST_PATCH_SCORE[patch_index] = 0
