@@ -414,7 +414,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
 def generate_path_for_negation():
     constraint_list = []
     parser = SmtLibParser()
-
+    emitter.normal("\tgenerating path for negation of patch constraint")
     for control_loc, sym_path in values.LIST_PPC:
         if control_loc == values.CONF_LOC_PATCH:
             script = parser.get_script(cStringIO(sym_path))
