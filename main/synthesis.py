@@ -12,7 +12,7 @@ from collections import namedtuple
 import pysmt.fnode
 from pysmt.solvers.solver import Model
 from pysmt.smtlib.parser import SmtLibParser
-from pysmt.shortcuts import is_sat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, SBV
+from pysmt.shortcuts import is_sat, is_unsat, get_model, Symbol, BV, Equals, EqualsOrIff, And, Or, TRUE, FALSE, Select, BVConcat, SBV
 import pysmt.environment
 from pysmt.walkers import DagWalker, IdentityDagWalker
 from pysmt.environment import get_env
@@ -21,7 +21,6 @@ from pysmt.typing import BOOL, BV32, BV8, ArrayType
 import pysmt.operators as op
 
 from funcy import all_fn, any_fn, complement
-
 
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
@@ -673,6 +672,8 @@ def enumerate_trees(components: List[Component],
                     typ: TridentType,
                     need_lreturn: bool,
                     need_rreturn: bool):
+
+    # Contains all components, which match the return types if necessary.                 
     roots = [c for c in components
              if (not need_lreturn \
                    or (ComponentSemantics.get_lreturn(c[1]) \
@@ -745,26 +746,237 @@ def synthesize(components: List[Component],
     assert len(lids) == 1
     (lid, typ) = list(lids.items())[0]
 
+    tautology_included = False
+    contradiction_included = False
+    
+    optimized = True
+
     for tree in enumerate_trees(components, depth, typ, False, True):
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
-        if concrete_enumeration:
 
-            for value_a in range(lower_bound, upper_bound):
-                result = verify({lid: (tree, {"a": value_a})},
-                                specification)  # TODO-YN currently it is not checking for a and does support any other constant
-                if result:
-                    yield {lid: (tree, {"a": value_a})}
-                # for value_b in range(lower_bound, upper_bound):
-                #     result = verify({lid: (tree, {"a": value_a, "b": value_b})}, specification) # TODO-YN currently it is not checking for a and does support any other constant
-                #     if result:
-                #         yield {lid: (tree, {"a": value_a, "b": value_b})}
+        if optimized:
+            ## Check for tautologies (TRUE) and contradictions (FALSE).
+            # 1. Check for x == x, x<=x, x>=x
+            component_type = tree[0][0]
+            left = tree[1]['left']
+            right = tree[1]['right']
+            if component_type in ['equal', 'less-or-equal', 'greater-or-equal']:
+                if left == right:
+                    ## Tautology detected. Only use this patch if it is the first tautology in the set.                
+                    if tautology_included:
+                        continue 
+                    else:
+                        tautology_included = True
+            # 2. Check for x != x, x < x, x > x
+            elif component_type in ['not-equal', 'less-than', 'greater-than']:
+                if left == right:
+                    ## Contradiction detected. Only use this patch if it is the first contradiction in the set.      
+                    if contradiction_included:
+                        continue
+                    else:
+                        contradiction_included = True 
+        
+        ## Enumerate concrete values for constants if demanded AND if possible (i.e., if there is any constant).
+        if concrete_enumeration and (contains_constant(tree[1]) or not optimized):
+            names = get_all_constant_names(tree[1])
+            if optimized and contains_only_constants(tree[1]):
+                if tautology_included and contradiction_included:
+                    continue
+                else:
+                    ## Determine whether the patch is always tautology or always contradiction.
+                    patch_constraint = extract_constraints_from_patch({lid: (tree, {})})
+                    can_be_true = is_sat(patch_constraint)
+                    can_be_false = is_unsat(patch_constraint)
+                    is_always_tautology = can_be_true and not can_be_false
+                    is_always_contradiction = not can_be_true and can_be_false
+
+                    if not tautology_included:
+                        if is_always_tautology:
+                            ## If tautology is new and patch is tautology, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            result = verify({lid: (tree, const_dict)}, specification)
+                            if result:
+                                tautology_included = True
+                                yield {lid: (tree, const_dict)}
+                        else:
+                            ## If tautology is new and patch can be true, then pick constant values specifically.
+                            # Check with specification for tautology, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            result = verify({lid: (tree, const_dict)}, specification)
+                            if result:
+                                tautology_included = True
+                                yield {lid: (tree, const_dict)}
+
+                    if not contradiction_included:
+                        if is_always_contradiction:
+                            ## If contradiction is new and patch is contradiction, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            result = verify({lid: (tree, const_dict)}, specification)
+                            if result:
+                                contradiction_included = True
+                                yield {lid: (tree, const_dict)}
+                        else:
+                            ## If contradiction is new and patch can be false, then pick constant values specifically.
+                            # Check with specification for contradiction, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            result = verify({lid: (tree, const_dict)}, specification)
+                            if result:
+                                tautology_included = True
+                                yield {lid: (tree, const_dict)}
+
+            # There is at least one variable and one constant, then iterate over possible constant values and verify the concrete patch.
+            else: # TODO explore neighborhood of existing value for constants
+                if not optimized and len(names) == 0: # TODO remove len=0, just for testing    
+                    for value_a in range(lower_bound, upper_bound):
+                        result = verify({lid: (tree, {'a': value_a})}, specification)
+                        if result:
+                            yield {lid: (tree, {'a': value_a})}
+                elif len(names) == 1: 
+                    const_a_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        result = verify({lid: (tree, {const_a_str: value_a})}, specification)
+                        if result:
+                            yield {lid: (tree, {const_a_str: value_a})}
+                elif len(names) == 2:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            result = verify({lid: (tree, {const_a_str: value_a, const_b_str: value_b})}, specification)
+                            if result:
+                                yield {lid: (tree, {const_a_str: value_a, const_b_str: value_b})}
+                elif len(names) == 3:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            for value_c in range(lower_bound, upper_bound):
+                                result = verify({lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c})}, specification)
+                                if result:
+                                    yield {lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c})}
+                elif len(names) == 4:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    const_d_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            for value_c in range(lower_bound, upper_bound):
+                                for value_d in range(lower_bound, upper_bound):
+                                    result = verify({lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c, const_d_str: value_d})}, specification)
+                                    if result:
+                                        yield {lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c, const_d_str: value_d})}
+                else:
+                    logger.error("BADA")
+                    logger.error("constants=" + str(names))
+                    logger.error("More than 4 constants are currently not supported!")
+                    exit(1)
+        ## Otherwise: verify the patch and report it.    
         else:
             result = verify({lid: (tree, {})}, specification)
             if result:
                 yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
 
+def contains_constant(tree_content: Dict[str, 'ComponentTree']) -> bool:
+    """
+    Checks the tree content (incl. sub-trees, ergo it is recursive) for constant values.
+    """
+    left_name = tree_content['left'][0][0]
+    left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
+    right_name = tree_content['right'][0][0]
+    right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
+
+    # If left side is a leaf node, then check for constant.
+    if not left_dict and left_name.startswith('constant_'):
+        return True
+    # If right side is a leaf node, then check for constant.
+    elif not right_dict and right_name.startswith('constant_'):
+        return True
+    # If left side is an intermediate node, then check the sub-tree for constants.
+    elif left_dict and contains_constant(left_dict):
+        return True
+    # If right side is an intermediate node, then check the sub-tree for constants.
+    elif right_dict and contains_constant(right_dict):
+        return True
+    # Finally, return that there is no constant.
+    else:
+        return False
+
+
+def contains_only_constants(tree_content: Dict[str, 'ComponentTree']) -> bool:
+    """
+    Checks whether there are only constants in the tree content (incl. sub-trees, ergo it is recursive) and no variables.
+    """
+    left_name = tree_content['left'][0][0]
+    left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
+    right_name = tree_content['right'][0][0]
+    right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
+
+    # If left side is a leaf node, then check for constant.
+    if not left_dict and not left_name.startswith('constant_'):
+        return False
+    # If right side is a leaf node, then check for constant.
+    elif not right_dict and not right_name.startswith('constant_'):
+        return False
+    # If left side is an intermediate node, then check the sub-tree for constants.
+    elif left_dict and not contains_only_constants(left_dict):
+        return False
+    # If right side is an intermediate node, then check the sub-tree for constants.
+    elif right_dict and not contains_only_constants(right_dict):
+        return False
+    # Finally, return that there is no constant.
+    else:
+        return True
+
+
+def get_all_constant_names(tree_content: Dict[str, 'ComponentTree']) -> Set[str]:
+    """
+    Collects all constant names in a tree.
+    """
+    names = set()
+
+    left_name = tree_content['left'][0][0]
+    left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
+    right_name = tree_content['right'][0][0]
+    right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
+
+    # If left side is a leaf node, then check for constant.
+    if not left_dict and left_name.startswith('constant_'):
+        names.add(left_name[9:])
+    # If left side is an intermediate node, then check the sub-tree for constants.
+    elif left_dict:
+        names = names.union(get_all_constant_names(left_dict))
+
+    # If right side is a leaf node, then check for constant.
+    if not right_dict and right_name.startswith('constant_'):
+        names.add(right_name[9:])
+    # If right side is an intermediate node, then check the sub-tree for constants.
+    elif right_dict:
+        names = names.union(get_all_constant_names(right_dict))
+    
+    # Finally, return the collected constant names (might be empty).
+    return names
 
 
 def load_specification(spec_files: List[Tuple[Path, Path]]) -> Specification:
@@ -935,6 +1147,27 @@ def export_json(output_file, json_content):
     f = open(output_file, "w+")
     f.write(str(json_content))
     f.close()
+
+# TODO just copied from extractor
+def extract_constraints_from_patch(patch):
+    lid = list(patch.keys())[0]
+    eid = 0
+    patch_component = patch[lid]
+    patch_constraint = program_to_formula(patch_component)
+    program_substitution = {}
+    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+        kind = ComponentSymbol.check(program_symbol)
+        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+        if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+        elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+        elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+        else:
+            pass  # FIXME: do I need to handle it somehow?
+    substituted_patch = patch_constraint.substitute(program_substitution)
+    return substituted_patch
 
 if __name__ == "__main__":
     import sys
