@@ -59,10 +59,10 @@ def rank_patches(patch_list):
         patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
-        if patch_score > 1:
+        if patch_score >= 1:
             score_list.append(patch_score)
             filtered_list.append(patch)
-    ranked_list = [x for _, x in sorted(zip(filtered_list, score_list))]
+    ranked_list = [x for _, x in sorted(zip(score_list, filtered_list))]
     return ranked_list.reverse()
 
 
