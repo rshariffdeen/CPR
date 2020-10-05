@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
   int x = atoi(argv[1]);
   int y = atoi(argv[2]);
   int res, z;
-  if (__trident_choice("L9", "bool", (int[]){x, z}, (char*[]){"x", "y"}, 1, (int*[]){}, (char*[]){}, 0))  {
+  if (__trident_choice("L9", "bool", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
 
