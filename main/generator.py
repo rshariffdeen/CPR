@@ -437,3 +437,4 @@ def generate_path_for_negation():
         else:
             negated_path = And(negated_path, constraint)
         formula = formula.arg(0)
+    return negated_path
