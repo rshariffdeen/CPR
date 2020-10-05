@@ -5,6 +5,8 @@ import signal
 import random
 from contextlib import contextmanager
 from main import logger, emitter, values, definitions
+import base64
+import hashlib
 
 
 def execute_command(command, show_output=True):
@@ -143,3 +145,11 @@ def get_byte_string(bit_vector):
         char = char_list[i]
         str_value += char
     return str_value
+
+
+def get_hash(str_value):
+    str_encoded = str(str_value).encode('utf-8')
+    str_hasher = hashlib.sha1(str_encoded)
+    hash_value = base64.urlsafe_b64encode(str_hasher.digest()[:10])
+    return hash_value
+

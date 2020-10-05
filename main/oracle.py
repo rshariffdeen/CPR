@@ -1,9 +1,8 @@
-from main import definitions, values, emitter
+from main import definitions, values, emitter, utilities
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
-import base64
-import hashlib
+
 
 import sys
 if not sys.warnoptions:
@@ -73,7 +72,8 @@ def check_path_feasibility(chosen_control_loc, new_path, index):
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
     specification = And(path_condition, patch_constraint)
-    patch_index = base64.urlsafe_b64encode(hashlib.sha1(patch_constraint.serialize()).digest())[:10]
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     result = True
     if assertion:
