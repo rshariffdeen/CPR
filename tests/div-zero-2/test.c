@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (x > 5)
-    z = x - 1;
+    z = x - 7;
   else
     z = x + 2;
 
