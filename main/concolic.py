@@ -159,7 +159,8 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
     patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
-    selected_new_path = And(selected_new_path, patch_constraint)
+    if patch_constraint:
+        selected_new_path = And(selected_new_path, patch_constraint)
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list
