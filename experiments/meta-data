@@ -1,0 +1,195 @@
+[
+ {
+   "id": 1,
+   "bug_id": "CVE-2016-5321",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 2,
+   "bug_id": "CVE-2014-8128",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 3,
+   "bug_id": "CVE-2016-3186",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 4,
+   "bug_id": "CVE-2016-5314",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 5,
+   "bug_id": "CVE-2016-9273",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 6,
+   "bug_id": "bugzilla 2633",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 7,
+   "bug_id": "CVE-2016-10094",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 8,
+   "bug_id": "CVE-2017-7601",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 9,
+   "bug_id": "CVE-2016-3623",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 10,
+   "bug_id": "CVE-2017-7595",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 11,
+   "bug_id": "bugzilla 2611",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 12,
+   "bug_id": "CVE-2018-10372",
+   "benchmark": "extractfix",
+   "subject": "binutils"
+ },
+ {
+   "id": 13,
+   "bug_id": "CVE-2017-15025",
+   "benchmark": "extractfix",
+   "subject": "binutils"
+ },
+ {
+   "id": 14,
+   "bug_id": "CVE-2016-1834",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 15,
+   "bug_id": "CVE-2016-1838",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 16,
+   "bug_id": "CVE-2016-1839",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 17,
+   "bug_id": "CVE-2012-5134",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 18,
+   "bug_id": "CVE-2017-5969",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 19,
+   "bug_id": "CVE-2018-14498",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 20,
+   "bug_id": "CVE-2018-19664",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 21,
+   "bug_id": "CVE-2017-15232",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 22,
+   "bug_id": "CVE-2012-2806",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 23,
+   "bug_id": "Bugzilla 26545",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 24,
+   "bug_id": "GNUBug 25003",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 25,
+   "bug_id": "GNUBug 25023",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 26,
+   "bug_id": "Bugzilla 19784",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 27,
+   "bug_id": "CVE-2016-8691",
+   "benchmark": "extractfix",
+   "subject": "jasper"
+ },
+ {
+   "id": 28,
+   "bug_id": "CVE-2016-9387",
+   "benchmark": "extractfix",
+   "subject": "jasper"
+ },
+ {
+   "id": 29,
+   "bug_id": "CVE-2017-9992",
+   "benchmark": "extractfix",
+   "subject": "ffmpeg"
+ },
+ {
+   "id": 30,
+   "bug_id": "Bugzilla-1404",
+   "benchmark": "extractfix",
+   "subject": "ffmpeg"
+ },
+  {
+   "id": 31,
+   "bug_id": "div-zero-1",
+   "benchmark": "test"
+
+ }
+  ,{
+   "id": 32,
+   "bug_id": "div-zero-2",
+   "benchmark": "test"
+
+ }
+
+]
