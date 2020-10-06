@@ -760,24 +760,28 @@ def synthesize(components: List[Component],
             ## Check for tautologies (TRUE) and contradictions (FALSE).
             # 1. Check for x == x, x<=x, x>=x
             component_type = tree[0][0]
-            left = tree[1]['left']
+            left = None
+            if "left" in tree[1]:
+                left = tree[1]['left']
             right = tree[1]['right']
             if component_type in ['equal', 'less-or-equal', 'greater-or-equal']:
-                if left == right:
-                    ## Tautology detected. Only use this patch if it is the first tautology in the set.                
-                    if tautology_included:
-                        continue 
-                    else:
-                        tautology_included = True
+                if left:
+                    if left == right:
+                        ## Tautology detected. Only use this patch if it is the first tautology in the set.
+                        if tautology_included:
+                            continue
+                        else:
+                            tautology_included = True
             # 2. Check for x != x, x < x, x > x
             elif component_type in ['not-equal', 'less-than', 'greater-than']:
-                if left == right:
-                    ## Contradiction detected. Only use this patch if it is the first contradiction in the set.      
-                    if contradiction_included:
-                        continue
-                    else:
-                        contradiction_included = True 
-        
+                if left:
+                    if left == right:
+                        ## Contradiction detected. Only use this patch if it is the first contradiction in the set.
+                        if contradiction_included:
+                            continue
+                        else:
+                            contradiction_included = True
+
         ## Enumerate concrete values for constants if demanded AND if possible (i.e., if there is any constant).
         if concrete_enumeration and (contains_constant(tree[1]) or not optimized):
             names = get_all_constant_names(tree[1])
