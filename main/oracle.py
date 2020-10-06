@@ -77,9 +77,9 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     result = True
     if assertion:
-        if is_loc_in_trace(values.CONF_LOC_BUG):
-            if is_sat(specification):
-                values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
+        if is_sat(specification):
+            if is_loc_in_trace(values.CONF_LOC_BUG):
+                values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
                 universal_quantification = is_unsat(And(specification, Not(assertion)))
                 if universal_quantification:
                     negated_path_condition = values.NEGATED_PPC_FORMULA
@@ -88,6 +88,8 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                     result = existential_quantification
                 else:
                     result = False
+            else:
+                values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
             # else:
             #     specification = And(path_condition, Not(patch_constraint))
             #     existential_quantification = is_unsat(And(specification, assertion))
@@ -98,7 +100,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
 
 def check_input_feasibility(index, patch_constraint, new_path):
     check_sat = And(new_path, patch_constraint)
-    result = is_sat(check_sat)
+    result = not is_unsat(check_sat)
     return result, index
 
 

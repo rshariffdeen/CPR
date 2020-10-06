@@ -11,7 +11,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
 from main.utilities import execute_command
-from main import emitter, values, reader, utilities, definitions, generator, oracle
+from main import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor
 import numpy
 
 
@@ -88,6 +88,34 @@ def select_new_path_condition():
     return selected_path, control_loc
 
 
+def select_patch_constraint_for_input(patch_list, selected_new_path):
+    # relationship = extractor.extract_var_relationship(var_expr_map)
+    # relationship = TRUE
+    # selected_new_path = And(selected_new_path, relationship)
+    result_list = parallel.validate_input_generation(patch_list, selected_new_path)
+    filtered_patch_list = list()
+    for result in result_list:
+        is_valid, index = result
+        selected_patch = patch_list[index]
+        if is_valid:
+            filtered_patch_list.append(selected_patch)
+
+    if not filtered_patch_list:
+        emitter.debug("Count paths explored: ", str(len(list_path_explored)))
+        emitter.debug("Count paths detected: ", str(len(list_path_detected)))
+        return None
+
+    if values.CONF_SELECTION_STRATEGY == "deterministic":
+        selected_patch = filtered_patch_list[0]
+    else:
+        selected_patch = random.choice(filtered_patch_list)
+
+    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
+    patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
+    # add patch constraint and user-input->prog-var relationship
+    return patch_constraint
+
+
 def select_new_input(argument_list, second_var_list, patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
@@ -130,35 +158,9 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
-    # relationship = extractor.extract_var_relationship(var_expr_map)
-    # relationship = TRUE
-    # selected_new_path = And(selected_new_path, relationship)
-    # result_list = parallel.validate_input_generation(patch_list, selected_new_path)
-    # filtered_patch_list = list()
-    # for result in result_list:
-    #     is_valid, index = result
-    #     selected_patch = patch_list[index]
-    #     if is_valid:
-    #         filtered_patch_list.append(selected_patch)
-    # #     else:
-    # #         # emitter.debug("Removing Patch", selected_patch)
-    # #         emitter.emit_patch(selected_patch, message="\t\tRemoving Patch: ")
-    # # patch_list = filtered_patch_list
-    # if not filtered_patch_list:
-    #     emitter.debug("Count paths explored: ", str(len(list_path_explored)))
-    #     emitter.debug("Count paths detected: ", str(len(list_path_detected)))
-    #     return None, None, {}
-
-    # if values.CONF_SELECTION_STRATEGY == "deterministic":
-    #     selected_patch = filtered_patch_list[0]
-    # else:
-    #     selected_patch = random.choice(filtered_patch_list)
-
-    # emitter.emit_patch(selected_patch, message="\tSelected patch: ")
-    # patch_constraint = extractor.extract_constraints_from_patch(selected_patch)
-    # add patch constraint and user-input->prog-var relationship
-    # selected_new_path = And(selected_new_path, patch_constraint)
-    input_arg_list, input_var_list = generator.generate_new_input(selected_new_path,argument_list)
+    patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
+    selected_new_path = And(selected_new_path, patch_constraint)
+    input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list
     return input_arg_list, input_var_list, patch_list
