@@ -146,7 +146,7 @@ def run():
         print(experiment_name)
         bug_name = str(experiment_item[KEY_BUG_ID])
         subject_name = str(experiment_item[KEY_SUBJECT])
-        benchmark = str(experiment_item[KEY_SUBJECT])
+        benchmark = str(experiment_item[KEY_BENCHMARK])
         directory_name = benchmark + "/" + subject_name + "/" + bug_name
         script_name = "setup.sh"
         conf_file_name = "repair.conf"
