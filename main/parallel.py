@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from main import emitter, oracle, definitions, extractor, reader, values, generator
+from main import emitter, oracle, definitions, extractor, reader, values, generator, concolic, utilities, distance
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -169,3 +169,26 @@ def generate_patch_pool(components: List[Component],
     emitter.normal("\t\twaiting for thread completion")
     pool.join()
     return result_list
+
+
+# def concolic_exploration_parallel():
+#     global pool, result_list
+#     result_list = []
+#     if values.CONF_OPERATION_MODE in ["sequential"]:
+#         for patch in patch_list:
+#             patch_constraint = extractor.extract_constraints_from_patch(patch)
+#             index = list(patch_list).index(patch)
+#             result_list.append(oracle.check_input_feasibility(index, patch_constraint, new_path))
+#     else:
+#         emitter.normal("\t\tstarting parallel computing")
+#         pool = mp.Pool(mp.cpu_count())
+#         lock = None
+#         for patch in patch_list:
+#             patch_constraint = extractor.extract_constraints_from_patch(patch)
+#             index = list(patch_list).index(patch)
+#             pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result)
+#         pool.close()
+#         emitter.normal("\t\twaiting for thread completion")
+#         pool.join()
+#     return result_list
+

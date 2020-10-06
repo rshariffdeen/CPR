@@ -2,7 +2,7 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, synthesize, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities
+from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic
 import time
 import sys
 import operator
@@ -30,15 +30,6 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
 
     return updated_patch_set
-
-
-def check_coverage():  # TODO
-    global check_counter
-    if check_counter < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
-        check_counter += 1
-        return False
-    else:
-        return True
 
 
 def print_patch_list(patch_list):
@@ -123,7 +114,7 @@ def run(project_path, program_path):
         assert exit_code == 0
 
         # Checks for the current coverage.
-        satisfied = check_coverage()
+        satisfied = utilities.check_budget()
 
         # check if new path hits patch location / fault location
         if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -139,3 +130,42 @@ def run(project_path, program_path):
     ranked_patch_list = rank_patches(P)
     print_patch_list(ranked_patch_list)
     values.COUNT_PATCH_END = len(ranked_patch_list)
+
+
+def concolic_exploration(program_path):
+    while not satisfied and len(patch_list) > 1:
+        patch_list = values.LIST_PATCHES
+        iteration = iteration + 1
+        values.ITERATION_NO = iteration
+        emitter.sub_sub_title("Iteration: " + str(iteration))
+
+        ## Pick new input and patch candidate for next concolic execution step.
+        argument_list = values.ARGUMENT_LIST
+        second_var_list = values.SECOND_VAR_LIST
+        if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+        gen_arg_list, gen_var_list, patch_list = concolic.select_new_input(argument_list, second_var_list,
+                                                                           patch_list)  # TODO (later) patch candidate missing
+
+        if not patch_list:
+            emitter.warning("\t\t[warning] unable to generate a patch")
+            break
+        elif not gen_arg_list and not gen_var_list:
+            emitter.warning("\t\t[warning] no more paths to generate new input")
+            break
+        assert gen_arg_list  # there should be a concrete input
+        # print(">> new input: " + str(gen_arg_list))
+
+        ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
+        exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
+        assert exit_code == 0
+
+        # Checks for the current coverage.
+        satisfied = utilities.check_budget()
+
+        # check if new path hits patch location / fault location
+        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            continue
+        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            continue
+        distance.update_distance_map()
