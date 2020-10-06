@@ -5,6 +5,8 @@ from typing import List, Dict, Tuple
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities
 import time
 import sys
+import operator
+import numpy
 
 
 check_counter = 1
@@ -41,30 +43,32 @@ def check_coverage():  # TODO
 
 def print_patch_list(patch_list):
     count = 0
-    emitter.sub_title("List of Synthesised Patches")
+    emitter.sub_title("List of Top " + str(values.DEFAULT_PATCH_RANK_LIMIT) + " Correct Patches")
     if not patch_list:
         emitter.warning("\t[warning] unable to generate any patch")
         return
     for patch in patch_list:
         count = count + 1
         emitter.sub_sub_title("Patch #" + str(count))
-
         emitter.emit_patch(patch, message="\t\t")
+        if count == values.DEFAULT_PATCH_RANK_LIMIT:
+            break
 
 
 def rank_patches(patch_list):
     filtered_list = []
-    score_list = []
+    # rank first based on coverage
     for patch in patch_list:
         patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
-        if patch_score >= 1:
-            score_list.append(patch_score)
-            filtered_list.append(patch)
-    ranked_list = [x for _, x in sorted(zip(score_list, filtered_list))]
+        patch_len = 10000 - len(patch_constraint_str)
+        filtered_list.append((patch, patch_score, patch_len))
+
+    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2))
     ranked_list.reverse()
-    return ranked_list
+    patch_list = numpy.array(ranked_list)[:,0]
+    return list(patch_list)
 
 
 def run(project_path, program_path):
