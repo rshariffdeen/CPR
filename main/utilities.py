@@ -155,9 +155,7 @@ def get_hash(str_value):
 
 
 def check_budget():  # TODO implement time budget
-    global check_counter
-    if check_counter < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
-        check_counter += 1
+    if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
         return False
     else:
         return True

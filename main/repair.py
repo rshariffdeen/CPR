@@ -9,9 +9,6 @@ import operator
 import numpy
 
 
-check_counter = 1
-
-
 def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: str,
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
