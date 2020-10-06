@@ -55,6 +55,9 @@ DEFAULT_STACK_SIZE = 15000
 DEFAULT_TIMEOUT_UNSAT = 10
 DEFAULT_TIMEOUT_SAT = 10
 DEFAULT_TIMEOUT_KLEE = 300
+
+IS_TAUTOLOGIES_INCLUDED = False
+IS_CONTRADICTIONS_INCLUDED = False
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 

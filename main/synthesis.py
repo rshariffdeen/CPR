@@ -21,7 +21,7 @@ from pysmt.typing import BOOL, BV32, BV8, ArrayType
 import pysmt.operators as op
 
 from funcy import all_fn, any_fn, complement
-
+from main import values
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
 
@@ -746,8 +746,8 @@ def synthesize(components: List[Component],
     assert len(lids) == 1
     (lid, typ) = list(lids.items())[0]
 
-    tautology_included = False
-    contradiction_included = False
+    tautology_included = values.IS_TAUTOLOGIES_INCLUDED
+    contradiction_included = values.IS_CONTRADICTIONS_INCLUDED
     
     optimized = True
 
