@@ -746,8 +746,8 @@ def synthesize(components: List[Component],
     assert len(lids) == 1
     (lid, typ) = list(lids.items())[0]
 
-    tautology_included = values.IS_TAUTOLOGIES_INCLUDED
-    contradiction_included = values.IS_CONTRADICTIONS_INCLUDED
+    tautology_included = not values.IS_TAUTOLOGIES_INCLUDED
+    contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
     
     optimized = True
 
