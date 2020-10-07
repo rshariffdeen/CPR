@@ -101,7 +101,7 @@ def initialize():
             values.CONF_LOC_CRASH = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
             if values.CONF_LOC_CRASH:
                 values.IS_CRASH = True
-                emitter.success("\tidentified crash location: " + str(values.CONF_LOC_CRASH))
+                emitter.success("\t\t\t[info]identified crash location: " + str(values.CONF_LOC_CRASH))
         if values.IS_CRASH:
             arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
             for var in var_list:
