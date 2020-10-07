@@ -33,7 +33,7 @@ def load_component_list():
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
         for comp_file in component_file_list:
             if ".smt2" in comp_file:
-                if any(x in comp_file for x in ["logical-not", "post-decrement", "post-increment", "minus"]):
+                if any(x in comp_file for x in ["logical-not", "post-decrement", "post-increment", "minus", "constant"]):
                     continue
                 gen_comp_files.append(Path(comp_file))
                 emitter.note("\tloading component: " + str(comp_file))
