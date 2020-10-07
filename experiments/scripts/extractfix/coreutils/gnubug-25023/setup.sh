@@ -14,9 +14,18 @@ cd src
 git checkout $commit_id
 
 
+sed -i '2227i TRIDENT_OUTPUT("observation", "i32", l - strlen(s));\n' src/pr.c
+sed -i '1236d' src/pr.c
+sed -i '1236i else if (!join_lines && *col_sep_string == \x27\\t\x27 && __trident_choice("L290", "bool", (int[]){col_sep_length}, (char*[]){"col_sep_length"}, 1, (int*[]){}, (char*[]){}, 0))' src/pr.c
+sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/pr.c
+sed -i '97i #include <klee/klee.h>' src/pr.c
+git add src/pr.c
+git commit -m "instrument trident"
+
+
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure
-make -j32
+FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
+make CFLAGS="-fPIC -fPIE -lkleeRuntest" src/pr -j32
 
 cd $current_dir
 cp repair.conf $dir_name
