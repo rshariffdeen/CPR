@@ -21,9 +21,77 @@ from pysmt.typing import BOOL, BV32, BV8, ArrayType
 import pysmt.operators as op
 
 from funcy import all_fn, any_fn, complement
+import multiprocessing as mp
+from threading import Lock
 from main import values
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
+
+pool = mp.Pool(mp.cpu_count())
+synthesis_result_list = []
+tautology_included = False
+contradiction_included = False
+patch_list = []
+
+tautology_lock = Lock()
+contradiction_lock = Lock()
+patch_list_lock = Lock()
+
+def is_tautology_included():
+    global tautology_included
+    tautology_lock.acquire()
+    res = tautology_included
+    tautology_lock.release()
+    return res
+
+
+def is_contradiction_included():
+    global contradiction_included
+    contradiction_lock.acquire()
+    res = contradiction_included
+    contradiction_lock.release()
+    return res
+
+
+def is_tautology_and_contradiction_included():
+    global tautology_included, contradiction_included
+    tautology_lock.acquire()
+    contradiction_lock.acquire()
+    res = tautology_included and contradiction_included
+    contradiction_lock.release()
+    tautology_lock.release()
+    return res
+
+
+def update_tautology_included():
+    global tautology_included
+    res = False
+    tautology_lock.acquire()
+    if not tautology_included:
+        tautology_included = True
+        res = True
+    tautology_lock.release()
+    return res
+
+
+def update_contradiction_included():
+    global contradiction_included
+    res = False
+    contradiction_lock.acquire()
+    if not contradiction_included:
+        contradiction_included = True
+        res = True
+    contradiction_lock.release()
+    return res
+
+
+def atomic_patchlist_append(item):
+    global patch_list
+    patch_list_lock.acquire()
+    patch_list.append(item)
+    res = len(patch_list) - 1
+    patch_list_lock.release()
+    return res
 
 
 def collect_symbols(formula, predicate):
@@ -606,7 +674,7 @@ def verify_parallel(programs: Union[Dict[str, Program], Dict[str, Formula]],
 
     program_semantics = { lid:(program if isinstance(program, Formula) else program_to_formula(program))
                           for (lid, program) in programs.items() }
-    free_variables = [v for p in program_semantics.values() for v in collect_symbols(p, ComponentSymbol.is_const)]
+    #free_variables = [v for p in program_semantics.values() for v in collect_symbols(p, ComponentSymbol.is_const)]
 
     for tid in specification.keys():
         test_vc = FALSE()
@@ -658,12 +726,7 @@ def verify_parallel(programs: Union[Dict[str, Program], Dict[str, Formula]],
 
         # print(get_model(vc))
         # dump(vc, "vc.smt2")
-
-    model = get_model(vc)
-    if model is None:
-        return None, None
-    else:
-        return VerificationSuccess({v:model[v].bv_signed_value() for v in free_variables}), programs
+    return vc
 
 
 # Enumerating components trees
@@ -736,7 +799,7 @@ def synthesize(components: List[Component],
                # Optional arguments for concrete patch enumeration
                concrete_enumeration = False,
                lower_bound = -10,
-               upper_bound = +10) -> Optional[Dict[str, Program]]:
+               upper_bound = +10) -> Optional[Dict[str, Program]]:          
     lids = {}
     for (tid, (paths, _)) in specification.items():
         for path in paths:
@@ -896,7 +959,6 @@ def synthesize(components: List[Component],
                                     if result:
                                         yield {lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c, const_d_str: value_d})}
                 else:
-                    logger.error("BADA")
                     logger.error("constants=" + str(names))
                     logger.error("More than 4 constants are currently not supported!")
                     exit(1)
@@ -905,6 +967,237 @@ def synthesize(components: List[Component],
             result = verify({lid: (tree, {})}, specification)
             if result:
                 yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
+
+def collect_synthesis_result(synthesis_result):
+    global collected_patch_indeces
+    collected_patch_indeces.append(synthesis_result)
+
+
+def collect_tautology_result(synthesis_result):
+    global collected_patch_indeces
+    new_tautology_included = update_tautology_included()
+    if new_tautology_included:
+        collected_patch_indeces.append(synthesis_result)
+
+
+def collect_contradiction_result(synthesis_result):
+    global collected_patch_indeces
+    new_contradiction_included = update_contradiction_included()
+    if new_contradiction_included:
+        collected_patch_indeces.append(synthesis_result)
+
+def check_sat(vc, index):
+    if is_sat(vc):
+        return True, index
+    else:
+        return False, index
+
+def synthesize_parallel(components: List[Component],
+               depth: int,
+               specification: Specification,
+               # Optional arguments for concrete patch enumeration
+               concrete_enumeration = False,
+               lower_bound = -10,
+               upper_bound = +10) -> Optional[Dict[str, Program]]:
+    lids = {}
+    for (tid, (paths, _)) in specification.items():
+        for path in paths:
+            lids.update(extract_lids(path))
+    logger.info(f"locations extracted from klee paths: {list(lids.keys())}")
+
+    assert len(lids) == 1
+    (lid, typ) = list(lids.items())[0]
+
+    optimized = True
+
+    ## Variables for parallel execution.
+    global tautology_included, contradiction_included, collected_patch_indeces, patch_list
+    tautology_included = not values.IS_TAUTOLOGIES_INCLUDED
+    contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
+    patch_list = []
+    collected_patch_indeces = []
+    
+    ## Open new pool for parallel execution.
+    pool = mp.Pool(mp.cpu_count())
+
+    for tree in enumerate_trees(components, depth, typ, False, True):
+        assigned = extract_assigned(tree)
+        if len(assigned) != len(set(assigned)):
+            continue
+
+        if optimized:
+            ## Check for tautologies (TRUE) and contradictions (FALSE).
+            # 1. Check for x == x, x<=x, x>=x
+            component_type = tree[0][0]
+            left = None
+            if "left" in tree[1]:
+                left = tree[1]['left']
+            right = None
+            if "right" in tree[1]:
+                right = tree[1]['right']
+            if component_type in ['equal', 'less-or-equal', 'greater-or-equal']:
+                if left and right:
+                    if left == right:
+                        ## Tautology detected. Only use this patch if it is the first tautology in the set.  
+                        new_tautology_detected = update_tautology_included()
+                        if not new_tautology_detected:
+                            continue
+            # 2. Check for x != x, x < x, x > x
+            elif component_type in ['not-equal', 'less-than', 'greater-than']:
+                if left and right:
+                    if left == right:
+                        ## Contradiction detected. Only use this patch if it is the first contradiction in the set.
+                        new_contradiction_included = update_contradiction_included()
+                        if not new_contradiction_included:
+                            continue
+
+        ## Enumerate concrete values for constants if demanded AND if possible (i.e., if there is any constant).
+        if concrete_enumeration and (contains_constant(tree[1]) or not optimized):
+            names = get_all_constant_names(tree[1])
+            if optimized and contains_only_constants(tree[1]):
+                if is_tautology_and_contradiction_included():
+                    continue
+                else:
+                    ## Determine whether the patch is always tautology or always contradiction.
+                    patch_constraint = extract_constraints_from_patch({lid: (tree, {})})
+                    can_be_true = is_sat(patch_constraint)
+                    can_be_false = is_unsat(patch_constraint)
+                    is_always_tautology = can_be_true and not can_be_false
+                    is_always_contradiction = not can_be_true and can_be_false
+
+                    if not is_tautology_included():
+                        if is_always_tautology:
+                            ## If tautology is new and patch is tautology, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_tautology_result)
+                            continue
+                        else:
+                            ## If tautology is new and patch can be true, then pick constant values specifically.
+                            # Check with specification for tautology, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_tautology_result)
+                            continue
+
+                    if not is_contradiction_included():
+                        if is_always_contradiction:
+                            ## If contradiction is new and patch is contradiction, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_contradiction_result)
+                            continue
+                        else:
+                            ## If contradiction is new and patch can be false, then pick constant values specifically.
+                            # Check with specification for contradiction, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_contradiction_result)
+                            continue
+
+            # There is at least one variable and one constant, then iterate over possible constant values and verify the concrete patch.
+            else: # TODO explore neighborhood of existing value for constants
+                if not optimized and len(names) == 0: # TODO remove len=0, just for testing    
+                    for value_a in range(lower_bound, upper_bound):
+                        patch = {lid: (tree, {'a': value_a})}
+                        index = atomic_patchlist_append(patch)
+                        vc = verify_parallel(patch, specification)
+                        pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+                elif len(names) == 1: 
+                    const_a_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        patch = {lid: (tree, {const_a_str: value_a})}
+                        index = atomic_patchlist_append(patch)
+                        vc = verify_parallel(patch, specification)
+                        pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+                elif len(names) == 2:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            patch = {lid: (tree, {const_a_str: value_a, const_b_str: value_b})}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+                elif len(names) == 3:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            for value_c in range(lower_bound, upper_bound):
+                                patch = {lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c})}
+                                index = atomic_patchlist_append(patch)
+                                vc = verify_parallel(patch, specification)
+                                pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+                elif len(names) == 4:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    const_d_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        for value_b in range(lower_bound, upper_bound):
+                            for value_c in range(lower_bound, upper_bound):
+                                for value_d in range(lower_bound, upper_bound):
+                                    patch = {lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c, const_d_str: value_d})}
+                                    index = atomic_patchlist_append(patch)
+                                    vc = verify_parallel(patch, specification)
+                                    pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+                else:
+                    logger.error("BADA")
+                    logger.error("constants=" + str(names))
+                    logger.error("More than 4 constants are currently not supported!")
+                    exit(1)
+        ## Otherwise: verify the patch and report it.    
+        else:
+            patch = {lid: (tree, {})}
+            index = atomic_patchlist_append(patch)
+            vc = verify_parallel(patch, specification)
+            pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
+
+    pool.close()
+    logger.info("\t\twaiting for thread completion")
+    pool.join()
+
+    # assert(len(result_list) == len(path_list))
+
+    #print("collected_patch_indeces=" + str(collected_patch_indeces))
+
+    ## Filter feasible patches and return them.
+    synthesis_result_list = []
+    for result in collected_patch_indeces:
+        is_feasible, index = result
+        if is_feasible:
+            synthesis_result_list.append(patch_list[index])
+    return synthesis_result_list
+
+
 
 def contains_constant(tree_content: Dict[str, 'ComponentTree']) -> bool:
     """
