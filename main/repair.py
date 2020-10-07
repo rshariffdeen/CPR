@@ -79,7 +79,8 @@ def run(project_path, program_path):
             emitter.warning("\tcollision detected in patch score map")
         values.LIST_PATCH_SCORE[patch_index] = 0
     values.COUNT_PATCH_START = len(P)
-    values.TIME_TO_GENERATE = str(time.time() - time_check)
+    duration = format((time.time() - time_check) / 60, '.3f')
+    values.TIME_TO_GENERATE = str(duration)
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(P) <= 1
     iteration = 0

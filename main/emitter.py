@@ -154,17 +154,17 @@ def start():
 
 def end(time_info):
     statistics("\nRun time statistics:\n-----------------------\n")
-    statistics("Startup: " + time_info[definitions.KEY_DURATION_BOOTSTRAP] + " seconds")
-    statistics("Build: " + time_info[definitions.KEY_DURATION_BUILD] + " seconds")
-    statistics("Initialization: " + time_info[definitions.KEY_DURATION_INITIALIZATION] + " seconds")
-    statistics("Generation: " + values.TIME_TO_GENERATE + " seconds")
-    statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " seconds")
+    statistics("Startup: " + time_info[definitions.KEY_DURATION_BOOTSTRAP].format() + " minutes")
+    statistics("Build: " + time_info[definitions.KEY_DURATION_BUILD] + " minutes")
+    statistics("Initialization: " + time_info[definitions.KEY_DURATION_INITIALIZATION] + " minutes")
+    statistics("Generation: " + values.TIME_TO_GENERATE + " minutes")
+    statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " minutes")
     statistics("Iteration Count: " + str(values.ITERATION_NO))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
     statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
     statistics("Component Count: " + str(values.COUNT_COMPONENTS))
     statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " seconds\n")
+    success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " minutes \n")
 
 
 def help():
