@@ -174,6 +174,9 @@ def build_project(project_path, build_command=None):
             build_command += "bear make CFLAGS=\"" + C_FLAGS + "\" "
             build_command += "CXXFLAGS=\"" + CXX_FLAGS + " LDFLAGS=" + LD_FLAGS + "\" -j`nproc` > "
     else:
+        if build_command == "skip":
+            emitter.warning("\t[warning] skipping build")
+            return
         if not os.path.isfile(project_path + "/compile_commands.json"):
             build_command = build_command.replace("make ", "bear make ")
         if CC == "wllvm":
@@ -181,6 +184,7 @@ def build_project(project_path, build_command=None):
         build_command = apply_flags(build_command)
     if not build_command:
         error_exit("[Not Found] Build Command")
+
     build_command = dir_command + build_command
     build_command = build_command + " > " + definitions.FILE_MAKE_LOG
     ret_code = execute_command(build_command)
