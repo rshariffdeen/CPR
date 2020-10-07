@@ -199,7 +199,8 @@ def build_normal():
     emitter.sub_title("Building Program")
     execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
     execute_command("export TRIDENT_CXX=" + definitions.DIRECTORY_TOOLS + "/trident-cxx")
-    clean_project(values.CONF_DIR_SRC, values.CONF_PATH_PROGRAM)
+    if values.CONF_COMMAND_BUILD != "skip":
+        clean_project(values.CONF_DIR_SRC, values.CONF_PATH_PROGRAM)
     CC = "$TRIDENT_CC"
     CXX = "$TRIDENT_CXX"
     C_FLAGS = "-g -O0"
