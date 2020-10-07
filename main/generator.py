@@ -92,11 +92,11 @@ def generate_mask_bytes(klee_out_dir):
     concretized_byte_list = reader.collect_concretized_bytes(log_path)
     smt2_file_path = klee_out_dir + "/test000001.smt2"
     control_byte_list = reader.collect_bytes_from_smt2(smt2_file_path)
-    emitter.debug("Control Byte List", control_byte_list)
+    emitter.data("Control Byte List", control_byte_list)
     fixed_byte_list = list()
     if "A-data" in concretized_byte_list:
         influence_byte_list = sorted(list(concretized_byte_list["A-data"]))
-        emitter.debug("Influencing Byte List", influence_byte_list)
+        emitter.data("Influencing Byte List", influence_byte_list)
     fixed_byte_list = control_byte_list
     if values.CONF_PATH_POC:
         byte_length = os.path.getsize(values.CONF_PATH_POC)
@@ -164,7 +164,7 @@ def generate_model(formula):
                     else:
                         break
         sym_var_list[var_name] = byte_list
-    emitter.debug("model var list", sym_var_list)
+    emitter.data("model var list", sym_var_list)
     return sym_var_list
 
 
@@ -237,8 +237,8 @@ def generate_new_input(sym_path, argument_list):
     #         for i in range(1, var_size):
     #             var_value += ((2 << 7) << (int(i) - 1)) * random.randint(0, 255)
     #         input_var_list.append({"identifier": var_name, "value": var_value, "size": var_size})
-    emitter.debug("Generated Arg List", input_arg_list)
-    emitter.debug("Generated Var List", input_var_list)
+    emitter.data("Generated Arg List", input_arg_list)
+    emitter.data("Generated Var List", input_var_list)
     return input_arg_list, input_var_list
 
 
@@ -272,12 +272,12 @@ def generate_binary_file(byte_array):
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)
             byte = poc_file.read(1)
-    emitter.debug("Masked Byte List", values.MASK_BYTE_LIST)
+    emitter.data("Masked Byte List", values.MASK_BYTE_LIST)
     for index in byte_array:
         if index not in values.MASK_BYTE_LIST:
             byte_list[index] = byte_array[index]
             modified_index_list.append(index)
-    emitter.debug("Modified Byte List", modified_index_list)
+    emitter.data("Modified Byte List", modified_index_list)
     file_extension = str(values.CONF_PATH_POC).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
 

@@ -66,7 +66,16 @@ def debug(message, info=None):
         write(message, GREY, prefix=prefix, indent_level=2)
         if info:
             write(info, GREY, prefix=prefix, indent_level=2)
-    logger.command(message)
+    logger.debug(message)
+
+
+def data(message, info=None):
+    if values.DEBUG:
+        prefix = "\t\t[data] "
+        write(message, GREY, prefix=prefix, indent_level=2)
+        if info:
+            write(info, GREY, prefix=prefix, indent_level=2)
+    logger.data(message)
 
 
 def normal(message, jump_line=True):
@@ -98,7 +107,7 @@ def information(message, jump_line=True):
 
 
 def statistics(message):
-    write(message, GREY)
+    write(message, WHITE)
     logger.output(message)
 
 
@@ -141,6 +150,11 @@ def emit_ast_script(ast_script):
 def warning(message):
     write(message, YELLOW)
     logger.warning(message)
+
+
+def note(message):
+    write(message, WHITE)
+    logger.note(message)
 
 
 def start():

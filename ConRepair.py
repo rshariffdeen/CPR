@@ -28,20 +28,20 @@ def load_component_list():
     if values.CONF_GENERAL_COMP_LIST:
         for component_name in values.CONF_GENERAL_COMP_LIST:
             gen_comp_files.append(Path(component_name))
-            emitter.debug("\tloading component: " + str(component_name))
+            emitter.note("\tloading component: " + str(component_name))
     else:
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
         for comp_file in component_file_list:
             if ".smt2" in comp_file:
                 gen_comp_files.append(Path(comp_file))
-                emitter.debug("\tloading component: " + str(comp_file))
+                emitter.note("\tloading component: " + str(comp_file))
     general_components = synthesis.load_components(gen_comp_files)
 
     proj_comp_files = []
     os.chdir(values.CONF_PATH_PROJECT)
     for component_name in values.CONF_CUSTOM_COMP_LIST:
         proj_comp_files.append(Path(component_name))
-        emitter.debug("\tloading component: " + str(component_name))
+        emitter.note("\tloading component: " + str(component_name))
     project_components = synthesis.load_components(proj_comp_files)
     values.LIST_COMPONENTS = project_components + general_components
     values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
@@ -101,7 +101,7 @@ def initialize():
             values.CONF_LOC_CRASH = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
             if values.CONF_LOC_CRASH:
                 values.IS_CRASH = True
-                emitter.warning("\t[note] identified crash location: " + str(values.CONF_LOC_CRASH))
+                emitter.success("\tidentified crash location: " + str(values.CONF_LOC_CRASH))
         if values.IS_CRASH:
             arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
             for var in var_list:

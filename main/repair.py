@@ -63,12 +63,12 @@ def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
 
-    emitter.debug("\tconfiguration.is_crash:" + str(values.IS_CRASH))
-    emitter.debug("\tconfiguration.assertion:" + str(values.SPECIFICATION))
-    emitter.debug("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.debug("\tconfiguration.max_bound:" + str(values.DEFAULT_UPPER_BOUND))
-    emitter.debug("\tconfiguration.low_bound:" + str(values.DEFAULT_LOWER_BOUND))
-    emitter.debug("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
+    emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
+    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION))
+    emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
+    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_UPPER_BOUND))
+    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_LOWER_BOUND))
+    emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
 
     time_check = time.time()
     P = generator.generate_patch_set(project_path)
@@ -123,7 +123,7 @@ def run(project_path, program_path):
         distance.update_distance_map()
         ## Reduces the set of patch candidates based on the current path constraint
         P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-        emitter.debug("|P|=", str(len(P)))
+        emitter.note("|P|=", str(len(P)))
 
     ranked_patch_list = rank_patches(P)
     print_patch_list(ranked_patch_list)

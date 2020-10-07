@@ -24,6 +24,7 @@ def create():
 
 
 def log(log_message):
+    log_message = "[" + str(time.asctime()) + "]" + log_message
     if "COMMAND" in log_message:
         with open(definitions.FILE_COMMAND_LOG, 'a') as log_file:
             log_file.write(log_message)
@@ -48,8 +49,23 @@ def command(message):
     log(message)
 
 
+def data(message):
+    message = "[DATA]: " + str(message) + "\n"
+    log(message)
+
+
+def debug(message):
+    message = "[DEBUG]: " + str(message) + "\n"
+    log(message)
+
+
 def error(message):
     message = "[ERROR]: " + str(message) + "\n"
+    log(message)
+
+
+def note(message):
+    message = "[NOTE]: " + str(message) + "\n"
     log(message)
 
 
