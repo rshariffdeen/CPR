@@ -81,6 +81,8 @@ def generate_angelic_val_for_crash(klee_out_dir):
         if ".err" in file_name:
             error_file_path = file_name.split(".")[0] + ".smt2"
             break
+    if error_file_path is None:
+        error_file_path = klee_out_dir + "/test000001.smt2"
     sym_path = extractor.extract_assertion(error_file_path)
     input_arg_list, input_var_list = generate_new_input(sym_path, values.ARGUMENT_LIST)
     return input_arg_list, input_var_list
