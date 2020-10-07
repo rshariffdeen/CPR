@@ -199,8 +199,8 @@ def build_normal():
     emitter.sub_title("Building Program")
     execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
     execute_command("export TRIDENT_CXX=" + definitions.DIRECTORY_TOOLS + "/trident-cxx")
-    if values.CONF_COMMAND_BUILD != "skip":
-        clean_project(values.CONF_DIR_SRC, values.CONF_PATH_PROGRAM)
+
+    clean_project(values.CONF_DIR_SRC, values.CONF_PATH_PROGRAM)
     CC = "$TRIDENT_CC"
     CXX = "$TRIDENT_CXX"
     C_FLAGS = "-g -O0"
@@ -368,10 +368,13 @@ def soft_restore_project(project_path):
 def clean_project(project_path, binary_path):
     emitter.sub_sub_title("cleaning files")
     binary_dir_path = "/".join(str(binary_path).split("/")[:-1])
-    clean_command = "cd " + project_path + "; make clean"
-    clean_command += "; rm compile_commands.json"
-    clean_command += "; rm CMakeCache.txt"
-    clean_command += "; rm -rf CMakeFiles"
+
+    if values.CONF_COMMAND_BUILD != "skip":
+        clean_command = "cd " + project_path
+        clean_command += "; make clean"
+        clean_command += "; rm compile_commands.json"
+        clean_command += "; rm CMakeCache.txt"
+        clean_command += "; rm -rf CMakeFiles"
     execute_command(clean_command)
     clean_residues = "cd " + binary_dir_path + ";" + "rm -rf ./patches/*;" + "rm -rf ./klee*"
     execute_command(clean_residues)
