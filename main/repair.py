@@ -17,7 +17,8 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     updated_patch_set = []
     result_list = parallel.validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion)
     if not result_list:
-        emitter.warning("\tsomething went wrong with patch validation")
+        emitter.error("\tsomething went wrong with patch validation")
+        utilities.error_exit()
     for result in result_list:
         is_valid, index = result
         if is_valid:
@@ -123,7 +124,7 @@ def run(project_path, program_path):
         distance.update_distance_map()
         ## Reduces the set of patch candidates based on the current path constraint
         P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-        emitter.note("\t|P|=" + str(len(P)))
+        emitter.note("\t\t|P|=" + str(len(P)))
 
     ranked_patch_list = rank_patches(P)
     print_patch_list(ranked_patch_list)
