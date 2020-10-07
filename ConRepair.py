@@ -142,7 +142,7 @@ def main(arg_list):
 
     time_check = time.time()
     repair.run(values.CONF_PATH_PROJECT, values.CONF_PATH_PROGRAM)
-    duration = format(((time.time() - time_check) / 60 - values.TIME_TO_GENERATE), '.3f')
+    duration = format(((time.time() - time_check) / 60 - float(values.TIME_TO_GENERATE)), '.3f')
     time_info[definitions.KEY_DURATION_REPAIR] = str(duration)
 
     # Final running time and exit message
