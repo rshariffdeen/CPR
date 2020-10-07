@@ -129,7 +129,7 @@ ENV TRIDENT_CXX=/concolic-repair/tools/trident-cxx
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 
 # install LowFat
-RUN git clone https://github.com/GJDuck/LowFat.git /lowfat &&
+RUN git clone https://github.com/GJDuck/LowFat.git /lowfat && \
     cd /lowfat; bash build.sh
 
 # install experiment dependencies
