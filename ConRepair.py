@@ -146,7 +146,7 @@ def main(arg_list):
     time_info[definitions.KEY_DURATION_REPAIR] = str(duration)
 
     # Final running time and exit message
-    duration = ((time.time() - start_time) / 60, '.3f')
+    duration = format((time.time() - start_time) / 60, '.3f')
     time_info[definitions.KEY_DURATION_TOTAL] = str(duration)
     emitter.end(time_info)
     logger.end(time_info)
