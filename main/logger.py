@@ -80,7 +80,7 @@ def note(message):
 
 def output(message):
     message = str(message).strip()
-    message = "[LOG]" + message
+    message = "[LOG]: " + message
     log(message + "\n")
 
 
