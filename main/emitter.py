@@ -80,7 +80,6 @@ def data(message, info=None):
 
 def normal(message, jump_line=True):
     write(message, BLUE, jump_line)
-    message = "[LOG]" + message
     logger.output(message)
 
 
@@ -124,7 +123,7 @@ def success(message):
 
 def special(message):
     write(message, ROSE)
-    logger.output(message)
+    logger.note(message)
 
 
 def program_output(output_message):

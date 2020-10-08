@@ -35,6 +35,7 @@ def log(log_message):
 
 
 def information(message):
+    message = str(message).strip()
     message = "[INFO]: " + str(message) + "\n"
     log(message)
 
@@ -45,41 +46,51 @@ def trace(function_name, arguments):
 
 
 def command(message):
+    message = str(message).strip().lower().replace("[command]", "")
     message = "[COMMAND]: " + str(message) + "\n"
     log(message)
 
 
-def data(message):
+def data(message, data):
+    message = str(message).strip()
     message = "[DATA]: " + str(message) + "\n"
+    data = "[DATA]: " + str(data) + "\n"
     log(message)
+    log(data)
 
 
 def debug(message):
+    message = str(message).strip()
     message = "[DEBUG]: " + str(message) + "\n"
     log(message)
 
 
 def error(message):
+    message = str(message).strip()
     message = "[ERROR]: " + str(message) + "\n"
     log(message)
 
 
 def note(message):
+    message = str(message).strip()
     message = "[NOTE]: " + str(message) + "\n"
     log(message)
 
 
 def output(message):
+    message = str(message).strip()
+    message = "[LOG]" + message
     log(message + "\n")
 
 
 def warning(message):
+    message = str(message).strip()
     message = "[WARNING]: " + str(message) + "\n"
     log(message)
 
 
 def end(time_duration):
-    output("[END] PatchWeave ended at " + str(datetime.datetime.now()) + "\n\n")
+    output("PatchWeave ended at " + str(datetime.datetime.now()) + "\n\n")
     output("\nTime duration\n----------------------\n\n")
     output("Startup: " + time_duration[definitions.KEY_DURATION_BOOTSTRAP] + " minutes")
     output("Build: " + time_duration[definitions.KEY_DURATION_BUILD] + " minutes")

@@ -1,5 +1,5 @@
 import os
-from main import emitter, definitions, values, extractor
+from main import emitter, definitions, values, extractor, logger
 from main.utilities import error_exit
 
 
@@ -55,6 +55,7 @@ def read_conf(arg_list):
 
 def read_conf_file():
     emitter.normal("reading configuration values form configuration file")
+    logger.information(values.FILE_CONFIGURATION)
     if not os.path.exists(values.FILE_CONFIGURATION):
         emitter.error("[NOT FOUND] Configuration file " + values.FILE_CONFIGURATION)
         exit()
