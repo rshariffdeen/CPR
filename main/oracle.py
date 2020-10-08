@@ -66,7 +66,7 @@ def check_path_feasibility(chosen_control_loc, new_path, index):
     if result:
         return True, index
     else:
-        emitter.debug("Path is not satisfiable at " + str(chosen_control_loc), new_path)
+        emitter.data("Path is not satisfiable at " + str(chosen_control_loc), new_path)
         return False, index
 
 

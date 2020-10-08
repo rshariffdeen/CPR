@@ -60,12 +60,10 @@ def command(message):
     logger.command(message)
 
 
-def debug(message, info=None):
+def debug(message):
     if values.DEBUG:
         prefix = "\t\t[debug] "
         write(message, GREY, prefix=prefix, indent_level=2)
-        if info:
-            write(info, GREY, prefix=prefix, indent_level=2)
     logger.debug(message)
 
 

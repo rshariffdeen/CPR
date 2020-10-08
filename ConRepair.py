@@ -93,7 +93,7 @@ def initialize():
     klee_out_dir = directory_path + "/klee-last"
     for argument_list in test_input_list:
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
-        emitter.debug("input list in test case:", argument_list)
+        emitter.debug("input list in test case:" + argument_list)
         argument_list = str(argument_list).split(" ")
         values.ARGUMENT_LIST = argument_list
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)

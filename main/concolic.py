@@ -179,7 +179,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     global File_Log_Path
     current_dir = os.getcwd()
     directory_path = "/".join(str(program).split("/")[:-1])
-    emitter.debug("changing directory:", directory_path)
+    emitter.debug("changing directory:" + directory_path)
     project_path = values.CONF_PATH_PROJECT
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
@@ -234,7 +234,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = execute_command(klee_command)
-    emitter.debug("changing directory:", current_dir)
+    emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
 
     # collect artifacts
@@ -263,7 +263,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     global File_Log_Path
     current_dir = os.getcwd()
     directory_path = "/".join(str(program).split("/")[:-1])
-    emitter.debug("changing directory:", directory_path)
+    emitter.debug("changing directory:" + directory_path)
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
@@ -289,7 +289,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = execute_command(klee_command)
-    emitter.debug("changing directory:", current_dir)
+    emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
     return return_code
 
