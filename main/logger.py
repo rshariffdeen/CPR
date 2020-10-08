@@ -91,7 +91,6 @@ def warning(message):
 
 
 def end(time_duration):
-    output("PatchWeave ended at " + str(datetime.datetime.now()) + "\n\n")
     output("\nTime duration\n----------------------\n\n")
     output("Startup: " + time_duration[definitions.KEY_DURATION_BOOTSTRAP] + " minutes")
     output("Build: " + time_duration[definitions.KEY_DURATION_BUILD] + " minutes")
@@ -104,5 +103,6 @@ def end(time_duration):
     output("Component Count: " + str(values.COUNT_COMPONENTS))
     output("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " minutes \n")
+    log("[END] " + values.TOOL_NAME + " ended at  " + str(datetime.datetime.now()) + "\n\n")
     copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_OUTPUT + "/main-log")
 
