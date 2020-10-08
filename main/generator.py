@@ -394,8 +394,6 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     global File_Ktest_Path
-
-    logger.log("creating ktest file")
     emitter.normal("\tgenerating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
