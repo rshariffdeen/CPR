@@ -80,7 +80,8 @@ def data(message, info=None):
 
 def normal(message, jump_line=True):
     write(message, BLUE, jump_line)
-    # Logger.output(message)
+    message = "[LOG]" + message
+    logger.output(message)
 
 
 def highlight(message, jump_line=True):
