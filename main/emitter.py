@@ -75,7 +75,7 @@ def data(message, info=None):
         write(message, GREY, prefix=prefix, indent_level=2)
         if info:
             write(info, GREY, prefix=prefix, indent_level=2)
-    logger.data(message)
+    logger.data(message, info)
 
 
 def normal(message, jump_line=True):

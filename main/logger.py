@@ -51,12 +51,13 @@ def command(message):
     log(message)
 
 
-def data(message, data):
+def data(message, data=None):
     message = str(message).strip()
     message = "[DATA]: " + str(message) + "\n"
-    data = "[DATA]: " + str(data) + "\n"
     log(message)
-    log(data)
+    if data:
+        data = "[DATA]: " + str(data) + "\n"
+        log(data)
 
 
 def debug(message):
