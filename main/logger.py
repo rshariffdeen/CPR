@@ -67,13 +67,13 @@ def debug(message):
 
 
 def error(message):
-    message = str(message).strip()
+    message = str(message).strip().lower().replace("[error]", "")
     message = "[ERROR]: " + str(message) + "\n"
     log(message)
 
 
 def note(message):
-    message = str(message).strip()
+    message = str(message).strip().lower().replace("[note]", "")
     message = "[NOTE]: " + str(message) + "\n"
     log(message)
 
@@ -85,7 +85,7 @@ def output(message):
 
 
 def warning(message):
-    message = str(message).strip()
+    message = str(message).strip().lower().replace("[warning]", "")
     message = "[WARNING]: " + str(message) + "\n"
     log(message)
 

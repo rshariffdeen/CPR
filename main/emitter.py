@@ -57,7 +57,7 @@ def sub_sub_title(sub_title):
 def command(message):
     prefix = "\t\t[command] "
     write(message, ROSE, prefix=prefix, indent_level=2)
-    logger.command("[command]" + message)
+    logger.command(message)
 
 
 def debug(message, info=None):
@@ -88,6 +88,7 @@ def highlight(message, jump_line=True):
     prefix = "\t" * indent_length
     message = message.replace("\t", "")
     write(message, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
+    logger.note(message)
 
 
 def emit_patch(patch_tree, jump_line=True, message=""):
@@ -98,6 +99,7 @@ def emit_patch(patch_tree, jump_line=True, message=""):
     prefix = "\t" * indent_length
     output = output + code
     write(output, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
+    logger.data(message, code)
 
 
 def information(message, jump_line=True):
