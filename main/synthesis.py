@@ -1170,7 +1170,6 @@ def synthesize_parallel(components: List[Component],
                                     vc = verify_parallel(patch, specification)
                                     pool.apply_async(check_sat, args=(vc, index), callback=collect_synthesis_result)
                 else:
-                    logger.error("BADA")
                     logger.error("constants=" + str(names))
                     logger.error("More than 4 constants are currently not supported!")
                     exit(1)
@@ -1190,11 +1189,16 @@ def synthesize_parallel(components: List[Component],
     #print("collected_patch_indeces=" + str(collected_patch_indeces))
 
     ## Filter feasible patches and return them.
+    temp_set = set()
     synthesis_result_list = []
     for result in collected_patch_indeces:
         is_feasible, index = result
         if is_feasible:
-            synthesis_result_list.append(patch_list[index])
+            patch = patch_list[index]
+            patch_str = str(patch)
+            if not patch_str in temp_set:
+                temp_set.add(patch_str)
+                synthesis_result_list.append(patch)
     return synthesis_result_list
 
 
