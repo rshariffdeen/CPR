@@ -268,7 +268,7 @@ class ComponentSymbol(Enum):
     @staticmethod
     def const(name) -> Formula:
         #TODO: support bool type?
-        return Symbol(f"const_{name}", BV32)
+        return Symbol(f"const_{name}", ArrayType(BV32, BV8))
 
     @staticmethod
     def branch_of(s: Formula) -> Formula:
