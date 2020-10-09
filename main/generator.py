@@ -129,8 +129,6 @@ def generate_model(formula):
     for var_name in var_list:
         # sym_var_list[var_name] = dict()
         sym_def = Symbol(var_name, ArrayType(BV32, BV8))
-        if "const_" in var_name:
-            sym_def = Symbol(var_name, BV32)
         if sym_def not in model:
             continue
         x = model[sym_def].simplify()

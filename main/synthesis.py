@@ -1082,7 +1082,7 @@ def synthesize_parallel(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
@@ -1110,7 +1110,7 @@ def synthesize_parallel(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
