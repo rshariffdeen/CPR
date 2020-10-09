@@ -1,4 +1,4 @@
-from main.synthesis import load_specification, synthesize, synthesize_parallel, Program
+from main.synthesis import load_specification, synthesize_parallel, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
