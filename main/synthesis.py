@@ -268,7 +268,7 @@ class ComponentSymbol(Enum):
     @staticmethod
     def const(name) -> Formula:
         #TODO: support bool type?
-        return Symbol(f"const_{name}", ArrayType(BV32, BV8))
+        return Symbol(f"const_{name}", BV32)
 
     @staticmethod
     def branch_of(s: Formula) -> Formula:
@@ -879,7 +879,7 @@ def synthesize(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
+                                sym_def = Symbol("const_" + str(const_name), BV32)
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
@@ -905,7 +905,7 @@ def synthesize(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
+                                sym_def = Symbol("const_" + str(const_name), BV32)
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
@@ -1082,7 +1082,7 @@ def synthesize_parallel(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
+                                sym_def = Symbol("const_" + str(const_name), BV32)
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
@@ -1110,7 +1110,7 @@ def synthesize_parallel(components: List[Component],
                             model = get_model(patch_constraint)
                             const_dict = {}
                             for const_name in names:
-                                sym_def = Symbol("const_" + str(const_name), ArrayType(BV32, BV8))
+                                sym_def = Symbol("const_" + str(const_name), BV32)
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()

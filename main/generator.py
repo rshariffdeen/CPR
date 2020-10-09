@@ -128,44 +128,52 @@ def generate_model(formula):
     sym_var_list = dict()
     for var_name in var_list:
         # sym_var_list[var_name] = dict()
-        sym_def = Symbol(var_name, ArrayType(BV32, BV8))
-        if sym_def not in model:
-            continue
-        x = model[sym_def].simplify()
-        byte_list = dict()
-        value_array_map = x.array_value_assigned_values_map()
-        default_value = int(str(x.array_value_default()).split("_")[0])
-        if not value_array_map:
+        if "const_" in var_name:
+            sym_def = Symbol(var_name, BV32)
+            if sym_def not in model:
+                continue
+            byte_list = dict()
+            default_value = int(str(x.array_value_default()).split("_")[0])
             byte_list[0] = default_value
         else:
-            for idx, val in value_array_map.items():
-                index = int(str(idx).split("_")[0])
-                value = int(str(val).split("_")[0])
-                byte_list[index] = value
-
-            max_index = max(list(byte_list.keys()))
-            if var_name in values.LIST_BIT_LENGTH:
-                array_size = values.LIST_BIT_LENGTH[var_name] - 1
-                if var_name in ["A-data"]:
-                    array_size = max_index
-
+            sym_def = Symbol(var_name, ArrayType(BV32, BV8))
+            if sym_def not in model:
+                continue
+            x = model[sym_def].simplify()
+            byte_list = dict()
+            value_array_map = x.array_value_assigned_values_map()
+            default_value = int(str(x.array_value_default()).split("_")[0])
+            if not value_array_map:
+                byte_list[0] = default_value
             else:
-                array_size = max_index + 1  # TODO: this could be wrong calculation
+                for idx, val in value_array_map.items():
+                    index = int(str(idx).split("_")[0])
+                    value = int(str(val).split("_")[0])
+                    byte_list[index] = value
 
-            if max_index == 0:
-                array_size = 2
+                max_index = max(list(byte_list.keys()))
+                if var_name in values.LIST_BIT_LENGTH:
+                    array_size = values.LIST_BIT_LENGTH[var_name] - 1
+                    if var_name in ["A-data"]:
+                        array_size = max_index
 
-            if var_name not in ["A-data"]:
-                for i in range(0, array_size):
-                    if i not in byte_list:
-                        byte_list[i] = default_value
+                else:
+                    array_size = max_index + 1  # TODO: this could be wrong calculation
 
-            if var_name not in ["A-data", "A-data-stat"]:
-                for i in range(array_size - 1, -1, -1):
-                    if byte_list[i] == 0:
-                        byte_list.pop(i)
-                    else:
-                        break
+                if max_index == 0:
+                    array_size = 2
+
+                if var_name not in ["A-data"]:
+                    for i in range(0, array_size):
+                        if i not in byte_list:
+                            byte_list[i] = default_value
+
+                if var_name not in ["A-data", "A-data-stat"]:
+                    for i in range(array_size - 1, -1, -1):
+                        if byte_list[i] == 0:
+                            byte_list.pop(i)
+                        else:
+                            break
         sym_var_list[var_name] = byte_list
     emitter.data("model var list", sym_var_list)
     return sym_var_list
