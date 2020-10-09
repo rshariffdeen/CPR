@@ -48,7 +48,6 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     lower_bound = values.DEFAULT_LOWER_BOUND
     upper_bound = values.DEFAULT_UPPER_BOUND
 
-    #result = synthesize(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
     result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
