@@ -77,15 +77,13 @@ def generate_symbolic_paths_parallel(ppc_list):
     return filtered_list
 
 
-def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion):
+def validate_patches_parallel(patch_list, path_condition, assertion):
     global pool, result_list
     result_list = []
-    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
-    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
-    path_condition = extractor.extract_assertion(path_constraint_file_path)
+
 
     # test_specification = values.TEST_SPECIFICATION
-    sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
+    # sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
     # var_relationship = extractor.extract_var_relationship(sym_expr_map)
     var_relationship = TRUE
     if values.CONF_OPERATION_MODE in ["sequential"]:
@@ -101,6 +99,26 @@ def validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertio
             patch_constraint = extractor.extract_constraints_from_patch(patch)
             index = list(patch_list).index(patch)
             pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_constraint, path_condition, index), callback=collect_result)
+        pool.close()
+        emitter.normal("\t\twaiting for thread completion")
+        pool.join()
+    return result_list
+
+
+def refine_patches_parallel(patch_list, path_condition, assertion):
+    global pool, result_list
+    result_list = []
+
+    if values.CONF_OPERATION_MODE in ["sequential"]:
+        for patch in patch_list:
+            index = list(patch_list).index(patch)
+            result_list.append(generator.refine_patch_space(assertion, patch, path_condition, index))
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        for patch in patch_list:
+            index = list(patch_list).index(patch)
+            pool.apply_async(oracle.check_patch_feasibility, args=(assertion, patch, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()

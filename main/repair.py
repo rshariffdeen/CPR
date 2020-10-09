@@ -14,20 +14,36 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     emitter.normal("\tupdating patch pool")
-    updated_patch_set = []
-    result_list = parallel.validate_patches_parallel(patch_list, path_to_concolic_exec_result, assertion)
-    if not result_list:
-        emitter.error("\tsomething went wrong with patch validation")
-        utilities.error_exit()
-    for result in result_list:
-        is_valid, index = result
-        if is_valid:
-            updated_patch_set.append(patch_list[index])
-        else:
-            # emitter.debug("Removing Patch", patch_list[index])
-            emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
+    updated_patch_list = []
+    path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
+    expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
+    path_condition = extractor.extract_assertion(path_constraint_file_path)
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        result_list = parallel.refine_patches_parallel(patch_list, path_condition, assertion)
+        if not result_list:
+            emitter.error("\tsomething went wrong with patch validation")
+            utilities.error_exit()
+        for result in result_list:
+            refined_patch, index = result
+            if refined_patch:
+                updated_patch_list.append(refined_patch)
+            else:
+                # emitter.debug("Removing Patch", patch_list[index])
+                emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
+    else:
+        result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
+        if not result_list:
+            emitter.error("\tsomething went wrong with patch validation")
+            utilities.error_exit()
+        for result in result_list:
+            is_valid, index = result
+            if is_valid:
+                updated_patch_list.append(patch_list[index])
+            else:
+                # emitter.debug("Removing Patch", patch_list[index])
+                emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
 
-    return updated_patch_set
+    return updated_patch_list
 
 
 def print_patch_list(patch_list):

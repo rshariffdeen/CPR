@@ -6,7 +6,7 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol
+from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
 from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, logger
 import re
@@ -54,6 +54,8 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     list_of_patches = [_ for _ in result]
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
+    # filtered_list_of_patches = list(set(list_of_patches))
+    # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
     return list_of_patches
 
 
@@ -177,6 +179,30 @@ def generate_model(formula):
         sym_var_list[var_name] = byte_list
     emitter.data("model var list", sym_var_list)
     return sym_var_list
+
+
+def generate_constant_value_list(sym_path):
+    gen_const_list = dict()
+    gen_var_list = dict()
+    const_val_list = dict()
+    model = generate_model(sym_path)
+    if model is None:
+        return None
+    for var_name in model:
+        var_byte_list = model[var_name]
+        if "const" in var_name:
+            gen_const_list[var_name] = var_byte_list
+        else:
+            gen_var_list[var_name] = var_byte_list
+
+    for const_name in gen_const_list:
+        bit_vector = gen_const_list[const_name]
+        const_value = utilities.get_signed_value(bit_vector)
+        print(const_name, const_value)
+        const_val_list[const_name] = const_value
+
+    emitter.data("Generated Constant List", const_val_list)
+    return const_val_list
 
 
 def generate_new_input(sym_path, argument_list):
@@ -448,3 +474,46 @@ def generate_path_for_negation():
         formula = formula.arg(0)
     negated_path = And(negated_path, formula)
     return negated_path
+
+
+def refine_patch_space(assertion, patch, path_condition):
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
+    specification = And(path_condition, patch_constraint)
+    universal_quantification = is_unsat(And(specification, Not(assertion)))
+    if universal_quantification:
+        negated_path_condition = values.NEGATED_PPC_FORMULA
+        specification = And(negated_path_condition, patch_constraint)
+        existential_quantification = is_unsat(And(specification, assertion))
+        result = existential_quantification
+    else:
+        existential_quantification = is_sat(And(specification, assertion))
+        if existential_quantification:
+            const_list = generate_constant_value_list(And(specification, assertion))
+
+        else:
+            return None
+
+
+
+def refine_patch(assertion, patch, path_condition, index):
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
+    specification = And(path_condition, patch_constraint)
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    patch_score = values.LIST_PATCH_SCORE[patch_index]
+
+    if is_sat(specification):
+        if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            patch_score = patch_score + 2
+            universal_quantification = is_unsat(And(specification, Not(assertion)))
+            if universal_quantification:
+                negated_path_condition = values.NEGATED_PPC_FORMULA
+                specification = And(negated_path_condition, patch_constraint)
+                existential_quantification = is_unsat(And(specification, assertion))
+                result = existential_quantification
+            else:
+                result = False
+        else:
+            patch_score = patch_score + 1
+
+
