@@ -24,9 +24,14 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             emitter.error("\tsomething went wrong with patch validation")
             utilities.error_exit()
         for result in result_list:
-            refined_patch, index = result
-            if refined_patch:
-                updated_patch_list.append(refined_patch)
+            refined_space, index = result
+            if refined_space:
+                updated_patch_list.append(patch_list[index])
+                patch = patch_list[index]
+                patch_constraint = extractor.extract_constraints_from_patch(patch)
+                patch_constraint_str = patch_constraint.serialize()
+                patch_index = utilities.get_hash(patch_constraint_str)
+                values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_space
             else:
                 # emitter.debug("Removing Patch", patch_list[index])
                 emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
@@ -36,9 +41,14 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             emitter.error("\tsomething went wrong with patch validation")
             utilities.error_exit()
         for result in result_list:
-            is_valid, index = result
-            if is_valid:
+            refined_space, index = result
+            if refined_space:
                 updated_patch_list.append(patch_list[index])
+                patch = patch_list[index]
+                patch_constraint = extractor.extract_constraints_from_patch(patch)
+                patch_constraint_str = patch_constraint.serialize()
+                patch_index = utilities.get_hash(patch_constraint_str)
+                values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_space
             else:
                 # emitter.debug("Removing Patch", patch_list[index])
                 emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")

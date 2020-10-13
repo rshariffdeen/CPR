@@ -2,19 +2,20 @@ from main.synthesis import load_specification, synthesize_parallel, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE
+from pysmt.shortcuts import is_sat, Not, And, TRUE, GE, LE, Int, NotEquals
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
 from main.utilities import execute_command
-from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, logger
+from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities
 import re
 import struct
 import random
 
 File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
+
 
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
 
@@ -485,50 +486,35 @@ def generate_constraints_on_constants(patch):
             constraint_info = dict()
             constraint_info['lower-bound'] = values.DEFAULT_LOWER_BOUND
             constraint_info['upper-bound'] = values.DEFAULT_UPPER_BOUND
-            constraint_info['valid-values'] = list()
-            constraint_info['invalid-values'] = list()
+            constraint_info['valid-list'] = list()
+            constraint_info['invalid-list'] = list()
+            constraint_info['is_continuous'] = True
             constant_list[var] = constraint_info
     return constant_list
 
 
-def refine_patch_space(assertion, patch, path_condition):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
-    specification = And(path_condition, patch_constraint)
-    universal_quantification = is_unsat(And(specification, Not(assertion)))
-    if universal_quantification:
-        negated_path_condition = values.NEGATED_PPC_FORMULA
-        specification = And(negated_path_condition, patch_constraint)
-        existential_quantification = is_unsat(And(specification, assertion))
-        result = existential_quantification
-    else:
-        existential_quantification = is_sat(And(specification, assertion))
-        if existential_quantification:
-            const_list = generate_constant_value_list(And(specification, assertion))
+def generate_constant_constraint_formula(constant_list):
+    formula = None
+    for constant_name in constant_list:
+        sym_var = Symbol(constant_name, BV32)
+        constant_info = constant_list[constant_name]
+        upper_bound = int(constant_info['upper-bound'])
+        lower_bound = int(constant_info['lower-bound'])
+        valid_list = constant_info['valid-list']
+        invalid_list = constant_info['invalid-list']
 
+        if constant_info['is_continuous']:
+            sub_formula = And(GE(sym_var, Int(upper_bound)), LE(Int(lower_bound), sym_var))
         else:
-            return None
+            sub_formula = None
+            for value in invalid_list:
+                if sub_formula is None:
+                    sub_formula = NotEquals(sym_var, Int(int(value)))
+                else:
+                    sub_formula = And(sub_formula, NotEquals(sym_var, Int(int(value))))
 
-
-
-def refine_patch(assertion, patch, path_condition, index):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
-    specification = And(path_condition, patch_constraint)
-    patch_constraint_str = patch_constraint.serialize()
-    patch_index = utilities.get_hash(patch_constraint_str)
-    patch_score = values.LIST_PATCH_SCORE[patch_index]
-
-    if is_sat(specification):
-        if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-            patch_score = patch_score + 2
-            universal_quantification = is_unsat(And(specification, Not(assertion)))
-            if universal_quantification:
-                negated_path_condition = values.NEGATED_PPC_FORMULA
-                specification = And(negated_path_condition, patch_constraint)
-                existential_quantification = is_unsat(And(specification, assertion))
-                result = existential_quantification
-            else:
-                result = False
+        if formula is None:
+            formula = sub_formula
         else:
-            patch_score = patch_score + 1
-
-
+            formula = And(formula, sub_formula)
+    return formula

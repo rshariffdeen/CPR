@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from main import emitter, oracle, definitions, extractor, reader, values, generator, concolic, utilities, distance
+from main import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -112,13 +112,13 @@ def refine_patches_parallel(patch_list, path_condition, assertion):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            result_list.append(generator.refine_patch_space(assertion, patch, path_condition, index))
+            result_list.append(refine.refine_patch_space(assertion, patch, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            pool.apply_async(oracle.check_patch_feasibility, args=(assertion, patch, path_condition, index), callback=collect_result)
+            pool.apply_async(refine.refine_patch_space, args=(assertion, patch, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
