@@ -476,6 +476,21 @@ def generate_path_for_negation():
     return negated_path
 
 
+def generate_constraints_on_constants(patch):
+    constant_list = dict()
+    patch_formula = extractor.extract_constraints_from_patch(patch)
+    var_list = patch_formula.get_free_variables()
+    for var in var_list:
+        if "const_" in var:
+            constraint_info = dict()
+            constraint_info['lower-bound'] = values.DEFAULT_LOWER_BOUND
+            constraint_info['upper-bound'] = values.DEFAULT_UPPER_BOUND
+            constraint_info['valid-values'] = list()
+            constraint_info['invalid-values'] = list()
+            constant_list[var] = constraint_info
+    return constant_list
+
+
 def refine_patch_space(assertion, patch, path_condition):
     patch_constraint = extractor.extract_constraints_from_patch(patch)
     specification = And(path_condition, patch_constraint)

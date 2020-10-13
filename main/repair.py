@@ -95,6 +95,7 @@ def run(project_path, program_path):
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")
         values.LIST_PATCH_SCORE[patch_index] = 0
+        values.LIST_PATCH_CONSTRAINTS[patch_index] = generator.generate_constraints_on_constants(patch)
     values.COUNT_PATCH_START = len(P)
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
