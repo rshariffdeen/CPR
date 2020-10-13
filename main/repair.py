@@ -1,5 +1,5 @@
 from main.concolic import run_concolic_execution, select_new_input
-from main.synthesis import load_specification, synthesize, Program
+from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic
