@@ -133,8 +133,9 @@ def generate_model(formula):
             sym_def = Symbol(var_name, BV32)
             if sym_def not in model:
                 continue
+            x = model[sym_def].simplify()
             byte_list = dict()
-            default_value = int(str(x.array_value_default()).split("_")[0])
+            default_value = int(str(x).split("_")[0])
             byte_list[0] = default_value
         else:
             sym_def = Symbol(var_name, ArrayType(BV32, BV8))
