@@ -2,7 +2,7 @@ from main.synthesis import load_specification, synthesize_parallel, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE, GE, LE, Int, NotEquals
+from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
@@ -504,14 +504,14 @@ def generate_constant_constraint_formula(constant_list):
         invalid_list = constant_info['invalid-list']
 
         if constant_info['is_continuous']:
-            sub_formula = And(GE(sym_var, Int(upper_bound)), LE(Int(lower_bound), sym_var))
+            sub_formula = And(BVSGE(sym_var, SBV(upper_bound, 32)), BVSLE(SBV(lower_bound, 32), sym_var))
         else:
             sub_formula = None
             for value in invalid_list:
                 if sub_formula is None:
-                    sub_formula = NotEquals(sym_var, Int(int(value)))
+                    sub_formula = NotEquals(sym_var, SBV(int(value), 32))
                 else:
-                    sub_formula = And(sub_formula, NotEquals(sym_var, Int(int(value))))
+                    sub_formula = And(sub_formula, NotEquals(sym_var, SBV(int(value), 32)))
 
         if formula is None:
             formula = sub_formula
