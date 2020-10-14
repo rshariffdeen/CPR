@@ -161,6 +161,7 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
     constant_count = len(constant_space)
     refined_constant_space = None
     partition_list = dict()
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
 
     for var_name in model:
         if "const_" in var_name:
@@ -176,13 +177,20 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
             constant_info['upper-bound'] = upper_bound
             partitioned_constant_space[constant_name] = constant_info
             index = index + 1
-        valid_formula = generate_formula_for_range(patch, partitioned_constant_space, path_condition, assertion)
-        invalid_formula = generate_formula_for_range(patch, partitioned_constant_space, path_condition, Not(assertion))
-        if is_unsat(check_formula):
-            if refined_constant_space is None:
-                refined_constant_space = partitioned_constant_space
-            else:
-                utilities.error_exit("unhandled range refinement")
+
+        constant_constraint = generator.generate_constant_constraint_formula(partitioned_constant_space)
+        patch_space_constraint = And(patch_constraint, constant_constraint)
+        path_feasibility = And(path_condition, patch_space_constraint)
+        is_exist_verification = And(path_feasibility, assertion)
+        negated_path = values.NEGATED_PPC_FORMULA
+        is_always_verification = And(negated_path, And(patch_space_constraint, assertion))
+
+        if is_sat(is_exist_verification):
+            if is_unsat(is_always_verification):
+                if refined_constant_space is None:
+                    refined_constant_space = partitioned_constant_space
+                else:
+                    utilities.error_exit("unhandled range refinement")
 
     return refined_constant_space
 
