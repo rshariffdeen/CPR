@@ -39,6 +39,7 @@ def refine_patch_space(assertion, patch, path_condition, index):
                 else:
 
                     while not existential_quantification:
+                        emitter.debug("\trefining for existential quantification")
                         model = generator.generate_model(specification)
                         refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
                         if refined_constant_space is None:
@@ -53,6 +54,7 @@ def refine_patch_space(assertion, patch, path_condition, index):
             else:
 
                 while not universal_quantification:
+                    emitter.debug("\trefining for universal quantification")
                     model = generator.generate_model(specification)
                     refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
                     if refined_constant_space is None:
@@ -71,6 +73,7 @@ def refine_patch_space(assertion, patch, path_condition, index):
                     return refined_constant_space, index
                 else:
                     while not existential_quantification:
+                        emitter.debug("\trefining for existential quantification")
                         model = generator.generate_model(specification)
                         refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
                         if refined_constant_space is None:

@@ -117,7 +117,7 @@ def generate_model(formula):
            Arguments:
                formula: smtlib formatted formula
     """
-    emitter.normal("\textracting z3 model")
+    emitter.debug("\textracting z3 model")
     model = get_model(formula)
     if model is None:
         return None
