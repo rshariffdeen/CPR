@@ -22,63 +22,69 @@ def refine_patch_space(assertion, patch, path_condition, index):
     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_constraint = And(patch_constraint, constant_constraint)
     path_feasibility = And(path_condition, patch_constraint)
-
+    patch_score = values.LIST_PATCH_SCORE[patch_index]
+    refined_constant_space = None
     if is_sat(path_feasibility):
-        specification = And(path_feasibility, Not(assertion))
-        universal_quantification = is_unsat(specification)
-        if universal_quantification:
-            negated_path_condition = values.NEGATED_PPC_FORMULA
-            path_feasibility = And(negated_path_condition, patch_constraint)
-            specification = And(path_feasibility, assertion)
-            existential_quantification = is_unsat(specification)
-            if existential_quantification:
-                return patch, index
+        if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
+            specification = And(path_feasibility, Not(assertion))
+            universal_quantification = is_unsat(specification)
+            if universal_quantification:
+                negated_path_condition = values.NEGATED_PPC_FORMULA
+                path_feasibility = And(negated_path_condition, patch_constraint)
+                specification = And(path_feasibility, assertion)
+                existential_quantification = is_unsat(specification)
+                if existential_quantification:
+                    return patch, index
+                else:
+
+                    while not existential_quantification:
+                        model = generator.generate_model(specification)
+                        refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
+                        if refined_constant_space is None:
+                            break
+                        constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
+                        patch_constraint = And(patch_constraint, constant_constraint)
+                        path_feasibility = And(negated_path_condition, patch_constraint)
+                        specification = And(path_feasibility, assertion)
+                        existential_quantification = is_unsat(specification)
+
+                    return refined_constant_space, index
             else:
 
-                while not existential_quantification:
+                while not universal_quantification:
                     model = generator.generate_model(specification)
-                    refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
+                    refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
                     if refined_constant_space is None:
                         break
                     constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
                     patch_constraint = And(patch_constraint, constant_constraint)
-                    path_feasibility = And(negated_path_condition, patch_constraint)
-                    specification = And(path_feasibility, assertion)
-                    existential_quantification = is_unsat(specification)
+                    path_feasibility = And(path_condition, patch_constraint)
+                    specification = And(path_feasibility, Not(assertion))
+                    universal_quantification = is_unsat(specification)
 
-                return refined_constant_space, index
+                negated_path_condition = values.NEGATED_PPC_FORMULA
+                path_feasibility = And(negated_path_condition, patch_constraint)
+                specification = And(path_feasibility, assertion)
+                existential_quantification = is_sat(specification)
+                if existential_quantification:
+                    return refined_constant_space, index
+                else:
+                    while not existential_quantification:
+                        model = generator.generate_model(specification)
+                        refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
+                        if refined_constant_space is None:
+                            break
+                        constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
+                        patch_constraint = And(patch_constraint, constant_constraint)
+                        path_feasibility = And(negated_path_condition, patch_constraint)
+                        specification = And(path_feasibility, assertion)
+                        existential_quantification = is_unsat(specification)
+
+                    return refined_constant_space, index
         else:
-
-            while not universal_quantification:
-                model = generator.generate_model(specification)
-                refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
-                if refined_constant_space is None:
-                    break
-                constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-                patch_constraint = And(patch_constraint, constant_constraint)
-                path_feasibility = And(path_condition, patch_constraint)
-                specification = And(path_feasibility, Not(assertion))
-                universal_quantification = is_unsat(specification)
-
-            negated_path_condition = values.NEGATED_PPC_FORMULA
-            path_feasibility = And(negated_path_condition, patch_constraint)
-            specification = And(path_feasibility, assertion)
-            existential_quantification = is_sat(specification)
-            if existential_quantification:
-                return refined_constant_space, index
-            else:
-                while not existential_quantification:
-                    model = generator.generate_model(specification)
-                    refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
-                    if refined_constant_space is None:
-                        break
-                    constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-                    patch_constraint = And(patch_constraint, constant_constraint)
-                    path_feasibility = And(negated_path_condition, patch_constraint)
-                    specification = And(path_feasibility, assertion)
-                    existential_quantification = is_unsat(specification)
-
-                return refined_constant_space, index
+            values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
+            return constant_space, index
 
 
 def generate_new_range(constant_space, partition_list):
@@ -90,8 +96,8 @@ def generate_new_range(constant_space, partition_list):
             partition_value = partition_list[constant_name]
             range_lower = (constant_info['lower-bound'], partition_value - 1)
             range_upper = (partition_value + 1, constant_info['upper-bound'])
-            new_range_list.append(range_lower)
-            new_range_list.append(range_upper)
+            new_range_list.append((range_lower,))
+            new_range_list.append((range_upper,))
 
     elif constant_count == 2:
         for constant_name_a in constant_space:
@@ -154,11 +160,11 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
     refined_patch = None
     constant_count = len(constant_space)
     refined_constant_space = None
-    partition_list = list()
+    partition_list = dict()
 
     for var_name in model:
         if "const_" in var_name:
-            partition_list[var_name] = int(str(model[var_name]).split("_")[0])
+            partition_list[var_name] = int(model[var_name][0])
     range_list = generate_new_range(constant_space, partition_list)
     for partition_range in range_list:
         partitioned_constant_space = dict()
@@ -170,8 +176,9 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
             constant_info['upper-bound'] = upper_bound
             partitioned_constant_space[constant_name] = constant_info
             index = index + 1
-        check_formula = generate_formula_for_range(patch, partitioned_constant_space, path_condition, assertion)
-        if is_sat(check_formula):
+        valid_formula = generate_formula_for_range(patch, partitioned_constant_space, path_condition, assertion)
+        invalid_formula = generate_formula_for_range(patch, partitioned_constant_space, path_condition, Not(assertion))
+        if is_unsat(check_formula):
             if refined_constant_space is None:
                 refined_constant_space = partitioned_constant_space
             else:

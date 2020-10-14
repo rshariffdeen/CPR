@@ -504,7 +504,7 @@ def generate_constant_constraint_formula(constant_list):
         invalid_list = constant_info['invalid-list']
 
         if constant_info['is_continuous']:
-            sub_formula = And(BVSGE(sym_var, SBV(upper_bound, 32)), BVSLE(SBV(lower_bound, 32), sym_var))
+            sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
         else:
             sub_formula = None
             for value in invalid_list:
