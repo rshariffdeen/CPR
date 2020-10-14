@@ -480,16 +480,16 @@ def generate_path_for_negation():
 def generate_constraints_on_constants(patch):
     constant_list = dict()
     patch_formula = extractor.extract_constraints_from_patch(patch)
-    var_list = patch_formula.get_free_variables()
+    var_list = list(patch_formula.get_free_variables())
     for var in var_list:
-        if "const_" in var:
+        if "const_" in str(var):
             constraint_info = dict()
             constraint_info['lower-bound'] = values.DEFAULT_LOWER_BOUND
             constraint_info['upper-bound'] = values.DEFAULT_UPPER_BOUND
             constraint_info['valid-list'] = list()
             constraint_info['invalid-list'] = list()
             constraint_info['is_continuous'] = True
-            constant_list[var] = constraint_info
+            constant_list[str(var)] = constraint_info
     return constant_list
 
 
