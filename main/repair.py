@@ -66,6 +66,16 @@ def print_patch_list(patch_list):
         count = count + 1
         emitter.sub_sub_title("Patch #" + str(count))
         emitter.emit_patch(patch, message="\t\t")
+        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
+            patch_constraint_str = patch_constraint.serialize()
+            patch_index = utilities.get_hash(patch_constraint_str)
+            constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+            for constant_name in constant_space:
+                constant_info = constant_space[constant_name]
+                lower_bound = constant_info['lower-bound']
+                upper_bound = constant_info['upper-bound']
+                emitter.highlight("\t" + lower_bound + " <= " + constant_name + " <= " + upper_bound)
         if count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
 

@@ -24,10 +24,10 @@ libtrident_runtime.so: $(OBJ_KLEE)
 libtrident_runtime.a: $(OBJ_KLEE)
 	llvm-ar rcs $@ $(OBJ_KLEE)
 
-libtrident_runtime.bca:
+libtrident_runtime.bca: libtrident_runtime.a
 	extract-bc libtrident_runtime.a
 
-libtrident_proxy.bca:
+libtrident_proxy.bca: libtrident_proxy.a
 	extract-bc libtrident_proxy.a
 
 clean:

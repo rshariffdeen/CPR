@@ -117,7 +117,7 @@ def generate_model(formula):
            Arguments:
                formula: smtlib formatted formula
     """
-    emitter.debug("\textracting z3 model")
+    emitter.debug("extracting z3 model")
     model = get_model(formula)
     if model is None:
         return None
@@ -134,9 +134,9 @@ def generate_model(formula):
             sym_def = Symbol(var_name, BV32)
             if sym_def not in model:
                 continue
-            x = model[sym_def].simplify()
+            x = model[sym_def]
             byte_list = dict()
-            default_value = int(str(x).split("_")[0])
+            default_value = x.bv_signed_value()
             byte_list[0] = default_value
         else:
             sym_def = Symbol(var_name, ArrayType(BV32, BV8))
