@@ -73,8 +73,8 @@ def print_patch_list(patch_list):
             constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
             for constant_name in constant_space:
                 constant_info = constant_space[constant_name]
-                lower_bound = constant_info['lower-bound']
-                upper_bound = constant_info['upper-bound']
+                lower_bound = str(constant_info['lower-bound'])
+                upper_bound = str(constant_info['upper-bound'])
                 emitter.highlight("\t" + lower_bound + " <= " + constant_name + " <= " + upper_bound)
         if count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
