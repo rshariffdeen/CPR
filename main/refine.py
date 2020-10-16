@@ -195,6 +195,10 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
                     refined_constant_space = partitioned_constant_space
                 else:
                     utilities.error_exit("unhandled range refinement")
+        else:
+            refined_constant_space = partitioned_constant_space
+            emitter.data("refined space", refined_constant_space)
+            return refined_constant_space
 
     emitter.data("refined space", refined_constant_space)
     return refined_constant_space
