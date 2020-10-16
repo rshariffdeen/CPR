@@ -168,7 +168,7 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
 
     for var_name in model:
         if "const_" in var_name:
-            partition_list[var_name] = int(model[var_name])
+            partition_list[var_name] = int(model[var_name][0])
     range_list = generate_new_range(constant_space, partition_list)
     for partition_range in range_list:
         partitioned_constant_space = dict()
