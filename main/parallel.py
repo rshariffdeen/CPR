@@ -112,12 +112,14 @@ def refine_patches_parallel(patch_list, path_condition, assertion):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            emitter.emit_patch(patch, message="refining abstract patch")
             result_list.append(refine.refine_patch_space(assertion, patch, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            emitter.emit_patch(patch, message="refining abstract patch")
             pool.apply_async(refine.refine_patch_space, args=(assertion, patch, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
