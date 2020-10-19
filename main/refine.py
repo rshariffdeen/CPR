@@ -126,7 +126,7 @@ def generate_new_range(constant_space, partition_list):
             partition_value = partition_list[constant_name]
             range_lower = (constant_info['lower-bound'], partition_value - 1)
             range_upper = (partition_value + 1, constant_info['upper-bound'])
-            if is_valid_range(range_upper):
+            if is_valid_range(range_lower):
                 new_range_list.append((range_lower,))
             if is_valid_range(range_upper):
                 new_range_list.append((range_upper,))
