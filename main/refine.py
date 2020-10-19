@@ -135,10 +135,17 @@ def generate_new_range(constant_space, partition_list):
                 range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
                 range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
 
-                new_range_list.append((range_lower_a, range_lower_b))
-                new_range_list.append((range_lower_a, range_upper_b))
-                new_range_list.append((range_upper_a, range_lower_b))
-                new_range_list.append((range_upper_a, range_upper_b))
+                if is_valid_range(range_lower_a):
+                    if is_valid_range(range_lower_b):
+                        new_range_list.append((range_lower_a, range_lower_b))
+                    if is_valid_range(range_upper_b):
+                        new_range_list.append((range_lower_a, range_upper_b))
+
+                if is_valid_range(range_upper_a):
+                    if is_valid_range(range_lower_b):
+                        new_range_list.append((range_upper_a, range_lower_b))
+                    if is_valid_range(range_upper_b):
+                        new_range_list.append((range_upper_a, range_upper_b))
 
     elif constant_count == 3:
         for constant_name_a in constant_space:
