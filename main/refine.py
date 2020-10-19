@@ -12,6 +12,51 @@ from main import emitter, values, reader, parallel, definitions, extractor, orac
 import re
 import struct
 import random
+import copy
+
+
+def merge_partition(partition_list):
+    sorted_partition_list = sorted(partition_list, key=lambda x: x['const_a']['lower-bound'])
+    is_continuous = True
+    lower_bound = None
+    upper_bound = None
+    invalid_list = []
+    valid_list = []
+    merged_partition = dict()
+    for partition in sorted_partition_list:
+        p_lower_bound = partition['const_a']['lower-bound']
+        p_upper_bound = partition['const_a']['upper-bound']
+        if lower_bound is None:
+            lower_bound = p_lower_bound
+            upper_bound = p_upper_bound
+        else:
+            if upper_bound + 1 == p_lower_bound:
+                upper_bound = p_upper_bound
+            else:
+                is_continuous = False
+                invalid_list = invalid_list + list(range(upper_bound + 1, p_lower_bound))
+                upper_bound = p_upper_bound
+        valid_list = valid_list + list(range(p_lower_bound, p_upper_bound + 1))
+
+    if not is_continuous:
+        invalid_list = invalid_list + list(range(values.DEFAULT_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_UPPER_BOUND))
+        constraint_info = dict()
+        constraint_info['lower-bound'] = None
+        constraint_info['upper-bound'] = None
+        constraint_info['valid-list'] = valid_list
+        constraint_info['invalid-list'] = invalid_list
+        constraint_info['is_continuous'] = False
+        merged_partition['const_a'] = constraint_info
+    else:
+        constraint_info = dict()
+        constraint_info['lower-bound'] = lower_bound
+        constraint_info['upper-bound'] = upper_bound
+        constraint_info['valid-list'] = []
+        constraint_info['invalid-list'] = []
+        constraint_info['is_continuous'] = True
+        merged_partition['const_a'] = constraint_info
+
+    return merged_partition
 
 
 def refine_for_under_approx(p_specification, patch_constraint, path_condition):
@@ -31,8 +76,8 @@ def refine_for_under_approx(p_specification, patch_constraint, path_condition):
         if refined_partition_list:
             if len(refined_partition_list) == 1:
                 refined_constant_space = refined_partition_list[0]
-            for parition in refined_partition_list:
-                print(parition)
+            else:
+                refined_constant_space = merge_partition(refined_partition_list)
     return refined_constant_space
 
 
@@ -218,8 +263,8 @@ def refine_constant_range(model, constant_space, path_condition, patch_constrain
             child_list = refine_constant_range(model, partitioned_constant_space, path_condition, patch_constraint, p_specification)
             refined_list = refined_list + child_list
         else:
-            emitter.data("refined space", refined_constant_space)
-            refined_list.append(partitioned_constant_space)
+            emitter.data("adding space", partitioned_constant_space)
+            refined_list.append(copy.deepcopy(partitioned_constant_space))
 
     emitter.data("refined list", refined_list)
     return refined_list
