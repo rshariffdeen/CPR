@@ -112,8 +112,9 @@ def refine_patches_parallel(patch_list, path_condition, assertion):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
             emitter.emit_patch(patch, message="\trefining abstract patch: ")
-            result_list.append(refine.refine_patch_space(assertion, patch, path_condition, index))
+            result_list.append(refine.refine_patch_space(assertion, patch_constraint, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
