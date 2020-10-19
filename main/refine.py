@@ -14,8 +14,7 @@ import struct
 import random
 
 
-def refine_for_under_approx(assertion, patch, path_condition):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
+def refine_for_under_approx(assertion, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -29,7 +28,7 @@ def refine_for_under_approx(assertion, patch, path_condition):
         while not universal_quantification:
             emitter.debug("refining for universal quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
@@ -40,8 +39,7 @@ def refine_for_under_approx(assertion, patch, path_condition):
     return refined_constant_space
 
 
-def refine_for_over_approx(assertion, patch, path_condition):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
+def refine_for_over_approx(assertion, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -56,7 +54,7 @@ def refine_for_over_approx(assertion, patch, path_condition):
         while not existential_quantification:
             emitter.debug("refining for existential quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, patch)
+            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, patch_constraint)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
@@ -67,8 +65,7 @@ def refine_for_over_approx(assertion, patch, path_condition):
     return refined_constant_space
 
 
-def refine_for_over_fit(assertion, patch, path_condition):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
+def refine_for_over_fit(assertion, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -82,8 +79,7 @@ def refine_for_over_fit(assertion, patch, path_condition):
     return refined_constant_space
 
 
-def refine_patch_space(assertion, patch, path_condition, index):
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
+def refine_patch_space(assertion, patch_constraint, path_condition, index):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -92,21 +88,17 @@ def refine_patch_space(assertion, patch, path_condition, index):
     path_feasibility = And(path_condition, patch_space_constraint)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     refined_constant_space = constant_space
-
     if is_sat(path_feasibility):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
-
             if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
-                refined_constant_space = refine_for_under_approx(assertion, patch, path_condition)
+                refined_constant_space = refine_for_under_approx(assertion, patch_constraint, path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
-                refined_constant_space = refine_for_over_approx(assertion, patch, path_condition)
+                refined_constant_space = refine_for_over_approx(assertion, patch_constraint, path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
-                refined_constant_space = refine_for_over_fit(assertion, patch, path_condition)
-
+                refined_constant_space = refine_for_over_fit(assertion, patch_constraint, path_condition)
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
-
     return refined_constant_space, index
 
 
@@ -188,12 +180,11 @@ def generate_formula_for_range(patch, constant_space, path_condition, assertion)
     return formula
 
 
-def refine_constant_range(constant_space, model, path_condition, patch):
+def refine_constant_range(constant_space, model, path_condition, patch_constraint):
     refined_patch = None
     constant_count = len(constant_space)
     refined_constant_space = None
     partition_list = dict()
-    patch_constraint = extractor.extract_constraints_from_patch(patch)
 
     for var_name in model:
         if "const_" in var_name:

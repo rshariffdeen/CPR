@@ -119,8 +119,9 @@ def refine_patches_parallel(patch_list, path_condition, assertion):
         pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            patch_constraint = extractor.extract_constraints_from_patch(patch)
             emitter.emit_patch(patch, message="\trefining abstract patch: ")
-            pool.apply_async(refine.refine_patch_space, args=(assertion, patch, path_condition, index), callback=collect_result)
+            pool.apply_async(refine.refine_patch_space, args=(assertion, patch_constraint, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
