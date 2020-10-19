@@ -98,11 +98,11 @@ def refine_patch_space(assertion, patch, path_condition, index):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
 
-            if values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
+            if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
                 refined_constant_space = refine_for_under_approx(assertion, patch, path_condition)
-            elif values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
+            elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
                 refined_constant_space = refine_for_over_approx(assertion, patch, path_condition)
-            elif values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
+            elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
                 refined_constant_space = refine_for_over_fit(assertion, patch, path_condition)
 
         else:
