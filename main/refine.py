@@ -6,7 +6,7 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
+from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, Equals, Int, BVConcat, Select, BV
 from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, generator
 import re
@@ -180,7 +180,7 @@ def generate_formula_for_range(patch, constant_space, path_condition, assertion)
     return formula
 
 
-def refine_constant_range(constant_space, model, path_condition, assertion, patch):
+def refine_constant_range(constant_space, model, path_condition, patch):
     refined_patch = None
     constant_count = len(constant_space)
     refined_constant_space = None
@@ -190,6 +190,15 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
     for var_name in model:
         if "const_" in var_name:
             partition_list[var_name] = int(model[var_name][0])
+        if "rvalue" in var_name:
+            bit_vector = model[var_name]
+            contradiction_value = utilities.get_signed_value(bit_vector)
+            array = Symbol(var_name, ArrayType(BV32, BV8))
+            array_value = BVConcat(Select(array, BV(3, 32)),
+                 BVConcat(Select(array, BV(2, 32)),
+                 BVConcat(Select(array, BV(1, 32)), Select(array, BV(0, 32)))))
+            assertion = Equals(array_value, BV(contradiction_value, 32))
+
     range_list = generate_new_range(constant_space, partition_list)
     for partition_range in range_list:
         partitioned_constant_space = dict()
@@ -207,15 +216,15 @@ def refine_constant_range(constant_space, model, path_condition, assertion, patc
         patch_space_constraint = And(patch_constraint, constant_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         is_exist_verification = And(path_feasibility, assertion)
+        # is_always_verification = And(path_feasibility, Not(assertion))
         negated_path = values.NEGATED_PPC_FORMULA
         is_always_verification = And(negated_path, And(patch_space_constraint, assertion))
-
         if is_sat(is_exist_verification):
-            if is_unsat(is_always_verification):
+            if is_sat(is_always_verification):
                 if refined_constant_space is None:
                     refined_constant_space = partitioned_constant_space
-                else:
-                    utilities.error_exit("unhandled range refinement")
+                    emitter.data("refined space", refined_constant_space)
+                    return refined_constant_space
         else:
             refined_constant_space = partitioned_constant_space
             emitter.data("refined space", refined_constant_space)
