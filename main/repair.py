@@ -75,7 +75,9 @@ def print_patch_list(patch_list):
                 constant_info = constant_space[constant_name]
                 lower_bound = str(constant_info['lower-bound'])
                 upper_bound = str(constant_info['upper-bound'])
-                emitter.highlight("\t" + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                emitter.highlight("\t\tRange:" + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
+                emitter.highlight("\t\tCount:" + str(concrete_count))
         if count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
 
