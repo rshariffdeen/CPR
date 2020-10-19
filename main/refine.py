@@ -92,7 +92,7 @@ def refine_patch_space(assertion, patch, path_condition, index):
     patch_space_constraint = And(patch_constraint, constant_constraint)
     path_feasibility = And(path_condition, patch_space_constraint)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
-    refined_constant_space = None
+    refined_constant_space = constant_space
 
     if is_sat(path_feasibility):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
@@ -107,7 +107,7 @@ def refine_patch_space(assertion, patch, path_condition, index):
 
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
-            refined_constant_space = constant_space
+
     return refined_constant_space, index
 
 
