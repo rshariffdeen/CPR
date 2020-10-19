@@ -68,6 +68,7 @@ OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
 OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
 OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
 OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}
+OPTIONS_REFINE_METHOD = {0: "under-approx", 1: "over-approx", 2: "overfit"}
 
 
 # ------------------ Configuration Values ---------------
@@ -102,6 +103,7 @@ CONF_ITERATION_LIMIT = ""
 CONF_SELECTION_STRATEGY = "deterministic"
 CONF_DISTANCE_METRIC = "control-loc"
 CONF_PATCH_TYPE = "concrete"
+CONF_REFINE_METHOD = "under-approx"
 CONF_SKIP_BUILD = False
 CONF_SKIP_GEN = False
 CONF_SKIP_TEST = False

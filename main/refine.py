@@ -14,6 +14,75 @@ import struct
 import random
 
 
+def refine_for_under_approx(assertion, patch, path_condition):
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
+    patch_space_constraint = And(patch_constraint, constant_constraint)
+    path_feasibility = And(path_condition, patch_space_constraint)
+    specification = And(path_feasibility, Not(assertion))
+    universal_quantification = is_unsat(specification)
+    refined_constant_space = constant_space
+    if not universal_quantification:
+        while not universal_quantification:
+            emitter.debug("refining for universal quantification")
+            model = generator.generate_model(specification)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
+            if refined_constant_space is None:
+                break
+            constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
+            patch_space_constraint = And(patch_constraint, constant_constraint)
+            path_feasibility = And(path_condition, patch_space_constraint)
+            specification = And(path_feasibility, Not(assertion))
+            universal_quantification = is_unsat(specification)
+    return refined_constant_space
+
+
+def refine_for_over_approx(assertion, patch, path_condition):
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
+    patch_space_constraint = And(patch_constraint, constant_constraint)
+    negated_path_condition = values.NEGATED_PPC_FORMULA
+    path_feasibility = And(negated_path_condition, patch_space_constraint)
+    specification = And(path_feasibility, assertion)
+    existential_quantification = is_unsat(specification)
+    refined_constant_space = constant_space
+    if not existential_quantification:
+        while not existential_quantification:
+            emitter.debug("refining for existential quantification")
+            model = generator.generate_model(specification)
+            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion,
+                                                           patch)
+            if refined_constant_space is None:
+                break
+            constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
+            patch_space_constraint = And(patch_constraint, constant_constraint)
+            path_feasibility = And(negated_path_condition, patch_space_constraint)
+            specification = And(path_feasibility, assertion)
+            existential_quantification = is_unsat(specification)
+    return refined_constant_space
+
+
+def refine_for_over_fit(assertion, patch, path_condition):
+    patch_constraint = extractor.extract_constraints_from_patch(patch)
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
+    patch_space_constraint = And(patch_constraint, constant_constraint)
+    negated_path_condition = values.NEGATED_PPC_FORMULA
+    path_feasibility = And(negated_path_condition, patch_space_constraint)
+    specification = And(path_feasibility, assertion)
+    existential_quantification = is_unsat(specification)
+    refined_constant_space = constant_space
+    return refined_constant_space
+
+
 def refine_patch_space(assertion, patch, path_condition, index):
     patch_constraint = extractor.extract_constraints_from_patch(patch)
     patch_constraint_str = patch_constraint.serialize()
@@ -24,70 +93,22 @@ def refine_patch_space(assertion, patch, path_condition, index):
     path_feasibility = And(path_condition, patch_space_constraint)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     refined_constant_space = None
+
     if is_sat(path_feasibility):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
-            specification = And(path_feasibility, Not(assertion))
-            universal_quantification = is_unsat(specification)
-            if universal_quantification:
-                negated_path_condition = values.NEGATED_PPC_FORMULA
-                path_feasibility = And(negated_path_condition, patch_space_constraint)
-                specification = And(path_feasibility, assertion)
-                existential_quantification = is_unsat(specification)
-                if existential_quantification:
-                    return patch, index
-                else:
 
-                    while not existential_quantification:
-                        emitter.debug("refining for existential quantification")
-                        model = generator.generate_model(specification)
-                        refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
-                        if refined_constant_space is None:
-                            break
-                        constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-                        patch_space_constraint = And(patch_constraint, constant_constraint)
-                        path_feasibility = And(negated_path_condition, patch_space_constraint)
-                        specification = And(path_feasibility, assertion)
-                        existential_quantification = is_unsat(specification)
+            if values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
+                refined_constant_space = refine_for_under_approx(assertion, patch, path_condition)
+            elif values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
+                refined_constant_space = refine_for_over_approx(assertion, patch, path_condition)
+            elif values.OPTIONS_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
+                refined_constant_space = refine_for_over_fit(assertion, patch, path_condition)
 
-                    return refined_constant_space, index
-            else:
-
-                while not universal_quantification:
-                    emitter.debug("refining for universal quantification")
-                    model = generator.generate_model(specification)
-                    refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
-                    if refined_constant_space is None:
-                        break
-                    constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-                    patch_space_constraint = And(patch_constraint, constant_constraint)
-                    path_feasibility = And(path_condition, patch_space_constraint)
-                    specification = And(path_feasibility, Not(assertion))
-                    universal_quantification = is_unsat(specification)
-
-                negated_path_condition = values.NEGATED_PPC_FORMULA
-                path_feasibility = And(negated_path_condition, patch_space_constraint)
-                specification = And(path_feasibility, assertion)
-                existential_quantification = is_unsat(specification)
-                if existential_quantification:
-                    return refined_constant_space, index
-                else:
-                    while not existential_quantification:
-                        emitter.debug("refining for existential quantification")
-                        model = generator.generate_model(specification)
-                        refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion, patch)
-                        if refined_constant_space is None:
-                            break
-                        constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-                        patch_space_constraint = And(patch_constraint, constant_constraint)
-                        path_feasibility = And(negated_path_condition, patch_space_constraint)
-                        specification = And(path_feasibility, assertion)
-                        existential_quantification = is_unsat(specification)
-
-                    return refined_constant_space, index
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
-            return constant_space, index
+            refined_constant_space = constant_space
+    return refined_constant_space, index
 
 
 def generate_new_range(constant_space, partition_list):
