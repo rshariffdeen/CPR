@@ -80,7 +80,7 @@ def print_patch_list(patch_list):
                     emitter.highlight("\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
                     concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
                 else:
-                    valid_list = constant_info['valid_list']
+                    valid_list = constant_info['valid-list']
                     emitter.highlight("\t\tSet: " + str(valid_list))
                     concrete_count = len(valid_list)
                 emitter.highlight("\t\tCount: " + str(concrete_count))
@@ -97,9 +97,14 @@ def count_concrete_patches(patch_list):
         constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
         for constant_name in constant_space:
             constant_info = constant_space[constant_name]
+            is_continuous = constant_info['is_continuous']
             lower_bound = str(constant_info['lower-bound'])
             upper_bound = str(constant_info['upper-bound'])
-            tmp_count = len(range(int(lower_bound), int(upper_bound) + 1))
+            valid_list = constant_info['valid-list']
+            if is_continuous:
+                tmp_count = len(range(int(lower_bound), int(upper_bound) + 1))
+            else:
+                tmp_count = len(valid_list)
             con_count = con_count + tmp_count
     return con_count
 
