@@ -73,10 +73,16 @@ def print_patch_list(patch_list):
             constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
             for constant_name in constant_space:
                 constant_info = constant_space[constant_name]
-                lower_bound = str(constant_info['lower-bound'])
-                upper_bound = str(constant_info['upper-bound'])
-                emitter.highlight("\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
-                concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
+                is_continuous = constant_space['is_continuous']
+                if is_continuous:
+                    lower_bound = str(constant_info['lower-bound'])
+                    upper_bound = str(constant_info['upper-bound'])
+                    emitter.highlight("\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                    concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
+                else:
+                    valid_list = constant_info['valid_list']
+                    emitter.highlight("\t\tSet: " + str(valid_list))
+                    concrete_count = len(valid_list)
                 emitter.highlight("\t\tCount: " + str(concrete_count))
         if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
@@ -197,7 +203,6 @@ def run(project_path, program_path):
             values.COUNT_PATCH_END = count_concrete_patches(ranked_patch_list)
         else:
             values.COUNT_PATCH_END = len(ranked_patch_list)
-
 
 
 def concolic_exploration(program_path):
