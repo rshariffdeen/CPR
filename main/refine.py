@@ -14,58 +14,58 @@ import struct
 import random
 
 
-def refine_for_under_approx(assertion, patch_constraint, path_condition):
+def refine_for_under_approx(p_specification, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_space_constraint = And(patch_constraint, constant_constraint)
     path_feasibility = And(path_condition, patch_space_constraint)
-    specification = And(path_feasibility, Not(assertion))
+    specification = And(path_feasibility, Not(p_specification))
     universal_quantification = is_unsat(specification)
     refined_constant_space = constant_space
     if not universal_quantification:
         while not universal_quantification:
             emitter.debug("refining for universal quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint, Not(p_specification))
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
             patch_space_constraint = And(patch_constraint, constant_constraint)
             path_feasibility = And(path_condition, patch_space_constraint)
-            specification = And(path_feasibility, Not(assertion))
+            specification = And(path_feasibility, Not(p_specification))
             universal_quantification = is_unsat(specification)
     return refined_constant_space
 
 
-def refine_for_over_approx(assertion, patch_constraint, path_condition):
+def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_space_constraint = And(patch_constraint, constant_constraint)
-    # negated_path_condition = values.NEGATED_PPC_FORMULA
+    path_condition = values.NEGATED_PPC_FORMULA
     path_feasibility = And(path_condition, patch_space_constraint)
-    specification = And(path_feasibility, assertion)
+    specification = And(path_feasibility, p_specification)
     existential_quantification = is_unsat(specification)
     refined_constant_space = constant_space
     if not existential_quantification:
         while not existential_quantification:
             emitter.debug("refining for existential quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint, p_specification)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
             patch_space_constraint = And(patch_constraint, constant_constraint)
             path_feasibility = And(path_condition, patch_space_constraint)
-            specification = And(path_feasibility, assertion)
+            specification = And(path_feasibility, p_specification)
             existential_quantification = is_unsat(specification)
     return refined_constant_space
 
 
-def refine_for_over_fit(assertion, patch_constraint, path_condition):
+def refine_for_over_fit(p_specification, patch_constraint, path_condition):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -73,13 +73,13 @@ def refine_for_over_fit(assertion, patch_constraint, path_condition):
     patch_space_constraint = And(patch_constraint, constant_constraint)
     negated_path_condition = values.NEGATED_PPC_FORMULA
     path_feasibility = And(negated_path_condition, patch_space_constraint)
-    specification = And(path_feasibility, assertion)
+    specification = And(path_feasibility, p_specification)
     existential_quantification = is_unsat(specification)
     refined_constant_space = constant_space
     return refined_constant_space
 
 
-def refine_patch_space(assertion, patch_constraint, path_condition, index):
+def refine_patch_space(p_specification, patch_constraint, path_condition, index):
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
@@ -92,11 +92,11 @@ def refine_patch_space(assertion, patch_constraint, path_condition, index):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
             if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
-                refined_constant_space = refine_for_under_approx(assertion, patch_constraint, path_condition)
+                refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
-                refined_constant_space = refine_for_over_approx(assertion, patch_constraint, path_condition)
+                refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
-                refined_constant_space = refine_for_over_fit(assertion, patch_constraint, path_condition)
+                refined_constant_space = refine_for_over_fit(p_specification, patch_constraint, path_condition)
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
     return refined_constant_space, index
@@ -187,7 +187,7 @@ def generate_formula_for_range(patch, constant_space, path_condition, assertion)
     return formula
 
 
-def refine_constant_range(constant_space, model, path_condition, patch_constraint):
+def refine_constant_range(constant_space, model, path_condition, patch_constraint, p_specification):
     refined_patch = None
     constant_count = len(constant_space)
     refined_constant_space = None
@@ -222,12 +222,7 @@ def refine_constant_range(constant_space, model, path_condition, patch_constrain
         patch_space_constraint = And(patch_constraint, constant_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         is_exist_verification = And(path_feasibility, assertion)
-        # is_always_verification = And(path_feasibility, Not(assertion))
-        if path_condition == values.NEGATED_PPC_FORMULA:
-            negated_path = values.LAST_PPC_FORMULA
-        else:
-            negated_path = values.NEGATED_PPC_FORMULA
-        is_always_verification = And(negated_path, And(patch_space_constraint, assertion))
+        is_always_verification = And(path_feasibility, p_specification)
         if is_sat(is_exist_verification):
             if is_sat(is_always_verification):
                 if refined_constant_space is None:
