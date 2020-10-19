@@ -57,14 +57,14 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
 
 
 def print_patch_list(patch_list):
-    count = 0
+    template_count = 0
     emitter.sub_title("List of Top " + str(values.DEFAULT_PATCH_RANK_LIMIT) + " Correct Patches")
     if not patch_list:
         emitter.warning("\t[warning] unable to generate any patch")
         return
     for patch in patch_list:
-        count = count + 1
-        emitter.sub_sub_title("Patch #" + str(count))
+        template_count = template_count + 1
+        emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_constraint = extractor.extract_constraints_from_patch(patch)
@@ -78,8 +78,24 @@ def print_patch_list(patch_list):
                 emitter.highlight("\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
                 concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
                 emitter.highlight("\t\tCount: " + str(concrete_count))
-        if count == values.DEFAULT_PATCH_RANK_LIMIT:
+        if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
+
+
+def count_concrete_patches(patch_list):
+    con_count = 0
+    for patch in patch_list:
+        patch_constraint = extractor.extract_constraints_from_patch(patch)
+        patch_constraint_str = patch_constraint.serialize()
+        patch_index = utilities.get_hash(patch_constraint_str)
+        constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+        for constant_name in constant_space:
+            constant_info = constant_space[constant_name]
+            lower_bound = str(constant_info['lower-bound'])
+            upper_bound = str(constant_info['upper-bound'])
+            tmp_count = len(range(int(lower_bound), int(upper_bound) + 1))
+            con_count = con_count + tmp_count
+    return con_count
 
 
 def rank_patches(patch_list):
@@ -118,7 +134,12 @@ def run(project_path, program_path):
             emitter.warning("\tcollision detected in patch score map")
         values.LIST_PATCH_SCORE[patch_index] = 0
         values.LIST_PATCH_CONSTRAINTS[patch_index] = generator.generate_constraints_on_constants(patch)
-    values.COUNT_PATCH_START = len(P)
+
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        values.COUNT_PATCH_START = count_concrete_patches(P)
+    else:
+        values.COUNT_PATCH_START = len(P)
+
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
     emitter.sub_title("Evaluating Patch Pool")
@@ -171,7 +192,11 @@ def run(project_path, program_path):
     else:
         ranked_patch_list = rank_patches(P)
         print_patch_list(ranked_patch_list)
-        values.COUNT_PATCH_END = len(ranked_patch_list)
+        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            values.COUNT_PATCH_END = count_concrete_patches(ranked_patch_list)
+        else:
+            values.COUNT_PATCH_END = len(ranked_patch_list)
+
 
 
 def concolic_exploration(program_path):
