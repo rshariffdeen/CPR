@@ -110,6 +110,13 @@ def refine_patch_space(assertion, patch, path_condition, index):
     return refined_constant_space, index
 
 
+def is_valid_range(range):
+    lower_bound, upper_bound = range
+    if lower_bound <= upper_bound:
+        return True
+    return False
+
+
 def generate_new_range(constant_space, partition_list):
     new_range_list = list()
     constant_count = len(constant_space)
@@ -119,8 +126,10 @@ def generate_new_range(constant_space, partition_list):
             partition_value = partition_list[constant_name]
             range_lower = (constant_info['lower-bound'], partition_value - 1)
             range_upper = (partition_value + 1, constant_info['upper-bound'])
-            new_range_list.append((range_lower,))
-            new_range_list.append((range_upper,))
+            if is_valid_range(range_upper):
+                new_range_list.append((range_lower,))
+            if is_valid_range(range_upper):
+                new_range_list.append((range_upper,))
 
     elif constant_count == 2:
         for constant_name_a in constant_space:
