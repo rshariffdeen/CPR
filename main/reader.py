@@ -3,6 +3,10 @@ import json
 import pickle
 import re
 from main import emitter, definitions, values
+from six.moves import cStringIO
+from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV
+import os
+from pysmt.smtlib.parser import SmtLibParser
 
 
 def read_json(file_path):
@@ -110,7 +114,10 @@ def collect_symbolic_path(log_path, project_path):
                         path_condition = ""
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
-    return ppc_list, last_sym_path
+    parser = SmtLibParser()
+    script = parser.get_script(cStringIO(last_sym_path))
+    formula = script.get_last_formula()
+    return ppc_list, formula
 
 
 def collect_trace(file_path, project_path):

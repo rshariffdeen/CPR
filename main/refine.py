@@ -45,8 +45,8 @@ def refine_for_over_approx(assertion, patch_constraint, path_condition):
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_space_constraint = And(patch_constraint, constant_constraint)
-    negated_path_condition = values.NEGATED_PPC_FORMULA
-    path_feasibility = And(negated_path_condition, patch_space_constraint)
+    # negated_path_condition = values.NEGATED_PPC_FORMULA
+    path_feasibility = And(path_condition, patch_space_constraint)
     specification = And(path_feasibility, assertion)
     existential_quantification = is_unsat(specification)
     refined_constant_space = constant_space
@@ -54,12 +54,12 @@ def refine_for_over_approx(assertion, patch_constraint, path_condition):
         while not existential_quantification:
             emitter.debug("refining for existential quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, patch_constraint)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch_constraint)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
             patch_space_constraint = And(patch_constraint, constant_constraint)
-            path_feasibility = And(negated_path_condition, patch_space_constraint)
+            path_feasibility = And(path_condition, patch_space_constraint)
             specification = And(path_feasibility, assertion)
             existential_quantification = is_unsat(specification)
     return refined_constant_space
@@ -223,7 +223,10 @@ def refine_constant_range(constant_space, model, path_condition, patch_constrain
         path_feasibility = And(path_condition, patch_space_constraint)
         is_exist_verification = And(path_feasibility, assertion)
         # is_always_verification = And(path_feasibility, Not(assertion))
-        negated_path = values.NEGATED_PPC_FORMULA
+        if path_condition == values.NEGATED_PPC_FORMULA:
+            negated_path = values.LAST_PPC_FORMULA
+        else:
+            negated_path = values.NEGATED_PPC_FORMULA
         is_always_verification = And(negated_path, And(patch_space_constraint, assertion))
         if is_sat(is_exist_verification):
             if is_sat(is_always_verification):

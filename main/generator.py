@@ -459,11 +459,11 @@ def generate_path_for_negation():
             constraint_list.append(patch_constraint.serialize())
 
     last_sym_path = values.LAST_PPC_FORMULA
-    script = parser.get_script(cStringIO(last_sym_path))
-    formula = script.get_last_formula()
+    # script = parser.get_script(cStringIO(last_sym_path))
+    # formula = script.get_last_formula()
     negated_path = None
     while constraint_list:
-        constraint = formula.arg(1)
+        constraint = last_sym_path.arg(1)
         constraint_str = constraint.serialize()
         if constraint_str in constraint_list:
             constraint_list.remove(constraint_str)
@@ -472,8 +472,8 @@ def generate_path_for_negation():
             negated_path = constraint
         else:
             negated_path = And(negated_path, constraint)
-        formula = formula.arg(0)
-    negated_path = And(negated_path, formula)
+            last_sym_path = last_sym_path.arg(0)
+    negated_path = And(negated_path, last_sym_path)
     return negated_path
 
 
