@@ -29,7 +29,7 @@ def refine_for_under_approx(assertion, patch, path_condition):
         while not universal_quantification:
             emitter.debug("refining for universal quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, path_condition, Not(assertion), patch)
+            refined_constant_space = refine_constant_range(constant_space, model, path_condition, patch)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
@@ -56,8 +56,7 @@ def refine_for_over_approx(assertion, patch, path_condition):
         while not existential_quantification:
             emitter.debug("refining for existential quantification")
             model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, assertion,
-                                                           patch)
+            refined_constant_space = refine_constant_range(constant_space, model, negated_path_condition, patch)
             if refined_constant_space is None:
                 break
             constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
