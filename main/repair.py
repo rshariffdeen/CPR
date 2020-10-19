@@ -73,7 +73,7 @@ def print_patch_list(patch_list):
             constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
             for constant_name in constant_space:
                 constant_info = constant_space[constant_name]
-                is_continuous = constant_space['is_continuous']
+                is_continuous = constant_info['is_continuous']
                 if is_continuous:
                     lower_bound = str(constant_info['lower-bound'])
                     upper_bound = str(constant_info['upper-bound'])
