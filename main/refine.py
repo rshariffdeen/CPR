@@ -87,23 +87,19 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_space_constraint = And(patch_constraint, constant_constraint)
-    path_condition = values.NEGATED_PPC_FORMULA
     path_feasibility = And(path_condition, patch_space_constraint)
     specification = And(path_feasibility, p_specification)
     existential_quantification = is_unsat(specification)
     refined_constant_space = constant_space
     if not existential_quantification:
-        while not existential_quantification:
-            emitter.debug("refining for existential quantification")
-            model = generator.generate_model(specification)
-            refined_constant_space = refine_constant_range(model, constant_space, path_condition, patch_constraint, p_specification)
-            if refined_constant_space is None:
-                break
-            constant_constraint = generator.generate_constant_constraint_formula(refined_constant_space)
-            patch_space_constraint = And(patch_constraint, constant_constraint)
-            path_feasibility = And(path_condition, patch_space_constraint)
-            specification = And(path_feasibility, p_specification)
-            existential_quantification = is_unsat(specification)
+        emitter.debug("refining for existential quantification")
+        model = generator.generate_model(specification)
+        refined_partition_list = refine_constant_range(model, constant_space, path_condition, patch_constraint, p_specification)
+        if refined_partition_list:
+            if len(refined_partition_list) == 1:
+                refined_constant_space = refined_partition_list[0]
+            else:
+                refined_constant_space = merge_partition(refined_partition_list)
     return refined_constant_space
 
 
@@ -130,13 +126,15 @@ def refine_patch_space(p_specification, patch_constraint, path_condition, index)
     path_feasibility = And(path_condition, patch_space_constraint)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     refined_constant_space = constant_space
+    negated_path_condition = values.NEGATED_PPC_FORMULA
     if is_sat(path_feasibility):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
             if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
                 refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
-                refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, path_condition)
+
+                refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
                 refined_constant_space = refine_for_over_fit(p_specification, patch_constraint, path_condition)
         else:
