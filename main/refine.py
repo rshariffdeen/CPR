@@ -16,45 +16,46 @@ import copy
 
 
 def merge_partition(partition_list):
-    sorted_partition_list = sorted(partition_list, key=lambda x: x['const_a']['lower-bound'])
-    is_continuous = True
-    lower_bound = None
-    upper_bound = None
-    invalid_list = []
-    valid_list = []
     merged_partition = dict()
-    for partition in sorted_partition_list:
-        p_lower_bound = partition['const_a']['lower-bound']
-        p_upper_bound = partition['const_a']['upper-bound']
-        if lower_bound is None:
-            lower_bound = p_lower_bound
-            upper_bound = p_upper_bound
-        else:
-            if upper_bound + 1 == p_lower_bound:
+    for constant in partition_list:
+        sorted_partition_list = sorted(partition_list, key=lambda x: x[constant]['lower-bound'])
+        is_continuous = True
+        lower_bound = None
+        upper_bound = None
+        invalid_list = []
+        valid_list = []
+        for partition in sorted_partition_list:
+            p_lower_bound = partition[constant]['lower-bound']
+            p_upper_bound = partition[constant]['upper-bound']
+            if lower_bound is None:
+                lower_bound = p_lower_bound
                 upper_bound = p_upper_bound
             else:
-                is_continuous = False
-                invalid_list = invalid_list + list(range(upper_bound + 1, p_lower_bound))
-                upper_bound = p_upper_bound
-        valid_list = valid_list + list(range(p_lower_bound, p_upper_bound + 1))
+                if upper_bound + 1 == p_lower_bound:
+                    upper_bound = p_upper_bound
+                else:
+                    is_continuous = False
+                    invalid_list = invalid_list + list(range(upper_bound + 1, p_lower_bound))
+                    upper_bound = p_upper_bound
+            valid_list = valid_list + list(range(p_lower_bound, p_upper_bound + 1))
 
-    if not is_continuous:
-        invalid_list = invalid_list + list(range(values.DEFAULT_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_UPPER_BOUND))
-        constraint_info = dict()
-        constraint_info['lower-bound'] = None
-        constraint_info['upper-bound'] = None
-        constraint_info['valid-list'] = valid_list
-        constraint_info['invalid-list'] = invalid_list
-        constraint_info['is_continuous'] = False
-        merged_partition['const_a'] = constraint_info
-    else:
-        constraint_info = dict()
-        constraint_info['lower-bound'] = lower_bound
-        constraint_info['upper-bound'] = upper_bound
-        constraint_info['valid-list'] = []
-        constraint_info['invalid-list'] = []
-        constraint_info['is_continuous'] = True
-        merged_partition['const_a'] = constraint_info
+        if not is_continuous:
+            invalid_list = invalid_list + list(range(values.DEFAULT_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_UPPER_BOUND))
+            constraint_info = dict()
+            constraint_info['lower-bound'] = None
+            constraint_info['upper-bound'] = None
+            constraint_info['valid-list'] = valid_list
+            constraint_info['invalid-list'] = invalid_list
+            constraint_info['is_continuous'] = False
+            merged_partition[constant] = constraint_info
+        else:
+            constraint_info = dict()
+            constraint_info['lower-bound'] = lower_bound
+            constraint_info['upper-bound'] = upper_bound
+            constraint_info['valid-list'] = []
+            constraint_info['invalid-list'] = []
+            constraint_info['is_continuous'] = True
+            merged_partition[constant] = constraint_info
 
     return merged_partition
 
