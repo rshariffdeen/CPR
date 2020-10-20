@@ -112,6 +112,8 @@ def refine_for_over_fit(p_specification, patch_constraint, path_condition, negat
     patch_index = utilities.get_hash(patch_constraint_str)
     refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
     values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_constant_space
+    if refined_constant_space is None:
+        return None
     refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
     return refined_constant_space
 
