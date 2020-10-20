@@ -253,6 +253,8 @@ def refine_constant_range(model, constant_space, path_condition, patch_constrain
             else:
                 invalid_list = partition_range[index]
                 constant_info['invalid-list'] = invalid_list
+                valid_list = constant_info['valid-list']
+                constant_info['valid-list'] = list(set(valid_list) - set(invalid_list))
             partitioned_constant_space[constant_name] = constant_info
             index = index + 1
 
