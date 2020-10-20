@@ -78,6 +78,8 @@ def refine_for_under_approx(p_specification, patch_constraint, path_condition):
                 refined_constant_space = refined_partition_list[0]
             else:
                 refined_constant_space = merge_partition(refined_partition_list)
+        else:
+            refined_constant_space = None
     return refined_constant_space
 
 
@@ -100,6 +102,8 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
                 refined_constant_space = refined_partition_list[0]
             else:
                 refined_constant_space = merge_partition(refined_partition_list)
+        else:
+            refined_constant_space = None
     return refined_constant_space
 
 
