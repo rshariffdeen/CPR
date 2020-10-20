@@ -103,17 +103,10 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     return refined_constant_space
 
 
-def refine_for_over_fit(p_specification, patch_constraint, path_condition):
-    patch_constraint_str = patch_constraint.serialize()
-    patch_index = utilities.get_hash(patch_constraint_str)
-    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
-    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
-    patch_space_constraint = And(patch_constraint, constant_constraint)
-    negated_path_condition = values.NEGATED_PPC_FORMULA
-    path_feasibility = And(negated_path_condition, patch_space_constraint)
-    specification = And(path_feasibility, p_specification)
-    existential_quantification = is_unsat(specification)
-    refined_constant_space = constant_space
+def refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition):
+    u_refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
+    o_refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
+    refined_constant_space = merge_partition([u_refined_constant_space, o_refined_constant_space])
     return refined_constant_space
 
 
@@ -136,7 +129,7 @@ def refine_patch_space(p_specification, patch_constraint, path_condition, index)
 
                 refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
             elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
-                refined_constant_space = refine_for_over_fit(p_specification, patch_constraint, path_condition)
+                refined_constant_space = refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition)
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
     return refined_constant_space, index
