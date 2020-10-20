@@ -104,9 +104,11 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
 
 
 def refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition):
-    u_refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
-    o_refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
-    refined_constant_space = merge_partition([u_refined_constant_space, o_refined_constant_space])
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    refined_constant_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
+    values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_constant_space
+    refined_constant_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
     return refined_constant_space
 
 
