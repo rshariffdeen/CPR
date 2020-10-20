@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   if (__trident_choice("L9", "bool", (int[]){x, a}, (char*[]){"x", "a"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
+  TRIDENT_OUTPUT("x", "i32", x);
   b = x * a;
-  TRIDENT_OUTPUT("b", "i32", b);
   return 0;
 }
