@@ -150,13 +150,19 @@ def generate_new_range(constant_space, partition_list):
     if constant_count == 1:
         for constant_name in constant_space:
             constant_info = constant_space[constant_name]
-            partition_value = partition_list[constant_name]
-            range_lower = (constant_info['lower-bound'], partition_value - 1)
-            range_upper = (partition_value + 1, constant_info['upper-bound'])
-            if is_valid_range(range_lower):
-                new_range_list.append((range_lower,))
-            if is_valid_range(range_upper):
-                new_range_list.append((range_upper,))
+            is_continuous = constant_info['is_continuous']
+            if is_continuous:
+                partition_value = partition_list[constant_name]
+                range_lower = (constant_info['lower-bound'], partition_value - 1)
+                range_upper = (partition_value + 1, constant_info['upper-bound'])
+                if is_valid_range(range_lower):
+                    new_range_list.append((range_lower,))
+                if is_valid_range(range_upper):
+                    new_range_list.append((range_upper,))
+            else:
+                invalid_list = constant_info['invalid-list']
+                invalid_list.append(partition_value)
+                new_range_list.append((invalid_list,))
 
     elif constant_count == 2:
         for constant_name_a in constant_space:
@@ -239,9 +245,14 @@ def refine_constant_range(model, constant_space, path_condition, patch_constrain
         index = 0
         for constant_name in constant_space:
             constant_info = constant_space[constant_name]
-            lower_bound, upper_bound = partition_range[index]
-            constant_info['lower-bound'] = lower_bound
-            constant_info['upper-bound'] = upper_bound
+            is_continuous = constant_info['is_continuous']
+            if is_continuous:
+                lower_bound, upper_bound = partition_range[index]
+                constant_info['lower-bound'] = lower_bound
+                constant_info['upper-bound'] = upper_bound
+            else:
+                invalid_list = partition_range[index]
+                constant_info['invalid-list'] = invalid_list
             partitioned_constant_space[constant_name] = constant_info
             index = index + 1
 

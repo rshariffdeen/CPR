@@ -503,21 +503,13 @@ def generate_constant_constraint_formula(constant_list):
             lower_bound = int(constant_info['lower-bound'])
             sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
         else:
-            valid_list = constant_info['valid-list']
             invalid_list = constant_info['invalid-list']
             sub_formula = None
-            if len(valid_list) >= len(invalid_list):
-                for value in valid_list:
-                    if sub_formula is None:
-                        sub_formula = Equals(sym_var, SBV(int(value), 32))
-                    else:
-                        sub_formula = And(sub_formula, Equals(sym_var, SBV(int(value), 32)))
-            else:
-                for value in invalid_list:
-                    if sub_formula is None:
-                        sub_formula = NotEquals(sym_var, SBV(int(value), 32))
-                    else:
-                        sub_formula = And(sub_formula, NotEquals(sym_var, SBV(int(value), 32)))
+            for value in invalid_list:
+                if sub_formula is None:
+                    sub_formula = NotEquals(sym_var, SBV(int(value), 32))
+                else:
+                    sub_formula = And(sub_formula, NotEquals(sym_var, SBV(int(value), 32)))
 
         if formula is None:
             formula = sub_formula
