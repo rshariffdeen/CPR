@@ -120,9 +120,9 @@ def refine_patch_space(p_specification, patch_constraint, path_condition, index)
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
     constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
-    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
-    if constant_constraint is None:
+    if not constant_space:
         return None, index
+    constant_constraint = generator.generate_constant_constraint_formula(constant_space)
     patch_space_constraint = And(patch_constraint, constant_constraint)
     path_feasibility = And(path_condition, patch_space_constraint)
     patch_score = values.LIST_PATCH_SCORE[patch_index]
