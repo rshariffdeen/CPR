@@ -152,37 +152,40 @@ def generate_new_range(constant_space, partition_list):
     new_range_list = list()
     constant_count = len(constant_space)
     if constant_count == 1:
-        for constant_name in constant_space:
-            constant_info = constant_space[constant_name]
-            is_continuous = constant_info['is_continuous']
-            partition_value = partition_list[constant_name]
-            if is_continuous:
-                range_lower = (constant_info['lower-bound'], partition_value - 1)
-                range_upper = (partition_value + 1, constant_info['upper-bound'])
-                if is_valid_range(range_lower):
-                    new_range_list.append((range_lower,))
-                if is_valid_range(range_upper):
-                    new_range_list.append((range_upper,))
-            else:
-                invalid_list = constant_info['invalid-list']
-                valid_list = constant_info['valid-list']
-                valid_list.remove(partition_value)
-                invalid_list.append(partition_value)
-                if valid_list:
-                    new_range_list.append((invalid_list,))
+        constant_name = list(constant_space.keys())[0]
+        constant_info = constant_space[constant_name]
+        is_continuous = constant_info['is_continuous']
+        partition_value = partition_list[constant_name]
+        if is_continuous:
+            range_lower = (constant_info['lower-bound'], partition_value - 1)
+            range_upper = (partition_value + 1, constant_info['upper-bound'])
+            if is_valid_range(range_lower):
+                new_range_list.append((range_lower,))
+            if is_valid_range(range_upper):
+                new_range_list.append((range_upper,))
+        else:
+            invalid_list = constant_info['invalid-list']
+            valid_list = constant_info['valid-list']
+            valid_list.remove(partition_value)
+            invalid_list.append(partition_value)
+            if valid_list:
+                new_range_list.append((invalid_list,))
 
     elif constant_count == 2:
-        for constant_name_a in constant_space:
-            constant_info_a = constant_space[constant_name_a]
-            partition_value_a = partition_list[constant_name_a]
-            for constant_name_b in constant_space:
-                constant_info_b = constant_space[constant_name_b]
-                partition_value_b = partition_list[constant_name_b]
-                range_lower_a = (constant_info_a['lower-bound'], partition_value_a - 1)
-                range_upper_a = (partition_value_a + 1, constant_info_a['upper-bound'])
+        constant_name_a = list(constant_space.keys())[0]
+        constant_name_b = list(constant_space.keys())[1]
+        constant_info_a = constant_space[constant_name_a]
+        is_continuous_a = constant_info_a['is_continuous']
+        partition_value_a = partition_list[constant_name_a]
+        constant_info_b = constant_space[constant_name_b]
+        partition_value_b = partition_list[constant_name_b]
+        is_continuous_b = constant_info_b['is_continuous']
+        if is_continuous_a:
+            range_lower_a = (constant_info_a['lower-bound'], partition_value_a - 1)
+            range_upper_a = (partition_value_a + 1, constant_info_a['upper-bound'])
+            if is_continuous_b:
                 range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
                 range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
-
                 if is_valid_range(range_lower_a):
                     if is_valid_range(range_lower_b):
                         new_range_list.append((range_lower_a, range_lower_b))
@@ -194,6 +197,30 @@ def generate_new_range(constant_space, partition_list):
                         new_range_list.append((range_upper_a, range_lower_b))
                     if is_valid_range(range_upper_b):
                         new_range_list.append((range_upper_a, range_upper_b))
+            else:
+                invalid_list_b = constant_info_b['invalid-list']
+                valid_list_b = constant_info_b['valid-list']
+                valid_list_b.remove(partition_value_b)
+                invalid_list_b.append(partition_value_b)
+                if valid_list_b:
+                    if is_valid_range(range_lower_a):
+                        new_range_list.append((range_lower_a, invalid_list_b))
+                    if is_valid_range(range_upper_a):
+                        new_range_list.append((range_upper_a, invalid_list_b))
+
+        else:
+            if is_continuous_b:
+                invalid_list_a = constant_info_a['invalid-list']
+                valid_list_a = constant_info_a['valid-list']
+                valid_list_a.remove(partition_value_a)
+                invalid_list_a.append(partition_value_a)
+                range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
+                range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
+                if valid_list_a:
+                    if is_valid_range(range_lower_b):
+                        new_range_list.append((invalid_list_a, range_lower_b))
+                    if is_valid_range(range_upper_b):
+                        new_range_list.append((invalid_list_a, range_upper_b))
 
     elif constant_count == 3:
         for constant_name_a in constant_space:
