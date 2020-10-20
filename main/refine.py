@@ -151,8 +151,8 @@ def generate_new_range(constant_space, partition_list):
         for constant_name in constant_space:
             constant_info = constant_space[constant_name]
             is_continuous = constant_info['is_continuous']
+            partition_value = partition_list[constant_name]
             if is_continuous:
-                partition_value = partition_list[constant_name]
                 range_lower = (constant_info['lower-bound'], partition_value - 1)
                 range_upper = (partition_value + 1, constant_info['upper-bound'])
                 if is_valid_range(range_lower):
