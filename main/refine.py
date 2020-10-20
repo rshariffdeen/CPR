@@ -165,8 +165,11 @@ def generate_new_range(constant_space, partition_list):
                     new_range_list.append((range_upper,))
             else:
                 invalid_list = constant_info['invalid-list']
+                valid_list = constant_info['valid-list']
+                valid_list.remove(partition_value)
                 invalid_list.append(partition_value)
-                new_range_list.append((invalid_list,))
+                if valid_list:
+                    new_range_list.append((invalid_list,))
 
     elif constant_count == 2:
         for constant_name_a in constant_space:
