@@ -284,7 +284,7 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint):
             fixed_point_list[var_name] = utilities.get_signed_value(model[var_name])
     constant_count = len(constant_list)
     is_multi_dimension = False
-    if len(constant_count) > 1:
+    if constant_count > 1:
         is_multi_dimension = True
 
     for constant_name in constant_list:
