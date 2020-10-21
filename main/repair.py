@@ -94,25 +94,34 @@ def print_patch_list(patch_list):
             break
 
 
-def count_concrete_patches(patch_list):
-    con_count = 0
-    for patch in patch_list:
-        patch_constraint = extractor.extract_constraints_from_patch(patch)
-        patch_constraint_str = patch_constraint.serialize()
-        patch_index = utilities.get_hash(patch_constraint_str)
-        constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
-        for constant_name in constant_space:
-            constant_info = constant_space[constant_name]
-            is_continuous = constant_info['is_continuous']
-            lower_bound = str(constant_info['lower-bound'])
-            upper_bound = str(constant_info['upper-bound'])
-            valid_list = constant_info['valid-list']
-            if is_continuous:
-                tmp_count = len(range(int(lower_bound), int(upper_bound) + 1))
-            else:
-                tmp_count = len(valid_list)
-            con_count = con_count + tmp_count
+def count_concrete_patches_per_template(abstract_patch):
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+        return 1
+    patch_constraint = extractor.extract_constraints_from_patch(abstract_patch)
+    patch_constraint_str = patch_constraint.serialize()
+    patch_index = utilities.get_hash(patch_constraint_str)
+    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+    con_count = 1
+    for constant_name in constant_space:
+        constant_info = constant_space[constant_name]
+        is_continuous = constant_info['is_continuous']
+        lower_bound = str(constant_info['lower-bound'])
+        upper_bound = str(constant_info['upper-bound'])
+        valid_list = constant_info['valid-list']
+        if is_continuous:
+            constant_count = len(range(int(lower_bound), int(upper_bound) + 1))
+        else:
+            constant_count = len(valid_list)
+        con_count = con_count * constant_count
     return con_count
+
+
+def count_concrete_patches(patch_list):
+    patch_count = 0
+    for abstract_patch in patch_list:
+        concrete_count = count_concrete_patches_per_template(abstract_patch)
+        patch_count = patch_count + concrete_count
+    return patch_count
 
 
 def rank_patches(patch_list):
@@ -123,11 +132,12 @@ def rank_patches(patch_list):
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         patch_len = 10000 - len(patch_constraint_str)
-        filtered_list.append((patch, patch_score, patch_len))
+        patch_count = count_concrete_patches_per_template(patch)
+        filtered_list.append((patch, patch_score, patch_count, patch_len))
 
-    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2))
+    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2, 3))
     ranked_list.reverse()
-    patch_list = numpy.array(ranked_list)[:,0]
+    patch_list = numpy.array(ranked_list)[:, 0]
     return list(patch_list)
 
 
