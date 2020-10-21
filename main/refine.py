@@ -69,6 +69,8 @@ def refine_for_under_approx(p_specification, patch_constraint, path_condition):
         emitter.debug("refining for universal quantification")
         model = generator.generate_model(specification)
         refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+        if refined_patch_space is None:
+            break
         constant_constraint = generator.generate_constant_constraint_formula(refined_patch_space)
         patch_space_constraint = And(patch_constraint, constant_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
@@ -94,6 +96,8 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
                 emitter.debug("refining for existential quantification")
                 model = generator.generate_model(specification)
                 refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+                if refined_patch_space is None:
+                    break
                 constant_constraint = generator.generate_constant_constraint_formula(refined_patch_space)
                 patch_space_constraint = And(patch_constraint, constant_constraint)
                 path_feasibility = And(path_condition, patch_space_constraint)
