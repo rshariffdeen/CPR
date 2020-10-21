@@ -313,7 +313,7 @@ def refine_constant_range(constant_info, path_condition, patch_constraint, fixed
         is_exist_verification = And(path_feasibility, input_fixation)
         if is_sat(is_exist_verification):
             new_model = generator.generate_model(is_exist_verification)
-            new_partition_value = new_model[constant_name]
+            new_partition_value = new_model[constant_name][0]
             constant_info['partition-value'] = new_partition_value
             child_list = refine_constant_range(constant_info, path_condition,
                                                patch_constraint, fixed_point_list)
