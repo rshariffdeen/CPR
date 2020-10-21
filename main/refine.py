@@ -82,6 +82,7 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     specification = And(path_feasibility, p_specification)
     existential_quantification = is_unsat(specification)
     if not existential_quantification:
+        values.LIST_PATCH_SCORE[patch_index] = values.LIST_PATCH_SCORE[patch_index] - 100
         emitter.debug("refining for existential quantification")
         model = generator.generate_model(specification)
         refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
