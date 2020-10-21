@@ -15,18 +15,17 @@ import random
 import copy
 
 
-def merge_partition(partition_list, constant_name):
+def merge_partition(partition_list):
     merged_partition = dict()
-
-    sorted_partition_list = sorted(partition_list, key=lambda x: x[constant_name]['lower-bound'])
+    sorted_partition_list = sorted(partition_list, key=lambda x: x['lower-bound'])
     is_continuous = True
     lower_bound = None
     upper_bound = None
     invalid_list = []
     valid_list = []
     for partition in sorted_partition_list:
-        p_lower_bound = partition[constant_name]['lower-bound']
-        p_upper_bound = partition[constant_name]['upper-bound']
+        p_lower_bound = partition['lower-bound']
+        p_upper_bound = partition['upper-bound']
         if lower_bound is None:
             lower_bound = p_lower_bound
             upper_bound = p_upper_bound
@@ -41,21 +40,17 @@ def merge_partition(partition_list, constant_name):
 
     if not is_continuous:
         invalid_list = invalid_list + list(range(values.DEFAULT_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_UPPER_BOUND))
-        constraint_info = dict()
-        constraint_info['lower-bound'] = None
-        constraint_info['upper-bound'] = None
-        constraint_info['valid-list'] = valid_list
-        constraint_info['invalid-list'] = invalid_list
-        constraint_info['is_continuous'] = False
-        merged_partition[constant_name] = constraint_info
+        merged_partition['lower-bound'] = None
+        merged_partition['upper-bound'] = None
+        merged_partition['valid-list'] = valid_list
+        merged_partition['invalid-list'] = invalid_list
+        merged_partition['is_continuous'] = False
     else:
-        constraint_info = dict()
-        constraint_info['lower-bound'] = lower_bound
-        constraint_info['upper-bound'] = upper_bound
-        constraint_info['valid-list'] = []
-        constraint_info['invalid-list'] = []
-        constraint_info['is_continuous'] = True
-        merged_partition[constant_name] = constraint_info
+        merged_partition['lower-bound'] = lower_bound
+        merged_partition['upper-bound'] = upper_bound
+        merged_partition['valid-list'] = []
+        merged_partition['invalid-list'] = []
+        merged_partition['is_continuous'] = True
 
     return merged_partition
 
