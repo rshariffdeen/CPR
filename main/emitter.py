@@ -189,3 +189,4 @@ def help():
     write("\t" + definitions.ARG_SELECTION_METHOD + "\t| " + "selection strategy [0: deterministic, 1: random] (default=0)", RED)
     write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", RED)
     write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "patch type [0: concrete, 1: abstract] (default=0)", RED)
+    write("\t" + definitions.ARG_REFINE_METHOD + "\t| " + "refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx] (default=0)", RED)
