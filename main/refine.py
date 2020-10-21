@@ -148,9 +148,9 @@ def generate_partition_for_constant(constant_info, partition_value):
     is_continuous = constant_info['is_continuous']
     if is_continuous:
         if is_valid_range(range_lower):
-            partition_list.append((range_lower,))
+            partition_list.append(range_lower)
         if is_valid_range(range_upper):
-            partition_list.append((range_upper,))
+            partition_list.append(range_upper)
     partition_list.append(range_equal)
     return partition_list
 
