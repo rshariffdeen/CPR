@@ -287,6 +287,10 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint):
         if "rvalue" in var_name:
             fixed_point_list[var_name] = utilities.get_signed_value(model[var_name])
     constant_count = len(constant_list)
+
+    if constant_count == 0:
+        return None
+
     is_multi_dimension = False
     if constant_count > 1:
         is_multi_dimension = True
