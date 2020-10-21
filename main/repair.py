@@ -66,24 +66,30 @@ def print_patch_list(patch_list):
         template_count = template_count + 1
         emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
+        concrete_patch_count = 1
+        patch_constraint = extractor.extract_constraints_from_patch(patch)
+        patch_constraint_str = patch_constraint.serialize()
+        patch_index = utilities.get_hash(patch_constraint_str)
+        patch_score = values.LIST_PATCH_SCORE[patch_index]
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            patch_constraint = extractor.extract_constraints_from_patch(patch)
-            patch_constraint_str = patch_constraint.serialize()
-            patch_index = utilities.get_hash(patch_constraint_str)
             constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
             for constant_name in constant_space:
+                emitter.highlight("\t\tConstant: " + constant_name)
                 constant_info = constant_space[constant_name]
                 is_continuous = constant_info['is_continuous']
                 if is_continuous:
                     lower_bound = str(constant_info['lower-bound'])
                     upper_bound = str(constant_info['upper-bound'])
-                    emitter.highlight("\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                    emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
                     concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
                 else:
                     valid_list = constant_info['valid-list']
-                    emitter.highlight("\t\tSet: " + str(valid_list))
+                    emitter.highlight("\t\t\tSet: " + str(valid_list))
                     concrete_count = len(valid_list)
                 emitter.highlight("\t\tCount: " + str(concrete_count))
+                concrete_patch_count = concrete_patch_count * concrete_count
+        emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
+        emitter.highlight("\t\tPatch Score: " + str(patch_score))
         if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
 
