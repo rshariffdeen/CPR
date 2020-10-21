@@ -81,14 +81,16 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     path_feasibility = And(path_condition, patch_space_constraint)
     specification = And(path_feasibility, p_specification)
     existential_quantification = is_unsat(specification)
+    refined_patch_space = patch_space
     if not existential_quantification:
-        values.LIST_PATCH_SCORE[patch_index] = values.LIST_PATCH_SCORE[patch_index] - 100
-        emitter.debug("refining for existential quantification")
-        model = generator.generate_model(specification)
-        refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
-        if refined_patch_space is None:
-            values.LIST_PATCH_SCORE[patch_index] = values.LIST_PATCH_SCORE[patch_index] - 10000
-    return patch_space
+        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 1
+        if values.CONF_REFINE_METHOD != values.OPTIONS_REFINE_METHOD[0]:
+            emitter.debug("refining for existential quantification")
+            model = generator.generate_model(specification)
+            refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+    else:
+        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
+    return refined_patch_space
 
 
 def refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition):
@@ -117,13 +119,15 @@ def refine_patch(p_specification, patch_constraint, path_condition, index):
     if is_sat(path_feasibility):
         if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
-            if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
-                refined_patch_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
-            elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
-
-                refined_patch_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
-            elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
-                refined_patch_space = refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition)
+            refined_patch_space = refine_for_over_fit(p_specification, patch_constraint, path_condition,
+                                                      negated_path_condition)
+            # if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[0]:
+            #     refined_patch_space = refine_for_under_approx(p_specification, patch_constraint, path_condition)
+            # elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[1]:
+            #
+            #     refined_patch_space = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition)
+            # elif values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[2]:
+            #     refined_patch_space = refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition)
         else:
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
     return refined_patch_space, index
