@@ -305,11 +305,13 @@ def refine_constant_range(constant_info, path_condition, patch_constraint, p_spe
     constant_name = constant_info['name']
     partition_value = constant_info['partition-value']
     partition_list = generate_partition_for_constant(constant_info, partition_value)
+    constant_list = dict()
     for const_partition in partition_list:
         lower_bound, upper_bound = const_partition
         constant_info['lower-bound'] = lower_bound
         constant_info['upper-bound'] = upper_bound
-        constant_constraint = generator.generate_constant_constraint_formula(constant_info)
+        constant_list[constant_name] = constant_info
+        constant_constraint = generator.generate_constant_constraint_formula(constant_list)
         patch_space_constraint = And(patch_constraint, constant_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         input_fixation = generator.generate_input_constraint_formula(fixed_point_list)
