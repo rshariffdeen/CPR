@@ -136,13 +136,12 @@ def is_valid_range(check_range):
     return False
 
 
-def generate_partition_for_constant(constant_info, partition_value):
+def generate_partition_for_constant(constant_info, partition_value, is_multi_dimension):
     partition_list = list()
     if constant_info['lower-bound'] == constant_info['upper-bound']:
         return partition_list
     range_lower = (constant_info['lower-bound'], partition_value - 1)
     range_upper = (partition_value + 1, constant_info['upper-bound'])
-    range_equal = (partition_value, partition_value)
     is_continuous = constant_info['is_continuous']
 
     if is_continuous:
@@ -150,7 +149,9 @@ def generate_partition_for_constant(constant_info, partition_value):
             partition_list.append(range_lower)
         if is_valid_range(range_upper):
             partition_list.append(range_upper)
-    partition_list.append(range_equal)
+    if is_multi_dimension:
+        range_equal = (partition_value, partition_value)
+        partition_list.append(range_equal)
     return partition_list
 
 #
@@ -281,13 +282,17 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint):
             constant_list[var_name] = int(model[var_name][0])
         if "rvalue" in var_name:
             fixed_point_list[var_name] = utilities.get_signed_value(model[var_name])
+    constant_count = len(constant_list)
+    is_multi_dimension = False
+    if len(constant_count) > 1:
+        is_multi_dimension = True
 
     for constant_name in constant_list:
         partition_value = constant_list[constant_name]
         constant_info = patch_space[constant_name]
         constant_info['name'] = constant_name
         constant_info['partition-value'] = partition_value
-        refined_partition_list = refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list)
+        refined_partition_list = refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list, is_multi_dimension)
         if refined_partition_list:
             if len(refined_partition_list) == 1:
                 refined_constant_range = refined_partition_list[0]
@@ -299,11 +304,11 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint):
     return refined_patch_space
 
 
-def refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list):
+def refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list, is_multi_dimension):
     refined_list = list()
     constant_name = constant_info['name']
     partition_value = constant_info['partition-value']
-    partition_list = generate_partition_for_constant(constant_info, partition_value)
+    partition_list = generate_partition_for_constant(constant_info, partition_value, is_multi_dimension)
     if not partition_list:
         return refined_list
     constant_list = dict()
@@ -322,7 +327,7 @@ def refine_constant_range(constant_info, path_condition, patch_constraint, fixed
             new_partition_value = new_model[constant_name][0]
             constant_info['partition-value'] = new_partition_value
             child_list = refine_constant_range(constant_info, path_condition,
-                                               patch_constraint, fixed_point_list)
+                                               patch_constraint, fixed_point_list, is_multi_dimension)
             refined_list = refined_list + child_list
         else:
             emitter.data("adding space", constant_info)
