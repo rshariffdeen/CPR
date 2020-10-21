@@ -104,8 +104,8 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
             else:
                 refined_constant_space = merge_partition(refined_partition_list)
         else:
-            refined_constant_space = None
-    return refined_constant_space
+            values.LIST_PATCH_SCORE[patch_index] = values.LIST_PATCH_SCORE[patch_index] - 10000
+    return constant_space
 
 
 def refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition):
