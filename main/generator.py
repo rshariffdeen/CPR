@@ -2,7 +2,7 @@ from main.synthesis import load_specification, synthesize_parallel, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals
+from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals, BVConcat, Select, BV
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
@@ -521,7 +521,10 @@ def generate_input_constraint_formula(fixed_point_list):
     formula = None
     for var_name in fixed_point_list:
         fixed_point = fixed_point_list[var_name]
-        sym_var = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_array = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_var = BVConcat(Select(sym_array, BV(3, 32)),
+                 BVConcat(Select(sym_array, BV(2, 32)),
+                 BVConcat(Select(sym_array, BV(1, 32)), Select(sym_array, BV(0, 32)))))
         sub_formula = Equals(sym_var, SBV(int(fixed_point), 32))
         if formula is None:
             formula = sub_formula
