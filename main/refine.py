@@ -65,10 +65,15 @@ def refine_for_under_approx(p_specification, patch_constraint, path_condition):
     specification = And(path_feasibility, Not(p_specification))
     universal_quantification = is_unsat(specification)
     refined_patch_space = patch_space
-    if not universal_quantification:
+    while not universal_quantification:
         emitter.debug("refining for universal quantification")
         model = generator.generate_model(specification)
         refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+        constant_constraint = generator.generate_constant_constraint_formula(refined_patch_space)
+        patch_space_constraint = And(patch_constraint, constant_constraint)
+        path_feasibility = And(path_condition, patch_space_constraint)
+        specification = And(path_feasibility, Not(p_specification))
+        universal_quantification = is_unsat(specification)
     return refined_patch_space
 
 
@@ -85,9 +90,16 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     if not existential_quantification:
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 1
         if values.CONF_REFINE_METHOD != values.OPTIONS_REFINE_METHOD[0]:
-            emitter.debug("refining for existential quantification")
-            model = generator.generate_model(specification)
-            refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+            while not existential_quantification:
+                emitter.debug("refining for existential quantification")
+                model = generator.generate_model(specification)
+                refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
+                constant_constraint = generator.generate_constant_constraint_formula(refined_patch_space)
+                patch_space_constraint = And(patch_constraint, constant_constraint)
+                path_feasibility = And(path_condition, patch_space_constraint)
+                specification = And(path_feasibility, p_specification)
+                existential_quantification = is_unsat(specification)
+
     else:
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
     return refined_patch_space
