@@ -515,3 +515,16 @@ def generate_constant_constraint_formula(constant_list):
         else:
             formula = And(formula, sub_formula)
     return formula
+
+
+def generate_input_constraint_formula(fixed_point_list):
+    formula = None
+    for var_name in fixed_point_list:
+        fixed_point = fixed_point_list[var_name]
+        sym_var = Symbol(var_name, ArrayType(BV32, BV8))
+        sub_formula = Equals(sym_var, SBV(int(fixed_point), 32))
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = And(formula, sub_formula)
+    return formula
