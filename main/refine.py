@@ -137,12 +137,13 @@ def is_valid_range(check_range):
 
 def generate_partition_for_constant(constant_info, partition_value):
     partition_list = list()
+    if constant_info['lower-bound'] == constant_info['upper-bound']:
+        return partition_list
     range_lower = (constant_info['lower-bound'], partition_value - 1)
     range_upper = (partition_value + 1, constant_info['upper-bound'])
     range_equal = (partition_value, partition_value)
     is_continuous = constant_info['is_continuous']
-    if range_upper == range_lower:
-        return partition_list
+
     if is_continuous:
         if is_valid_range(range_lower):
             partition_list.append(range_lower)
