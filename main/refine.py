@@ -141,6 +141,8 @@ def generate_partition_for_constant(constant_info, partition_value):
     range_upper = (partition_value + 1, constant_info['upper-bound'])
     range_equal = (partition_value, partition_value)
     is_continuous = constant_info['is_continuous']
+    if range_upper == range_lower:
+        return partition_list
     if is_continuous:
         if is_valid_range(range_lower):
             partition_list.append(range_lower)
@@ -300,6 +302,8 @@ def refine_constant_range(constant_info, path_condition, patch_constraint, fixed
     constant_name = constant_info['name']
     partition_value = constant_info['partition-value']
     partition_list = generate_partition_for_constant(constant_info, partition_value)
+    if not partition_list:
+        return refined_list
     constant_list = dict()
     for const_partition in partition_list:
         lower_bound, upper_bound = const_partition
