@@ -131,11 +131,12 @@ def rank_patches(patch_list):
         patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
+        is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
         patch_len = 10000 - len(patch_constraint_str)
         patch_count = len(range(values.DEFAULT_LOWER_BOUND, values.DEFAULT_UPPER_BOUND)) - count_concrete_patches_per_template(patch)
-        filtered_list.append((patch, patch_score, patch_count, patch_len))
+        filtered_list.append((patch, is_over_approx, patch_score, patch_count, patch_len))
 
-    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2, 3))
+    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2, 3, 4))
     ranked_list.reverse()
     patch_list = numpy.array(ranked_list)[:, 0]
     return list(patch_list)
