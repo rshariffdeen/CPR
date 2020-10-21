@@ -288,7 +288,7 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint, p_s
             if len(refined_partition_list) == 1:
                 refined_constant_range = refined_partition_list[0]
             else:
-                refined_constant_range = merge_partition(refined_partition_list, constant_name)
+                refined_constant_range = merge_partition(refined_partition_list)
             refined_patch_space[constant_name] = refined_constant_range
         else:
             return None
