@@ -68,7 +68,7 @@ def refine_for_under_approx(p_specification, patch_constraint, path_condition):
     if not universal_quantification:
         emitter.debug("refining for universal quantification")
         model = generator.generate_model(specification)
-        refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint, Not(p_specification))
+        refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
     return refined_patch_space
 
 
@@ -84,7 +84,7 @@ def refine_for_over_approx(p_specification, patch_constraint, path_condition):
     if not existential_quantification:
         emitter.debug("refining for existential quantification")
         model = generator.generate_model(specification)
-        refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint, p_specification)
+        refined_patch_space = refine_patch_space(model, patch_space, path_condition, patch_constraint)
         if refined_patch_space is None:
             values.LIST_PATCH_SCORE[patch_index] = values.LIST_PATCH_SCORE[patch_index] - 10000
     return patch_space
@@ -267,7 +267,7 @@ def generate_partition_for_constant(constant_info, partition_value):
 #     return formula
 
 
-def refine_patch_space(model, patch_space, path_condition, patch_constraint, p_specification):
+def refine_patch_space(model, patch_space, path_condition, patch_constraint):
     refined_patch_space = dict()
     constant_list = dict()
     fixed_point_list = dict()
@@ -283,7 +283,7 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint, p_s
         constant_info = patch_space[constant_name]
         constant_info['name'] = constant_name
         constant_info['partition-value'] = partition_value
-        refined_partition_list = refine_constant_range(constant_info, path_condition, patch_constraint, p_specification, fixed_point_list)
+        refined_partition_list = refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list)
         if refined_partition_list:
             if len(refined_partition_list) == 1:
                 refined_constant_range = refined_partition_list[0]
@@ -295,7 +295,7 @@ def refine_patch_space(model, patch_space, path_condition, patch_constraint, p_s
     return refined_patch_space
 
 
-def refine_constant_range(constant_info, path_condition, patch_constraint, p_specification, fixed_point_list):
+def refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list):
     refined_list = list()
     constant_name = constant_info['name']
     partition_value = constant_info['partition-value']
@@ -310,17 +310,14 @@ def refine_constant_range(constant_info, path_condition, patch_constraint, p_spe
         patch_space_constraint = And(patch_constraint, constant_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         input_fixation = generator.generate_input_constraint_formula(fixed_point_list)
-        fixed_path_feasibility = And(path_feasibility, input_fixation)
-        is_exist_verification = And(fixed_path_feasibility, p_specification)
-        is_always_verification = And(fixed_path_feasibility, Not(p_specification))
+        is_exist_verification = And(path_feasibility, input_fixation)
         if is_sat(is_exist_verification):
-            if is_sat(is_always_verification):
-                new_model = generator.generate_model(And(path_feasibility, p_specification))
-                new_partition_value = new_model[constant_name]
-                constant_info['partition-value'] = new_partition_value
-                child_list = refine_constant_range(constant_info, path_condition,
-                                                   patch_constraint, p_specification, fixed_point_list)
-                refined_list = refined_list + child_list
+            new_model = generator.generate_model(is_exist_verification)
+            new_partition_value = new_model[constant_name]
+            constant_info['partition-value'] = new_partition_value
+            child_list = refine_constant_range(constant_info, path_condition,
+                                               patch_constraint, fixed_point_list)
+            refined_list = refined_list + child_list
         else:
             emitter.data("adding space", constant_info)
             refined_list.append(copy.deepcopy(constant_info))
