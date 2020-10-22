@@ -29,6 +29,7 @@ LIST_BIT_LENGTH = dict()
 LIST_PATH_CHECK = []
 LIST_PATCH_SCORE = dict()
 LIST_PATCH_OVERAPPROX_CHECK = dict()
+LIST_PATCH_UNDERAPPROX_CHECK = dict()
 LIST_PATCH_CONSTRAINTS = dict()
 
 PREFIX_PPC_STR = ""
@@ -69,8 +70,8 @@ OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
 OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
 OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
 OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}
-OPTIONS_REFINE_METHOD = {0: "under-approx", 1: "over-approx", 2: "overfit"}
-
+OPTIONS_REFINE_METHOD = {0: "under-approx", 1: "over-approx", 2: "overfit", 3: "none"}
+OPTIONS_REDUCE_METHOD = {0: "fitreduce", 1: "cegis"}
 
 # ------------------ Configuration Values ---------------
 CONF_PATH_PROJECT = ""
