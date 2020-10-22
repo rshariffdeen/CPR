@@ -176,6 +176,9 @@ def end(time_info):
     statistics("Iteration Count: " + str(values.ITERATION_NO))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
     statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
+        statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
     statistics("Component Count: " + str(values.COUNT_COMPONENTS))
     statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " minutes \n")

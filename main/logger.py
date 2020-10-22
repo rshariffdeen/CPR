@@ -100,6 +100,9 @@ def end(time_duration):
     output("Iteration Count: " + str(values.ITERATION_NO))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))
     output("Patch End Count: " + str(values.COUNT_PATCH_END))
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        output("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
+        output("Template End Count: " + str(values.COUNT_TEMPLATE_END))
     output("Component Count: " + str(values.COUNT_COMPONENTS))
     output("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " minutes \n")
