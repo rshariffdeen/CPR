@@ -175,9 +175,9 @@ def run(project_path, program_path):
     values.TIME_TO_GENERATE = str(duration)
 
     if values.CONF_REDUCE_METHOD == "fitreduce":
-        run_fitreduce(project_path, program_path)
+        run_fitreduce(program_path, patch_list)
     elif values.CONF_REDUCE_METHOD == "cegis":
-        run_cegis(project_path, program_path)
+        run_cegis(program_path, patch_list)
 
 
 def run_cegis(program_path, patch_list):
