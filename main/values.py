@@ -73,6 +73,7 @@ OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}
 OPTIONS_REFINE_METHOD = {0: "under-approx", 1: "over-approx", 2: "overfit", 3: "none"}
 OPTIONS_REDUCE_METHOD = {0: "fitreduce", 1: "cegis"}
 
+
 # ------------------ Configuration Values ---------------
 CONF_PATH_PROJECT = ""
 CONF_PATH_SPECIFICATION = ""
@@ -116,3 +117,4 @@ CONF_STACK_SIZE = ""
 CONF_MASK_ARG = ""
 CONF_IS_CPP = False
 CONF_IS_CRASH = False
+CONF_REDUCE_METHOD = "fitreduce"

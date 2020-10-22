@@ -87,6 +87,7 @@ ARG_REFINE_METHOD = "--refine-method="
 ARG_SKIP_BUILD = "--skip-build"
 ARG_SKIP_GENERATION = "--skip-gen"
 ARG_SKIP_TEST = "--skip-test"
+ARG_REDUCE_METHOD = "--reduce-method="
 
 
 # ----------------- TOOLS --------------------------------

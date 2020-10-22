@@ -146,7 +146,6 @@ def rank_patches(patch_list):
 def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
-
     emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION))
     emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
@@ -154,10 +153,9 @@ def run(project_path, program_path):
     emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_LOWER_BOUND))
     emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
     emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
-
     time_check = time.time()
-    P = generator.generate_patch_set(project_path)
-    for patch in P:
+    patch_list = generator.generate_patch_set(project_path)
+    for patch in patch_list:
         patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         if patch_index in values.LIST_PATCH_SCORE:
@@ -168,14 +166,31 @@ def run(project_path, program_path):
         values.LIST_PATCH_CONSTRAINTS[patch_index] = generator.generate_constraints_on_constants(patch)
 
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-        values.COUNT_PATCH_START = count_concrete_patches(P)
+        values.COUNT_PATCH_START = count_concrete_patches(patch_list)
     else:
-        values.COUNT_PATCH_START = len(P)
+        values.COUNT_PATCH_START = len(patch_list)
 
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
+
+    if values.CONF_REDUCE_METHOD == "fitreduce":
+        run_fitreduce(project_path, program_path)
+    elif values.CONF_REDUCE_METHOD == "cegis":
+        run_cegis(project_path, program_path)
+
+
+def run_cegis(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
-    satisfied = len(P) <= 1
+    satisfied = len(patch_list) <= 1
+    iteration = 0
+    assertion = values.SPECIFICATION
+    test_output_list = values.CONF_TEST_OUTPUT
+    binary_dir_path = "/".join(program_path.split("/")[:-1])
+
+
+def run_fitreduce(program_path, patch_list):
+    emitter.sub_title("Evaluating Patch Pool")
+    satisfied = len(patch_list) <= 1
     iteration = 0
     assertion = values.SPECIFICATION
     test_output_list = values.CONF_TEST_OUTPUT
