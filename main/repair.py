@@ -179,7 +179,7 @@ def run(project_path, program_path):
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
-    while not satisfied and len(P) > 1:
+    while not satisfied and len(P) > 0:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
