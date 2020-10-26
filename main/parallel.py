@@ -153,8 +153,6 @@ def partition_input_space(path_condition, assertion):
                 pool.close()
                 emitter.normal("\t\twaiting for thread completion")
                 pool.join()
-        else:
-            result_list.append((True, input_space))
     return result_list
 
 
