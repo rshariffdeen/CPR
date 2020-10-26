@@ -159,48 +159,48 @@ def refine_patch_space(constant_list, fixed_point_list, patch_space, path_condit
 
     return refined_patch_space
 
-
-def refine_patch_partition(constant_list, fixed_point_list, patch_space, path_condition, patch_constraint, p_specification):
-    refined_patch_space = dict()
-    constant_count = len(constant_list)
-    if constant_count == 0:
-        return None
-
-    is_multi_dimension = False
-    if constant_count > 1:
-        is_multi_dimension = True
-
-    partition_list = generator.generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension)
-    refined_partition_list = []
-
-    for partition in partition_list:
-        constant_list_p = list()
-        constant_index = 0
-        for constant_name in constant_list:
-            constant_info_p = dict()
-            constant_info_p['name'] = constant_name
-            constant_info_p['is_continuous'] = True
-            lower_bound, upper_bound = partition[constant_index]
-            constant_index = constant_index + 1
-            constant_info_p['lower-bound'] = lower_bound
-            constant_info_p['upper-bound'] = upper_bound
-            constant_list[constant_name] = constant_info_p
-
-        partition_constraint = generator.generate_constraint_for_patch_partition(constant_list)
-        patch_space_constraint = And(patch_constraint, partition_constraint)
-        path_feasibility = And(path_condition, patch_space_constraint)
-        input_fixation = generator.generate_constraint_for_fixed_point(fixed_point_list)
-        fixed_path = And(path_feasibility, input_fixation)
-        is_exist_verification = And(fixed_path, p_specification)
-        is_always_verification = And(fixed_path, Not(p_specification))
-
-        if is_sat(is_exist_verification):
-            if is_sat(is_always_verification):
-
-        else:
-            refined_partition_list.append(constant_list)
-
-    return refined_patch_space
+#
+# def refine_patch_partition(constant_list, fixed_point_list, patch_space, path_condition, patch_constraint, p_specification):
+#     refined_patch_space = dict()
+#     constant_count = len(constant_list)
+#     if constant_count == 0:
+#         return None
+#
+#     is_multi_dimension = False
+#     if constant_count > 1:
+#         is_multi_dimension = True
+#
+#     partition_list = generator.generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension)
+#     refined_partition_list = []
+#
+#     for partition in partition_list:
+#         constant_list_p = list()
+#         constant_index = 0
+#         for constant_name in constant_list:
+#             constant_info_p = dict()
+#             constant_info_p['name'] = constant_name
+#             constant_info_p['is_continuous'] = True
+#             lower_bound, upper_bound = partition[constant_index]
+#             constant_index = constant_index + 1
+#             constant_info_p['lower-bound'] = lower_bound
+#             constant_info_p['upper-bound'] = upper_bound
+#             constant_list[constant_name] = constant_info_p
+#
+#         partition_constraint = generator.generate_constraint_for_patch_partition(constant_list)
+#         patch_space_constraint = And(patch_constraint, partition_constraint)
+#         path_feasibility = And(path_condition, patch_space_constraint)
+#         input_fixation = generator.generate_constraint_for_fixed_point(fixed_point_list)
+#         fixed_path = And(path_feasibility, input_fixation)
+#         is_exist_verification = And(fixed_path, p_specification)
+#         is_always_verification = And(fixed_path, Not(p_specification))
+#
+#         if is_sat(is_exist_verification):
+#             if is_sat(is_always_verification):
+#
+#         else:
+#             refined_partition_list.append(constant_list)
+#
+#     return refined_patch_space
 
 
 def refine_constant_range(constant_info, path_condition, patch_constraint, fixed_point_list, is_multi_dimension):

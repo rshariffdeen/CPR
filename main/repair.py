@@ -84,22 +84,26 @@ def print_patch_list(patch_list):
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            constant_space = values.LIST_PATCH_SPACE[patch_index]
-            for constant_name in constant_space:
-                emitter.highlight("\t\tConstant: " + constant_name)
-                constant_info = constant_space[constant_name]
-                is_continuous = constant_info['is_continuous']
-                if is_continuous:
-                    lower_bound = str(constant_info['lower-bound'])
-                    upper_bound = str(constant_info['upper-bound'])
-                    emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
-                    concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
-                else:
-                    valid_list = constant_info['valid-list']
-                    emitter.highlight("\t\t\tSet: " + str(valid_list))
-                    concrete_count = len(valid_list)
-                emitter.highlight("\t\tCount: " + str(concrete_count))
-                concrete_patch_count = concrete_patch_count * concrete_count
+            patch_space = values.LIST_PATCH_SPACE[patch_index]
+            partition_count = 0
+            for partition in patch_space:
+                partition_count = partition_count + 1
+                emitter.highlight("\t\tPartition: " + str(partition_count))
+                for constant_name in partition:
+                    emitter.highlight("\t\t\tConstant: " + constant_name)
+                    constant_info = partition[constant_name]
+                    is_continuous = constant_info['is_continuous']
+                    if is_continuous:
+                        lower_bound = str(constant_info['lower-bound'])
+                        upper_bound = str(constant_info['upper-bound'])
+                        emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                        concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
+                    else:
+                        valid_list = constant_info['valid-list']
+                        emitter.highlight("\t\t\tSet: " + str(valid_list))
+                        concrete_count = len(valid_list)
+                    emitter.highlight("\t\tCount: " + str(concrete_count))
+                    concrete_patch_count = concrete_patch_count * concrete_count
         emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
         emitter.highlight("\t\tPatch Score: " + str(patch_score))
         if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
@@ -112,19 +116,20 @@ def count_concrete_patches_per_template(abstract_patch):
     patch_constraint = extractor.extract_constraints_from_patch(abstract_patch)
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
-    constant_space = values.LIST_PATCH_SPACE[patch_index]
+    patch_space = values.LIST_PATCH_SPACE[patch_index]
     con_count = 1
-    for constant_name in constant_space:
-        constant_info = constant_space[constant_name]
-        is_continuous = constant_info['is_continuous']
-        lower_bound = str(constant_info['lower-bound'])
-        upper_bound = str(constant_info['upper-bound'])
-        valid_list = constant_info['valid-list']
-        if is_continuous:
-            constant_count = len(range(int(lower_bound), int(upper_bound) + 1))
-        else:
-            constant_count = len(valid_list)
-        con_count = con_count * constant_count
+    for partition in patch_space:
+        for constant_name in partition:
+            constant_info = partition[constant_name]
+            is_continuous = constant_info['is_continuous']
+            lower_bound = str(constant_info['lower-bound'])
+            upper_bound = str(constant_info['upper-bound'])
+            valid_list = constant_info['valid-list']
+            if is_continuous:
+                constant_count = len(range(int(lower_bound), int(upper_bound) + 1))
+            else:
+                constant_count = len(valid_list)
+            con_count = con_count * constant_count
     return con_count
 
 
