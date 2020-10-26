@@ -16,25 +16,24 @@ import copy
 
 
 def merge_space(partition_list):
-    merged_space = []
-    current_space = partition_list
-    len_partition = len(current_space)
+    merged_space = partition_list
+    len_partition = len(merged_space)
     partition_id = 0
     count_iteration = 0
     if len_partition == 1:
         return partition_list
     while len_partition > 1:
-        partition_a = current_space[partition_id % len_partition]
+        partition_a = merged_space[partition_id % len_partition]
         if not partition_a:
-            current_space.remove(partition_a)
+            merged_space.remove(partition_a)
             continue
-        partition_b = current_space[(partition_id + 1) % len_partition]
+        partition_b = merged_space[(partition_id + 1) % len_partition]
         merged_partition = merge_two_partitions(partition_a, partition_b)
         if merged_partition:
-            current_space.remove(partition_a)
-            current_space.remove(partition_b)
-            current_space.append(merged_partition)
-            len_partition = len(current_space)
+            merged_space.remove(partition_a)
+            merged_space.remove(partition_b)
+            merged_space.append(merged_partition)
+            len_partition = len(merged_space)
             count_iteration = 0
         partition_id = (partition_id + 1) % len_partition
         if count_iteration == len_partition:
