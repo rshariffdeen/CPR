@@ -12,6 +12,7 @@ from main import emitter, values, reader, parallel, definitions, extractor, orac
 import re
 import struct
 import random
+import copy
 
 File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
@@ -408,9 +409,6 @@ def generate_patch_space(patch):
     partition = dict()
     patch_formula = extractor.extract_constraints_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
-    is_multi_dimension = False
-    if len(var_list) > 1:
-        is_multi_dimension = True
     for var in var_list:
         if "const_" in str(var):
             constraint_info = dict()
@@ -419,7 +417,6 @@ def generate_patch_space(patch):
             constraint_info['valid-list'] = list()
             constraint_info['invalid-list'] = list()
             constraint_info['is_continuous'] = True
-            constraint_info['is_multi_dim'] = is_multi_dimension
             partition[str(var)] = constraint_info
     return partition
 
@@ -427,16 +424,13 @@ def generate_patch_space(patch):
 def generate_input_space(path_condition):
     partition = dict()
     var_list = generate_model(path_condition)
-    is_multi_dimension = False
-    if len(var_list) > 1:
-        is_multi_dimension = True
     for var in var_list:
         if "rvalue!" in str(var):
             constraint_info = dict()
             constraint_info['lower-bound'] = values.DEFAULT_INPUT_LOWER_BOUND
             constraint_info['upper-bound'] = values.DEFAULT_INPUT_UPPER_BOUND
             partition[str(var)] = constraint_info
-    return partition, is_multi_dimension
+    return partition
 
 
 def generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension):
@@ -468,17 +462,16 @@ def generate_partition_for_input_space(partition_model, input_space, is_multi_di
     input_info = input_space[var_name]
     input_info['name'] = var_name
     input_info['partition-value'] = partition_value
-    var_partition_list = generate_partition_for_input(input_info, partition_value, is_multi_dimension)
+    var_partition_list = generate_partition_for_input(input_info, partition_value, is_multi_dimension, var_name)
     del partition_model[var_name]
     if partition_model:
         partition_list_tmp = generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
         for partition_a in partition_list_tmp:
             for partition_b in var_partition_list:
-                partition = partition_b + partition_a
+                partition = partition_b.update(partition_a)
                 partition_list.append(partition)
     else:
-        for partition in var_partition_list:
-            partition_list.append((partition,))
+        partition_list = var_partition_list
 
     return partition_list
 
@@ -502,20 +495,31 @@ def generate_partition_for_constant(constant_info, partition_value, is_multi_dim
     return partition_list
 
 
-def generate_partition_for_input(input_info, partition_value, is_multi_dimension):
+def generate_partition_for_input(input_info, partition_value, is_multi_dimension, var_name):
     partition_list = list()
+    partition_info = dict()
+    range_info = dict()
     if input_info['lower-bound'] == input_info['upper-bound']:
         return partition_list
     range_lower = (input_info['lower-bound'], partition_value - 1)
     range_upper = (partition_value + 1, input_info['upper-bound'])
 
     if oracle.is_valid_range(range_lower):
-        partition_list.append(range_lower)
+        range_info['lower-bound'] = range_lower[0]
+        range_info['upper-bound'] = range_lower[1]
+        partition_info[var_name] = range_info
+        partition_list.append(copy.deepcopy(partition_info))
     if oracle.is_valid_range(range_upper):
-        partition_list.append(range_upper)
+        range_info['lower-bound'] = range_upper[0]
+        range_info['upper-bound'] = range_upper[1]
+        partition_info[var_name] = range_info
+        partition_list.append(copy.deepcopy(partition_info))
     if is_multi_dimension:
         range_equal = (partition_value, partition_value)
-        partition_list.append(range_equal)
+        range_info['lower-bound'] = range_equal[0]
+        range_info['upper-bound'] = range_equal[1]
+        partition_info[var_name] = range_info
+        partition_list.append(copy.deepcopy(partition_info))
     return partition_list
 
 
@@ -562,7 +566,10 @@ def generate_constraint_for_fixed_point(fixed_point_list):
 def generate_constraint_for_input_partition(input_var_list):
     formula = None
     for var_name in input_var_list:
-        sym_var = Symbol(var_name, BV32)
+        sym_array = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_var = BVConcat(Select(sym_array, BV(3, 32)),
+                           BVConcat(Select(sym_array, BV(2, 32)),
+                                    BVConcat(Select(sym_array, BV(1, 32)), Select(sym_array, BV(0, 32)))))
         constant_info = input_var_list[var_name]
         upper_bound = int(constant_info['upper-bound'])
         lower_bound = int(constant_info['lower-bound'])

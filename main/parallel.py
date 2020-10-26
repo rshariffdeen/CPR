@@ -134,26 +134,27 @@ def partition_input_space(path_condition, assertion):
     result_list = []
 
     specification = And(path_condition, Not(assertion))
-    input_space, is_multi_dimension = generator.generate_input_space(path_condition)
-
-    if is_sat(specification):
-        partition_model = generator.generate_model(specification)
-        partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
-        if values.CONF_OPERATION_MODE in ["sequential"]:
-            for partition in partition_list:
-                # emitter.emit_patch(patch, message="\trefining abstract patch: ")
-                result_list.append(refine.refine_input_partition(specification, partition, is_multi_dimension))
+    input_space = generator.generate_input_space(path_condition)
+    if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+        if is_sat(specification):
+            partition_model = generator.generate_model(specification)
+            partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
+            partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
+            if values.CONF_OPERATION_MODE in ["sequential"]:
+                for partition in partition_list:
+                    # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+                    result_list.append(refine.refine_input_partition(specification, partition, is_multi_dimension))
+            else:
+                emitter.normal("\t\tstarting parallel computing")
+                pool = mp.Pool(mp.cpu_count())
+                for partition in partition_list:
+                    pool.apply_async(refine.refine_input_partition, args=(specification, partition, is_multi_dimension),
+                                     callback=collect_result)
+                pool.close()
+                emitter.normal("\t\twaiting for thread completion")
+                pool.join()
         else:
-            emitter.normal("\t\tstarting parallel computing")
-            pool = mp.Pool(mp.cpu_count())
-            for partition in partition_list:
-                pool.apply_async(refine.refine_input_partition, args=(specification, partition, is_multi_dimension),
-                                 callback=collect_result)
-            pool.close()
-            emitter.normal("\t\twaiting for thread completion")
-            pool.join()
-    else:
-        result_list.append((True, input_space))
+            result_list.append((True, input_space))
     return result_list
 
 

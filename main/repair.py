@@ -20,6 +20,8 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     path_condition = extractor.extract_assertion(path_constraint_file_path)
     input_space = parallel.partition_input_space(path_condition, assertion)
     print(input_space)
+    if not input_space:
+        return patch_list
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
         if not result_list:

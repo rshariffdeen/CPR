@@ -3,7 +3,7 @@ from six.moves import cStringIO
 from pysmt.shortcuts import And
 import os
 
-from main import emitter
+from main import emitter, utilities
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
 from main.synthesis import program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
@@ -97,3 +97,26 @@ def extract_constraints_from_patch(patch):
     substituted_patch = patch_constraint.substitute(program_substitution)
     return substituted_patch
 
+
+def extract_input_list(model):
+    input_list = dict()
+    for var_name in model:
+        if "rvalue!" in str(var_name):
+            byte_list = model[var_name]
+            input_list[str(var_name)] = utilities.get_signed_value(byte_list)
+    is_multi_dimension = False
+    if len(input_list) > 1:
+        is_multi_dimension = True
+    return input_list, is_multi_dimension
+
+
+def extract_constant_list(model):
+    constant_list = dict()
+    for var_name in model:
+        if "const_" in str(var_name):
+            byte_list = model[var_name]
+            constant_list[str(var_name)] = utilities.get_signed_value(byte_list)
+    is_multi_dimension = False
+    if len(constant_list) > 1:
+        is_multi_dimension = True
+    return constant_list, is_multi_dimension
