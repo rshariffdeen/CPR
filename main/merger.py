@@ -18,14 +18,12 @@ import copy
 def merge_space(partition_list):
     merged_space = []
     current_space = partition_list
-    is_new_merge = True
     len_partition = len(current_space)
     partition_id = 0
     count_iteration = 0
     if len_partition == 1:
         return partition_list
-    while len_partition > 1 or is_new_merge:
-        is_new_merge = False
+    while len_partition > 1:
         partition_a = current_space[partition_id % len_partition]
         if not partition_a:
             current_space.remove(partition_a)
@@ -36,7 +34,6 @@ def merge_space(partition_list):
             current_space.remove(partition_a)
             current_space.remove(partition_b)
             current_space.append(merged_partition)
-            is_new_merge = True
             len_partition = len(current_space)
             count_iteration = 0
         partition_id = (partition_id + 1) % len_partition
