@@ -406,6 +406,7 @@ def generate_path_for_negation():
 
 
 def generate_patch_space(patch):
+    partition_list = []
     partition = dict()
     patch_formula = extractor.extract_constraints_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
@@ -418,7 +419,8 @@ def generate_patch_space(patch):
             constraint_info['invalid-list'] = list()
             constraint_info['is_continuous'] = True
             partition[str(var)] = constraint_info
-    return partition
+    partition_list.append(partition)
+    return partition_list
 
 
 def generate_input_space(path_condition):
