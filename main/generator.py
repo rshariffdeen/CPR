@@ -436,8 +436,8 @@ def generate_input_space(path_condition):
     for var in var_list:
         if "rvalue!" in str(var):
             constraint_info = dict()
-            constraint_info['lower-bound'] = values.DEFAULT_PATCH_LOWER_BOUND
-            constraint_info['upper-bound'] = values.DEFAULT_PATCH_UPPER_BOUND
+            constraint_info['lower-bound'] = values.DEFAULT_INPUT_LOWER_BOUND
+            constraint_info['upper-bound'] = values.DEFAULT_INPUT_UPPER_BOUND
             partition[str(var)] = constraint_info
     partition_list.append(partition)
     return partition_list, is_multi_dimension
