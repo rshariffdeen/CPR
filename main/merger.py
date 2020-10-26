@@ -65,10 +65,10 @@ def merge_two_dimensions(range_a, range_b):
     if range_a == range_b:
         return range_a
 
-    if range(range_b) in range(range_a):
+    if range(lb_b, ub_b + 1) in range(lb_a, ub_a + 1):
         return range_a
 
-    if range(range_a) in range(range_b):
+    if range(lb_a, ub_a + 1) in range(lb_b, ub_b + 1):
         return range_b
 
     if lb_a == ub_b + 1:
