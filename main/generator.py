@@ -420,9 +420,10 @@ def generate_patch_space(patch):
             constraint_info['valid-list'] = list()
             constraint_info['invalid-list'] = list()
             constraint_info['is_continuous'] = True
+            constraint_info['is_multi_dim'] = is_multi_dimension
             partition[str(var)] = constraint_info
     partition_list.append(partition)
-    return partition_list, is_multi_dimension
+    return partition_list
 
 
 def generate_input_space(path_condition):
