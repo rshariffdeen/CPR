@@ -15,18 +15,21 @@ import random
 import copy
 
 
-def refine_input_partition(specification, input_partition, is_multi_dimension):
+def refine_input_partition(path_condition, assertion, input_partition, is_multi_dimension):
     input_constraints = generator.generate_constraint_for_input_partition(input_partition)
-    is_exist_verification = And(specification, input_constraints)
+    path_condition = And(path_condition, input_constraints)
+    is_exist_check = And(path_condition, Not(assertion))
+    is_always_check = And(path_condition, assertion)
     refined_partition_list = []
-    if is_sat(is_exist_verification):
-        partition_model = generator.generate_model(is_exist_verification)
-        partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
-        partition_list = generator.generate_partition_for_input_space(partition_model, input_partition, is_multi_dimension)
-        for partition in partition_list:
-            refined_partition_list.append(refine_input_partition(specification, partition, is_multi_dimension))
-    else:
-        refined_partition_list.append(input_partition)
+    if is_sat(is_always_check):
+        if is_sat(is_exist_check):
+            partition_model = generator.generate_model(is_exist_check)
+            partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
+            partition_list = generator.generate_partition_for_input_space(partition_model, input_partition, is_multi_dimension)
+            for partition in partition_list:
+                refined_partition_list = refined_partition_list + refine_input_partition(path_condition, assertion, partition, is_multi_dimension)
+        else:
+            refined_partition_list.append(input_partition)
     return refined_partition_list
 
 

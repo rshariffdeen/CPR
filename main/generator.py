@@ -470,8 +470,8 @@ def generate_partition_for_input_space(partition_model, input_space, is_multi_di
         partition_list_tmp = generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
         for partition_a in partition_list_tmp:
             for partition_b in var_partition_list:
-                partition = partition_b.update(partition_a)
-                partition_list.append(partition)
+                partition_b.update(partition_a)
+                partition_list.append(copy.deepcopy(partition_b))
     else:
         partition_list = var_partition_list
 

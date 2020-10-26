@@ -133,22 +133,23 @@ def partition_input_space(path_condition, assertion):
     global pool, result_list
     result_list = []
 
-    specification = And(path_condition, Not(assertion))
+    is_exist = And(path_condition, Not(assertion))
+    is_always = And(path_condition, assertion)
     input_space = generator.generate_input_space(path_condition)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-        if is_sat(specification):
-            partition_model = generator.generate_model(specification)
+        if is_sat(is_exist):
+            partition_model = generator.generate_model(is_exist)
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
             if values.CONF_OPERATION_MODE in ["sequential"]:
                 for partition in partition_list:
                     # emitter.emit_patch(patch, message="\trefining abstract patch: ")
-                    result_list.append(refine.refine_input_partition(specification, partition, is_multi_dimension))
+                    result_list.append(refine.refine_input_partition(path_condition, assertion, partition, is_multi_dimension))
             else:
                 emitter.normal("\t\tstarting parallel computing")
                 pool = mp.Pool(mp.cpu_count())
                 for partition in partition_list:
-                    pool.apply_async(refine.refine_input_partition, args=(specification, partition, is_multi_dimension),
+                    pool.apply_async(refine.refine_input_partition, args=(path_condition, assertion, partition, is_multi_dimension),
                                      callback=collect_result)
                 pool.close()
                 emitter.normal("\t\twaiting for thread completion")
