@@ -15,42 +15,77 @@ import random
 import copy
 
 
-def merge_partition(partition_list):
+def merge_space(partition_list):
+    merged_space = []
+    current_space = partition_list
+    is_new_merge = True
+    len_partition = len(current_space)
+    partition_id = 0
+    count_iteration = 0
+    while len_partition > 1 or is_new_merge:
+        is_new_merge = False
+        partition_a = current_space[partition_id % len_partition]
+        if partition_a is None:
+            current_space.remove(partition_a)
+            continue
+        partition_b = current_space[(partition_id + 1) % len_partition]
+        merged_partition = merge_two_partitions(partition_a, partition_b)
+        if merged_partition:
+            current_space.remove(partition_a)
+            current_space.remove(partition_b)
+            current_space.append(merged_partition)
+            is_new_merge = True
+            len_partition = len(current_space)
+            count_iteration = 0
+        partition_id = (partition_id + 1) % len_partition
+        if count_iteration == len_partition:
+            break
+        count_iteration = count_iteration + 1
+    return merged_space
+
+
+def merge_two_partitions(partition_a, partition_b):
+    dimension_list = list(partition_a.keys())
     merged_partition = dict()
-    sorted_partition_list = sorted(partition_list, key=lambda x: x['lower-bound'])
-    is_continuous = True
-    lower_bound = None
-    upper_bound = None
-    invalid_list = []
-    valid_list = []
-    for partition in sorted_partition_list:
-        p_lower_bound = partition['lower-bound']
-        p_upper_bound = partition['upper-bound']
-        if lower_bound is None:
-            lower_bound = p_lower_bound
-            upper_bound = p_upper_bound
-        else:
-            if upper_bound + 1 == p_lower_bound:
-                upper_bound = p_upper_bound
-            else:
-                is_continuous = False
-                invalid_list = invalid_list + list(range(upper_bound + 1, p_lower_bound))
-                upper_bound = p_upper_bound
-        valid_list = valid_list + list(range(p_lower_bound, p_upper_bound + 1))
-
-    if not is_continuous:
-        invalid_list = invalid_list + list(range(values.DEFAULT_PATCH_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_PATCH_UPPER_BOUND + 1))
-        merged_partition['lower-bound'] = None
-        merged_partition['upper-bound'] = None
-        merged_partition['valid-list'] = valid_list
-        merged_partition['invalid-list'] = invalid_list
-        merged_partition['is_continuous'] = False
-    else:
-        merged_partition['lower-bound'] = lower_bound
-        merged_partition['upper-bound'] = upper_bound
-        merged_partition['valid-list'] = []
-        merged_partition['invalid-list'] = []
-        merged_partition['is_continuous'] = True
-
+    for dimension_name in dimension_list:
+        dimension_a = partition_a[dimension_name]['lower-bound'], partition_a[dimension_name]['upper-bound']
+        dimension_b = partition_b[dimension_name]['lower-bound'], partition_b[dimension_name]['upper-bound']
+        merged_dimension = merge_two_dimensions(dimension_a, dimension_b)
+        if merged_dimension is None:
+            return None
+        merged_partition[dimension_name]['lower-bound'] = merged_dimension[0]
+        merged_partition[dimension_name]['upper-bound'] = merged_dimension[1]
     return merged_partition
 
+
+def merge_two_dimensions(range_a, range_b):
+    lb_a, ub_a = range_a
+    lb_b, ub_b = range_b
+
+    if range_a == range_b:
+        return range_a
+
+    if range(range_b) in range(range_a):
+        return range_a
+
+    if range(range_a) in range(range_b):
+        return range_b
+
+    if lb_a == ub_b + 1:
+        return lb_b, ub_a
+
+    if lb_b == ub_a + 1:
+        return lb_a, ub_b
+
+    if lb_b == ub_a or lb_a == ub_b:
+        lb = lb_a
+        if lb_b <= lb_a:
+            lb = lb_b
+        ub = ub_b
+        if ub_b <= ub_a:
+            ub = ub_a
+        return lb, ub
+
+    # TODO: do I need to handle intermediate intersections?
+
+    return None

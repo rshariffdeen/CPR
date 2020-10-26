@@ -2,7 +2,7 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic
+from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger
 import time
 import sys
 import operator
@@ -19,6 +19,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)
     input_space = parallel.partition_input_space(path_condition, assertion)
+    input_space = merger.merge_space(input_space)
     print(input_space)
     if not input_space:
         return patch_list
