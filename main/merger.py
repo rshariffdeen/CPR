@@ -22,6 +22,8 @@ def merge_space(partition_list):
     len_partition = len(current_space)
     partition_id = 0
     count_iteration = 0
+    if len_partition == 1:
+        return partition_list
     while len_partition > 1 or is_new_merge:
         is_new_merge = False
         partition_a = current_space[partition_id % len_partition]
