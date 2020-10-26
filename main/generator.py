@@ -405,7 +405,6 @@ def generate_path_for_negation():
 
 
 def generate_patch_space(patch):
-    partition_list = []
     partition = dict()
     patch_formula = extractor.extract_constraints_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
@@ -422,12 +421,10 @@ def generate_patch_space(patch):
             constraint_info['is_continuous'] = True
             constraint_info['is_multi_dim'] = is_multi_dimension
             partition[str(var)] = constraint_info
-    partition_list.append(partition)
-    return partition_list
+    return partition
 
 
 def generate_input_space(path_condition):
-    partition_list = []
     partition = dict()
     var_list = generate_model(path_condition)
     is_multi_dimension = False
@@ -439,8 +436,7 @@ def generate_input_space(path_condition):
             constraint_info['lower-bound'] = values.DEFAULT_INPUT_LOWER_BOUND
             constraint_info['upper-bound'] = values.DEFAULT_INPUT_UPPER_BOUND
             partition[str(var)] = constraint_info
-    partition_list.append(partition)
-    return partition_list, is_multi_dimension
+    return partition, is_multi_dimension
 
 
 def generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension):
