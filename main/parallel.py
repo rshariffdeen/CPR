@@ -158,10 +158,10 @@ def partition_input_space(path_condition, assertion):
             for partition in result_list:
                 if not partition:
                     continue
-                if len(partition) > 1:
+                if isinstance(partition, list):
                     for sub_partition in partition:
                         filtered_list.append(sub_partition)
-                if len(partition) == 1:
+                else:
                     filtered_list.append(partition)
 
             result_list = filtered_list
