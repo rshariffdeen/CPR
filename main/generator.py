@@ -8,7 +8,7 @@ from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
 from main.utilities import execute_command
-from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities
+from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser
 import re
 import struct
 import random
@@ -297,7 +297,7 @@ def generate_model_cli(formula):
     with open(path_result, "r") as result_file:
         z3_output = result_file.readlines()
 
-    model_byte_list = parse_z3_output(z3_output)
+    model_byte_list = parser.parse_z3_output(z3_output)
     return model_byte_list
 
 
@@ -321,79 +321,6 @@ def generate_binary_file(byte_array):
 
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
         new_input_file.write(bytearray(byte_list))
-
-
-def parse_z3_output(z3_output):
-    """
-           This function will read the output log of z3 cli interface and extract/parse the values of the model
-           Arguments:
-               z3_output: string output of the z3 cli invocation
-    """
-    model = dict()
-    var_name = ""
-    byte_list = dict()
-    str_lambda = ""
-    for line in z3_output:
-        if "sat" in line or "model" in line:
-            continue
-        if "define-fun " in line or line == z3_output[-1]:
-            if str_lambda:
-                if "const" in str_lambda:
-                    str_value = str_lambda.split("#x")[-1].split(")")[0]
-                    byte_list = dict()
-                    byte_list[0] = int("0x" + str_value, 16)
-                elif "(lambda ((x!1 (_ BitVec 32))) #x" in str_lambda:
-                    str_value = str_lambda.replace("(lambda ((x!1 (_ BitVec 32))) ", "").replace("))", "").replace("\n",
-                                                                                                                   "")
-                    byte_list[0] = int(str_value.replace("#", "0"), 16)
-                elif "true)" in str_lambda:
-                    byte_list[0] = int("0xff", 16)
-                elif "false)" in str_lambda:
-                    byte_list[0] = int("0x00", 16)
-                elif "ite" in str_lambda:
-                    max_index = 0
-                    byte_list = dict()
-                    token_list = str_lambda.split("(ite (= x!1 ")
-                    for token in token_list[1:]:
-                        if token.count("#x") == 2:
-                            index, value = token.split(") ")
-                        elif token.count("#x") == 3:
-                            index, value, default = token.split(" ")
-                            index = index.replace(")", "")
-                            default = default.split(")")[0].replace("#", "0")
-                        index = index.replace("#", "0")
-                        value = value.replace("#", "0")
-                        index = int(index, 16)
-                        if index > max_index:
-                            max_index = index
-                        byte_list[index] = int(value, 16)
-
-                    if max_index > 0:
-                        byte_list.pop(max_index)
-                        max_index = max_index - 1
-
-                    for i in range(0, max_index):
-                        if i not in byte_list:
-                            byte_list[i] = int(default, 16)
-
-                else:
-                    print("Unhandled output")
-                    print(str_lambda)
-                    print(z3_output)
-                    exit(1)
-
-            if var_name and byte_list:
-                model[var_name] = byte_list
-                var_name = ""
-                byte_list = dict()
-            if line != z3_output[-1]:
-                var_name = line.split("define-fun ")[1].split(" ()")[0]
-                str_lambda = ""
-
-        else:
-            str_lambda += line
-
-    return model
 
 
 def generate_formula(ppc):
@@ -531,3 +458,163 @@ def generate_input_constraint_formula(fixed_point_list):
         else:
             formula = And(formula, sub_formula)
     return formula
+
+
+def generate_partition_for_space(constant_list, patch_space, is_multi_dimension):
+    partition_list = list()
+    constant_name = list(sorted(constant_list.keys()))[0]
+    partition_value = constant_list[constant_name]
+    constant_info = patch_space[constant_name]
+    constant_info['name'] = constant_name
+    constant_info['partition-value'] = partition_value
+    const_partition_list = generate_partition_for_constant(constant_info, partition_value, is_multi_dimension)
+    del constant_list[constant_name]
+    if constant_list:
+        partition_list_tmp = generate_partition_for_space(constant_list, patch_space, is_multi_dimension)
+        for partition_a in partition_list_tmp:
+            for partition_b in const_partition_list:
+                partition = partition_b + partition_a
+                partition_list.append(partition)
+    else:
+        for partition in const_partition_list:
+            partition_list.append((partition,))
+
+    return partition_list
+
+
+def generate_partition_for_constant(constant_info, partition_value, is_multi_dimension):
+    partition_list = list()
+    if constant_info['lower-bound'] == constant_info['upper-bound']:
+        return partition_list
+    range_lower = (constant_info['lower-bound'], partition_value - 1)
+    range_upper = (partition_value + 1, constant_info['upper-bound'])
+    is_continuous = constant_info['is_continuous']
+
+    if is_continuous:
+        if oracle.is_valid_range(range_lower):
+            partition_list.append(range_lower)
+        if oracle.is_valid_range(range_upper):
+            partition_list.append(range_upper)
+    if is_multi_dimension:
+        range_equal = (partition_value, partition_value)
+        partition_list.append(range_equal)
+    return partition_list
+
+
+
+#
+# def generate_new_range(constant_space, partition_list):
+#     new_range_list = list()
+#     constant_count = len(constant_space)
+#     if constant_count == 1:
+#         constant_name = list(constant_space.keys())[0]
+#         constant_info = constant_space[constant_name]
+#         is_continuous = constant_info['is_continuous']
+#         partition_value = partition_list[constant_name]
+#         if is_continuous:
+#             range_lower = (constant_info['lower-bound'], partition_value - 1)
+#             range_upper = (partition_value + 1, constant_info['upper-bound'])
+#             if is_valid_range(range_lower):
+#                 new_range_list.append((range_lower,))
+#             if is_valid_range(range_upper):
+#                 new_range_list.append((range_upper,))
+#         else:
+#             invalid_list = constant_info['invalid-list']
+#             valid_list = constant_info['valid-list']
+#             valid_list.remove(partition_value)
+#             invalid_list.append(partition_value)
+#             if valid_list:
+#                 new_range_list.append((invalid_list,))
+#
+#     elif constant_count == 2:
+#         constant_name_a = list(constant_space.keys())[0]
+#         constant_name_b = list(constant_space.keys())[1]
+#         constant_info_a = constant_space[constant_name_a]
+#         is_continuous_a = constant_info_a['is_continuous']
+#         partition_value_a = partition_list[constant_name_a]
+#         constant_info_b = constant_space[constant_name_b]
+#         partition_value_b = partition_list[constant_name_b]
+#         is_continuous_b = constant_info_b['is_continuous']
+#         if is_continuous_a:
+#             range_lower_a = (constant_info_a['lower-bound'], partition_value_a - 1)
+#             range_upper_a = (partition_value_a + 1, constant_info_a['upper-bound'])
+#             if is_continuous_b:
+#                 range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
+#                 range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
+#                 if is_valid_range(range_lower_a):
+#                     if is_valid_range(range_lower_b):
+#                         new_range_list.append((range_lower_a, range_lower_b))
+#                     if is_valid_range(range_upper_b):
+#                         new_range_list.append((range_lower_a, range_upper_b))
+#
+#                 if is_valid_range(range_upper_a):
+#                     if is_valid_range(range_lower_b):
+#                         new_range_list.append((range_upper_a, range_lower_b))
+#                     if is_valid_range(range_upper_b):
+#                         new_range_list.append((range_upper_a, range_upper_b))
+#             else:
+#                 invalid_list_b = constant_info_b['invalid-list']
+#                 valid_list_b = constant_info_b['valid-list']
+#                 valid_list_b.remove(partition_value_b)
+#                 invalid_list_b.append(partition_value_b)
+#                 if valid_list_b:
+#                     if is_valid_range(range_lower_a):
+#                         new_range_list.append((range_lower_a, invalid_list_b))
+#                     if is_valid_range(range_upper_a):
+#                         new_range_list.append((range_upper_a, invalid_list_b))
+#
+#         else:
+#             if is_continuous_b:
+#                 invalid_list_a = constant_info_a['invalid-list']
+#                 valid_list_a = constant_info_a['valid-list']
+#                 valid_list_a.remove(partition_value_a)
+#                 invalid_list_a.append(partition_value_a)
+#                 range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
+#                 range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
+#                 if valid_list_a:
+#                     if is_valid_range(range_lower_b):
+#                         new_range_list.append((invalid_list_a, range_lower_b))
+#                     if is_valid_range(range_upper_b):
+#                         new_range_list.append((invalid_list_a, range_upper_b))
+#
+#
+#
+#
+#     elif constant_count == 3:
+#         for constant_name_a in constant_space:
+#             constant_info_a = constant_space[constant_name_a]
+#             partition_value_a = partition_list[constant_name_a]
+#             for constant_name_b in constant_space:
+#                 constant_info_b = constant_space[constant_name_b]
+#                 partition_value_b = partition_list[constant_name_b]
+#                 for constant_name_c in constant_space:
+#                     constant_info_c = constant_space[constant_name_c]
+#                     partition_value_c = partition_list[constant_name_c]
+#                     range_lower_a = (constant_info_a['lower-bound'], partition_value_a - 1)
+#                     range_upper_a = (partition_value_a + 1, constant_info_a['upper-bound'])
+#                     range_lower_b = (constant_info_b['lower-bound'], partition_value_b - 1)
+#                     range_upper_b = (partition_value_b + 1, constant_info_b['upper-bound'])
+#                     range_lower_c = (constant_info_c['lower-bound'], partition_value_c - 1)
+#                     range_upper_c = (partition_value_c + 1, constant_info_c['upper-bound'])
+#
+#                     new_range_list.append((range_lower_a, range_lower_b, range_lower_c))
+#                     new_range_list.append((range_lower_a, range_lower_b, range_upper_c))
+#                     new_range_list.append((range_lower_a, range_upper_b, range_lower_c))
+#                     new_range_list.append((range_lower_a, range_upper_b, range_upper_c))
+#                     new_range_list.append((range_upper_a, range_lower_b, range_lower_c))
+#                     new_range_list.append((range_upper_a, range_lower_b, range_upper_c))
+#                     new_range_list.append((range_upper_a, range_upper_b, range_lower_c))
+#                     new_range_list.append((range_upper_a, range_upper_b, range_upper_c))
+#     else:
+#         utilities.error_exit("unhandled constant count in generate new range")
+#
+#     return new_range_list
+
+
+# def generate_formula_for_range(patch, constant_space, path_condition, assertion):
+#     patch_constraint = extractor.extract_constraints_from_patch(patch)
+#     constant_constraint = generator.generate_constant_constraint_formula(constant_space)
+#     patch_constraint = And(patch_constraint, constant_constraint)
+#     path_feasibility = And(path_condition, patch_constraint)
+#     formula = And(path_feasibility, assertion)
+#     return formula

@@ -104,6 +104,12 @@ def check_input_feasibility(index, patch_constraint, new_path):
     return result, index
 
 
+def is_valid_range(check_range):
+    lower_bound, upper_bound = check_range
+    if lower_bound <= upper_bound:
+        return True
+    return False
+
 # def verify_patch(programs: Union[Dict[str, Program], Dict[str, Formula]],
 #            specification: Specification) -> Optional[VerificationSuccess]:
 #     """Check if programs satisfy specification
