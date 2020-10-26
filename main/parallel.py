@@ -105,7 +105,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     return result_list
 
 
-def refine_patches_parallel(patch_list, path_condition, assertion):
+def refine_patch_space(patch_list, path_condition, assertion):
     global pool, result_list
     result_list = []
 
@@ -126,6 +126,34 @@ def refine_patches_parallel(patch_list, path_condition, assertion):
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
+    return result_list
+
+
+def partition_input_space(path_condition, assertion):
+    global pool, result_list
+    result_list = []
+
+    specification = And(path_condition, Not(assertion))
+    input_space, is_multi_dimension = generator.generate_input_space(path_condition)
+
+    if is_sat(specification):
+        partition_model = generator.generate_model(specification)
+        partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
+        if values.CONF_OPERATION_MODE in ["sequential"]:
+            for partition in partition_list:
+                # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+                result_list.append(refine.refine_input_partition(specification, partition, is_multi_dimension))
+        else:
+            emitter.normal("\t\tstarting parallel computing")
+            pool = mp.Pool(mp.cpu_count())
+            for partition in partition_list:
+                pool.apply_async(refine.refine_input_partition, args=(specification, partition, is_multi_dimension),
+                                 callback=collect_result)
+            pool.close()
+            emitter.normal("\t\twaiting for thread completion")
+            pool.join()
+    else:
+        result_list.append((True, input_space))
     return result_list
 
 

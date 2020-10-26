@@ -19,24 +19,24 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-        result_list = parallel.refine_patches_parallel(patch_list, path_condition, assertion)
+        result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
         if not result_list:
             emitter.error("\tsomething went wrong with patch validation")
             utilities.error_exit()
         if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             for result in result_list:
-                refined_space, index = result
+                is_refined, index = result
                 updated_patch_list.append(patch_list[index])
         else:
             for result in result_list:
-                refined_space, index = result
-                if refined_space:
+                is_refined, index = result
+                if is_refined:
                     updated_patch_list.append(patch_list[index])
-                    patch = patch_list[index]
-                    patch_constraint = extractor.extract_constraints_from_patch(patch)
-                    patch_constraint_str = patch_constraint.serialize()
-                    patch_index = utilities.get_hash(patch_constraint_str)
-                    values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_space
+                    # patch = patch_list[index]
+                    # patch_constraint = extractor.extract_constraints_from_patch(patch)
+                    # patch_constraint_str = patch_constraint.serialize()
+                    # patch_index = utilities.get_hash(patch_constraint_str)
+                    # values.LIST_PATCH_SPACE[patch_index] = refined_space
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
@@ -47,18 +47,18 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             utilities.error_exit()
         if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             for result in result_list:
-                refined_space, index = result
+                is_refined, index = result
                 updated_patch_list.append(patch_list[index])
         else:
             for result in result_list:
-                refined_space, index = result
-                if refined_space:
+                is_refined, index = result
+                if is_refined:
                     updated_patch_list.append(patch_list[index])
-                    patch = patch_list[index]
-                    patch_constraint = extractor.extract_constraints_from_patch(patch)
-                    patch_constraint_str = patch_constraint.serialize()
-                    patch_index = utilities.get_hash(patch_constraint_str)
-                    values.LIST_PATCH_CONSTRAINTS[patch_index] = refined_space
+                    # patch = patch_list[index]
+                    # patch_constraint = extractor.extract_constraints_from_patch(patch)
+                    # patch_constraint_str = patch_constraint.serialize()
+                    # patch_index = utilities.get_hash(patch_constraint_str)
+                    # values.LIST_PATCH_SPACE[patch_index] = refined_space
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
@@ -82,7 +82,7 @@ def print_patch_list(patch_list):
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+            constant_space = values.LIST_PATCH_SPACE[patch_index]
             for constant_name in constant_space:
                 emitter.highlight("\t\tConstant: " + constant_name)
                 constant_info = constant_space[constant_name]
@@ -110,7 +110,7 @@ def count_concrete_patches_per_template(abstract_patch):
     patch_constraint = extractor.extract_constraints_from_patch(abstract_patch)
     patch_constraint_str = patch_constraint.serialize()
     patch_index = utilities.get_hash(patch_constraint_str)
-    constant_space = values.LIST_PATCH_CONSTRAINTS[patch_index]
+    constant_space = values.LIST_PATCH_SPACE[patch_index]
     con_count = 1
     for constant_name in constant_space:
         constant_info = constant_space[constant_name]
@@ -144,7 +144,7 @@ def rank_patches(patch_list):
         is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
         is_under_approx = 1 - values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
         patch_len = 10000 - len(patch_constraint_str)
-        patch_count = len(range(values.DEFAULT_LOWER_BOUND, values.DEFAULT_UPPER_BOUND)) - count_concrete_patches_per_template(patch)
+        patch_count = len(range(values.DEFAULT_PATCH_LOWER_BOUND, values.DEFAULT_PATCH_UPPER_BOUND)) - count_concrete_patches_per_template(patch)
         filtered_list.append((patch, is_under_approx, is_over_approx, patch_score, patch_count, patch_len))
 
     ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2, 3, 4, 5))
@@ -159,8 +159,8 @@ def run(project_path, program_path):
     emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION))
     emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_UPPER_BOUND))
-    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_LOWER_BOUND))
+    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
+    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
     emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
     emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
     time_check = time.time()
@@ -173,7 +173,7 @@ def run(project_path, program_path):
         values.LIST_PATCH_SCORE[patch_index] = 0
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
-        values.LIST_PATCH_CONSTRAINTS[patch_index] = generator.generate_constraints_on_constants(patch)
+        values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
 
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = count_concrete_patches(patch_list)

@@ -39,7 +39,7 @@ def merge_partition(partition_list):
         valid_list = valid_list + list(range(p_lower_bound, p_upper_bound + 1))
 
     if not is_continuous:
-        invalid_list = invalid_list + list(range(values.DEFAULT_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_UPPER_BOUND + 1))
+        invalid_list = invalid_list + list(range(values.DEFAULT_PATCH_LOWER_BOUND, lower_bound)) + list(range(upper_bound + 1, values.DEFAULT_PATCH_UPPER_BOUND + 1))
         merged_partition['lower-bound'] = None
         merged_partition['upper-bound'] = None
         merged_partition['valid-list'] = valid_list

@@ -46,8 +46,8 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     concrete_enumeration = False
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
-    lower_bound = values.DEFAULT_LOWER_BOUND
-    upper_bound = values.DEFAULT_UPPER_BOUND
+    lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
+    upper_bound = values.DEFAULT_PATCH_UPPER_BOUND
 
     result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
@@ -404,63 +404,45 @@ def generate_path_for_negation():
     return negated_path
 
 
-def generate_constraints_on_constants(patch):
-    constant_list = dict()
+def generate_patch_space(patch):
+    partition_list = []
+    partition = dict()
     patch_formula = extractor.extract_constraints_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
+    is_multi_dimension = False
+    if len(var_list) > 1:
+        is_multi_dimension = True
     for var in var_list:
         if "const_" in str(var):
             constraint_info = dict()
-            constraint_info['lower-bound'] = values.DEFAULT_LOWER_BOUND
-            constraint_info['upper-bound'] = values.DEFAULT_UPPER_BOUND
+            constraint_info['lower-bound'] = values.DEFAULT_PATCH_LOWER_BOUND
+            constraint_info['upper-bound'] = values.DEFAULT_PATCH_UPPER_BOUND
             constraint_info['valid-list'] = list()
             constraint_info['invalid-list'] = list()
             constraint_info['is_continuous'] = True
-            constant_list[str(var)] = constraint_info
-    return constant_list
+            partition[str(var)] = constraint_info
+    partition_list.append(partition)
+    return partition_list, is_multi_dimension
 
 
-def generate_constant_constraint_formula(constant_list):
-    formula = None
-    for constant_name in constant_list:
-        sym_var = Symbol(constant_name, BV32)
-        constant_info = constant_list[constant_name]
-        if constant_info['is_continuous']:
-            upper_bound = int(constant_info['upper-bound'])
-            lower_bound = int(constant_info['lower-bound'])
-            sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
-        else:
-            upper_bound = int(values.DEFAULT_UPPER_BOUND)
-            lower_bound = int(values.DEFAULT_LOWER_BOUND)
-            sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
-            invalid_list = constant_info['invalid-list']
-            for value in invalid_list:
-                sub_formula = And(sub_formula, NotEquals(sym_var, SBV(int(value), 32)))
-
-        if formula is None:
-            formula = sub_formula
-        else:
-            formula = And(formula, sub_formula)
-    return formula
+def generate_input_space(path_condition):
+    partition_list = []
+    partition = dict()
+    var_list = generate_model(path_condition)
+    is_multi_dimension = False
+    if len(var_list) > 1:
+        is_multi_dimension = True
+    for var in var_list:
+        if "rvalue_" in str(var):
+            constraint_info = dict()
+            constraint_info['lower-bound'] = values.DEFAULT_PATCH_LOWER_BOUND
+            constraint_info['upper-bound'] = values.DEFAULT_PATCH_UPPER_BOUND
+            partition[str(var)] = constraint_info
+    partition_list.append(partition)
+    return partition_list, is_multi_dimension
 
 
-def generate_input_constraint_formula(fixed_point_list):
-    formula = None
-    for var_name in fixed_point_list:
-        fixed_point = fixed_point_list[var_name]
-        sym_array = Symbol(var_name, ArrayType(BV32, BV8))
-        sym_var = BVConcat(Select(sym_array, BV(3, 32)),
-                 BVConcat(Select(sym_array, BV(2, 32)),
-                 BVConcat(Select(sym_array, BV(1, 32)), Select(sym_array, BV(0, 32)))))
-        sub_formula = Equals(sym_var, SBV(int(fixed_point), 32))
-        if formula is None:
-            formula = sub_formula
-        else:
-            formula = And(formula, sub_formula)
-    return formula
-
-
-def generate_partition_for_space(constant_list, patch_space, is_multi_dimension):
+def generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension):
     partition_list = list()
     constant_name = list(sorted(constant_list.keys()))[0]
     partition_value = constant_list[constant_name]
@@ -470,13 +452,35 @@ def generate_partition_for_space(constant_list, patch_space, is_multi_dimension)
     const_partition_list = generate_partition_for_constant(constant_info, partition_value, is_multi_dimension)
     del constant_list[constant_name]
     if constant_list:
-        partition_list_tmp = generate_partition_for_space(constant_list, patch_space, is_multi_dimension)
+        partition_list_tmp = generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension)
         for partition_a in partition_list_tmp:
             for partition_b in const_partition_list:
                 partition = partition_b + partition_a
                 partition_list.append(partition)
     else:
         for partition in const_partition_list:
+            partition_list.append((partition,))
+
+    return partition_list
+
+
+def generate_partition_for_input_space(partition_model, input_space, is_multi_dimension):
+    partition_list = list()
+    var_name = list(sorted(partition_model.keys()))[0]
+    partition_value = partition_model[var_name]
+    input_info = input_space[var_name]
+    input_info['name'] = var_name
+    input_info['partition-value'] = partition_value
+    var_partition_list = generate_partition_for_input(input_info, partition_value, is_multi_dimension)
+    del partition_model[var_name]
+    if partition_model:
+        partition_list_tmp = generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
+        for partition_a in partition_list_tmp:
+            for partition_b in var_partition_list:
+                partition = partition_b + partition_a
+                partition_list.append(partition)
+    else:
+        for partition in var_partition_list:
             partition_list.append((partition,))
 
     return partition_list
@@ -499,6 +503,79 @@ def generate_partition_for_constant(constant_info, partition_value, is_multi_dim
         range_equal = (partition_value, partition_value)
         partition_list.append(range_equal)
     return partition_list
+
+
+def generate_partition_for_input(input_info, partition_value, is_multi_dimension):
+    partition_list = list()
+    if input_info['lower-bound'] == input_info['upper-bound']:
+        return partition_list
+    range_lower = (input_info['lower-bound'], partition_value - 1)
+    range_upper = (partition_value + 1, input_info['upper-bound'])
+
+    if oracle.is_valid_range(range_lower):
+        partition_list.append(range_lower)
+    if oracle.is_valid_range(range_upper):
+        partition_list.append(range_upper)
+    if is_multi_dimension:
+        range_equal = (partition_value, partition_value)
+        partition_list.append(range_equal)
+    return partition_list
+
+
+def generate_constraint_for_patch_partition(constant_list):
+    formula = None
+    for constant_name in constant_list:
+        sym_var = Symbol(constant_name, BV32)
+        constant_info = constant_list[constant_name]
+        if constant_info['is_continuous']:
+            upper_bound = int(constant_info['upper-bound'])
+            lower_bound = int(constant_info['lower-bound'])
+            sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
+        else:
+            upper_bound = int(values.DEFAULT_PATCH_UPPER_BOUND)
+            lower_bound = int(values.DEFAULT_PATCH_LOWER_BOUND)
+            sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
+            invalid_list = constant_info['invalid-list']
+            for value in invalid_list:
+                sub_formula = And(sub_formula, NotEquals(sym_var, SBV(int(value), 32)))
+
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = And(formula, sub_formula)
+    return formula
+
+
+def generate_constraint_for_fixed_point(fixed_point_list):
+    formula = None
+    for var_name in fixed_point_list:
+        fixed_point = fixed_point_list[var_name]
+        sym_array = Symbol(var_name, ArrayType(BV32, BV8))
+        sym_var = BVConcat(Select(sym_array, BV(3, 32)),
+                 BVConcat(Select(sym_array, BV(2, 32)),
+                 BVConcat(Select(sym_array, BV(1, 32)), Select(sym_array, BV(0, 32)))))
+        sub_formula = Equals(sym_var, SBV(int(fixed_point), 32))
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = And(formula, sub_formula)
+    return formula
+
+
+def generate_constraint_for_input_partition(input_var_list):
+    formula = None
+    for var_name in input_var_list:
+        sym_var = Symbol(var_name, BV32)
+        constant_info = input_var_list[var_name]
+        upper_bound = int(constant_info['upper-bound'])
+        lower_bound = int(constant_info['lower-bound'])
+        sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = And(formula, sub_formula)
+    return formula
+
 
 
 

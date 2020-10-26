@@ -66,9 +66,9 @@ def bootstrap(arg_list):
         os.mkdir(definitions.DIRECTORY_OUTPUT)
 
     if values.CONF_MAX_BOUND:
-        values.DEFAULT_UPPER_BOUND = values.CONF_MAX_BOUND
+        values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
-        values.DEFAULT_LOWER_BOUND = values.CONF_LOW_BOUND
+        values.DEFAULT_PATCH_LOWER_BOUND = values.CONF_LOW_BOUND
     if values.CONF_MAX_FORK:
         values.DEFAULT_MAX_FORK = values.CONF_MAX_FORK
     if values.CONF_GEN_SEARCH_LIMIT:
