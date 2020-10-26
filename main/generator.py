@@ -434,7 +434,7 @@ def generate_input_space(path_condition):
     if len(var_list) > 1:
         is_multi_dimension = True
     for var in var_list:
-        if "rvalue_" in str(var):
+        if "rvalue!" in str(var):
             constraint_info = dict()
             constraint_info['lower-bound'] = values.DEFAULT_PATCH_LOWER_BOUND
             constraint_info['upper-bound'] = values.DEFAULT_PATCH_UPPER_BOUND
