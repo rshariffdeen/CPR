@@ -25,7 +25,7 @@ def merge_space(partition_list):
     while len_partition > 1 or is_new_merge:
         is_new_merge = False
         partition_a = current_space[partition_id % len_partition]
-        if partition_a is None:
+        if not partition_a:
             current_space.remove(partition_a)
             continue
         partition_b = current_space[(partition_id + 1) % len_partition]

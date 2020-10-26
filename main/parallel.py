@@ -154,6 +154,17 @@ def partition_input_space(path_condition, assertion):
                 pool.close()
                 emitter.normal("\t\twaiting for thread completion")
                 pool.join()
+            filtered_list = list()
+            for partition in result_list:
+                if not partition:
+                    continue
+                if len(partition) > 1:
+                    for sub_partition in partition:
+                        filtered_list.append(sub_partition)
+                if len(partition) == 1:
+                    filtered_list.append(partition)
+
+            result_list = filtered_list
     return result_list
 
 

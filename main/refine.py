@@ -27,7 +27,10 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_partition, is_multi_dimension)
             for partition in partition_list:
-                refined_partition_list = refined_partition_list + refine_input_partition(path_condition, assertion, partition, is_multi_dimension)
+                if refined_partition_list:
+                    refined_partition_list = refined_partition_list + refine_input_partition(path_condition, assertion, partition, is_multi_dimension)
+                else:
+                    refined_partition_list = refine_input_partition(path_condition, assertion, partition, is_multi_dimension)
         else:
             refined_partition_list.append(input_partition)
     return refined_partition_list

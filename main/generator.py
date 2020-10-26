@@ -473,7 +473,8 @@ def generate_partition_for_input_space(partition_model, input_space, is_multi_di
                 partition_b.update(partition_a)
                 partition_list.append(copy.deepcopy(partition_b))
     else:
-        partition_list = var_partition_list
+        if var_partition_list:
+            partition_list = var_partition_list
 
     return partition_list
 
