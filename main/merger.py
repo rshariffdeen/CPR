@@ -55,6 +55,7 @@ def merge_two_partitions(partition_a, partition_b):
         merged_dimension = merge_two_dimensions(dimension_a, dimension_b)
         if merged_dimension is None:
             return None
+        merged_partition[dimension_name] = dict()
         merged_partition[dimension_name]['lower-bound'] = merged_dimension[0]
         merged_partition[dimension_name]['upper-bound'] = merged_dimension[1]
     return merged_partition
@@ -67,10 +68,10 @@ def merge_two_dimensions(range_a, range_b):
     if range_a == range_b:
         return range_a
 
-    if range(lb_b, ub_b + 1) in range(lb_a, ub_a + 1):
+    if lb_a <= lb_b and ub_b <= ub_a:
         return range_a
 
-    if range(lb_a, ub_a + 1) in range(lb_b, ub_b + 1):
+    if lb_b <= lb_a and ub_a <= ub_b:
         return range_b
 
     if lb_a == ub_b + 1:
