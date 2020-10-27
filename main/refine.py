@@ -17,9 +17,9 @@ import copy
 
 def refine_input_partition(path_condition, assertion, input_partition, is_multi_dimension):
     input_constraints = generator.generate_constraint_for_input_partition(input_partition)
-    path_condition = And(path_condition, input_constraints)
-    is_exist_check = And(path_condition, Not(assertion))
-    is_always_check = And(path_condition, assertion)
+    path_constraints = And(path_condition, input_constraints)
+    is_exist_check = And(path_constraints, Not(assertion))
+    is_always_check = And(path_constraints, assertion)
     refined_partition_list = []
     if is_sat(is_always_check):
         if is_sat(is_exist_check):

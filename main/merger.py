@@ -15,8 +15,31 @@ import random
 import copy
 
 
-def merge_space(partition_list, specification):
-    merged_space = partition_list
+def get_sorted_space(partition_list):
+    dimension_list = list(partition_list[0].keys())
+    dim_count = len(dimension_list)
+    merged_space = None
+    if dim_count == 1:
+        merged_space = sorted(partition_list, key=lambda x: x[dimension_list[0]]['lower-bound'])
+    elif dim_count == 2:
+        merged_space = sorted(partition_list, key=lambda x: (x[dimension_list[0]]['lower-bound'],
+                                                             x[dimension_list[1]]['lower-bound']))
+    elif dim_count == 3:
+        merged_space = sorted(partition_list, key=lambda x: (x[dimension_list[0]]['lower-bound'],
+                                                             x[dimension_list[1]]['lower-bound'],
+                                                             x[dimension_list[2]]['lower-bound']))
+    elif dim_count == 4:
+        merged_space = sorted(partition_list, key=lambda x: (x[dimension_list[0]]['lower-bound'],
+                                                             x[dimension_list[1]]['lower-bound'],
+                                                             x[dimension_list[2]]['lower-bound'],
+                                                             x[dimension_list[3]]['lower-bound']))
+    else:
+        utilities.error_exit("unhandled sorting of multi-dimensional space")
+    return merged_space
+
+
+def merge_space(partition_list, path_condition, specification):
+    merged_space = get_sorted_space(partition_list)
     len_partition = len(merged_space)
     partition_id = 0
     count_iteration = 0
@@ -31,10 +54,11 @@ def merge_space(partition_list, specification):
         merged_partition = merge_two_partitions(partition_a, partition_b)
         if merged_partition:
             partition_constraints = generator.generate_constraint_for_input_partition(merged_partition)
-            if is_unsat(And(partition_constraints, specification)):
+            if is_unsat(And(partition_constraints, And(path_condition, Not(specification)))):
+                insert_index = merged_space.index(partition_a)
                 merged_space.remove(partition_a)
                 merged_space.remove(partition_b)
-                merged_space.append(merged_partition)
+                merged_space.insert(insert_index, merged_partition)
                 len_partition = len(merged_space)
                 count_iteration = 0
         partition_id = (partition_id + 1) % len_partition

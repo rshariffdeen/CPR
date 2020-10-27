@@ -2,6 +2,7 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
+from pysmt.shortcuts import Not
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger
 import time
 import sys
@@ -18,10 +19,11 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)
-    input_space = parallel.partition_input_space(path_condition, assertion)
-    if not input_space:
+    valid_input_space = parallel.partition_input_space(path_condition, assertion)
+    if not valid_input_space:
         return patch_list
-    input_space = merger.merge_space(input_space, assertion)
+    valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
+
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
         if not result_list:
