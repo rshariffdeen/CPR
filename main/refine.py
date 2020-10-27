@@ -85,6 +85,8 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
         return None, index
     refined_patch_space = patch_space
     patch_score = 0
+    is_under_approx = None
+    is_over_approx = None
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
         parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
         patch_space_constraint = And(patch_formula, parameter_constraint)
@@ -92,23 +94,23 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
         negated_path_condition = values.NEGATED_PPC_FORMULA
         if is_sat(path_feasibility):
             patch_score = patch_score + 2
-            refined_patch_space = refine_for_over_fit(patch_index, patch_formula, path_condition,
-                                                      negated_path_condition, patch_space)
+            refined_patch_space, is_under_approx, is_over_approx = refine_for_over_fit(patch_formula, path_condition,
+                                                                                       negated_path_condition, patch_space)
     else:
         patch_score = patch_score + 1
         refined_patch_space = patch_space
-    return refined_patch_space, index, patch_score
+    return refined_patch_space, index, patch_score, is_under_approx, is_over_approx
 
 
-def refine_for_over_fit(patch_index, patch_formula, path_condition, negated_path_condition, patch_space):
-    refined_patch_space = refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space)
+def refine_for_over_fit(patch_formula, path_condition, negated_path_condition, patch_space):
+    refined_patch_space, is_under_approx = refine_for_under_approx(patch_formula, path_condition, patch_space)
     if not refined_patch_space:
-        return None
-    refined_patch_space = refine_for_over_approx(patch_index, patch_formula, negated_path_condition, refined_patch_space)
-    return refined_patch_space
+        return None, False, False
+    refined_patch_space, is_over_approx = refine_for_over_approx(patch_formula, negated_path_condition, refined_patch_space)
+    return refined_patch_space, is_under_approx, is_over_approx
 
 
-def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space):
+def refine_for_under_approx(patch_formula, path_condition, patch_space):
     parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = And(patch_formula, parameter_constraint)
     input_space_constraint = Not(generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
@@ -116,32 +118,30 @@ def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_sp
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     # specification = And(path_feasibility, Not(p_specification))
     refined_patch_space = patch_space
+    is_under_approx = False
     if is_sat(path_feasibility):
-        values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 1
+        is_under_approx = True
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
             refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
-            values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
-    else:
-        values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
-    return refined_patch_space
+            is_under_approx = False
+    return refined_patch_space, is_under_approx
 
 
-def refine_for_over_approx(patch_index, patch_formula, path_condition, patch_space):
+def refine_for_over_approx(patch_formula, path_condition, patch_space):
     parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = And(patch_formula, parameter_constraint)
     input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     refined_patch_space = patch_space
+    is_over_approx = False
     if is_sat(path_feasibility):
-        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 1
+        is_over_approx = True
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
             refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
-            values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
-    else:
-        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
-    return refined_patch_space
+            is_over_approx = False
+    return refined_patch_space, is_over_approx
 
 
 

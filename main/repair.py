@@ -10,12 +10,40 @@ import operator
 import numpy
 
 
+def update_patch(result_list, patch_list):
+    updated_patch_list = []
+    if not result_list:
+        emitter.error("\tsomething went wrong with patch validation")
+        utilities.error_exit()
+    for result in result_list:
+        refined_space, index, patch_score, is_under_approx, is_over_approx = result
+        patch = patch_list[index]
+        patch_constraint = extractor.extract_formula_from_patch(patch)
+        patch_constraint_str = patch_constraint.serialize()
+        patch_index = utilities.get_hash(patch_constraint_str)
+        updated_patch_list.append(patch_list[index])
+        values.LIST_PATCH_SCORE[patch_index] += patch_score
+        if is_under_approx is not None:
+            values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = is_under_approx
+        if is_over_approx is not None:
+            values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = is_over_approx
+        if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
+            updated_patch_list.append(patch_list[index])
+        else:
+            if refined_space:
+                values.LIST_PATCH_SPACE[patch_index] = refined_space
+            else:
+                # emitter.debug("Removing Patch", patch_list[index])
+                emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
+
+    return updated_patch_list
+
+
 def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: str,
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     emitter.normal("\tupdating patch pool")
-    updated_patch_list = []
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)
@@ -26,61 +54,9 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     values.VALID_INPUT_SPACE = valid_input_space
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
-        if not result_list:
-            emitter.error("\tsomething went wrong with patch validation")
-            utilities.error_exit()
-        if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
-            for result in result_list:
-                refined_space, index, patch_score = result
-                patch = patch_list[index]
-                patch_constraint = extractor.extract_formula_from_patch(patch)
-                patch_constraint_str = patch_constraint.serialize()
-                patch_index = utilities.get_hash(patch_constraint_str)
-                updated_patch_list.append(patch_list[index])
-                values.LIST_PATCH_SCORE[patch_index] += patch_score
-        else:
-            for result in result_list:
-                refined_space, index, patch_score = result
-                if refined_space:
-                    updated_patch_list.append(patch_list[index])
-                    patch = patch_list[index]
-                    patch_constraint = extractor.extract_formula_from_patch(patch)
-                    patch_constraint_str = patch_constraint.serialize()
-                    patch_index = utilities.get_hash(patch_constraint_str)
-                    values.LIST_PATCH_SPACE[patch_index] = refined_space
-                    values.LIST_PATCH_SCORE[patch_index] += patch_score
-                else:
-                    # emitter.debug("Removing Patch", patch_list[index])
-                    emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
-        if not result_list:
-            emitter.error("\tsomething went wrong with patch validation")
-            utilities.error_exit()
-        if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
-            for result in result_list:
-                is_refined, index, patch_score = result
-                patch = patch_list[index]
-                patch_constraint = extractor.extract_formula_from_patch(patch)
-                patch_constraint_str = patch_constraint.serialize()
-                patch_index = utilities.get_hash(patch_constraint_str)
-                updated_patch_list.append(patch_list[index])
-                values.LIST_PATCH_SCORE[patch_index] += patch_score
-        else:
-            for result in result_list:
-                refined_space, index, patch_score = result
-                if refined_space:
-                    updated_patch_list.append(patch_list[index])
-                    patch = patch_list[index]
-                    patch_constraint = extractor.extract_formula_from_patch(patch)
-                    patch_constraint_str = patch_constraint.serialize()
-                    patch_index = utilities.get_hash(patch_constraint_str)
-                    values.LIST_PATCH_SPACE[patch_index] = refined_space
-                    values.LIST_PATCH_SCORE[patch_index] += patch_score
-                else:
-                    # emitter.debug("Removing Patch", patch_list[index])
-                    emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
-
+    updated_patch_list = update_patch(result_list, patch_list)
     return updated_patch_list
 
 
