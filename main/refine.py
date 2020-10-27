@@ -47,7 +47,7 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
         if is_sat(is_exist_check):
             concrete_count = 1
             for parameter in patch_partition:
-                dimension = len(range(patch_partition[parameter]['lower-bound'], patch_partition[parameter]['upper-bound']))
+                dimension = len(range(patch_partition[parameter]['lower-bound'], patch_partition[parameter]['upper-bound'] + 1))
                 concrete_count = concrete_count * dimension
             if concrete_count == 1:
                 return [patch_partition]
