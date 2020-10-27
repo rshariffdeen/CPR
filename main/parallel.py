@@ -113,7 +113,7 @@ def refine_patch_space(patch_list, path_condition, assertion):
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = extractor.extract_formula_from_patch(patch)
-            # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -124,7 +124,7 @@ def refine_patch_space(patch_list, path_condition, assertion):
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = extractor.extract_formula_from_patch(patch)
-            # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
