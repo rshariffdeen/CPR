@@ -134,7 +134,7 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
         is_under_approx = True
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
-            refined_patch_space = refine_parameter_space(p_specification, path_constraint, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(Not(p_specification), path_constraint, patch_space, patch_formula)
             is_under_approx = False
     return refined_patch_space, is_under_approx
 
