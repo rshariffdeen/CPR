@@ -53,7 +53,12 @@ def merge_space(partition_list, path_condition, specification):
         partition_b = merged_space[(partition_id + 1) % len_partition]
         merged_partition = merge_two_partitions(partition_a, partition_b)
         if merged_partition:
-            partition_constraints = generator.generate_constraint_for_input_partition(merged_partition)
+            dimension_list = list(merged_partition.keys())
+            dimension_name = dimension_list[0]
+            if "const_" in dimension_name:
+                partition_constraints = generator.generate_constraint_for_patch_partition(merged_partition)
+            else:
+                partition_constraints = generator.generate_constraint_for_input_partition(merged_partition)
             if is_unsat(And(partition_constraints, And(path_condition, Not(specification)))):
                 insert_index = merged_space.index(partition_a)
                 merged_space.remove(partition_a)
