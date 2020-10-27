@@ -99,9 +99,9 @@ def print_patch_list(patch_list):
                     lower_bound = str(constant_info['lower-bound'])
                     upper_bound = str(constant_info['upper-bound'])
                     emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
-                    concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
-                    emitter.highlight("\t\tCount: " + str(concrete_count))
-                    concrete_patch_count = concrete_patch_count * concrete_count
+                    dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+                    emitter.highlight("\t\t\tDimension: " + str(dimension))
+                    concrete_patch_count = concrete_patch_count * dimension
         emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
         emitter.highlight("\t\tPatch Score: " + str(patch_score))
         if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
