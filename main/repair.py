@@ -21,20 +21,21 @@ def update_patch(result_list, patch_list):
         patch_constraint = extractor.extract_formula_from_patch(patch)
         patch_constraint_str = patch_constraint.serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
-        updated_patch_list.append(patch_list[index])
         values.LIST_PATCH_SCORE[patch_index] += patch_score
         if is_under_approx is not None:
             values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = is_under_approx
         if is_over_approx is not None:
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = is_over_approx
+
         if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
-            updated_patch_list.append(patch_list[index])
+            updated_patch_list.append(patch)
         else:
             if refined_space:
                 values.LIST_PATCH_SPACE[patch_index] = refined_space
+                updated_patch_list.append(patch)
             else:
                 # emitter.debug("Removing Patch", patch_list[index])
-                emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
+                emitter.emit_patch(patch, message="\t\tRemoving Patch: ")
 
     return updated_patch_list
 
