@@ -35,14 +35,14 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
                 updated_patch_list.append(patch_list[index])
         else:
             for result in result_list:
-                is_refined, index = result
-                if is_refined:
+                refined_space, index = result
+                if refined_space:
                     updated_patch_list.append(patch_list[index])
-                    # patch = patch_list[index]
-                    # patch_constraint = extractor.extract_constraints_from_patch(patch)
-                    # patch_constraint_str = patch_constraint.serialize()
-                    # patch_index = utilities.get_hash(patch_constraint_str)
-                    # values.LIST_PATCH_SPACE[patch_index] = refined_space
+                    patch = patch_list[index]
+                    patch_constraint = extractor.extract_formula_from_patch(patch)
+                    patch_constraint_str = patch_constraint.serialize()
+                    patch_index = utilities.get_hash(patch_constraint_str)
+                    values.LIST_PATCH_SPACE[patch_index] = refined_space
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
@@ -57,14 +57,14 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
                 updated_patch_list.append(patch_list[index])
         else:
             for result in result_list:
-                is_refined, index = result
-                if is_refined:
+                refined_space, index = result
+                if refined_space:
                     updated_patch_list.append(patch_list[index])
-                    # patch = patch_list[index]
-                    # patch_constraint = extractor.extract_constraints_from_patch(patch)
-                    # patch_constraint_str = patch_constraint.serialize()
-                    # patch_index = utilities.get_hash(patch_constraint_str)
-                    # values.LIST_PATCH_SPACE[patch_index] = refined_space
+                    patch = patch_list[index]
+                    patch_constraint = extractor.extract_formula_from_patch(patch)
+                    patch_constraint_str = patch_constraint.serialize()
+                    patch_index = utilities.get_hash(patch_constraint_str)
+                    values.LIST_PATCH_SPACE[patch_index] = refined_space
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")

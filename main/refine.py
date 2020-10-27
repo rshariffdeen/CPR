@@ -82,7 +82,7 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
     patch_index = utilities.get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]
     if not patch_space:
-        return False, index
+        return None, index
     refined_patch_space = patch_space
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
@@ -94,15 +94,10 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
             values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
             refined_patch_space = refine_for_over_fit(patch_index, patch_formula, path_condition,
                                                       negated_path_condition, patch_space)
-
     else:
         values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
         refined_patch_space = patch_space
-    is_refined = False
-    values.LIST_PATCH_SPACE[patch_index] = refined_patch_space
-    if refined_patch_space:
-        is_refined = True
-    return is_refined, index
+    return refined_patch_space, index
 
 
 def refine_for_over_fit(patch_index, patch_formula, path_condition, negated_path_condition, patch_space):
