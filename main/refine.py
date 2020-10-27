@@ -38,6 +38,8 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
 
 def refine_patch_partition(path_condition, input_constraints, patch_partition, is_multi_dimension):
     patch_constraints = generator.generate_constraint_for_patch_partition(patch_partition)
+    if is_unsat(And(patch_constraints, path_condition)):
+        return [patch_partition]
     is_exist_check = And(And(path_condition, input_constraints), patch_constraints)
     is_always_check = And(And(path_condition, Not(input_constraints)), patch_constraints)
     refined_partition_list = []
