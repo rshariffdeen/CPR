@@ -117,15 +117,16 @@ def count_concrete_patches_per_template(abstract_patch):
     patch_space = values.LIST_PATCH_SPACE[patch_index]
     total_concrete_count = 0
 
-    for partition in patch_space:
-        partition_concrete_count = 1
-        for parameter_name in partition:
-            constraint_info = partition[parameter_name]
-            lower_bound = str(constraint_info['lower-bound'])
-            upper_bound = str(constraint_info['upper-bound'])
-            parameter_dimension = len(range(int(lower_bound), int(upper_bound) + 1))
-            partition_concrete_count = partition_concrete_count * parameter_dimension
-        total_concrete_count = total_concrete_count + partition_concrete_count
+    if patch_space:
+        for partition in patch_space:
+            partition_concrete_count = 1
+            for parameter_name in partition:
+                constraint_info = partition[parameter_name]
+                lower_bound = str(constraint_info['lower-bound'])
+                upper_bound = str(constraint_info['upper-bound'])
+                parameter_dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+                partition_concrete_count = partition_concrete_count * parameter_dimension
+            total_concrete_count = total_concrete_count + partition_concrete_count
     return total_concrete_count
 
 
