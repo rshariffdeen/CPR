@@ -12,8 +12,10 @@ import numpy
 
 def update_patch(result_list, patch_list):
     updated_patch_list = []
-    if not result_list:
+    if len(result_list) != len(patch_list):
         emitter.error("\tsomething went wrong with patch validation")
+        emitter.debug("result list size: " + str(len(result_list)))
+        emitter.debug("patch list size: " + str(len(patch_list)))
         utilities.error_exit()
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
