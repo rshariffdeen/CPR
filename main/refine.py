@@ -106,11 +106,11 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
 
 
 def refine_for_over_fit(patch_index, patch_formula, path_condition, negated_path_condition, patch_space):
-    refined_partition_list = refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space)
-    if not refined_partition_list:
+    refined_patch_space = refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space)
+    if not refined_patch_space:
         return None
-    refined_partition_list = refine_for_over_approx(patch_index, patch_formula, negated_path_condition, patch_space)
-    return refined_partition_list
+    refined_patch_space = refine_for_over_approx(patch_index, patch_formula, negated_path_condition, refined_patch_space)
+    return refined_patch_space
 
 
 def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space):
