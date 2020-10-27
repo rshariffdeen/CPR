@@ -408,7 +408,7 @@ def generate_path_for_negation():
 def generate_patch_space(patch):
     partition_list = []
     partition = dict()
-    patch_formula = extractor.extract_constraints_from_patch(patch)
+    patch_formula = extractor.extract_formula_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
     for var in var_list:
         if "const_" in str(var):

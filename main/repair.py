@@ -83,9 +83,9 @@ def print_patch_list(patch_list):
         emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
         concrete_patch_count = 1
-        patch_constraint = extractor.extract_constraints_from_patch(patch)
-        patch_constraint_str = patch_constraint.serialize()
-        patch_index = utilities.get_hash(patch_constraint_str)
+        patch_formula = extractor.extract_formula_from_patch(patch)
+        patch_formula_str = patch_formula.serialize()
+        patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -96,16 +96,10 @@ def print_patch_list(patch_list):
                 for constant_name in partition:
                     emitter.highlight("\t\t\tConstant: " + constant_name)
                     constant_info = partition[constant_name]
-                    is_continuous = constant_info['is_continuous']
-                    if is_continuous:
-                        lower_bound = str(constant_info['lower-bound'])
-                        upper_bound = str(constant_info['upper-bound'])
-                        emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
-                        concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
-                    else:
-                        valid_list = constant_info['valid-list']
-                        emitter.highlight("\t\t\tSet: " + str(valid_list))
-                        concrete_count = len(valid_list)
+                    lower_bound = str(constant_info['lower-bound'])
+                    upper_bound = str(constant_info['upper-bound'])
+                    emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                    concrete_count = len(range(int(lower_bound), int(upper_bound) + 1))
                     emitter.highlight("\t\tCount: " + str(concrete_count))
                     concrete_patch_count = concrete_patch_count * concrete_count
         emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
@@ -117,24 +111,22 @@ def print_patch_list(patch_list):
 def count_concrete_patches_per_template(abstract_patch):
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
-    patch_constraint = extractor.extract_constraints_from_patch(abstract_patch)
-    patch_constraint_str = patch_constraint.serialize()
-    patch_index = utilities.get_hash(patch_constraint_str)
+    patch_formula = extractor.extract_formula_from_patch(abstract_patch)
+    patch_formula_str = patch_formula.serialize()
+    patch_index = utilities.get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]
-    con_count = 1
+    total_concrete_count = 0
+
     for partition in patch_space:
-        for constant_name in partition:
-            constant_info = partition[constant_name]
-            is_continuous = constant_info['is_continuous']
-            lower_bound = str(constant_info['lower-bound'])
-            upper_bound = str(constant_info['upper-bound'])
-            valid_list = constant_info['valid-list']
-            if is_continuous:
-                constant_count = len(range(int(lower_bound), int(upper_bound) + 1))
-            else:
-                constant_count = len(valid_list)
-            con_count = con_count * constant_count
-    return con_count
+        partition_concrete_count = 1
+        for parameter_name in partition:
+            constraint_info = partition[parameter_name]
+            lower_bound = str(constraint_info['lower-bound'])
+            upper_bound = str(constraint_info['upper-bound'])
+            parameter_dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+            partition_concrete_count = partition_concrete_count * parameter_dimension
+        total_concrete_count = total_concrete_count + partition_concrete_count
+    return total_concrete_count
 
 
 def count_concrete_patches(patch_list):
@@ -149,7 +141,7 @@ def rank_patches(patch_list):
     filtered_list = []
     # rank first based on coverage
     for patch in patch_list:
-        patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
+        patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
@@ -177,7 +169,7 @@ def run(project_path, program_path):
     time_check = time.time()
     patch_list = generator.generate_patch_set(project_path)
     for patch in patch_list:
-        patch_constraint_str = extractor.extract_constraints_from_patch(patch).serialize()
+        patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")

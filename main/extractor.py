@@ -77,7 +77,7 @@ def extract_assertion(spec_file_path):
     return assertion_formula
 
 
-def extract_constraints_from_patch(patch):
+def extract_formula_from_patch(patch):
     lid = list(patch.keys())[0]
     eid = 0
     patch_component = patch[lid]
