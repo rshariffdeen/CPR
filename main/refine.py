@@ -85,45 +85,39 @@ def refine_patch_space(input_space_constraint, path_condition, patch_space, patc
     return merged_refine_space
 
 
-def refine_patch(p_specification, patch_constraint, path_condition, index):
-    patch_constraint_str = patch_constraint.serialize()
-    patch_index = utilities.get_hash(patch_constraint_str)
+def refine_patch(p_specification, patch_formula, path_condition, index):
+    patch_formula_str = patch_formula.serialize()
+    patch_index = utilities.get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]
     if not patch_space:
         return False, index
-
+    refined_patch_space = patch_space
     patch_score = values.LIST_PATCH_SCORE[patch_index]
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-        refined_partition_list = []
-        for partition in patch_space:
-            constant_constraint = generator.generate_constraint_for_patch_partition(partition)
-            patch_space_constraint = And(patch_constraint, constant_constraint)
-            path_feasibility = And(path_condition, patch_space_constraint)
-            negated_path_condition = values.NEGATED_PPC_FORMULA
-            if is_sat(path_feasibility):
-                values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
-                refined_partition = refine_for_over_fit(p_specification, patch_constraint, path_condition,
-                                                        negated_path_condition, partition)
-                if refined_partition:
-                    refined_partition_list = refined_partition_list + refined_partition
+        parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        patch_space_constraint = And(patch_formula, parameter_constraint)
+        path_feasibility = And(path_condition, patch_space_constraint)
+        negated_path_condition = values.NEGATED_PPC_FORMULA
+        if is_sat(path_feasibility):
+            values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
+            refined_patch_space = refine_for_over_fit(patch_index, patch_formula, path_condition,
+                                                      negated_path_condition, patch_space)
 
     else:
         values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
-        refined_partition_list = patch_space
-
+        refined_patch_space = patch_space
     is_refined = False
-    values.LIST_PATCH_SPACE[patch_index] = refined_partition_list
-    if refined_partition_list:
+    values.LIST_PATCH_SPACE[patch_index] = refined_patch_space
+    if refined_patch_space:
         is_refined = True
-
     return is_refined, index
 
 
-def refine_for_over_fit(p_specification, patch_constraint, path_condition, negated_path_condition, patch_partition):
-    refined_partition_list = refine_for_under_approx(p_specification, patch_constraint, path_condition, patch_partition)
+def refine_for_over_fit(patch_index, patch_formula, path_condition, negated_path_condition, patch_space):
+    refined_partition_list = refine_for_under_approx(patch_index, patch_formula, path_condition, patch_space)
     if not refined_partition_list:
         return None
-    refined_partition_list = refine_for_over_approx(p_specification, patch_constraint, negated_path_condition, patch_partition)
+    refined_partition_list = refine_for_over_approx(patch_index, patch_formula, negated_path_condition, patch_space)
     return refined_partition_list
 
 
