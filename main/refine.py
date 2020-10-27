@@ -36,12 +36,12 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
     return refined_partition_list
 
 
-def refine_patch_partition(path_condition, input_constraints, patch_partition, is_multi_dimension):
+def refine_patch_partition(path_condition, p_specification, patch_partition, is_multi_dimension):
     patch_constraints = generator.generate_constraint_for_patch_partition(patch_partition)
     if is_unsat(And(patch_constraints, path_condition)):
         return [patch_partition]
-    is_exist_check = And(And(path_condition, input_constraints), patch_constraints)
-    is_always_check = And(And(path_condition, Not(input_constraints)), patch_constraints)
+    is_exist_check = And(And(path_condition, p_specification), patch_constraints)
+    is_always_check = And(And(path_condition, Not(p_specification)), patch_constraints)
     refined_partition_list = []
     if is_sat(is_always_check):
         if is_sat(is_exist_check):
@@ -58,22 +58,22 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
             partition_list = generator.generate_partition_for_patch_space(partition_model, patch_partition, is_multi_dimension)
             for partition in partition_list:
                 if refined_partition_list:
-                    refined_partition_list = refined_partition_list + refine_patch_partition(path_condition, input_constraints, partition, is_multi_dimension)
+                    refined_partition_list = refined_partition_list + refine_patch_partition(path_condition, p_specification, partition, is_multi_dimension)
                 else:
-                    refined_partition_list = refine_patch_partition(path_condition, input_constraints, partition, is_multi_dimension)
+                    refined_partition_list = refine_patch_partition(path_condition, p_specification, partition, is_multi_dimension)
         else:
             refined_partition_list.append(patch_partition)
     return refined_partition_list
 
 
-def refine_parameter_space(input_space_constraint, path_condition, parameter_space, patch_formula):
+def refine_parameter_space(p_specification, path_condition, parameter_space, patch_formula):
     refined_patch_space = list()
     is_multi_dimension = False
     path_condition = And(path_condition, patch_formula)
     for partition in parameter_space:
         if len(partition.keys()) > 1:
             is_multi_dimension = True
-        refined_partition = refine_patch_partition(path_condition, input_space_constraint, partition, is_multi_dimension)
+        refined_partition = refine_patch_partition(path_condition, p_specification, partition, is_multi_dimension)
         if not refined_partition:
             continue
         if isinstance(refined_partition, list):
@@ -83,7 +83,7 @@ def refine_parameter_space(input_space_constraint, path_condition, parameter_spa
             refined_patch_space.append(refined_partition)
     merged_refine_space = None
     if refined_patch_space:
-        merged_refine_space = merger.merge_space(refined_patch_space, path_condition, input_space_constraint)
+        merged_refine_space = merger.merge_space(refined_patch_space, path_condition, p_specification)
     return merged_refine_space
 
 
