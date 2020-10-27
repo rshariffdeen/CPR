@@ -112,17 +112,23 @@ def refine_patch_space(patch_list, path_condition, assertion):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_constraint = extractor.extract_formula_from_patch(patch)
+            patch_formula = extractor.extract_formula_from_patch(patch)
             # emitter.emit_patch(patch, message="\trefining abstract patch: ")
-            result_list.append(refine.refine_patch(assertion, patch_constraint, path_condition, index))
+            patch_formula_str = patch_formula.serialize()
+            patch_index = utilities.get_hash(patch_formula_str)
+            patch_space = values.LIST_PATCH_SPACE[patch_index]
+            result_list.append(refine.refine_patch(assertion, patch_formula, path_condition, index, patch_space))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_constraint = extractor.extract_formula_from_patch(patch)
+            patch_formula = extractor.extract_formula_from_patch(patch)
             # emitter.emit_patch(patch, message="\trefining abstract patch: ")
-            pool.apply_async(refine.refine_patch, args=(assertion, patch_constraint, path_condition, index), callback=collect_result)
+            patch_formula_str = patch_formula.serialize()
+            patch_index = utilities.get_hash(patch_formula_str)
+            patch_space = values.LIST_PATCH_SPACE[patch_index]
+            pool.apply_async(refine.refine_patch, args=(assertion, patch_formula, path_condition, index, patch_space), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()

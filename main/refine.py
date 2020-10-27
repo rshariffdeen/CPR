@@ -77,18 +77,18 @@ def refine_parameter_space(input_space_constraint, path_condition, parameter_spa
     return merged_refine_space
 
 
-def refine_patch(p_specification, patch_formula, path_condition, index):
-    patch_formula_str = patch_formula.serialize()
-    patch_index = utilities.get_hash(patch_formula_str)
-    patch_space = values.LIST_PATCH_SPACE[patch_index]
-    if not patch_space:
-        return None, index
-    refined_patch_space = patch_space
+def refine_patch(p_specification, patch_formula, path_condition, index, patch_space):
     patch_score = 0
     is_under_approx = None
     is_over_approx = None
+    refined_patch_space = patch_space
+    if not patch_space:
+        return None, index, patch_score, is_under_approx, is_over_approx
+
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
         parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        if not parameter_constraint:
+            return None, index, patch_score, is_under_approx, is_over_approx
         patch_space_constraint = And(patch_formula, parameter_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         negated_path_condition = values.NEGATED_PPC_FORMULA
