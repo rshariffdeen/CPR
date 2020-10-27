@@ -49,6 +49,8 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
             for parameter in patch_partition:
                 dimension = len(range(patch_partition[parameter]['lower-bound'], patch_partition[parameter]['upper-bound'] + 1))
                 concrete_count = concrete_count * dimension
+                if concrete_count > 1:
+                    break
             if concrete_count == 1:
                 return [patch_partition]
             partition_model = generator.generate_model(is_exist_check)
