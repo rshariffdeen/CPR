@@ -15,7 +15,7 @@ import random
 import copy
 
 
-def merge_space(partition_list):
+def merge_space(partition_list, specification):
     merged_space = partition_list
     len_partition = len(merged_space)
     partition_id = 0
@@ -30,11 +30,13 @@ def merge_space(partition_list):
         partition_b = merged_space[(partition_id + 1) % len_partition]
         merged_partition = merge_two_partitions(partition_a, partition_b)
         if merged_partition:
-            merged_space.remove(partition_a)
-            merged_space.remove(partition_b)
-            merged_space.append(merged_partition)
-            len_partition = len(merged_space)
-            count_iteration = 0
+            partition_constraints = generator.generate_constraint_for_input_partition(merged_partition)
+            if is_unsat(And(partition_constraints, specification)):
+                merged_space.remove(partition_a)
+                merged_space.remove(partition_b)
+                merged_space.append(merged_partition)
+                len_partition = len(merged_space)
+                count_iteration = 0
         partition_id = (partition_id + 1) % len_partition
         if count_iteration == len_partition:
             break
