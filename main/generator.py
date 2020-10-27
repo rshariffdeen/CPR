@@ -482,6 +482,13 @@ def generate_partition_for_parameter(constraint_info, partition_value, is_multi_
     partition_list = list()
     partition_info = dict()
     range_info = dict()
+    if is_multi_dimension:
+        range_equal = (partition_value, partition_value)
+        range_info['lower-bound'] = range_equal[0]
+        range_info['upper-bound'] = range_equal[1]
+        partition_info[parameter_name] = range_info
+        partition_list.append(copy.deepcopy(partition_info))
+
     if constraint_info['lower-bound'] == constraint_info['upper-bound']:
         return partition_list
     range_lower = (constraint_info['lower-bound'], partition_value - 1)
@@ -497,12 +504,7 @@ def generate_partition_for_parameter(constraint_info, partition_value, is_multi_
         range_info['upper-bound'] = range_upper[1]
         partition_info[parameter_name] = range_info
         partition_list.append(copy.deepcopy(partition_info))
-    if is_multi_dimension:
-        range_equal = (partition_value, partition_value)
-        range_info['lower-bound'] = range_equal[0]
-        range_info['upper-bound'] = range_equal[1]
-        partition_info[parameter_name] = range_info
-        partition_list.append(copy.deepcopy(partition_info))
+
     return partition_list
 
 
@@ -510,6 +512,13 @@ def generate_partition_for_input(constraint_info, partition_value, is_multi_dime
     partition_list = list()
     partition_info = dict()
     range_info = dict()
+    if is_multi_dimension:
+        range_equal = (partition_value, partition_value)
+        range_info['lower-bound'] = range_equal[0]
+        range_info['upper-bound'] = range_equal[1]
+        partition_info[var_name] = range_info
+        partition_list.append(copy.deepcopy(partition_info))
+
     if constraint_info['lower-bound'] == constraint_info['upper-bound']:
         return partition_list
     range_lower = (constraint_info['lower-bound'], partition_value - 1)
@@ -525,12 +534,7 @@ def generate_partition_for_input(constraint_info, partition_value, is_multi_dime
         range_info['upper-bound'] = range_upper[1]
         partition_info[var_name] = range_info
         partition_list.append(copy.deepcopy(partition_info))
-    if is_multi_dimension:
-        range_equal = (partition_value, partition_value)
-        range_info['lower-bound'] = range_equal[0]
-        range_info['upper-bound'] = range_equal[1]
-        partition_info[var_name] = range_info
-        partition_list.append(copy.deepcopy(partition_info))
+
     return partition_list
 
 
