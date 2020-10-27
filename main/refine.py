@@ -45,6 +45,12 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
     refined_partition_list = []
     if is_sat(is_always_check):
         if is_sat(is_exist_check):
+            concrete_count = 1
+            for parameter in patch_partition:
+                dimension = len(range(patch_partition[parameter]['lower-bound'], patch_partition[parameter]['upper-bound']))
+                concrete_count = concrete_count * dimension
+            if concrete_count == 1:
+                return [patch_partition]
             partition_model = generator.generate_model(is_exist_check)
             partition_model, is_multi_dimension = extractor.extract_parameter_list(partition_model)
             partition_list = generator.generate_partition_for_patch_space(partition_model, patch_partition, is_multi_dimension)
