@@ -2,7 +2,7 @@ from main.synthesis import load_specification, synthesize_parallel, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals, BVConcat, Select, BV
+from pysmt.shortcuts import is_sat, Not, And, Or, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals, BVConcat, Select, BV
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
@@ -435,17 +435,17 @@ def generate_input_space(path_condition):
     return partition
 
 
-def generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension):
+def generate_partition_for_patch_space(partition_model, patch_space, is_multi_dimension):
     partition_list = list()
-    constant_name = list(sorted(constant_list.keys()))[0]
-    partition_value = constant_list[constant_name]
+    constant_name = list(sorted(partition_model.keys()))[0]
+    partition_value = partition_model[constant_name]
     constant_info = patch_space[constant_name]
     constant_info['name'] = constant_name
     constant_info['partition-value'] = partition_value
     const_partition_list = generate_partition_for_constant(constant_info, partition_value, is_multi_dimension)
-    del constant_list[constant_name]
-    if constant_list:
-        partition_list_tmp = generate_partition_for_patch_space(constant_list, patch_space, is_multi_dimension)
+    del partition_model[constant_name]
+    if partition_model:
+        partition_list_tmp = generate_partition_for_patch_space(partition_model, patch_space, is_multi_dimension)
         for partition_a in partition_list_tmp:
             for partition_b in const_partition_list:
                 partition = partition_b + partition_a
@@ -566,14 +566,14 @@ def generate_constraint_for_fixed_point(fixed_point_list):
     return formula
 
 
-def generate_constraint_for_input_partition(input_var_list):
+def generate_constraint_for_input_partition(input_partition):
     formula = None
-    for var_name in input_var_list:
+    for var_name in input_partition:
         sym_array = Symbol(var_name, ArrayType(BV32, BV8))
         sym_var = BVConcat(Select(sym_array, BV(3, 32)),
                            BVConcat(Select(sym_array, BV(2, 32)),
                                     BVConcat(Select(sym_array, BV(1, 32)), Select(sym_array, BV(0, 32)))))
-        constant_info = input_var_list[var_name]
+        constant_info = input_partition[var_name]
         upper_bound = int(constant_info['upper-bound'])
         lower_bound = int(constant_info['lower-bound'])
         sub_formula = And(BVSGE(SBV(upper_bound, 32), sym_var), BVSLE(SBV(lower_bound, 32), sym_var))
@@ -584,7 +584,26 @@ def generate_constraint_for_input_partition(input_var_list):
     return formula
 
 
+def generate_constraint_for_input_space(input_space):
+    formula = None
+    for input_partition in input_space:
+        sub_formula = generate_constraint_for_input_partition(input_partition)
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = Or(formula, sub_formula)
+    return formula
 
+
+def generate_constraint_for_patch_space(patch_space):
+    formula = None
+    for patch_partition in patch_space:
+        sub_formula = generate_constraint_for_patch_partition(patch_partition)
+        if formula is None:
+            formula = sub_formula
+        else:
+            formula = Or(formula, sub_formula)
+    return formula
 
 #
 # def generate_new_range(constant_space, partition_list):

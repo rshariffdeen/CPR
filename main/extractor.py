@@ -110,13 +110,13 @@ def extract_input_list(model):
     return input_list, is_multi_dimension
 
 
-def extract_constant_list(model):
-    constant_list = dict()
+def extract_parameter_list(model):
+    parameter_list = dict()
     for var_name in model:
         if "const_" in str(var_name):
             byte_list = model[var_name]
-            constant_list[str(var_name)] = utilities.get_signed_value(byte_list)
+            parameter_list[str(var_name)] = utilities.get_signed_value(byte_list)
     is_multi_dimension = False
-    if len(constant_list) > 1:
+    if len(parameter_list) > 1:
         is_multi_dimension = True
-    return constant_list, is_multi_dimension
+    return parameter_list, is_multi_dimension

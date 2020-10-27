@@ -23,7 +23,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     if not valid_input_space:
         return patch_list
     valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
-
+    values.VALID_INPUT_SPACE = valid_input_space
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
         if not result_list:
