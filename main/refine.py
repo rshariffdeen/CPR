@@ -105,51 +105,53 @@ def refine_patch(p_specification, patch_formula, path_condition, index, patch_sp
         if is_sat(path_feasibility):
             patch_score = patch_score + 2
             refined_patch_space, is_under_approx, is_over_approx = refine_for_over_fit(patch_formula, path_condition,
-                                                                                       negated_path_condition, patch_space)
+                                                                                       negated_path_condition, patch_space, p_specification)
     else:
         patch_score = patch_score + 1
         refined_patch_space = patch_space
     return refined_patch_space, index, patch_score, is_under_approx, is_over_approx
 
 
-def refine_for_over_fit(patch_formula, path_condition, negated_path_condition, patch_space):
-    refined_patch_space, is_under_approx = refine_for_under_approx(patch_formula, path_condition, patch_space)
+def refine_for_over_fit(patch_formula, path_condition, negated_path_condition, patch_space, p_specification):
+    refined_patch_space, is_under_approx = refine_for_under_approx(patch_formula, path_condition, patch_space, p_specification)
     if not refined_patch_space:
         return None, False, False
-    refined_patch_space, is_over_approx = refine_for_over_approx(patch_formula, negated_path_condition, refined_patch_space)
+    refined_patch_space, is_over_approx = refine_for_over_approx(patch_formula, negated_path_condition, refined_patch_space, p_specification)
     return refined_patch_space, is_under_approx, is_over_approx
 
 
-def refine_for_under_approx(patch_formula, path_condition, patch_space):
+def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specification):
     parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = And(patch_formula, parameter_constraint)
     input_space_constraint = Not(generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
     # invalid input range is used to check for violations
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     # specification = And(path_feasibility, Not(p_specification))
+    path_constraint = And(path_condition, input_space_constraint)
     refined_patch_space = patch_space
     is_under_approx = False
     if is_sat(path_feasibility):
         is_under_approx = True
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
-            refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(p_specification, path_constraint, patch_space, patch_formula)
             is_under_approx = False
     return refined_patch_space, is_under_approx
 
 
-def refine_for_over_approx(patch_formula, path_condition, patch_space):
+def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specification):
     parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = And(patch_formula, parameter_constraint)
     input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     refined_patch_space = patch_space
+    path_constraint = And(path_condition, input_space_constraint)
     is_over_approx = False
     if is_sat(path_feasibility):
         is_over_approx = True
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
-            refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(p_specification, path_constraint, patch_space, patch_formula)
             is_over_approx = False
     return refined_patch_space, is_over_approx
 
