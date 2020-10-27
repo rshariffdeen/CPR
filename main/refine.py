@@ -62,8 +62,8 @@ def refine_patch_space(input_space_constraint, path_condition, patch_space, patc
     patch_space_constraint = And(patch_formula, parameter_constraint)
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     partition_model = generator.generate_model(path_feasibility)
-    parameter_list = extractor.extract_parameter_list(partition_model)
-    dimension_count = len(parameter_list)
+    partition_model = extractor.extract_parameter_list(partition_model)
+    dimension_count = len(partition_model)
     if dimension_count == 0:
         return None
     is_multi_dimension = False
