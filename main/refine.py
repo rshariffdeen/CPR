@@ -84,20 +84,20 @@ def refine_patch(p_specification, patch_formula, path_condition, index):
     if not patch_space:
         return None, index
     refined_patch_space = patch_space
-    patch_score = values.LIST_PATCH_SCORE[patch_index]
+    patch_score = 0
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
         parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
         patch_space_constraint = And(patch_formula, parameter_constraint)
         path_feasibility = And(path_condition, patch_space_constraint)
         negated_path_condition = values.NEGATED_PPC_FORMULA
         if is_sat(path_feasibility):
-            values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
+            patch_score = patch_score + 2
             refined_patch_space = refine_for_over_fit(patch_index, patch_formula, path_condition,
                                                       negated_path_condition, patch_space)
     else:
-        values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
+        patch_score = patch_score + 1
         refined_patch_space = patch_space
-    return refined_patch_space, index
+    return refined_patch_space, index, patch_score
 
 
 def refine_for_over_fit(patch_index, patch_formula, path_condition, negated_path_condition, patch_space):

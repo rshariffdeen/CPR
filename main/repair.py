@@ -31,11 +31,16 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             utilities.error_exit()
         if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             for result in result_list:
-                is_refined, index = result
+                refined_space, index, patch_score = result
+                patch = patch_list[index]
+                patch_constraint = extractor.extract_formula_from_patch(patch)
+                patch_constraint_str = patch_constraint.serialize()
+                patch_index = utilities.get_hash(patch_constraint_str)
                 updated_patch_list.append(patch_list[index])
+                values.LIST_PATCH_SCORE[patch_index] += patch_score
         else:
             for result in result_list:
-                refined_space, index = result
+                refined_space, index, patch_score = result
                 if refined_space:
                     updated_patch_list.append(patch_list[index])
                     patch = patch_list[index]
@@ -43,6 +48,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
                     patch_constraint_str = patch_constraint.serialize()
                     patch_index = utilities.get_hash(patch_constraint_str)
                     values.LIST_PATCH_SPACE[patch_index] = refined_space
+                    values.LIST_PATCH_SCORE[patch_index] += patch_score
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
@@ -53,11 +59,16 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
             utilities.error_exit()
         if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             for result in result_list:
-                is_refined, index = result
+                is_refined, index, patch_score = result
+                patch = patch_list[index]
+                patch_constraint = extractor.extract_formula_from_patch(patch)
+                patch_constraint_str = patch_constraint.serialize()
+                patch_index = utilities.get_hash(patch_constraint_str)
                 updated_patch_list.append(patch_list[index])
+                values.LIST_PATCH_SCORE[patch_index] += patch_score
         else:
             for result in result_list:
-                refined_space, index = result
+                refined_space, index, patch_score = result
                 if refined_space:
                     updated_patch_list.append(patch_list[index])
                     patch = patch_list[index]
@@ -65,6 +76,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
                     patch_constraint_str = patch_constraint.serialize()
                     patch_index = utilities.get_hash(patch_constraint_str)
                     values.LIST_PATCH_SPACE[patch_index] = refined_space
+                    values.LIST_PATCH_SCORE[patch_index] += patch_score
                 else:
                     # emitter.debug("Removing Patch", patch_list[index])
                     emitter.emit_patch(patch_list[index], message="\t\tRemoving Patch: ")
