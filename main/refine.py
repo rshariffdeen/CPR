@@ -80,8 +80,9 @@ def refine_patch_space(input_space_constraint, path_condition, patch_space, patc
                 refined_patch_space.append(sub_partition)
         else:
             refined_patch_space.append(refined_partition)
-
-    merged_refine_space = merger.merge_space(refined_patch_space,path_condition,input_space_constraint)
+    merged_refine_space = None
+    if refined_patch_space:
+        merged_refine_space = merger.merge_space(refined_patch_space,path_condition,input_space_constraint)
     return merged_refine_space
 
 
@@ -128,7 +129,7 @@ def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_sp
     # invalid input range is used to check for violations
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     # specification = And(path_feasibility, Not(p_specification))
-    refined_patch_space = None
+    refined_patch_space = patch_space
     if is_sat(path_feasibility):
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 1
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
@@ -137,7 +138,6 @@ def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_sp
             values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
     else:
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
-        refined_patch_space = patch_space
     return refined_patch_space
 
 
@@ -146,7 +146,7 @@ def refine_for_over_approx(patch_index, patch_formula, path_condition, patch_spa
     patch_space_constraint = And(patch_formula, parameter_constraint)
     input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
-    refined_patch_space = None
+    refined_patch_space = patch_space
     if is_sat(path_feasibility):
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 1
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
@@ -155,7 +155,6 @@ def refine_for_over_approx(patch_index, patch_formula, path_condition, patch_spa
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
     else:
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
-        refined_patch_space = patch_space
     return refined_patch_space
 
 
