@@ -50,7 +50,7 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
                 if refined_partition_list:
                     refined_partition_list = refined_partition_list + refine_patch_partition(path_condition, input_constraints, partition, is_multi_dimension)
                 else:
-                    refined_partition_list = refine_input_partition(path_condition, input_constraints, partition, is_multi_dimension)
+                    refined_partition_list = refine_patch_partition(path_condition, input_constraints, partition, is_multi_dimension)
         else:
             refined_partition_list.append(patch_partition)
     return refined_partition_list
