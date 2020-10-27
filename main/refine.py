@@ -56,15 +56,13 @@ def refine_patch_partition(path_condition, input_constraints, patch_partition, i
     return refined_partition_list
 
 
-def refine_patch_space(input_space_constraint, path_condition, patch_space, patch_formula):
+def refine_parameter_space(input_space_constraint, path_condition, parameter_space, patch_formula):
     refined_patch_space = list()
-    parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
-    patch_space_constraint = And(patch_formula, parameter_constraint)
-    path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
-    partition_model = generator.generate_model(path_feasibility)
-    partition_model, is_multi_dimension = extractor.extract_parameter_list(partition_model)
-    partition_list = generator.generate_partition_for_patch_space(partition_model, patch_space, is_multi_dimension)
-    for partition in partition_list:
+    is_multi_dimension = False
+    path_condition = And(path_condition, patch_formula)
+    for partition in parameter_space:
+        if len(partition.keys()) > 1:
+            is_multi_dimension = True
         refined_partition = refine_patch_partition(path_condition, input_space_constraint, partition, is_multi_dimension)
         if not refined_partition:
             continue
@@ -75,7 +73,7 @@ def refine_patch_space(input_space_constraint, path_condition, patch_space, patc
             refined_patch_space.append(refined_partition)
     merged_refine_space = None
     if refined_patch_space:
-        merged_refine_space = merger.merge_space(refined_patch_space,path_condition,input_space_constraint)
+        merged_refine_space = merger.merge_space(refined_patch_space, path_condition, input_space_constraint)
     return merged_refine_space
 
 
@@ -127,7 +125,7 @@ def refine_for_under_approx(patch_index, patch_formula, path_condition, patch_sp
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 1
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
-            refined_patch_space = refine_patch_space(input_space_constraint, path_condition, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
             values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
     else:
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
@@ -144,7 +142,7 @@ def refine_for_over_approx(patch_index, patch_formula, path_condition, patch_spa
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 1
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
-            refined_patch_space = refine_patch_space(input_space_constraint, path_condition, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(input_space_constraint, path_condition, patch_space, patch_formula)
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
     else:
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
