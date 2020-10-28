@@ -10,25 +10,48 @@ import operator
 import numpy
 
 
+def get_diff_list(result_list, patch_list):
+    filtered_list = []
+    diff_list = patch_list.copy()
+    for result in result_list:
+        refined_space, index, patch_score, is_under_approx, is_over_approx = result
+        patch = patch_list[index]
+        filtered_list.append(patch)
+        diff_list.remove(patch)
+    return diff_list
+
+
+def update_index(result_list, patch_list_new, patch_list_old):
+    updated_list = []
+    for result in result_list:
+        refined_space, index, patch_score, is_under_approx, is_over_approx = result
+        patch = patch_list_new[index]
+        new_index = patch_list_old.index(patch)
+        updated_list.append((refined_space, new_index, patch_score, is_under_approx, is_over_approx))
+    return updated_list
+
+
 def update_patch(result_list, patch_list, path_condition, assertion):
     updated_patch_list = []
     if len(result_list) != len(patch_list):
         emitter.error("\tsomething went wrong with patch validation")
         emitter.debug("result list size: " + str(len(result_list)))
         emitter.debug("patch list size: " + str(len(patch_list)))
-        filtered_list = []
-        diff_list = patch_list.copy()
-        for result in result_list:
-            refined_space, index, patch_score, is_under_approx, is_over_approx = result
-            patch = patch_list[index]
-            filtered_list.append(patch)
-            diff_list.remove(patch)
-        # for patch in diff_list:
-        #     emitter.emit_patch(patch, "Index " + str(patch_list.index(patch)))
-        # utilities.error_exit()
-        backup_list = parallel.refine_patch_space(diff_list, path_condition, assertion, True)
-        result_list = result_list + backup_list
+        emitter.warning("attempting to re-run parallel refinement: " + str(len(patch_list) - len(result_list)))
 
+        diff_list_a = get_diff_list(result_list, patch_list)
+        result_list_a = parallel.refine_patch_space(diff_list_a, path_condition, assertion)
+        updated_result_list = update_index(result_list_a, diff_list_a, patch_list)
+        if len(diff_list_a) != len(result_list_a):
+            emitter.error("\tsomething went wrong with patch validation")
+            emitter.debug("result list size: " + str(len(result_list)))
+            emitter.debug("patch list size: " + str(len(patch_list)))
+
+            emitter.warning("attempting to re-run sequential refinement: " + str(len(diff_list_a) - len(result_list_a)))
+            diff_list_b = get_diff_list(result_list_a, diff_list_a)
+            result_list_b = parallel.refine_patch_space(diff_list_b, path_condition, assertion, True)
+            updated_result_list = updated_result_list + update_index(result_list_b, diff_list_b, patch_list)
+    result_list = result_list + updated_result_list
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
         patch = patch_list[index]
