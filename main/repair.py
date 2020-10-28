@@ -135,7 +135,9 @@ def print_patch_list(patch_list):
                     emitter.highlight("\t\t\tDimension: " + str(dimension))
                     concrete_patch_count = concrete_patch_count * dimension
         emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
-        emitter.highlight("\t\tPatch Score: " + str(patch_score))
+        emitter.highlight("\t\tPath Coverage: " + str(patch_score))
+        emitter.highlight("\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
+        emitter.highlight("\t\tIs Over-approximating: " + str(values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]))
         if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
             break
 
