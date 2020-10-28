@@ -71,31 +71,37 @@ def check_path_feasibility(chosen_control_loc, new_path, index):
 
 
 def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index):  # TODO
-    specification = And(path_condition, patch_constraint)
-    patch_constraint_str = patch_constraint.serialize()
-    patch_index = utilities.get_hash(patch_constraint_str)
-    patch_score = values.LIST_PATCH_SCORE[patch_index]
+    path_constraint = And(path_condition, patch_constraint)
+    patch_score = 0
+    is_under_approx = None
+    is_over_approx = None
     result = True
     if assertion:
-        if is_sat(specification):
+        if is_sat(path_constraint):
             if is_loc_in_trace(values.CONF_LOC_BUG):
-                values.LIST_PATCH_SCORE[patch_index] = patch_score + 2
-                universal_quantification = is_unsat(And(specification, Not(assertion)))
+                patch_score = patch_score + 2
+                universal_quantification = is_unsat(And(path_constraint, Not(assertion)))
                 if universal_quantification:
+                    is_under_approx = False
                     negated_path_condition = values.NEGATED_PPC_FORMULA
-                    specification = And(negated_path_condition, patch_constraint)
-                    existential_quantification = is_unsat(And(specification, assertion))
+                    path_constraint = And(negated_path_condition, patch_constraint)
+                    existential_quantification = is_unsat(And(path_constraint, assertion))
+                    if existential_quantification:
+                        is_over_approx = False
+                    else:
+                        is_over_approx = True
                     result = existential_quantification
                 else:
+                    is_under_approx = True
                     result = False
             else:
-                values.LIST_PATCH_SCORE[patch_index] = patch_score + 1
+                patch_score = patch_score + 1
             # else:
             #     specification = And(path_condition, Not(patch_constraint))
             #     existential_quantification = is_unsat(And(specification, assertion))
             #     result = existential_quantification
 
-    return result, index
+    return result, index, patch_score, is_under_approx, is_over_approx
 
 
 def check_input_feasibility(index, patch_constraint, new_path):
