@@ -145,7 +145,7 @@ def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specifi
         is_over_approx = True
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
-            refined_patch_space = refine_parameter_space(p_specification, path_constraint, patch_space, patch_formula)
+            refined_patch_space = refine_parameter_space(path_constraint, patch_space, input_space_constraint)
             is_over_approx = False
     return refined_patch_space, is_over_approx
 
