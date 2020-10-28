@@ -105,11 +105,11 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     return result_list
 
 
-def refine_patch_space(patch_list, path_condition, assertion):
+def refine_patch_space(patch_list, path_condition, assertion, force_sequential = False):
     global pool, result_list
     result_list = []
 
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.CONF_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = extractor.extract_formula_from_patch(patch)

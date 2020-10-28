@@ -10,7 +10,7 @@ import operator
 import numpy
 
 
-def update_patch(result_list, patch_list):
+def update_patch(result_list, patch_list, path_condition, assertion):
     updated_patch_list = []
     if len(result_list) != len(patch_list):
         emitter.error("\tsomething went wrong with patch validation")
@@ -23,10 +23,12 @@ def update_patch(result_list, patch_list):
             patch = patch_list[index]
             filtered_list.append(patch)
             diff_list.remove(patch)
-        for patch in diff_list:
-            emitter.emit_patch(patch, "Index " + str(patch_list.index(patch)))
+        # for patch in diff_list:
+        #     emitter.emit_patch(patch, "Index " + str(patch_list.index(patch)))
+        # utilities.error_exit()
+        backup_list = parallel.refine_patch_space(diff_list, path_condition, assertion, True)
+        result_list = result_list + backup_list
 
-        utilities.error_exit()
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
         patch = patch_list[index]
@@ -69,7 +71,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
-    updated_patch_list = update_patch(result_list, patch_list)
+    updated_patch_list = update_patch(result_list, patch_list, path_condition, assertion)
     return updated_patch_list
 
 
