@@ -188,6 +188,7 @@ def help():
     write("Usage: python3.6 ConRepair.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_DEBUG + "\t| " + "enable debugging information", RED)
+    write("\t" + definitions.ARG_OPERATION_MODE + "\t| " + "execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)", RED)
     write("\t" + definitions.ARG_DISABLE_DISTANCE_CAL + "\t| " + "disable distance calculation (default=enabled)", RED)
     write("\t" + definitions.ARG_SELECTION_METHOD + "\t| " + "selection strategy [0: deterministic, 1: random] (default=0)", RED)
     write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", RED)
