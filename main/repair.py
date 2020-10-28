@@ -31,27 +31,33 @@ def update_index(result_list, patch_list_new, patch_list_old):
     return updated_list
 
 
-def update_patch(result_list, patch_list, path_condition, assertion):
-    updated_patch_list = []
-    if len(result_list) != len(patch_list):
-        emitter.error("\tsomething went wrong with patch validation")
+def recover_patch_list(result_list, patch_list, path_condition, assertion):
+    recover_list = []
+    emitter.error("\t[error] something went wrong with patch validation, attempting to recover")
+    emitter.debug("result list size: " + str(len(result_list)))
+    emitter.debug("patch list size: " + str(len(patch_list)))
+    emitter.warning("\t[warning] attempting to re-run parallel refinement: " + str(len(patch_list) - len(result_list)))
+
+    diff_list_a = get_diff_list(result_list, patch_list)
+    result_list_a = parallel.refine_patch_space(diff_list_a, path_condition, assertion)
+    recover_list = update_index(result_list_a, diff_list_a, patch_list)
+    if len(diff_list_a) != len(result_list_a):
+        emitter.error("\t[error] something went wrong with patch validation, attempting to recover")
         emitter.debug("result list size: " + str(len(result_list)))
         emitter.debug("patch list size: " + str(len(patch_list)))
-        emitter.warning("attempting to re-run parallel refinement: " + str(len(patch_list) - len(result_list)))
+        emitter.warning(
+            "\t[warning] attempting to re-run sequential refinement: " + str(len(diff_list_a) - len(result_list_a)))
+        diff_list_b = get_diff_list(result_list_a, diff_list_a)
+        result_list_b = parallel.refine_patch_space(diff_list_b, path_condition, assertion, True)
+        recover_list = recover_list + update_index(result_list_b, diff_list_b, patch_list)
+    return recover_list
 
-        diff_list_a = get_diff_list(result_list, patch_list)
-        result_list_a = parallel.refine_patch_space(diff_list_a, path_condition, assertion)
-        updated_result_list = update_index(result_list_a, diff_list_a, patch_list)
-        if len(diff_list_a) != len(result_list_a):
-            emitter.error("\tsomething went wrong with patch validation")
-            emitter.debug("result list size: " + str(len(result_list)))
-            emitter.debug("patch list size: " + str(len(patch_list)))
 
-            emitter.warning("attempting to re-run sequential refinement: " + str(len(diff_list_a) - len(result_list_a)))
-            diff_list_b = get_diff_list(result_list_a, diff_list_a)
-            result_list_b = parallel.refine_patch_space(diff_list_b, path_condition, assertion, True)
-            updated_result_list = updated_result_list + update_index(result_list_b, diff_list_b, patch_list)
-    result_list = result_list + updated_result_list
+def update_patch_list(result_list, patch_list, path_condition, assertion):
+    updated_patch_list = []
+    if len(result_list) != len(patch_list):
+        recover_list = recover_patch_list(result_list, patch_list, path_condition, assertion)
+        result_list = result_list + recover_list
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
         patch = patch_list[index]
@@ -94,7 +100,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
-    updated_patch_list = update_patch(result_list, patch_list, path_condition, assertion)
+    updated_patch_list = update_patch_list(result_list, patch_list, path_condition, assertion)
     return updated_patch_list
 
 
