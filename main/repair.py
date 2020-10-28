@@ -16,6 +16,16 @@ def update_patch(result_list, patch_list):
         emitter.error("\tsomething went wrong with patch validation")
         emitter.debug("result list size: " + str(len(result_list)))
         emitter.debug("patch list size: " + str(len(patch_list)))
+        filtered_list = []
+        diff_list = patch_list.copy()
+        for result in result_list:
+            refined_space, index, patch_score, is_under_approx, is_over_approx = result
+            patch = patch_list[index]
+            filtered_list.append(patch)
+            diff_list.remove(patch)
+        for patch in diff_list:
+            emitter.emit_patch(patch, "Index " + str(patch_list.index(patch)))
+
         utilities.error_exit()
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
