@@ -40,7 +40,7 @@ The tool supports the following functionality:
 		--selection=	    | selection strategy [0: deterministic, 1: random] (default=0)
 		--dist-metric=	    | distance metric [0: control-loc, 1: statement] (default=0)
 		--patch-type=	    | patch type [0: concrete, 1: abstract] (default=0)
-		--refine-method=    | refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx] (default=0)
+		--refine-method=    | refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)
 
 # Configuration Settings
 The tool supports the following configuration:
