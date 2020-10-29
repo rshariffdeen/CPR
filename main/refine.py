@@ -36,9 +36,9 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
     return refined_partition_list
 
 
-def refine_patch_partition(path_constraint, patch_partition, input_space_constraint, is_multi_dimension):
+def refine_patch_partition(path_constraint, patch_partition, p_specification, is_multi_dimension):
     parameter_constraint = generator.generate_constraint_for_patch_partition(patch_partition)
-    path_feasibility = And(path_constraint, And(parameter_constraint, input_space_constraint))
+    path_feasibility = And(path_constraint, And(parameter_constraint, p_specification))
     refined_partition_list = []
     if is_sat(path_feasibility):
         concrete_count = 1
@@ -54,21 +54,21 @@ def refine_patch_partition(path_constraint, patch_partition, input_space_constra
         partition_list = generator.generate_partition_for_patch_space(partition_model, patch_partition, is_multi_dimension)
         for partition in partition_list:
             if refined_partition_list:
-                refined_partition_list = refined_partition_list + refine_patch_partition(path_constraint, partition, input_space_constraint, is_multi_dimension)
+                refined_partition_list = refined_partition_list + refine_patch_partition(path_constraint, partition, p_specification, is_multi_dimension)
             else:
-                refined_partition_list = refine_patch_partition(path_constraint, partition, input_space_constraint, is_multi_dimension)
+                refined_partition_list = refine_patch_partition(path_constraint, partition, p_specification, is_multi_dimension)
     else:
         refined_partition_list = [patch_partition]
     return refined_partition_list
 
 
-def refine_parameter_space(path_constraint, parameter_space, input_space_constraint):
+def refine_parameter_space(path_constraint, parameter_space, p_specification):
     refined_patch_space = list()
     is_multi_dimension = False
     for partition in parameter_space:
         if len(partition.keys()) > 1:
             is_multi_dimension = True
-        refined_partition = refine_patch_partition(path_constraint, partition, input_space_constraint, is_multi_dimension)
+        refined_partition = refine_patch_partition(path_constraint, partition, p_specification, is_multi_dimension)
         if not refined_partition:
             continue
         if isinstance(refined_partition, list):
@@ -78,7 +78,7 @@ def refine_parameter_space(path_constraint, parameter_space, input_space_constra
             refined_patch_space.append(refined_partition)
     merged_refine_space = None
     if refined_patch_space:
-        merged_refine_space = merger.merge_space(refined_patch_space, path_constraint, input_space_constraint)
+        merged_refine_space = merger.merge_space(refined_patch_space, path_constraint, p_specification)
     return merged_refine_space
 
 
@@ -121,14 +121,14 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
     input_space_constraint = Not(generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
     # invalid input range is used to check for violations
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
-    path_constraint = And(path_condition, patch_formula)
+    path_constraint = And(And(path_condition, input_space_constraint), patch_formula)
     refined_patch_space = patch_space
     is_under_approx = False
     if is_sat(path_feasibility):
         is_under_approx = True
         if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
-            refined_patch_space = refine_parameter_space(path_constraint, patch_space, input_space_constraint)
+            refined_patch_space = refine_parameter_space(path_constraint, patch_space, p_specification)
             is_under_approx = False
     return refined_patch_space, is_under_approx
 
@@ -139,13 +139,13 @@ def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specifi
     input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
     path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
     refined_patch_space = patch_space
-    path_constraint = And(path_condition, patch_formula)
+    path_constraint = And(And(path_condition, input_space_constraint), patch_formula)
     is_over_approx = False
     if is_sat(path_feasibility):
         is_over_approx = True
         if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
-            refined_patch_space = refine_parameter_space(path_constraint, patch_space, input_space_constraint)
+            refined_patch_space = refine_parameter_space(path_constraint, patch_space, p_specification)
             is_over_approx = False
     return refined_patch_space, is_over_approx
 
