@@ -123,3 +123,4 @@ CONF_MASK_ARG = ""
 CONF_IS_CPP = False
 CONF_IS_CRASH = False
 CONF_REDUCE_METHOD = "fitreduce"
+CONF_ALL_COMPS = False

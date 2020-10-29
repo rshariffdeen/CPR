@@ -25,7 +25,7 @@ def load_component_list():
     emitter.normal("loading custom/general components")
     gen_comp_files = []
     os.chdir(definitions.DIRECTORY_COMPONENTS)
-    if values.CONF_GENERAL_COMP_LIST:
+    if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
         for component_name in values.CONF_GENERAL_COMP_LIST:
             gen_comp_files.append(Path(component_name))
             emitter.note("\tloading component: " + str(component_name))

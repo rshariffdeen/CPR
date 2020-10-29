@@ -47,6 +47,8 @@ def read_conf(arg_list):
                 values.CONF_REFINE_METHOD = values.OPTIONS_REFINE_METHOD[option]
             elif definitions.ARG_SKIP_BUILD in arg:
                 values.CONF_SKIP_BUILD = True
+            elif definitions.ARG_COMP_ALL in arg:
+                values.CONF_ALL_COMPS = True
             elif definitions.ARG_SKIP_GENERATION in arg:
                 values.CONF_SKIP_GEN = True
             elif definitions.ARG_SKIP_TEST in arg:
