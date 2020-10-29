@@ -6,6 +6,10 @@ from main import emitter, logger, definitions, values, builder, repair, \
 from main.utilities import error_exit
 from main.concolic import run_concrete_execution, run_concolic_execution
 
+time_info = dict()
+time_check = ""
+start_time = ""
+
 
 def create_directories():
     if not os.path.isdir(definitions.DIRECTORY_LOG):
@@ -119,10 +123,11 @@ def initialize():
 
 
 def main(arg_list):
+    global time_info, time_check, start_time
     create_directories()
     emitter.start()
     start_time = time.time()
-    time_info = dict()
+
     time_check = time.time()
     bootstrap(arg_list)
     duration = format((time.time() - time_check) / 60, '.3f')
@@ -155,6 +160,7 @@ def main(arg_list):
 
 
 if __name__ == "__main__":
+    global time_check, start_time, time_info
     import sys
     try:
         main(sys.argv[1:])
@@ -162,3 +168,13 @@ if __name__ == "__main__":
         parallel.pool.terminate()
         os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
         error_exit("Program Interrupted by User")
+
+        duration = format(((time.time() - time_check) / 60 - float(values.TIME_TO_GENERATE)), '.3f')
+        time_info[definitions.KEY_DURATION_REPAIR] = str(duration)
+
+        # Final running time and exit
+
+        duration = format((time.time() - start_time) / 60, '.3f')
+        time_info[definitions.KEY_DURATION_TOTAL] = str(duration)
+        emitter.end(time_info)
+        logger.end(time_info)
