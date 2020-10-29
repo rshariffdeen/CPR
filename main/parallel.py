@@ -41,7 +41,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
-            ppc_str = ppc.serialize()
+            ppc_str = ppc
             if ppc_str in values.LIST_PATH_READ:
                 continue
             values.LIST_PATH_READ.append(ppc_str)
@@ -62,7 +62,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
-            ppc_str = ppc.serialize()
+            ppc_str = ppc
             if ppc_str in values.LIST_PATH_READ:
                 continue
             values.LIST_PATH_READ.append(ppc_str)
