@@ -41,6 +41,10 @@ def generate_symbolic_paths_parallel(ppc_list):
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
+            ppc_str = ppc.serialize()
+            if ppc_str in values.LIST_PATH_READ:
+                continue
+            values.LIST_PATH_READ.append(ppc_str)
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             ppc_len = len(str(new_path.serialize()))
@@ -58,6 +62,10 @@ def generate_symbolic_paths_parallel(ppc_list):
             count = count + 1
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
+            ppc_str = ppc.serialize()
+            if ppc_str in values.LIST_PATH_READ:
+                continue
+            values.LIST_PATH_READ.append(ppc_str)
             new_path = generator.generate_flipped_path(ppc)
             new_path_str = new_path.serialize()
             ppc_len = len(str(new_path.serialize()))
