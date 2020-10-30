@@ -79,7 +79,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
     if assertion:
         if is_sat(path_constraint):
             if is_loc_in_trace(values.CONF_LOC_BUG):
-                patch_score = patch_score + 2
+                patch_score = 2
                 is_under_approx = not is_unsat(And(path_constraint, Not(assertion)))
                 if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
                     emitter.debug("refining for universal quantification")
@@ -94,7 +94,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                     if is_over_approx:
                         result = False
             else:
-                patch_score = patch_score + 1
+                patch_score =  1
             # else:
             #     specification = And(path_condition, Not(patch_constraint))
             #     existential_quantification = is_unsat(And(specification, assertion))
