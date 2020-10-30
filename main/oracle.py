@@ -94,7 +94,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                     if is_over_approx:
                         result = False
             else:
-                patch_score =  1
+                patch_score = 1
             # else:
             #     specification = And(path_condition, Not(patch_constraint))
             #     existential_quantification = is_unsat(And(specification, assertion))

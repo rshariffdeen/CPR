@@ -107,11 +107,11 @@ def refine_patch(p_specification, patch_formula, path_condition, index, patch_sp
         path_constraint = And(path_condition, patch_space_constraint)
         negated_path_condition = values.NEGATED_PPC_FORMULA
         if is_sat(path_constraint):
-            patch_score =  2
+            patch_score = 2
             refined_patch_space, is_under_approx, is_over_approx = refine_for_over_fit(patch_formula, path_condition,
                                                                                        negated_path_condition, patch_space, p_specification)
     else:
-        patch_score =  1
+        patch_score = 1
         refined_patch_space = patch_space
     return refined_patch_space, index, patch_score, is_under_approx, is_over_approx
 
