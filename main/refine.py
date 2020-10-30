@@ -129,7 +129,7 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
     patch_space_constraint = patch_formula
     if parameter_constraint:
         patch_space_constraint = And(patch_formula, parameter_constraint)
-    path_feasibility = And(path_condition, patch_space_constraint)
+    path_feasibility = And(path_condition, And(patch_space_constraint, p_specification))
     path_constraint = And(path_condition, patch_formula)
     if values.VALID_INPUT_SPACE:
         input_space_constraint = Not(generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
@@ -156,7 +156,7 @@ def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specifi
     patch_space_constraint = patch_formula
     if parameter_constraint:
         patch_space_constraint = And(patch_formula, parameter_constraint)
-    path_feasibility = And(path_condition, patch_space_constraint)
+    path_feasibility = And(path_condition, And(patch_space_constraint, p_specification))
     path_constraint = And(path_condition, patch_formula)
     if values.VALID_INPUT_SPACE:
         input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
