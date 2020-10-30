@@ -23,6 +23,15 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
     refined_partition_list = []
     if is_sat(is_always_check):
         if is_sat(is_exist_check):
+            concrete_count = 1
+            for parameter in input_partition:
+                dimension = len(
+                    range(input_partition[parameter]['lower-bound'], input_partition[parameter]['upper-bound'] + 1))
+                concrete_count = concrete_count * dimension
+                if concrete_count > 1:
+                    break
+            if concrete_count == 1:
+                return refined_partition_list
             partition_model = generator.generate_model(is_exist_check)
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_partition, is_multi_dimension)
