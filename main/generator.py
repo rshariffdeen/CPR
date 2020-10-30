@@ -48,7 +48,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
-    upper_bound = values.DEFAULT_PATCH_UPPER_BOUND
+    upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
 
     result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
