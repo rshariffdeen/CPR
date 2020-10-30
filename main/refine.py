@@ -101,9 +101,9 @@ def refine_patch(p_specification, patch_formula, path_condition, index, patch_sp
 
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
         parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
-        if not parameter_constraint:
-            return None, index, patch_score, is_under_approx, is_over_approx
-        patch_space_constraint = And(patch_formula, parameter_constraint)
+        patch_space_constraint = patch_formula
+        if parameter_constraint:
+            patch_space_constraint = And(patch_formula, parameter_constraint)
         path_constraint = And(path_condition, patch_space_constraint)
         negated_path_condition = values.NEGATED_PPC_FORMULA
         if is_sat(path_constraint):
