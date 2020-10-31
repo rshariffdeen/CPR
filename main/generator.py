@@ -360,12 +360,16 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     emitter.normal("\tgenerating ktest file")
     ktest_path = File_Ktest_Path
     ktest_command = "gen-bout --out-file {0}".format(ktest_path)
+
     for argument in argument_list:
+        index = list(argument_list).index(argument)
         if "$POC" in argument:
             binary_file_path = values.CONF_PATH_POC
             if values.FILE_POC_GEN:
                 binary_file_path = values.FILE_POC_GEN
             ktest_command += " --sym-file " + binary_file_path
+        elif str(index) in values.CONF_MASK_ARG:
+            continue
         else:
             ktest_command += " --sym-arg \"" + str(argument) + "\""
 
