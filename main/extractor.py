@@ -120,3 +120,19 @@ def extract_parameter_list(model):
     if len(parameter_list) > 1:
         is_multi_dimension = True
     return parameter_list, is_multi_dimension
+
+
+def extract_input_arg_list(argument_str):
+    argument_list = str(argument_str).split(" ")
+    merged_list = list()
+    is_merge = False
+    merged_arg = ""
+    for arg in argument_list:
+        merged_arg = merged_arg + arg
+        if "\"" in arg:
+            is_merge = not is_merge
+
+        if not is_merge:
+            argument_list.append(arg)
+            merged_arg = ""
+    return merged_list
