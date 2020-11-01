@@ -96,7 +96,7 @@ def read_conf_file():
             assertion_file_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_SPECIFICATION
             values.SPECIFICATION = extractor.extract_assertion(assertion_file_path)
         elif definitions.CONF_CUSTOM_COMP_LIST in configuration:
-            values.CONF_CUSTOM_COMP_LIST = configuration.replace(definitions.CONF_CUSTOM_COMP_LIST, '').split(",")
+            values.CONF_CUSTOM_COMP_LIST = configuration.replace(definitions.CONF_CUSTOM_COMP_LIST, '').split("],[")
         elif definitions.CONF_GENERAL_COMP_LIST in configuration:
             values.CONF_GENERAL_COMP_LIST = configuration.replace(definitions.CONF_GENERAL_COMP_LIST, '').split(",")
         elif definitions.CONF_DEPTH_VALUE in configuration:

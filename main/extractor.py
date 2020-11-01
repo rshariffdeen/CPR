@@ -123,16 +123,9 @@ def extract_parameter_list(model):
 
 
 def extract_input_arg_list(argument_str):
-    argument_list = str(argument_str).split(" ")
-    merged_list = list()
-    is_merge = False
-    merged_arg = ""
-    for arg in argument_list:
-        merged_arg = merged_arg + arg
-        if "\"" in arg:
-            is_merge = not is_merge
-
-        if not is_merge:
-            argument_list.append(arg)
-            merged_arg = ""
-    return merged_list
+    if "[" not in argument_str:
+        argument_list = str(argument_str).split(" ")
+    else:
+        argument_str = argument_str.replace("[", "").replace("]", "")
+        argument_list = str(argument_str).split(",")
+    return argument_list
