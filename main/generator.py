@@ -752,9 +752,6 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     model = generate_model(path_condition)
     var_list = list(model.keys())
     input_list = list()
-    count_obs = 0
-    declaration_line = assertion_temp[0]
-    specification_line = assertion_temp[1]
     count = 0
     for var in var_list:
         if "rvalue!" in var and "_" not in var:
