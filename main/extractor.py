@@ -101,7 +101,7 @@ def extract_formula_from_patch(patch):
 def extract_input_list(model):
     input_list = dict()
     for var_name in model:
-        if "rvalue!" in str(var_name):
+        if "rvalue!" in str(var_name) and "_" not in str(var_name):
             byte_list = model[var_name]
             input_list[str(var_name)] = utilities.get_signed_value(byte_list)
     is_multi_dimension = False
