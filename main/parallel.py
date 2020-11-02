@@ -29,13 +29,12 @@ def collect_patch(patch):
 
 
 def abortable_worker(func, *args, **kwargs):
-    timeout = kwargs.get('timeout', None)
     default_value = kwargs.get('default', None)
     index = kwargs.get('index', None)
     p = ThreadPool(1)
     res = p.apply_async(func, args=args)
     try:
-        out = res.get(timeout)
+        out = res.get(values.DEFAULT_TIMEOUT_SAT)
         return out
     except TimeoutError:
         emitter.warning("\t[warning] timeout raised on a thread")
@@ -89,7 +88,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, timeout=values.DEFAULT_TIMEOUT_SAT, default=False, index=count-1)
+                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, default=False, index=count-1)
                 pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1), callback=collect_result)
                 # thread_list.append(thread)
         emitter.normal("\t\twaiting for thread completion")
