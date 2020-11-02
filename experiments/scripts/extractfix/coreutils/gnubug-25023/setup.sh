@@ -25,14 +25,15 @@ git commit -m "instrument trident"
 
 ./bootstrap
 FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
-make CFLAGS="-fPIC -fPIE -lkleeRuntest" src/pr -j32
+make -j32
+make CFLAGS="-fPIC -fPIE -lkleeRuntest" CXXFLAGS=$CFLAGS src/pr -j32
 
 cd $current_dir
 cp repair.conf $dir_name
 cp spec.smt2 $dir_name
 cp t1.smt2 $dir_name
 cp -rf components $dir_name
-cp exploit.j2k $dir_name
+cp exploit.txt $dir_name
 
 
 
