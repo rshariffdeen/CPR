@@ -231,12 +231,13 @@ def validate_input_generation(patch_list, new_path):
         thread_list = []
         interrupt_event = threading.Event()
         for patch in patch_list:
-            if not found_one:
+            try:
                 patch_constraint = extractor.extract_formula_from_patch(patch)
                 index = list(patch_list).index(patch)
                 thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result_one)
                 thread_list.append(thread)
-            else:
+            except ValueError:
+                emitter.warning("\t\tvalue found before completing pool")
                 break
         emitter.normal("\t\twaiting for thread completion")
         pool.close()
