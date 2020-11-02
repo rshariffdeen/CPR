@@ -92,13 +92,16 @@ def collect_symbolic_path(log_path, project_path):
     emitter.normal("\textracting path conditions")
     ppc_list = list()
     last_sym_path = ""
+    skip_add = False
     if os.path.exists(log_path):
         source_path = ""
         path_condition = ""
         with open(log_path, 'r') as trace_file:
             for line in trace_file:
                 if '[path:ppc]' in line:
-                    if project_path in line or definitions.DIRECTORY_LIB in line:
+                    if project_path in line:
+                        if definitions.DIRECTORY_LIB in line:
+                            skip_add = True
                         source_path = str(line.replace("[path:ppc]", '')).split(" : ")[0]
                         source_path = source_path.strip()
                         source_path = os.path.abspath(source_path)
@@ -108,10 +111,12 @@ def collect_symbolic_path(log_path, project_path):
                     if "(exit)" not in line:
                         path_condition = path_condition + line
                     else:
-                        ppc_list.append((source_path, path_condition))
+                        if not skip_add:
+                            ppc_list.append((source_path, path_condition))
                         last_sym_path = path_condition
                         source_path = ""
                         path_condition = ""
+                        skip_add = False
     # constraints['last-sym-path'] = last_sym_path
     # print(constraints.keys())
     parser = SmtLibParser()
