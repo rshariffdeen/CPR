@@ -746,3 +746,37 @@ def generate_assertion(assertion_temp, klee_dir):
         assertion_text = assertion_text + specification_line.replace("obs!0", "obs!" + str(index))
     specification_formula = generate_formula(assertion_text)
     return specification_formula
+
+
+def generate_extended_patch_formula(patch_formula, path_condition):
+    model = generate_model(path_condition)
+    var_list = list(model.keys())
+    input_list = list()
+    count_obs = 0
+    declaration_line = assertion_temp[0]
+    specification_line = assertion_temp[1]
+    count = 0
+    for var in var_list:
+        if "rvalue!" in var and "_" not in var:
+            input_list.append(var)
+        if "angelic!bool" in var:
+            count = count + 1
+
+    path_script = "/tmp/z3_script"
+    write_smtlib(patch_formula, path_script)
+    formula_txt = ""
+    with open(path_script, 'r') as script_file:
+        read_lines = script_file.readlines()
+        formula_txt = "".join(read_lines)
+    extended_formula_txt = formula_txt
+    for index in range(1, count):
+        postfix = "!0_" + str(index)
+        substituted_formula_txt = formula_txt
+        for input_var in input_list:
+            input_var_postfix = input_var.replace("!0", postfix)
+            substituted_formula_txt = substituted_formula_txt.replace(input_var, input_var_postfix)
+            extended_formula_txt = extended_formula_txt + substituted_formula_txt
+    constraint_formula = generate_formula(extended_formula_txt)
+    return constraint_formula
+
+

@@ -142,17 +142,19 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     var_relationship = TRUE
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_constraint = extractor.extract_formula_from_patch(patch)
+            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
-            result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_constraint, path_condition, index))
+            result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_formula_extended, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         lock = None
         for patch in patch_list:
-            patch_constraint = extractor.extract_formula_from_patch(patch)
+            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
-            pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_constraint, path_condition, index), callback=collect_result)
+            pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_formula_extended, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
