@@ -122,7 +122,8 @@ def generate_symbolic_paths_parallel(ppc_list):
         #         emitter.warning("\t[warning] timeout raised on a thread")
         #         thread.successful()
         pool.close()
-        pool.join()
+        while len(result_list) != expected_count:
+            time.sleep(1)
     # assert(len(result_list) == len(path_list))
     for result in result_list:
         is_feasible, index = result
