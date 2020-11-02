@@ -9,7 +9,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import threading
 import time
 
-
+found_one = False
 pool = mp.Pool(mp.cpu_count())
 result_list = []
 
@@ -20,8 +20,9 @@ def collect_result(result):
 
 
 def collect_result_one(result):
-    global result_list
+    global result_list, found_one
     if result[0] is True:
+        found_one = True
         pool.terminate()
     result_list.append(result)
 
@@ -216,7 +217,7 @@ def partition_input_space(path_condition, assertion):
 
 
 def validate_input_generation(patch_list, new_path):
-    global pool, result_list
+    global pool, result_list, found_one
     result_list = []
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
@@ -230,10 +231,13 @@ def validate_input_generation(patch_list, new_path):
         thread_list = []
         interrupt_event = threading.Event()
         for patch in patch_list:
-            patch_constraint = extractor.extract_formula_from_patch(patch)
-            index = list(patch_list).index(patch)
-            thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result_one)
-            thread_list.append(thread)
+            if not found_one:
+                patch_constraint = extractor.extract_formula_from_patch(patch)
+                index = list(patch_list).index(patch)
+                thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result_one)
+                thread_list.append(thread)
+            else:
+                break
         emitter.normal("\t\twaiting for thread completion")
         pool.close()
         pool.join()
