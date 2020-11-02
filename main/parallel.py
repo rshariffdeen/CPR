@@ -56,6 +56,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
+        thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
@@ -72,10 +73,14 @@ def generate_symbolic_paths_parallel(ppc_list):
             path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                try:
-                    pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result).get(values.DEFAULT_TIMEOUT_SAT)
-                except TimeoutError:
-                    emitter.warning("[warning] timeout raised on thread")
+                thread = pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result).get(values.DEFAULT_TIMEOUT_SAT)
+                thread_list.append(thread)
+
+        for thread in thread_list:
+            try:
+                thread.get(values.DEFAULT_TIMEOUT_SAT)
+            except TimeoutError:
+                emitter.warning("[warning] timeout raised on thread")
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
