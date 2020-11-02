@@ -767,16 +767,20 @@ def generate_extended_patch_formula(patch_formula, path_condition):
         if "constant" not in var:
             input_list.append(var)
 
-    formula_txt = to_smtlib(patch_formula, False)
-    extended_formula_txt = formula_txt
+    formula_txt = script
+    formula_list = []
     for index in range(1, count):
         postfix = "_" + str(index)
         substituted_formula_txt = formula_txt
         for input_var in input_list:
             input_var_postfix = input_var + postfix
             substituted_formula_txt = substituted_formula_txt.replace(input_var, input_var_postfix)
-        extended_formula_txt = extended_formula_txt + substituted_formula_txt
-    constraint_formula = generate_formula(extended_formula_txt)
+        formula = generate_formula(substituted_formula_txt)
+        formula_list.append(formula)
+
+    constraint_formula = patch_formula
+    for formula in formula_list:
+        constraint_formula = And(constraint_formula, formula)
     return constraint_formula
 
 
