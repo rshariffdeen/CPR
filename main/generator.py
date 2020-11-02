@@ -773,7 +773,10 @@ def generate_extended_patch_formula(patch_formula, path_condition):
         postfix = "_" + str(index)
         substituted_formula_txt = formula_txt
         for input_var in input_list:
-            input_var_postfix = input_var + postfix
+            if "|" in input_var:
+                input_var_postfix = input_var[:-1] + postfix + "|"
+            else:
+                input_var_postfix = input_var + postfix
             substituted_formula_txt = substituted_formula_txt.replace(input_var, input_var_postfix)
         formula = generate_formula(substituted_formula_txt)
         formula_list.append(formula)
