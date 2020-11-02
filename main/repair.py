@@ -288,7 +288,7 @@ def run_fitreduce(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(patch_list) <= 1
     iteration = 0
-    assertion_template = values.SPECIFICATION
+    assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
