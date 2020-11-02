@@ -75,14 +75,13 @@ def generate_symbolic_paths_parallel(ppc_list):
                 values.LIST_PATH_CHECK.append(new_path_str)
                 thread = pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
                 thread_list.append(thread)
-
+        emitter.normal("\t\twaiting for thread completion")
         for thread in thread_list:
             try:
                 thread.get(values.DEFAULT_TIMEOUT_SAT)
             except TimeoutError:
-                emitter.warning("[warning] timeout raised on thread")
+                emitter.warning("\t[warning] timeout raised on a thread")
         pool.close()
-        emitter.normal("\t\twaiting for thread completion")
         pool.join()
     # assert(len(result_list) == len(path_list))
     for result in result_list:
