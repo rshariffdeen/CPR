@@ -31,7 +31,7 @@
  },
  {
    "id": 6,
-   "bug_id": "bugzilla 2633",
+   "bug_id": "bugzilla-2633",
    "benchmark": "extractfix",
    "subject": "libtiff"
  },
@@ -61,7 +61,7 @@
  },
  {
    "id": 11,
-   "bug_id": "bugzilla 2611",
+   "bug_id": "bugzilla-2611",
    "benchmark": "extractfix",
    "subject": "libtiff"
  },
@@ -133,25 +133,25 @@
  },
  {
    "id": 23,
-   "bug_id": "Bugzilla 26545",
+   "bug_id": "Bugzilla-26545",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 24,
-   "bug_id": "GNUBug 25003",
+   "bug_id": "GNUBug-25003",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 25,
-   "bug_id": "GNUBug 25023",
+   "bug_id": "GNUBug-25023",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 26,
-   "bug_id": "Bugzilla 19784",
+   "bug_id": "Bugzilla-19784",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
