@@ -12,11 +12,19 @@ import time
 found_one = False
 pool = mp.Pool(mp.cpu_count())
 result_list = []
+expected_count = -1
 
 
 def collect_result(result):
     global result_list
     result_list.append(result)
+
+
+def collect_result_timeout(result):
+    global result_list, expected_count
+    result_list.append(result)
+    if len(result_list) == expected_count:
+        pool.terminate()
 
 
 def collect_result_one(result):
@@ -53,12 +61,13 @@ def abortable_worker(func, *args, **kwargs):
 
 
 def generate_symbolic_paths_parallel(ppc_list):
-    global pool, result_list
+    global pool, result_list, expected_count
     result_list = []
     path_list = []
     filtered_list = []
     lock = None
     count = 0
+    expected_count = len(ppc_list)
     ppc_list.reverse()
     if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list:
@@ -85,11 +94,13 @@ def generate_symbolic_paths_parallel(ppc_list):
         thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
+                expected_count = expected_count - 1
                 continue
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
             ppc_str = ppc
             if ppc_str in values.LIST_PATH_READ:
+                expected_count = expected_count - 1
                 continue
             values.LIST_PATH_READ.append(ppc_str)
             count = count + 1
@@ -100,7 +111,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
                 abortable_func = partial(abortable_worker, oracle.check_path_feasibility, default=False, index=count-1)
-                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1), callback=collect_result)
+                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1), callback=collect_result_timeout)
                 # thread_list.append(thread)
         emitter.normal("\t\twaiting for thread completion")
         # for thread in thread_list:
