@@ -6,7 +6,7 @@ from pysmt.shortcuts import is_sat, Not, And, Or, TRUE, BVSGE, BVSLE, Int, NotEq
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
+from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
 from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser
 import re
@@ -756,19 +756,18 @@ def generate_extended_patch_formula(patch_formula, path_condition):
         if "angelic!bool" in var:
             count = count + 1
     input_list = list()
-    model_patch = generate_model(patch_formula)
-    var_list = list(model_patch.keys())
+
+    path_script = "/tmp/z3_script"
+    write_smtlib(patch_formula, path_script)
+    with open(path_script, "r") as script_file:
+        script_lines = script_file.readlines()
+    script = "".join(script_lines)
+    var_list = set(re.findall("\(declare-fun (.+?) \(\)", script))
     for var in var_list:
         if "constant" not in var:
             input_list.append(var)
 
-    path_script = "/tmp/z3_script"
-    write_smtlib(patch_formula, path_script)
-    formula_txt = ""
-    with open(path_script, 'r') as script_file:
-        read_lines = script_file.readlines()
-        formula_txt = "".join(read_lines[1:-1])
-
+    formula_txt = to_smtlib(patch_formula, False)
     extended_formula_txt = formula_txt
     for index in range(1, count):
         postfix = "_" + str(index)
@@ -776,7 +775,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
         for input_var in input_list:
             input_var_postfix = input_var + postfix
             substituted_formula_txt = substituted_formula_txt.replace(input_var, input_var_postfix)
-            extended_formula_txt = extended_formula_txt + substituted_formula_txt
+        extended_formula_txt = extended_formula_txt + substituted_formula_txt
     constraint_formula = generate_formula(extended_formula_txt)
     return constraint_formula
 
