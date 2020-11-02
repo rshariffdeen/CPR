@@ -72,7 +72,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
+                pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result).get(values.DEFAULT_TIMEOUT_SAT)
 
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
