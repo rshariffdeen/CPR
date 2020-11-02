@@ -4,6 +4,8 @@ from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from multiprocessing import TimeoutError
+from functools import partial
+from multiprocessing.dummy import Pool as ThreadPool
 
 pool = mp.Pool(mp.cpu_count())
 result_list = []
@@ -24,6 +26,19 @@ def collect_patch(patch):
                 result_list.append({lid: (tree, constant)})
             else:
                 result_list.append({lid: (tree, {ComponentSymbol.parse(f).name: v for (f, v) in result.constants.items()})})
+
+
+def abortable_worker(func, *args, **kwargs):
+    timeout = kwargs.get('timeout', None)
+    default_value = kwargs.get('default', None)
+    p = ThreadPool(1)
+    res = p.apply_async(func, args=args)
+    try:
+        out = res.get(timeout)
+        return out
+    except TimeoutError:
+        emitter.warning("\t[warning] timeout raised on a thread")
+        return default_value
 
 
 def generate_symbolic_paths_parallel(ppc_list):
@@ -73,14 +88,16 @@ def generate_symbolic_paths_parallel(ppc_list):
             path_list.append((control_loc, new_path, ppc_len))
             if new_path_str not in values.LIST_PATH_CHECK:
                 values.LIST_PATH_CHECK.append(new_path_str)
-                thread = pool.apply_async(oracle.check_path_feasibility, args=(control_loc, new_path, count - 1), callback=collect_result)
-                thread_list.append(thread)
+                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, timeout=values.DEFAULT_TIMEOUT_SAT, default=False)
+                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1), callback=collect_result)
+                # thread_list.append(thread)
         emitter.normal("\t\twaiting for thread completion")
-        for thread in thread_list:
-            try:
-                thread.get(values.DEFAULT_TIMEOUT_SAT)
-            except TimeoutError:
-                emitter.warning("\t[warning] timeout raised on a thread")
+        # for thread in thread_list:
+        #     try:
+        #         thread.get(values.DEFAULT_TIMEOUT_SAT)
+        #     except TimeoutError:
+        #         emitter.warning("\t[warning] timeout raised on a thread")
+        #         thread.successful()
         pool.close()
         pool.join()
     # assert(len(result_list) == len(path_list))
