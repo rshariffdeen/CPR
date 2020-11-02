@@ -96,7 +96,7 @@ def generate_symbolic_paths_parallel(ppc_list):
             if definitions.DIRECTORY_LIB in control_loc:
                 expected_count = expected_count - 1
                 continue
-            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+            if count > values.DEFAULT_GEN_SEARCH_LIMIT:
                 expected_count = count
                 break
             ppc_str = ppc
