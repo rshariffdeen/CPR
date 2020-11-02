@@ -3,7 +3,7 @@ from main import emitter, oracle, definitions, extractor, refine, values, genera
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
-
+from multiprocessing import TimeoutError
 
 pool = mp.Pool(mp.cpu_count())
 result_list = []
