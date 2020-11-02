@@ -268,3 +268,11 @@ def read_bit_length(log_file_path):
                     var_length = 0
 
     return bit_length_list
+
+
+def collect_specification(spec_file_path):
+    spec_lines = list()
+    if os.path.exists(spec_file_path):
+        with open(spec_file_path, 'r') as spec_file:
+            spec_lines = spec_file.readlines()
+    return spec_lines

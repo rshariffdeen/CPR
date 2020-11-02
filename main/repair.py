@@ -194,7 +194,7 @@ def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
     emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
-    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION))
+    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
     emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
     emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
@@ -288,7 +288,7 @@ def run_fitreduce(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = len(patch_list) <= 1
     iteration = 0
-    assertion = values.SPECIFICATION
+    assertion_template = values.SPECIFICATION
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
@@ -326,6 +326,8 @@ def run_fitreduce(program_path, patch_list):
 
         distance.update_distance_map()
         ## Reduces the set of patch candidates based on the current path constraint
+        assertion = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
+        print(assertion.serialize())
         patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.note("\t\t|P|=" + str(len(patch_list)))
 
