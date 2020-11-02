@@ -97,6 +97,7 @@ def generate_symbolic_paths_parallel(ppc_list):
                 expected_count = expected_count - 1
                 continue
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                expected_count = count
                 break
             ppc_str = ppc
             if ppc_str in values.LIST_PATH_READ:
