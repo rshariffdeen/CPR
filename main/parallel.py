@@ -6,6 +6,9 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 from multiprocessing import TimeoutError
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
+import threading
+import time
+
 
 pool = mp.Pool(mp.cpu_count())
 result_list = []
@@ -13,6 +16,13 @@ result_list = []
 
 def collect_result(result):
     global result_list
+    result_list.append(result)
+
+
+def collect_result_one(result):
+    global result_list
+    if result[0] is True:
+        pool.terminate()
     result_list.append(result)
 
 
@@ -217,12 +227,15 @@ def validate_input_generation(patch_list, new_path):
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
         lock = None
+        thread_list = []
+        interrupt_event = threading.Event()
         for patch in patch_list:
             patch_constraint = extractor.extract_formula_from_patch(patch)
             index = list(patch_list).index(patch)
-            pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result)
-        pool.close()
+            thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result_one)
+            thread_list.append(thread)
         emitter.normal("\t\twaiting for thread completion")
+        pool.close()
         pool.join()
     return result_list
 
