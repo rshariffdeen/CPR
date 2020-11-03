@@ -834,7 +834,7 @@ def generate_program_specification(binary_path):
         dir_name = dir_path.replace(binary_path, "")
         if "klee-out-" not in dir_name:
             continue
-        klee_index = dir_name.split("-")[-1]
+        klee_index = int(dir_name.split("-")[-1])
         if klee_index <= max_skip_index:
             continue
         file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
