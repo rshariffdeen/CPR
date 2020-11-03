@@ -830,16 +830,17 @@ def generate_program_specification(binary_path):
     test_count = len(expected_output_list)
     max_skip_index = (test_count * 2) - 1
     program_specification = None
-    for dir_path in dir_list:
-        dir_name = dir_path.replace(binary_path, "")
+    for dir_name in dir_list:
         if "klee-out-" not in dir_name:
             continue
+        dir_path = os.path.join(binary_path, dir_name)
         klee_index = int(dir_name.split("-")[-1])
         if klee_index <= max_skip_index:
             continue
         file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
-        for file_path in file_list:
-            if ".smt2" in file_path:
+        for file_name in file_list:
+            if ".smt2" in file_name:
+                file_path = os.path.join(dir_path, file_name)
                 path_condition = extractor.extract_formula_from_file(file_path)
                 if program_specification is None:
                     program_specification = path_condition
