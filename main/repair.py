@@ -200,6 +200,7 @@ def run(project_path, program_path):
     emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
     emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
     time_check = time.time()
+    satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
     for patch in patch_list:
         patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
@@ -281,6 +282,8 @@ def run_cegis(program_path, project_path, patch_list):
 def run_fitreduce(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+    if satisfied:
+        emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
