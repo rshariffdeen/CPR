@@ -60,6 +60,17 @@ def read_conf(arg_list):
                 values.CONF_SKIP_GEN = True
             elif definitions.ARG_SKIP_TEST in arg:
                 values.CONF_SKIP_TEST = True
+            elif definitions.ARG_TIME_DURATION in arg:
+                values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
+            elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
+                if ":" not in arg:
+                    emitter.error("Invalid option for " + definitions.ARG_CEGIS_TIME_SPLIT.replace("=", "") + " : " + arg)
+                    emitter.help()
+                    exit()
+                else:
+                    time_split = arg.replace(definitions.ARG_CEGIS_TIME_SPLIT, "")
+                    values.CONF_TIME_SPLIT = time_split
+
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.help()

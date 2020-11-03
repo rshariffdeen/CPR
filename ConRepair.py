@@ -83,6 +83,14 @@ def bootstrap(arg_list):
         values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
     if values.CONF_IS_CRASH:
         values.IS_CRASH = values.CONF_IS_CRASH
+    if values.CONF_TIME_DURATION:
+        values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
+    if values.CONF_TIME_SPLIT:
+        explore, refine = values.CONF_TIME_SPLIT.split(":")
+        total = int(explore) + int(refine)
+        values.CONF_TIME_CEGIS_EXPLORE = (int(explore) / total) * values.DEFAULT_TIME_DURATION
+        values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
+
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
     load_component_list()
 

@@ -89,6 +89,9 @@ ARG_SKIP_GENERATION = "--skip-gen"
 ARG_SKIP_TEST = "--skip-test"
 ARG_REDUCE_METHOD = "--reduce-method="
 ARG_COMP_ALL = "--all-comps"
+ARG_CEGIS_TIME_SPLIT = "--cegis-time-split="
+ARG_TIME_DURATION = "--time-duration="
+
 
 # ----------------- TOOLS --------------------------------
 TOOL_VECGEN = "third-party/deckard/cvecgen_fail "
