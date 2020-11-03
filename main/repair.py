@@ -255,7 +255,7 @@ def run_cegis(program_path, project_path, patch_list):
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             assert exit_code == 0
-            test_assertion = generator.generate_assertion(assertion_template, klee_out_dir)
+            test_assertion, count_obs = generator.generate_assertion(assertion_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
             counter_example_list.append((klee_test_file, klee_out_dir))
         else:
