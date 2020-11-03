@@ -263,7 +263,7 @@ def run_cegis(program_path, project_path, patch_list):
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
         if satisfied:
-            emitter.highlight("\t[timeout] ending due to timeout")
+            emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
 
     final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
     if not final_patch_list:
@@ -326,7 +326,7 @@ def run_fitreduce(program_path, patch_list):
         emitter.note("\t\t|P|=" + str(len(patch_list)))
 
         if satisfied:
-            emitter.highlight("\t[timeout] ending due to timeout")
+            emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)
@@ -397,5 +397,5 @@ def concolic_exploration(program_path, patch_list):
             continue
         distance.update_distance_map()
         if satisfied:
-            emitter.highlight("\t[timeout] ending due to timeout")
+            emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
     return largest_assertion, largest_path_condition
