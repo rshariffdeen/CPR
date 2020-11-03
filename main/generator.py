@@ -38,7 +38,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
         spec_files.append((output_spec_path, klee_spec_path))
     if model_list:
         for output_spec_path, klee_spec_path in model_list:
-            spec_files.append((output_spec_path, klee_spec_path))
+            spec_files.append((Path(output_spec_path), Path(klee_spec_path)))
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
