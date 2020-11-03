@@ -31,6 +31,7 @@ pool = mp.Pool(mp.cpu_count())
 synthesis_result_list = []
 tautology_included = False
 contradiction_included = False
+found_one = False
 patch_list = []
 
 tautology_lock = Lock()
@@ -796,6 +797,14 @@ def collect_synthesis_result(synthesis_result):
     collected_patch_indeces.append(synthesis_result)
 
 
+def collect_one(synthesis_result):
+    global collected_patch_indeces, pool, found_one
+    if synthesis_result[0] is True:
+        pool.terminate()
+        found_one = True
+    collected_patch_indeces.append(synthesis_result)
+
+
 def collect_tautology_result(synthesis_result):
     global collected_patch_indeces
     new_tautology_included = update_tautology_included()
@@ -814,6 +823,255 @@ def check_sat(vc, index):
         return True, index
     else:
         return False, index
+
+
+# TODO: enforce assigned variables in verification conditon
+# TODO: check hole types
+def synthesize_one_parallel(components: List[Component],
+                        depth: int,
+                        specification: Specification,
+                        # Optional arguments for concrete patch enumeration
+                        concrete_enumeration=False,
+                        lower_bound=-10,
+                        upper_bound=+10) -> Optional[Dict[str, Program]]:
+    lids = {}
+    for (tid, (paths, _)) in specification.items():
+        for path in paths:
+            lids.update(extract_lids(path))
+    logger.info(f"locations extracted from klee paths: {list(lids.keys())}")
+
+    assert len(lids) == 1
+    (lid, typ) = list(lids.items())[0]
+
+    optimized = True
+
+    ## Variables for parallel execution.
+    global tautology_included, contradiction_included, collected_patch_indeces, patch_list, pool
+    tautology_included = not values.IS_TAUTOLOGIES_INCLUDED
+    contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
+    patch_list = []
+    collected_patch_indeces = []
+
+    ## Open new pool for parallel execution.
+    pool = mp.Pool(mp.cpu_count())
+
+    for tree in enumerate_trees(components, depth, typ, False, True):
+        assigned = extract_assigned(tree)
+        if len(assigned) != len(set(assigned)):
+            continue
+
+        if optimized:
+            ## Check for tautologies (TRUE) and contradictions (FALSE).
+            # 1. Check for x == x, x<=x, x>=x
+            component_type = tree[0][0]
+            left = None
+            if "left" in tree[1]:
+                left = tree[1]['left']
+            right = None
+            if "right" in tree[1]:
+                right = tree[1]['right']
+            if component_type in ['equal', 'less-or-equal', 'greater-or-equal']:
+                if left and right:
+                    if left == right:
+                        ## Tautology detected. Only use this patch if it is the first tautology in the set.
+                        new_tautology_detected = update_tautology_included()
+                        if not new_tautology_detected:
+                            continue
+            # 2. Check for x != x, x < x, x > x
+            elif component_type in ['not-equal', 'less-than', 'greater-than']:
+                if left and right:
+                    if left == right:
+                        ## Contradiction detected. Only use this patch if it is the first contradiction in the set.
+                        new_contradiction_included = update_contradiction_included()
+                        if not new_contradiction_included:
+                            continue
+
+        ## Enumerate concrete values for constants if demanded AND if possible (i.e., if there is any constant).
+        if concrete_enumeration and (contains_constant(tree[1]) or not optimized):
+            names = get_all_constant_names(tree[1])
+            if optimized and contains_only_constants(tree[1]):
+                if is_tautology_and_contradiction_included():
+                    continue
+                else:
+                    ## Determine whether the patch is always tautology or always contradiction.
+                    patch_constraint = extract_constraints_from_patch({lid: (tree, {})})
+                    can_be_true = is_sat(patch_constraint)
+                    can_be_false = is_unsat(patch_constraint)
+                    is_always_tautology = can_be_true and not can_be_false
+                    is_always_contradiction = not can_be_true and can_be_false
+
+                    if not is_tautology_included():
+                        if is_always_tautology:
+                            ## If tautology is new and patch is tautology, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_tautology_result)
+                            continue
+                        else:
+                            ## If tautology is new and patch can be true, then pick constant values specifically.
+                            # Check with specification for tautology, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_tautology_result)
+                            continue
+
+                    if not is_contradiction_included():
+                        if is_always_contradiction:
+                            ## If contradiction is new and patch is contradiction, then pick any number for constant values.
+                            const_dict = {}
+                            for const_name in names:
+                                const_dict[const_name] = 1
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_contradiction_result)
+                            continue
+                        else:
+                            ## If contradiction is new and patch can be false, then pick constant values specifically.
+                            # Check with specification for contradiction, and hence, get one of the values from the model.
+                            model = get_model(patch_constraint)
+                            const_dict = {}
+                            for const_name in names:
+                                sym_def = Symbol("const_" + str(const_name), BV32)
+                                if sym_def not in model:
+                                    continue
+                                value_sym = model[sym_def].simplify()
+                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                            patch = {lid: (tree, const_dict)}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_contradiction_result)
+                            continue
+
+            # There is at least one variable and one constant, then iterate over possible constant values and verify the concrete patch.
+            else:  # TODO explore neighborhood of existing value for constants
+                if not optimized and len(names) == 0:  # TODO remove len=0, just for testing
+                    for value_a in range(lower_bound, upper_bound):
+                        if found_one:
+                            break
+                        patch = {lid: (tree, {'a': value_a})}
+                        index = atomic_patchlist_append(patch)
+                        vc = verify_parallel(patch, specification)
+                        try:
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+                        except ValueError:
+                            break
+                elif len(names) == 1:
+                    const_a_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        if found_one:
+                            break
+                        patch = {lid: (tree, {const_a_str: value_a})}
+                        index = atomic_patchlist_append(patch)
+                        vc = verify_parallel(patch, specification)
+                        try:
+                            pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+                        except ValueError:
+                            break
+                elif len(names) == 2:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        if found_one:
+                            break
+                        for value_b in range(lower_bound, upper_bound):
+                            patch = {lid: (tree, {const_a_str: value_a, const_b_str: value_b})}
+                            index = atomic_patchlist_append(patch)
+                            vc = verify_parallel(patch, specification)
+                            try:
+                                pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+                            except ValueError:
+                                break
+                elif len(names) == 3:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        if found_one:
+                            break
+                        for value_b in range(lower_bound, upper_bound):
+                            if found_one:
+                                break
+                            for value_c in range(lower_bound, upper_bound):
+                                patch = {
+                                    lid: (tree, {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c})}
+                                index = atomic_patchlist_append(patch)
+                                vc = verify_parallel(patch, specification)
+                                try:
+                                    pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+                                except ValueError:
+                                    break
+                elif len(names) == 4:
+                    const_a_str = names.pop()
+                    const_b_str = names.pop()
+                    const_c_str = names.pop()
+                    const_d_str = names.pop()
+                    for value_a in range(lower_bound, upper_bound):
+                        if found_one:
+                            break
+                        for value_b in range(lower_bound, upper_bound):
+                            if found_one:
+                                break
+                            for value_c in range(lower_bound, upper_bound):
+                                if found_one:
+                                    break
+                                for value_d in range(lower_bound, upper_bound):
+
+                                    patch = {lid: (tree,
+                                                   {const_a_str: value_a, const_b_str: value_b, const_c_str: value_c,
+                                                    const_d_str: value_d})}
+                                    index = atomic_patchlist_append(patch)
+                                    vc = verify_parallel(patch, specification)
+                                    try:
+                                        pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+                                    except ValueError:
+                                        break
+                else:
+                    logger.error("constants=" + str(names))
+                    logger.error("More than 4 constants are currently not supported!")
+                    exit(1)
+        ## Otherwise: verify the patch and report it.
+        else:
+            patch = {lid: (tree, {})}
+            index = atomic_patchlist_append(patch)
+            vc = verify_parallel(patch, specification)
+            try:
+                pool.apply_async(check_sat, args=(vc, index), callback=collect_one)
+            except ValueError:
+                logger.info("\t\tfound one")
+
+    logger.info("\t\twaiting for thread completion")
+
+    # assert(len(result_list) == len(path_list))
+
+    # print("collected_patch_indeces=" + str(collected_patch_indeces))
+
+    ## Filter feasible patches and return them.
+    temp_set = set()
+    synthesis_result_list = []
+    for result in collected_patch_indeces:
+        is_feasible, index = result
+        if is_feasible:
+            patch = patch_list[index]
+            patch_str = str(patch)
+            if not patch_str in temp_set:
+                temp_set.add(patch_str)
+                synthesis_result_list.append(patch)
+    return synthesis_result_list
+
 
 #TODO: enforce assigned variables in verification conditon
 #TODO: check hole types

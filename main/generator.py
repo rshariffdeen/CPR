@@ -1,4 +1,4 @@
-from main.synthesis import load_specification, synthesize_parallel, Program
+from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_one_parallel
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
@@ -47,7 +47,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
 
-    result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+    result = synthesize_one_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
