@@ -846,7 +846,7 @@ def synthesize_one_parallel(components: List[Component],
     optimized = True
 
     ## Variables for parallel execution.
-    global tautology_included, contradiction_included, collected_patch_indeces, patch_list, pool
+    global tautology_included, contradiction_included, collected_patch_indeces, patch_list, pool, found_one
     tautology_included = not values.IS_TAUTOLOGIES_INCLUDED
     contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
     patch_list = []
