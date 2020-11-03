@@ -265,7 +265,8 @@ def generate_new_input(sym_path, argument_list):
         if bit_vector:
             var_value = utilities.get_signed_value(bit_vector)
         # emitter.debug(var_name, var_value)
-        input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
+        if "angelic" in var_name:
+            input_var_list.append({"identifier": var_name, "value": var_value, "size": 4})
 
     # for var_tuple in second_var_list:
     #     var_name = var_tuple['identifier']
