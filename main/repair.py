@@ -246,6 +246,7 @@ def run_cegis(program_path, project_path, patch_list):
         if not patch:
             emitter.error("[error] cannot generate a patch")
         patch_formula = extractor.extract_formula_from_patch(patch)
+        emitter.emit_patch(patch, message="generated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
