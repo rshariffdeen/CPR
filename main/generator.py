@@ -57,7 +57,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     return list_of_patches[0]
 
 
-def generate_patch_set(project_path) -> List[Dict[str, Program]]:
+def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]]:
 
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
 
@@ -81,6 +81,10 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
         test_index = str((int(test_output_list.index(output_spec)) * 2) )
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
+
+    if model_list:
+        for output_spec_path, klee_spec_path in model_list:
+            spec_files.append((Path(output_spec_path), Path(klee_spec_path)))
 
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification

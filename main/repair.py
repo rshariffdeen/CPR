@@ -262,7 +262,7 @@ def run_cegis(program_path, project_path, patch_list):
             break
         satisfied = utilities.check_budget()
 
-    final_patch_list = generator.generate_patch_set(project_path)
+    final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
     if not final_patch_list:
         values.COUNT_PATCH_END = len(final_patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
