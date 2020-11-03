@@ -271,6 +271,12 @@ def run_symbolic_execution(program, argument_list, print_output=False):
     binary_name = str(program).split("/")[-1]
     emitter.normal("\texecuting klee in concolic mode")
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
+    input_argument = ""
+    for argument in argument_list:
+        if "$POC" in argument:
+            argument = values.CONF_PATH_POC
+        input_argument += " " + str(argument)
+
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
@@ -283,7 +289,7 @@ def run_symbolic_execution(program, argument_list, print_output=False):
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK_CEGIS) \
                    + values.CONF_KLEE_FLAGS + " " \
                    + "{0} ".format(binary_name) \
-                   + argument_list
+                   + input_argument
 
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
