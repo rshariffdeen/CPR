@@ -224,64 +224,40 @@ def run(project_path, program_path):
     if values.CONF_REDUCE_METHOD == "fitreduce":
         run_fitreduce(program_path, patch_list)
     elif values.CONF_REDUCE_METHOD == "cegis":
-        run_cegis(program_path, patch_list)
+        run_cegis(program_path, project_path)
 
 
-def run_cegis(program_path, patch_list):
+def run_cegis(program_path, project_path):
     emitter.sub_title("Evaluating Patch Pool")
-    satisfied = len(patch_list) <= 1
-    iteration = 0
-    assertion = values.SPECIFICATION
+    satisfied = utilities.check_budget()
+    assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
-    while not satisfied and len(patch_list) > 0:
+    symbolic_exploration(program_path)
+    iteration = 0
+    while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-        ## Pick new input and patch candidate for next concolic execution step.
-        argument_list = values.ARGUMENT_LIST
-        second_var_list = values.SECOND_VAR_LIST
-        if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-        gen_arg_list, gen_var_list, P = select_new_input(argument_list, second_var_list,
-                                                         P)  # TODO (later) patch candidate missing
-        if not P:
-            emitter.warning("\t\t[warning] unable to generate a patch")
-            break
-        elif not gen_arg_list and not gen_var_list:
-            emitter.warning("\t\t[warning] no more paths to generate new input")
-            break
-        assert gen_arg_list  # there should be a concrete input
-        # print(">> new input: " + str(gen_arg_list))
-
-        ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-        exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-        assert exit_code == 0
 
         # Checks for the current coverage.
         satisfied = utilities.check_budget()
+        assertion = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
 
-        # check if new path hits patch location / fault location
-        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            continue
-        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-            continue
-
-        distance.update_distance_map()
-        ## Reduces the set of patch candidates based on the current path constraint
         P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.note("\t\t|P|=" + str(len(P)))
 
-    if not patch_list:
-        values.COUNT_PATCH_END = len(patch_list)
+    final_patch_list = generator.generate_patch_set(project_path)
+    if not final_patch_list:
+        values.COUNT_PATCH_END = len(final_patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
-        print_patch_list(patch_list)
+        print_patch_list(final_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            values.COUNT_PATCH_END = count_concrete_patches(patch_list)
-            values.COUNT_TEMPLATE_END = len(patch_list)
+            values.COUNT_PATCH_END = count_concrete_patches(final_patch_list)
+            values.COUNT_TEMPLATE_END = len(final_patch_list)
         else:
-            values.COUNT_PATCH_END = len(patch_list)
+            values.COUNT_PATCH_END = len(final_patch_list)
 
 
 def run_fitreduce(program_path, patch_list):
@@ -342,6 +318,13 @@ def run_fitreduce(program_path, patch_list):
             values.COUNT_TEMPLATE_END = len(patch_list)
         else:
             values.COUNT_PATCH_END = len(ranked_patch_list)
+
+
+def symbolic_exploration(program_path):
+    argument_list = values.ARGUMENT_LIST
+    second_var_list = values.SECOND_VAR_LIST
+    exit_code = concolic.run_symbolic_execution(program_path + ".bc", argument_list, second_var_list)
+    assert exit_code == 0
 
 
 def concolic_exploration(program_path):
