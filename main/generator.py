@@ -78,7 +78,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
-        test_index = str((int(test_output_list.index(output_spec)) * 2) )
+        test_index = str((int(test_output_list.index(output_spec)) * 2))
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
 
@@ -98,7 +98,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
 
     list_of_patches = [_ for _ in result]
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
-    emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
+
     # filtered_list_of_patches = list(set(list_of_patches))
     # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
     return list_of_patches
