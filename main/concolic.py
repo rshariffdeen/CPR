@@ -254,14 +254,13 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     return return_code
 
 
-def run_symbolic_execution(program, argument_list, second_var_list, print_output=False):
+def run_symbolic_execution(program, argument_list, print_output=False):
     """
-    This function will execute the program in symbolic mode using the generated ktest file
+    This function will execute the program in symbolic mode using the initial test case
         program: the absolute path of the bitcode of the program
         argument_list : a list containing each argument in the order that should be fed to the program
-        second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
-    logger.info("running concolic/symbolic execution")
+    logger.info("running symbolic execution")
 
     global File_Log_Path
     current_dir = os.getcwd()
@@ -270,47 +269,22 @@ def run_symbolic_execution(program, argument_list, second_var_list, print_output
     project_path = values.CONF_PATH_PROJECT
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
-    input_argument = ""
-    # argument_list = str(argument_str).split(" ")
-    for argument in argument_list:
-        index = list(argument_list).index(argument)
-        if "$POC" in argument:
-            file_path = values.CONF_PATH_POC
-            if values.FILE_POC_GEN:
-                file_path = values.FILE_POC_GEN
-            concrete_file = open(file_path, 'rb')
-            bit_size = os.fstat(concrete_file.fileno()).st_size
-            input_argument += " A --sym-files 1 " + str(bit_size) + " "
-        elif str(index) in values.CONF_MASK_ARG:
-            input_argument += " " + argument
-        else:
-            input_argument += " --sym-arg " + str(len(str(argument)))
-    ktest_path, return_code = generator.generate_ktest(argument_list, second_var_list)
-    ktest_log_file = "/tmp/ktest.log"
-    ktest_command = "ktest-tool " + ktest_path + " > " + ktest_log_file
-    execute_command(ktest_command)
-
     emitter.normal("\texecuting klee in concolic mode")
-    hit_location_flag = " "
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
-                   "search=dfs " \
-                   "-allow-seed-truncation " \
-                   "-allow-seed-extension " \
-                   "-named-seed-matching " \
+                   "--search=dfs " \
                    "-no-exit-on-error " \
                    + "--external-calls=all " \
                    + "--link-llvm-lib={0} " .format(runtime_lib_path) \
                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CEGIS) \
-                   + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK_CEGIS) \
                    + values.CONF_KLEE_FLAGS + " " \
-                   + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
-                   + input_argument
+                   + argument_list
+
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = execute_command(klee_command)
