@@ -18,7 +18,7 @@ File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 
-def generate_patch(project_path) -> List[Dict[str, Program]]:
+def generate_patch(project_path, model_path) -> List[Dict[str, Program]]:
 
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
 
