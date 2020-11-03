@@ -294,10 +294,11 @@ def run_fitreduce(program_path, patch_list):
             test_input_list = values.CONF_TEST_INPUT
             second_var_list = list()
             for argument_list in test_input_list:
+                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                argument_list = extractor.extract_input_arg_list(argument_list)
                 iteration = iteration + 1
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 if values.IS_CRASH:
                     arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
                     for var in var_list:
