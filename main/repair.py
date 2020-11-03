@@ -286,7 +286,7 @@ def run_cegis(program_path, patch_list):
 
 def run_fitreduce(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
-    satisfied = len(patch_list) <= 1
+    satisfied = utilities.check_budget()
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
