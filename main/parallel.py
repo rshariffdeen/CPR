@@ -259,47 +259,47 @@ def validate_input_generation(patch_list, new_path):
         emitter.normal("\t\twaiting for thread completion")
     return result_list
 
-
-def generate_patch_pool(components: List[Component],
-               depth: int,
-               specification: Specification,
-               # Optional arguments for concrete patch enumeration
-               concrete_enumeration = False,
-               lower_bound = -10,
-               upper_bound = +10) -> Optional[Dict[str, Program]]:
-    lids = {}
-    for (tid, (paths, _)) in specification.items():
-        for path in paths:
-            lids.update(extract_lids(path))
-
-    assert len(lids) == 1
-    (lid, typ) = list(lids.items())[0]
-
-    global pool, result_list
-    emitter.normal("\t\tstarting parallel computing")
-    result_list = []
-    pool = mp.Pool(mp.cpu_count())
-
-    for tree in enumerate_trees(components, depth, typ, False, True):
-        assigned = extract_assigned(tree)
-        if len(assigned) != len(set(assigned)):
-            continue
-        if concrete_enumeration:
-            for value_a in range(lower_bound, upper_bound):
-                # result = verify_parallel({lid: (tree, {"a": value_a})}, specification)
-                # collect_patch(result)
-                pool.apply_async(verify_parallel,
-                                 args=({lid: (tree, {"a": value_a})}, specification),
-                                 callback=collect_patch)
-        else:
-            pool.apply_async(verify_parallel,
-                             args=({lid: (tree, {})}, specification),
-                             callback=collect_patch)
-
-    pool.close()
-    emitter.normal("\t\twaiting for thread completion")
-    pool.join()
-    return result_list
+#
+# def generate_patch_pool(components: List[Component],
+#                depth: int,
+#                specification: Specification,
+#                # Optional arguments for concrete patch enumeration
+#                concrete_enumeration = False,
+#                lower_bound = -10,
+#                upper_bound = +10) -> Optional[Dict[str, Program]]:
+#     lids = {}
+#     for (tid, (paths, _)) in specification.items():
+#         for path in paths:
+#             lids.update(extract_lids(path))
+#
+#     assert len(lids) == 1
+#     (lid, typ) = list(lids.items())[0]
+#
+#     global pool, result_list
+#     emitter.normal("\t\tstarting parallel computing")
+#     result_list = []
+#     pool = mp.Pool(mp.cpu_count())
+#
+#     for tree in enumerate_trees(components, depth, typ, False, True):
+#         assigned = extract_assigned(tree)
+#         if len(assigned) != len(set(assigned)):
+#             continue
+#         if concrete_enumeration:
+#             for value_a in range(lower_bound, upper_bound):
+#                 # result = verify_parallel({lid: (tree, {"a": value_a})}, specification)
+#                 # collect_patch(result)
+#                 pool.apply_async(verify_parallel,
+#                                  args=({lid: (tree, {"a": value_a})}, specification),
+#                                  callback=collect_patch)
+#         else:
+#             pool.apply_async(verify_parallel,
+#                              args=({lid: (tree, {})}, specification),
+#                              callback=collect_patch)
+#
+#     pool.close()
+#     emitter.normal("\t\twaiting for thread completion")
+#     pool.join()
+#     return result_list
 
 
 # def concolic_exploration_parallel():
