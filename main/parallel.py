@@ -200,6 +200,7 @@ def partition_input_space(path_condition, assertion):
     input_space = generator.generate_input_space(path_condition)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
         if is_sat(is_exist):
+            emitter.normal("\tpartitioning input space")
             partition_model = generator.generate_model(is_exist)
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
