@@ -799,10 +799,11 @@ def collect_synthesis_result(synthesis_result):
 
 def collect_one(synthesis_result):
     global collected_patch_indeces, pool, found_one
+    collected_patch_indeces.append(synthesis_result)
     if synthesis_result[0] is True:
         pool.terminate()
         found_one = True
-    collected_patch_indeces.append(synthesis_result)
+
 
 
 def collect_tautology_result(synthesis_result):
