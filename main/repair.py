@@ -323,7 +323,7 @@ def run_fitreduce(program_path, patch_list):
         assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
         # print(assertion.serialize())
         patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-        emitter.note("\t\t|P|=" + str(len(patch_list)))
+        emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
 
         if satisfied:
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
