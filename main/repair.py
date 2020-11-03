@@ -3,7 +3,7 @@ from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from pysmt.shortcuts import Not, And, is_sat, write_smtlib
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions
+from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader
 import time
 import sys
 import operator
@@ -228,8 +228,8 @@ def run(project_path, program_path):
 
 def run_cegis(program_path, project_path, patch_list):
     satisfied = utilities.check_budget()
-    assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
+    test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
     assertion, largest_path_condition = concolic_exploration(program_path, patch_list)
     program_specification = generator.generate_program_specification(binary_dir_path)
@@ -255,7 +255,7 @@ def run_cegis(program_path, project_path, patch_list):
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             assert exit_code == 0
-            test_assertion, count_obs = generator.generate_assertion(assertion_template, klee_out_dir)
+            test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
             counter_example_list.append((klee_test_file, klee_out_dir))
         else:
