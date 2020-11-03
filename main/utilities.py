@@ -161,7 +161,7 @@ def check_budget(time_budget):  # TODO implement time budget
         return False
     else:
         time_start = values.CONF_TIME_CHECK
-        duration = format((time.time() - time_start) / 60, '.3f')
+        duration = float(format((time.time() - time_start) / 60, '.3f'))
         if int(duration) > int(time_budget):
             values.CONF_TIME_CHECK = None
             return False

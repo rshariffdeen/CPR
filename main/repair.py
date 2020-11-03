@@ -262,6 +262,8 @@ def run_cegis(program_path, project_path, patch_list):
         else:
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
+        if satisfied:
+            emitter.highlight("\t[timeout] ending due to timeout")
 
     final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
     if not final_patch_list:
@@ -322,6 +324,9 @@ def run_fitreduce(program_path, patch_list):
         # print(assertion.serialize())
         patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.note("\t\t|P|=" + str(len(patch_list)))
+
+        if satisfied:
+            emitter.highlight("\t[timeout] ending due to timeout")
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)
@@ -391,4 +396,6 @@ def concolic_exploration(program_path, patch_list):
         if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             continue
         distance.update_distance_map()
+        if satisfied:
+            emitter.highlight("\t[timeout] ending due to timeout")
     return largest_assertion, largest_path_condition
