@@ -789,6 +789,8 @@ def generate_assertion(assertion_temp, klee_dir):
             for var in var_list:
                 if "obs!" in var:
                     count_obs = count_obs + 1
+            if count_obs == 0:
+                continue
             if max_obs < count_obs:
                 max_obs = count_obs
                 largest_path_condition = path_condition
@@ -859,6 +861,14 @@ def generate_program_specification(binary_path):
             if ".smt2" in file_name:
                 file_path = os.path.join(dir_path, file_name)
                 path_condition = extractor.extract_formula_from_file(file_path)
+                model_path = generate_model(path_condition)
+                var_list = list(model_path.keys())
+                count = 0
+                for var in var_list:
+                    if "obs!" in var:
+                        count = count + 1
+                if count == 0:
+                    continue
                 if program_specification is None:
                     program_specification = path_condition
                 else:
