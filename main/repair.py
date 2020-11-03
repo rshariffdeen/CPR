@@ -87,7 +87,6 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
            assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
-    emitter.normal("\tupdating patch pool")
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_assertion(path_constraint_file_path)

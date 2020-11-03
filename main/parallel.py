@@ -135,7 +135,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     global pool, result_list
     result_list = []
 
-
+    emitter.normal("\tupdating patch pool")
     # test_specification = values.TEST_SPECIFICATION
     # sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
     # var_relationship = extractor.extract_var_relationship(sym_expr_map)
@@ -161,10 +161,10 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     return result_list
 
 
-def refine_patch_space(patch_list, path_condition, assertion, force_sequential = False):
+def refine_patch_space(patch_list, path_condition, assertion, force_sequential=False):
     global pool, result_list
     result_list = []
-
+    emitter.normal("\tupdating patch pool")
     if values.CONF_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
