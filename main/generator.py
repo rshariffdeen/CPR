@@ -821,7 +821,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     script = "".join(script_lines)
     var_list = set(re.findall("\(declare-fun (.+?) \(\)", script))
     for var in var_list:
-        if "constant" not in var:
+        if "const" not in var:
             input_list.append(var)
 
     formula_txt = script
