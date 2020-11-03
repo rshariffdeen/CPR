@@ -227,7 +227,6 @@ def run(project_path, program_path):
 
 
 def run_cegis(program_path, project_path, patch_list):
-    satisfied = utilities.check_budget()
     test_output_list = values.CONF_TEST_OUTPUT
     test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
@@ -238,6 +237,7 @@ def run_cegis(program_path, project_path, patch_list):
     iteration = 0
     output_dir = definitions.DIRECTORY_OUTPUT
     counter_example_list = []
+    satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
@@ -261,7 +261,7 @@ def run_cegis(program_path, project_path, patch_list):
             counter_example_list.append((klee_test_file, klee_out_dir))
         else:
             break
-        satisfied = utilities.check_budget()
+        satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
 
     final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
     if not final_patch_list:
@@ -278,7 +278,7 @@ def run_cegis(program_path, project_path, patch_list):
 
 def run_fitreduce(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
-    satisfied = utilities.check_budget()
+    satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
@@ -308,7 +308,7 @@ def run_fitreduce(program_path, patch_list):
         assert exit_code == 0
 
         # Checks for the current coverage.
-        satisfied = utilities.check_budget()
+        satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
 
         # check if new path hits patch location / fault location
         if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -344,7 +344,7 @@ def symbolic_exploration(program_path):
 
 
 def concolic_exploration(program_path, patch_list):
-    satisfied = utilities.check_budget()
+    satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
     binary_dir_path = "/".join(program_path.split("/")[:-1])
@@ -384,7 +384,7 @@ def concolic_exploration(program_path, patch_list):
 
 
         # Checks for the current coverage.
-        satisfied = utilities.check_budget()
+        satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
         # check if new path hits patch location / fault location
         if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             continue

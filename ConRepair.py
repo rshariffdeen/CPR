@@ -67,8 +67,6 @@ def bootstrap(arg_list):
         shutil.rmtree(definitions.DIRECTORY_OUTPUT)
     os.mkdir(definitions.DIRECTORY_OUTPUT)
 
-
-
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:

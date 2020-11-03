@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from main import logger, emitter, values, definitions
 import base64
 import hashlib
+import time
 
 
 def execute_command(command, show_output=True):
@@ -154,8 +155,19 @@ def get_hash(str_value):
     return hash_value
 
 
-def check_budget():  # TODO implement time budget
-    if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
+def check_budget(time_budget):  # TODO implement time budget
+    if values.CONF_TIME_CHECK is None:
+        values.CONF_TIME_CHECK = time.time()
         return False
     else:
-        return True
+        time_start = values.CONF_TIME_CHECK
+        duration = format((time.time() - time_start) / 60, '.3f')
+        if int(duration) > int(time_budget):
+            values.CONF_TIME_CHECK = None
+            return False
+    return True
+
+    # if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
+    #     return False
+    # else:
+    #     return True
