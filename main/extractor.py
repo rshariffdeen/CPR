@@ -62,7 +62,7 @@ def extract_byte_code(binary_path):
     execute_command(extract_command)
 
 
-def extract_assertion(spec_file_path):
+def extract_formula_from_file(spec_file_path):
     spec_dir_path = "/".join(spec_file_path.split("/")[:-1])
     spec_file_name = spec_file_path.split("/")[-1]
     current_dir = os.getcwd()

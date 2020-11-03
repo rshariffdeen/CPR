@@ -18,6 +18,42 @@ File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 
+def generate_patch(project_path) -> List[Dict[str, Program]]:
+
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
+
+    emitter.sub_sub_title("Generating Patch")
+    test_output_list = values.CONF_TEST_OUTPUT
+    components = values.LIST_COMPONENTS
+    depth = values.DEFAULT_DEPTH
+    if values.CONF_DEPTH_VALUE.isnumeric():
+        depth = int(values.CONF_DEPTH_VALUE)
+
+    spec_files = []
+    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
+    for output_spec in test_output_list:
+        output_spec_path = Path(project_path + "/" + output_spec)
+        test_index = str((int(test_output_list.index(output_spec)) * 2) )
+        klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
+        spec_files.append((output_spec_path, klee_spec_path))
+    specification = load_specification(spec_files)
+    values.TEST_SPECIFICATION = specification
+    concrete_enumeration = False
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+        concrete_enumeration = True
+    lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
+    upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
+
+    result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+
+    list_of_patches = [_ for _ in result]
+    # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
+    emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
+    # filtered_list_of_patches = list(set(list_of_patches))
+    # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
+    return list_of_patches[0]
+
+
 def generate_patch_set(project_path) -> List[Dict[str, Program]]:
 
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
@@ -87,7 +123,7 @@ def generate_angelic_val_for_crash(klee_out_dir):
             break
     if error_file_path is None:
         error_file_path = klee_out_dir + "/test000001.smt2"
-    sym_path = extractor.extract_assertion(error_file_path)
+    sym_path = extractor.extract_formula_from_file(error_file_path)
     input_arg_list, input_var_list = generate_new_input(sym_path, values.ARGUMENT_LIST)
     return input_arg_list, input_var_list
 
@@ -731,7 +767,7 @@ def generate_constraint_for_patch_space(patch_space):
 
 def generate_assertion(assertion_temp, klee_dir):
     path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-    path_condition = extractor.extract_assertion(path_constraint_file_path)
+    path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
     model = generate_model(path_condition)
     var_list = list(model.keys())
     count_obs = 0
@@ -746,7 +782,7 @@ def generate_assertion(assertion_temp, klee_dir):
         assertion_text = assertion_text + declaration_line.replace("obs!0", "obs!" + str(index))
         assertion_text = assertion_text + specification_line.replace("obs!0", "obs!" + str(index))
     specification_formula = generate_formula(assertion_text)
-    return specification_formula
+    return specification_formula, count_obs
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
@@ -788,3 +824,26 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     return constraint_formula
 
 
+def generate_program_specification(binary_path):
+    dir_list = [f for f in os.listdir(binary_path) if not os.path.isfile(os.path.join(binary_path, f))]
+    expected_output_list = values.CONF_TEST_OUTPUT
+    test_count = len(expected_output_list)
+    max_skip_index = (test_count * 2) - 1
+    program_specification = None
+    for dir_path in dir_list:
+        dir_name = dir_path.replace(binary_path, "")
+        if "klee-out-" not in dir_name:
+            continue
+        klee_index = dir_name.split("-")[-1]
+        if klee_index <= max_skip_index:
+            continue
+        file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+        for file_path in file_list:
+            if ".smt2" in file_path:
+                path_condition = extractor.extract_formula_from_file(file_path)
+                if program_specification is None:
+                    program_specification = path_condition
+                else:
+                    program_specification = Or(program_specification, path_condition)
+
+    return program_specification

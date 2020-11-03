@@ -89,7 +89,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # Iterate over patches and check if they still hold based on path constraint.
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
-    path_condition = extractor.extract_assertion(path_constraint_file_path)
+    path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
     valid_input_space = parallel.partition_input_space(path_condition, assertion)
     if valid_input_space:
         valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
@@ -231,20 +231,20 @@ def run_cegis(program_path, project_path, patch_list):
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
-    concolic_exploration(program_path, patch_list)
+    assertion = concolic_exploration(program_path, patch_list)
+    program_specification = generator.generate_program_specification(binary_dir_path)
     emitter.sub_title("Evaluating Patch Pool")
     iteration = 0
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
+        patch = generator.generate_patch(project_path)[0]
+        if not patch:
+            emitter.error("[error] cannot generate a patch")
 
-        # Checks for the current coverage.
+
         satisfied = utilities.check_budget()
-        assertion = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
-
-        P = reduce(P, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-        emitter.note("\t\t|P|=" + str(len(P)))
 
     final_patch_list = generator.generate_patch_set(project_path)
     if not final_patch_list:
@@ -301,7 +301,7 @@ def run_fitreduce(program_path, patch_list):
 
         distance.update_distance_map()
         ## Reduces the set of patch candidates based on the current path constraint
-        assertion = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
+        assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
         # print(assertion.serialize())
         patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
         emitter.note("\t\t|P|=" + str(len(patch_list)))
@@ -330,6 +330,10 @@ def concolic_exploration(program_path, patch_list):
     satisfied = utilities.check_budget()
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
+    binary_dir_path = "/".join(program_path.split("/")[:-1])
+    assertion_template = values.SPECIFICATION_TXT
+    max_count = 0
+    largest_assertion = None
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
@@ -352,6 +356,10 @@ def concolic_exploration(program_path, patch_list):
         ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
         exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
         assert exit_code == 0
+        assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
+        if count_obs > max_count:
+            max_count = count_obs
+            largest_assertion = assertion
 
         # Checks for the current coverage.
         satisfied = utilities.check_budget()
@@ -361,3 +369,4 @@ def concolic_exploration(program_path, patch_list):
         if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
             continue
         distance.update_distance_map()
+    return largest_assertion
