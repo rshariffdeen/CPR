@@ -793,9 +793,6 @@ def extract_assigned(tree: ComponentTree) -> List[Component]:
 
 def collect_synthesis_result(synthesis_result):
     global collected_patch_indeces, pool
-    if values.CONF_REDUCE_METHOD == values.OPTIONS_REDUCE_METHOD[1]:
-        if synthesis_result[0] is True:
-            pool.terminate()
     collected_patch_indeces.append(synthesis_result)
 
 
