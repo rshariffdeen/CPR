@@ -18,7 +18,7 @@ File_Log_Path = "/tmp/log_sym_path"
 File_Ktest_Path = "/tmp/concolic.ktest"
 
 
-def generate_patch(project_path, model_path) -> List[Dict[str, Program]]:
+def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
 
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
 
@@ -36,6 +36,9 @@ def generate_patch(project_path, model_path) -> List[Dict[str, Program]]:
         test_index = str((int(test_output_list.index(output_spec)) * 2) )
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
+    if model_list:
+        for output_spec_path, klee_spec_path in model_list:
+            spec_files.append((output_spec_path, klee_spec_path))
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
@@ -78,6 +81,7 @@ def generate_patch_set(project_path) -> List[Dict[str, Program]]:
         test_index = str((int(test_output_list.index(output_spec)) * 2) )
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
+
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
@@ -766,23 +770,32 @@ def generate_constraint_for_patch_space(patch_space):
 #     return formula
 
 def generate_assertion(assertion_temp, klee_dir):
-    path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-    path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-    model = generate_model(path_condition)
-    var_list = list(model.keys())
-    count_obs = 0
+    largest_path_condition = None
+    max_obs = 0
+    file_list = [f for f in os.listdir(klee_dir) if os.path.isfile(os.path.join(klee_dir, f))]
+    for file_name in file_list:
+        if ".smt2" in file_name:
+            file_path = os.path.join(klee_dir, file_name)
+            path_condition = extractor.extract_formula_from_file(file_path)
+            model = generate_model(path_condition)
+            var_list = list(model.keys())
+            count_obs = 0
+            declaration_line = assertion_temp[0]
+            specification_line = assertion_temp[1]
+            for var in var_list:
+                if "obs!" in var:
+                    count_obs = count_obs + 1
+            if max_obs < count_obs:
+                max_obs = count_obs
+                largest_path_condition = path_condition
     declaration_line = assertion_temp[0]
     specification_line = assertion_temp[1]
-    for var in var_list:
-        if "obs!" in var:
-            count_obs = count_obs + 1
-
     assertion_text = ""
-    for index in range(0, count_obs):
+    for index in range(0, max_obs):
         assertion_text = assertion_text + declaration_line.replace("obs!0", "obs!" + str(index))
         assertion_text = assertion_text + specification_line.replace("obs!0", "obs!" + str(index))
     specification_formula = generate_formula(assertion_text)
-    return specification_formula, count_obs
+    return specification_formula, max_obs
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):

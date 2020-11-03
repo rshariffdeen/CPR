@@ -2,8 +2,8 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from pysmt.shortcuts import Not, And, is_sat
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger
+from pysmt.shortcuts import Not, And, is_sat, write_smtlib
+from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions
 import time
 import sys
 import operator
@@ -236,19 +236,28 @@ def run_cegis(program_path, project_path, patch_list):
     complete_specification = And(Not(assertion), program_specification)
     emitter.sub_title("Evaluating Patch Pool")
     iteration = 0
+    output_dir = definitions.DIRECTORY_OUTPUT
+    counter_example_list = []
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-        patch = generator.generate_patch(project_path)
+        patch = generator.generate_patch(project_path, counter_example_list)
         if not patch:
             emitter.error("[error] cannot generate a patch")
         patch_formula = extractor.extract_formula_from_patch(patch)
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
-            model = generator.generate_model(violation_check)
-            print(model)
+            # model = generator.generate_model(violation_check)
+            input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
+            klee_out_dir = output_dir + "/klee-output-" + str(iteration)
+            klee_test_file = output_dir + "/klee-test-" + str(iteration)
+            exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
+            assert exit_code == 0
+            test_assertion = generator.generate_assertion(assertion_template, klee_out_dir)
+            write_smtlib(test_assertion, klee_test_file)
+            counter_example_list.append((klee_test_file, klee_out_dir))
         else:
             break
         satisfied = utilities.check_budget()
