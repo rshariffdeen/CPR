@@ -45,6 +45,13 @@ def read_conf(arg_list):
                     emitter.help()
                     exit()
                 values.CONF_REFINE_METHOD = values.OPTIONS_REFINE_METHOD[option]
+            elif definitions.ARG_REDUCE_METHOD in arg:
+                option = int(arg.replace(definitions.ARG_REDUCE_METHOD, ''))
+                if option not in values.OPTIONS_REDUCE_METHOD:
+                    emitter.error("Invalid option for " + definitions.ARG_REDUCE_METHOD.replace("=", "") + " : " + arg)
+                    emitter.help()
+                    exit()
+                values.ARG_REDUCE_METHOD = values.OPTIONS_REDUCE_METHOD[option]
             elif definitions.ARG_SKIP_BUILD in arg:
                 values.CONF_SKIP_BUILD = True
             elif definitions.ARG_COMP_ALL in arg:
