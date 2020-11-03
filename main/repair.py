@@ -232,7 +232,7 @@ def run_cegis(program_path, project_path):
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
-    symbolic_exploration(program_path)
+    concolic_exploration(program_path)
     iteration = 0
     while not satisfied:
         iteration = iteration + 1
@@ -328,19 +328,19 @@ def symbolic_exploration(program_path):
 
 def concolic_exploration(program_path):
     satisfied = utilities.check_budget()
-    while not satisfied and len(patch_list) > 1:
+    iteration = 0
+    emitter.sub_title("Concolic Path Exploration")
+    while not satisfied:
         patch_list = values.LIST_PATCHES
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-
         ## Pick new input and patch candidate for next concolic execution step.
         argument_list = values.ARGUMENT_LIST
         second_var_list = values.SECOND_VAR_LIST
         if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-        gen_arg_list, gen_var_list, patch_list = concolic.select_new_input(argument_list, second_var_list,
-                                                                           patch_list)  # TODO (later) patch candidate missing
+        gen_arg_list, gen_var_list, patch_list = concolic.select_new_input(argument_list, second_var_list, patch_list)
 
         if not patch_list:
             emitter.warning("\t\t[warning] unable to generate a patch")
@@ -349,7 +349,6 @@ def concolic_exploration(program_path):
             emitter.warning("\t\t[warning] no more paths to generate new input")
             break
         assert gen_arg_list  # there should be a concrete input
-        # print(">> new input: " + str(gen_arg_list))
 
         ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
         exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
@@ -357,7 +356,6 @@ def concolic_exploration(program_path):
 
         # Checks for the current coverage.
         satisfied = utilities.check_budget()
-
         # check if new path hits patch location / fault location
         if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             continue
