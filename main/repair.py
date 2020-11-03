@@ -290,46 +290,82 @@ def run_fitreduce(program_path, patch_list):
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
     while not satisfied and len(patch_list) > 0:
-        iteration = iteration + 1
-        values.ITERATION_NO = iteration
-        emitter.sub_sub_title("Iteration: " + str(iteration))
-        ## Pick new input and patch candidate for next concolic execution step.
-        argument_list = values.ARGUMENT_LIST
-        second_var_list = values.SECOND_VAR_LIST
-        if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-        gen_arg_list, gen_var_list, patch_list = select_new_input(argument_list, second_var_list, patch_list)  # TODO (later) patch candidate missing
-        if not patch_list:
-            emitter.warning("\t\t[warning] unable to generate a patch")
-            break
-        elif not gen_arg_list and not gen_var_list:
-            emitter.warning("\t\t[warning] no more paths to generate new input")
-            break
-        assert gen_arg_list  # there should be a concrete input
-        # print(">> new input: " + str(gen_arg_list))
+        if iteration == 0:
+            test_input_list = values.CONF_TEST_INPUT
+            second_var_list = list()
+            for argument_list in test_input_list:
+                iteration = iteration + 1
+                values.ITERATION_NO = iteration
+                emitter.sub_sub_title("Iteration: " + str(iteration))
+                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                if values.IS_CRASH:
+                    arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
+                    for var in var_list:
+                        var_name = var["identifier"]
+                        if "angelic" in var_name:
+                            second_var_list.append(var)
+                # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
+                exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
+                assert exit_code == 0
+                if values.IS_CRASH:
+                    values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
+                # check if new path hits patch location / fault location
+                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                    continue
+                if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                    continue
+                distance.update_distance_map()
+                assertion, count_obs = generator.generate_assertion(assertion_template,
+                                                                    Path(binary_dir_path + "/klee-last/").resolve())
+                # print(assertion.serialize())
+                patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+                emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+                satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+                if satisfied:
+                    emitter.warning(
+                        "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
+                    break
+        else:
+            iteration = iteration + 1
+            values.ITERATION_NO = iteration
+            emitter.sub_sub_title("Iteration: " + str(iteration))
+            ## Pick new input and patch candidate for next concolic execution step.
+            argument_list = values.ARGUMENT_LIST
+            second_var_list = values.SECOND_VAR_LIST
+            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            gen_arg_list, gen_var_list, patch_list = select_new_input(argument_list, second_var_list, patch_list)  # TODO (later) patch candidate missing
+            if not patch_list:
+                emitter.warning("\t\t[warning] unable to generate a patch")
+                break
+            elif not gen_arg_list and not gen_var_list:
+                emitter.warning("\t\t[warning] no more paths to generate new input")
+                break
+            assert gen_arg_list  # there should be a concrete input
+            # print(">> new input: " + str(gen_arg_list))
 
-        ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-        exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-        assert exit_code == 0
+            ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
+            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
+            assert exit_code == 0
 
-        # Checks for the current coverage.
-        satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+            # Checks for the current coverage.
+            satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
 
-        # check if new path hits patch location / fault location
-        if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            continue
-        if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-            continue
+            # check if new path hits patch location / fault location
+            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                continue
+            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                continue
 
-        distance.update_distance_map()
-        ## Reduces the set of patch candidates based on the current path constraint
-        assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
-        # print(assertion.serialize())
-        patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-        emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+            distance.update_distance_map()
+            ## Reduces the set of patch candidates based on the current path constraint
+            assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
+            # print(assertion.serialize())
+            patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+            emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
 
-        if satisfied:
-            emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
+            if satisfied:
+                emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)

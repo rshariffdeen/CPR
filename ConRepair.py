@@ -116,18 +116,18 @@ def initialize():
             if values.CONF_LOC_CRASH:
                 values.IS_CRASH = True
                 emitter.success("\t\t\t[info] identified crash location: " + str(values.CONF_LOC_CRASH))
-        if values.IS_CRASH:
-            arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
-            for var in var_list:
-                var_name = var["identifier"]
-                if "angelic" in var_name:
-                    second_var_list.append(var)
-        emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
-        exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
-        assert exit_code == 0
-        if values.IS_CRASH:
-            values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
-        distance.update_distance_map()
+        # if values.IS_CRASH:
+        #     arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
+        #     for var in var_list:
+        #         var_name = var["identifier"]
+        #         if "angelic" in var_name:
+        #             second_var_list.append(var)
+        # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
+        # exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
+        # assert exit_code == 0
+        # if values.IS_CRASH:
+        #     values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
+        # distance.update_distance_map()
 
 
 def main(arg_list):
