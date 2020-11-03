@@ -223,16 +223,16 @@ def run(project_path, program_path):
     if values.CONF_REDUCE_METHOD == "fitreduce":
         run_fitreduce(program_path, patch_list)
     elif values.CONF_REDUCE_METHOD == "cegis":
-        run_cegis(program_path, project_path)
+        run_cegis(program_path, project_path, patch_list)
 
 
-def run_cegis(program_path, project_path):
-    emitter.sub_title("Evaluating Patch Pool")
+def run_cegis(program_path, project_path, patch_list):
     satisfied = utilities.check_budget()
     assertion_template = values.SPECIFICATION_TXT
     test_output_list = values.CONF_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
-    concolic_exploration(program_path)
+    concolic_exploration(program_path, patch_list)
+    emitter.sub_title("Evaluating Patch Pool")
     iteration = 0
     while not satisfied:
         iteration = iteration + 1
@@ -326,12 +326,11 @@ def symbolic_exploration(program_path):
     assert exit_code == 0
 
 
-def concolic_exploration(program_path):
+def concolic_exploration(program_path, patch_list):
     satisfied = utilities.check_budget()
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
     while not satisfied:
-        patch_list = values.LIST_PATCHES
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
