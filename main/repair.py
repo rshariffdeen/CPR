@@ -327,6 +327,7 @@ def symbolic_exploration(program_path):
 
 
 def concolic_exploration(program_path):
+    satisfied = utilities.check_budget()
     while not satisfied and len(patch_list) > 1:
         patch_list = values.LIST_PATCHES
         iteration = iteration + 1
