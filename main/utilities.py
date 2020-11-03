@@ -164,8 +164,8 @@ def check_budget(time_budget):  # TODO implement time budget
         duration = float(format((time.time() - time_start) / 60, '.3f'))
         if int(duration) > int(time_budget):
             values.CONF_TIME_CHECK = None
-            return False
-    return True
+            return True
+    return False
 
     # if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
     #     return False
