@@ -277,7 +277,7 @@ def run_symbolic_execution(program, argument_list, print_output=False):
             argument = values.CONF_PATH_POC
         input_argument += " " + str(argument)
 
-    klee_command = "klee " \
+    klee_command = "/klee/build-origin/bin/klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
