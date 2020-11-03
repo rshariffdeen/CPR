@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 from pathlib import Path
 from main import emitter, logger, definitions, values, builder, repair, \
@@ -62,8 +63,11 @@ def bootstrap(arg_list):
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
     values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
-    if not os.path.isdir(definitions.DIRECTORY_OUTPUT):
-        os.mkdir(definitions.DIRECTORY_OUTPUT)
+    if os.path.isdir(definitions.DIRECTORY_OUTPUT):
+        shutil.rmtree(definitions.DIRECTORY_OUTPUT)
+    os.mkdir(definitions.DIRECTORY_OUTPUT)
+
+
 
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
@@ -81,6 +85,7 @@ def bootstrap(arg_list):
         values.IS_CRASH = values.CONF_IS_CRASH
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
     load_component_list()
+
 
 
 def initialize():
