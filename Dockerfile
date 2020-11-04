@@ -142,6 +142,7 @@ RUN apt-get install -y  \
     gperf \
     libfreetype6 \
     libfreetype6-dev \
+    libjpeg-dev \
     libtool \
     libxml2-dev \
     nasm \
