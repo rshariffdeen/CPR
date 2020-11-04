@@ -104,6 +104,8 @@ def end(time_duration):
         output("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         output("Template End Count: " + str(values.COUNT_TEMPLATE_END))
     output("Component Count: " + str(values.COUNT_COMPONENTS))
+    output("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
+    output("Component Count Cust: " + str(values.COUNT_COMPONENTS_CUS))
     output("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " minutes \n")
     log("[END] " + values.TOOL_NAME + " ended at  " + str(datetime.datetime.now()) + "\n\n")

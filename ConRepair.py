@@ -48,6 +48,8 @@ def load_component_list():
     project_components = synthesis.load_components(proj_comp_files)
     values.LIST_COMPONENTS = project_components + general_components
     values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
+    values.COUNT_COMPONENTS_CUS = len(project_components)
+    values.COUNT_COMPONENTS_GEN = len(general_components)
 
 
 def bootstrap(arg_list):

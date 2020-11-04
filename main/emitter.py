@@ -180,6 +180,8 @@ def end(time_info):
         statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
     statistics("Component Count: " + str(values.COUNT_COMPONENTS))
+    statistics("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
+    statistics("Component Count Cus: " + str(values.COUNT_COMPONENTS_CUS))
     statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " minutes \n")
 
