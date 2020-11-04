@@ -202,7 +202,6 @@ def run(project_path, program_path):
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
-    emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
     for patch in patch_list:
         patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
@@ -212,7 +211,7 @@ def run(project_path, program_path):
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
-
+    emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = count_concrete_patches(patch_list)
         values.COUNT_TEMPLATE_START = len(patch_list)
