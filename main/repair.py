@@ -416,24 +416,24 @@ def concolic_exploration(program_path, patch_list):
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 assert exit_code == 0
-                if values.IS_CRASH:
-                    values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
+                klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
+                assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
+                if count_obs > max_count:
+                    max_count = count_obs
+                    largest_assertion = assertion
+                    path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
+                    largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
+
+                satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
                 if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
                 distance.update_distance_map()
-                assertion, count_obs = generator.generate_assertion(assertion_template,
-                                                                    Path(binary_dir_path + "/klee-last/").resolve())
-                # print(assertion.serialize())
-                patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-                emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-                satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
                 if satisfied:
                     emitter.warning(
-                        "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
-                    break
+                        "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
         else:
             iteration = iteration + 1
             values.ITERATION_NO = iteration
