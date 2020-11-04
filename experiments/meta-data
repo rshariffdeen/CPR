@@ -178,18 +178,7 @@
    "bug_id": "Bugzilla-1404",
    "benchmark": "extractfix",
    "subject": "ffmpeg"
- },
-  {
-   "id": 31,
-   "bug_id": "div-zero-1",
-   "benchmark": "test"
-
  }
-  ,{
-   "id": 32,
-   "bug_id": "div-zero-2",
-   "benchmark": "test"
 
- }
 
 ]
