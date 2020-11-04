@@ -202,6 +202,7 @@ def run(project_path, program_path):
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
+    emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
     for patch in patch_list:
         patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
