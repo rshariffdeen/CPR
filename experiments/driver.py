@@ -21,7 +21,7 @@ ARG_SKIP_LIST = "--skip-list="
 
 CONF_DATA_PATH = "/data"
 CONF_TOOL_PATH = "/concolic-repair"
-CONF_TOOL_PARAMS = ""
+CONF_TOOL_PARAMS = "--mode=2"
 CONF_TOOL_NAME = "python3.6 ConRepair.py"
 CONF_DEBUG = False
 CONF_BUG_ID = None
@@ -141,7 +141,7 @@ def run():
         if CONF_SKIP_LIST and str(index) in CONF_SKIP_LIST:
             index = index + 1
             continue
-        CONF_TOOL_PARAMS = "--mode=2 "
+
         experiment_name = "Experiment-" + str(index) + "\n-----------------------------"
         print(experiment_name)
         bug_name = str(experiment_item[KEY_BUG_ID])
