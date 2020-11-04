@@ -113,7 +113,7 @@ COPY tools/  tools/
 COPY tests/ tests/
 COPY components/ components/
 
-RUN cd /concolic/lib && KLEE_INCLUDE_PATH=/klee/source/include make
+RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
 RUN chmod +x /concolic-repair/tools/trident-cc
