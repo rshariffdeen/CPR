@@ -231,13 +231,17 @@ def run_cegis(program_path, project_path, patch_list):
     test_output_list = values.CONF_TEST_OUTPUT
     test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
+    time_check = time.time()
     assertion, largest_path_condition = concolic_exploration(program_path, patch_list)
+    duration = (time.time() - time_check) / 60
+    values.TIME_TO_EXPLORE = duration
     program_specification = generator.generate_program_specification(binary_dir_path)
     complete_specification = And(Not(assertion), program_specification)
     emitter.sub_title("Evaluating Patch Pool")
     iteration = 0
     output_dir = definitions.DIRECTORY_OUTPUT
     counter_example_list = []
+    time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
     while not satisfied:
         iteration = iteration + 1
@@ -265,7 +269,8 @@ def run_cegis(program_path, project_path, patch_list):
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
         if satisfied:
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
-
+    duration = (time.time() - time_check) / 60
+    values.TIME_TO_REDUCE = duration
     final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
     if not final_patch_list:
         values.COUNT_PATCH_END = len(final_patch_list)
@@ -294,6 +299,7 @@ def run_fitreduce(program_path, patch_list):
             test_input_list = values.CONF_TEST_INPUT
             second_var_list = list()
             for argument_list in test_input_list:
+                time_check = time.time()
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
                 iteration = iteration + 1
@@ -308,6 +314,8 @@ def run_fitreduce(program_path, patch_list):
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 assert exit_code == 0
+                duration = (time.time() - time_check) / 60
+                values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
                 if values.IS_CRASH:
                     values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 # check if new path hits patch location / fault location
@@ -316,11 +324,14 @@ def run_fitreduce(program_path, patch_list):
                 if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
                 distance.update_distance_map()
+                time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
                                                                     Path(binary_dir_path + "/klee-last/").resolve())
                 # print(assertion.serialize())
                 patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
                 emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+                duration = (time.time() - time_check) / 60
+                values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
                 satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
                 if satisfied:
                     emitter.warning(
@@ -331,6 +342,7 @@ def run_fitreduce(program_path, patch_list):
             values.ITERATION_NO = iteration
             emitter.sub_sub_title("Iteration: " + str(iteration))
             ## Pick new input and patch candidate for next concolic execution step.
+            time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
             if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -348,10 +360,11 @@ def run_fitreduce(program_path, patch_list):
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
             exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
             assert exit_code == 0
-
+            duration = (time.time() - time_check) / 60
+            values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
-
+            time_check = time.time()
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
@@ -364,7 +377,8 @@ def run_fitreduce(program_path, patch_list):
             # print(assertion.serialize())
             patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
             emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-
+            duration = (time.time() - time_check) / 60
+            values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
 
