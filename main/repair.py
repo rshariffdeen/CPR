@@ -192,13 +192,6 @@ def rank_patches(patch_list):
 def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
-    emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
-    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
-    emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
-    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
-    emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
-    emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
