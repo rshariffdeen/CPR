@@ -13,7 +13,7 @@ cd src
 git checkout $commit_id
 
 sed -i '292i klee_assert(i > size / 2 );\n' src/shred.c
-sed -i '292i TRIDENT_OUTPUT("i", "i32", i);\n' src/shred.c
+sed -i '292i TRIDENT_OUTPUT("obs", "i32", i - (size/2));\n' src/shred.c
 sed -i '290d' src/shred.c
 sed -i '290i for(i = 3; (__trident_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)); i *= 2)' src/shred.c
 sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/shred.c

@@ -1,2 +1,2 @@
-(declare-const i!0 (_ BitVec 32))
-(assert (= true (= i!0 (_ bv6 32) )))
+(declare-const obs!0 (_ BitVec 32))
+(assert (= true (bvsgt obs!0 (_ bv0 32) )))
