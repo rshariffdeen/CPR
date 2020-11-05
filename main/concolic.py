@@ -101,8 +101,8 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
             filtered_patch_list.append(selected_patch)
 
     if not filtered_patch_list:
-        emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
-        emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
+        # emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
+        # emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
         return None
 
     if values.CONF_SELECTION_STRATEGY == "deterministic":
@@ -153,14 +153,19 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
         emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
         return None, None, patch_list
 
-    selected_new_path, selected_control_loc = select_new_path_condition()
-    list_path_explored.append(str(selected_new_path.serialize()))
+    patch_constraint = None
+    selected_new_path = ""
+    selected_control_loc = ""
+    while not patch_constraint:
+        selected_new_path, selected_control_loc = select_new_path_condition()
+        list_path_explored.append(str(selected_new_path.serialize()))
+        patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
+        if patch_constraint:
+            selected_new_path = And(selected_new_path, patch_constraint)
+
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
-    patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
-    if patch_constraint:
-        selected_new_path = And(selected_new_path, patch_constraint)
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list
