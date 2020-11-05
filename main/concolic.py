@@ -110,7 +110,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
     else:
         selected_patch = random.choice(filtered_patch_list)
 
-    emitter.emit_patch(selected_patch, message="\tSelected patch: ")
+    emitter.emit_patch(selected_patch, message="\t\tSelected patch: ")
     patch_formula = extractor.extract_formula_from_patch(selected_patch)
     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, selected_new_path)
     # add patch constraint and user-input->prog-var relationship
