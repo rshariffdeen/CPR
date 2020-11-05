@@ -29,10 +29,10 @@ def collect_result_timeout(result):
 
 def collect_result_one(result):
     global result_list, found_one
+    result_list.append(result)
     if result[0] is True:
         found_one = True
         pool.terminate()
-    result_list.append(result)
 
 
 def collect_patch(patch):
