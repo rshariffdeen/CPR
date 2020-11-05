@@ -102,7 +102,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
 
     if not filtered_patch_list:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
-        emitter.note("\t\tCount paths detected: " + str(len(list_path_detected)))
+        emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
         return None
 
     if values.CONF_SELECTION_STRATEGY == "deterministic":
@@ -150,7 +150,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
 
     if not list_path_detected:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
-        emitter.note("\t\tCount paths detected: " + str(len(list_path_detected)))
+        emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
         return None, None, patch_list
 
     selected_new_path, selected_control_loc = select_new_path_condition()
