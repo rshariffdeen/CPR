@@ -228,8 +228,10 @@ def run_cegis(program_path, project_path, patch_list):
     assertion, largest_path_condition = concolic_exploration(program_path, patch_list)
     duration = (time.time() - time_check) / 60
     values.TIME_TO_EXPLORE = duration
+    emitter.normal("\tcombining explored program paths")
     program_specification = generator.generate_program_specification(binary_dir_path)
     complete_specification = And(Not(assertion), program_specification)
+    emitter.normal("\tcomputed the program specification formula")
     emitter.sub_title("Evaluating Patch Pool")
     iteration = 0
     output_dir = definitions.DIRECTORY_OUTPUT
@@ -244,7 +246,7 @@ def run_cegis(program_path, project_path, patch_list):
         if not patch:
             emitter.error("[error] cannot generate a patch")
         patch_formula = extractor.extract_formula_from_patch(patch)
-        emitter.emit_patch(patch, message="generated patch")
+        emitter.emit_patch(patch, message="\tgenerated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
