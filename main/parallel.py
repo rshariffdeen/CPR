@@ -238,9 +238,10 @@ def validate_input_generation(patch_list, new_path):
     result_list = []
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_constraint = extractor.extract_formula_from_patch(patch)
+            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
             index = list(patch_list).index(patch)
-            result_list.append(oracle.check_input_feasibility(index, patch_constraint, new_path))
+            result_list.append(oracle.check_input_feasibility(index, patch_formula_extended, new_path))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
@@ -249,9 +250,10 @@ def validate_input_generation(patch_list, new_path):
         interrupt_event = threading.Event()
         for patch in patch_list:
             try:
-                patch_constraint = extractor.extract_formula_from_patch(patch)
+                patch_formula = extractor.extract_formula_from_patch(patch)
+                patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
                 index = list(patch_list).index(patch)
-                thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_constraint, new_path), callback=collect_result_one)
+                thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_formula_extended, new_path), callback=collect_result_one)
                 thread_list.append(thread)
             except ValueError:
                 emitter.warning("\t\tvalue found before completing pool")
