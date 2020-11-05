@@ -340,6 +340,8 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.CONF_PATH_POC
+            if values.FILE_POC_GEN:
+                argument = values.FILE_POC_GEN
         input_argument += " " + str(argument)
     if output_dir:
         klee_command = "klee --output-dir=" + str(output_dir) + " "

@@ -250,15 +250,17 @@ def run_cegis(program_path, project_path, patch_list):
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
-            # model = generator.generate_model(violation_check)
+            model = generator.generate_model(violation_check)
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             assert exit_code == 0
+            emitter.normal("\t\tgenerating new assertion")
             test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
             counter_example_list.append((klee_test_file, klee_out_dir))
+            emitter.highlight("\t\tnew counter-example added")
         else:
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
