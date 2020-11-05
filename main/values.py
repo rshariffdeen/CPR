@@ -84,7 +84,7 @@ error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflo
 
 
 # ---------------- Option Values ---------------------
-OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement"}
+OPTIONS_DIST_METRIC = {0: "control-loc", 1: "statement", 2: "angelic"}
 OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
 OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
 OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}

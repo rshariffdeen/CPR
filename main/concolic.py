@@ -3,6 +3,7 @@ from typing import Union
 import os
 import re
 import random
+import operator
 import struct
 from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
@@ -60,29 +61,40 @@ def select_nearest_control_loc():
 def select_new_path_condition():
     global list_path_detected
     if values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
-        path_list_at_patch_loc = [(p[1], p[2]) for p in list_path_detected if p[0] == values.CONF_LOC_PATCH]
+        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_detected if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
             selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
-            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1])
+            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
         else:
             selected_pair = max(list_path_detected, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
         list_path_detected.remove(selected_pair)
-    else:
+    elif values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
-        path_list_at_loc = [(p[1], p[2]) for p in list_path_detected if p[0] == control_loc]
+        path_list_at_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_detected if p[0] == control_loc]
         if values.CONF_SELECTION_STRATEGY == "deterministic":
             selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1])
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
         else:
             selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1])
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
+        list_path_detected.remove(selected_pair)
+    else:
+        ranked_list = sorted(list_path_detected, key=operator.itemgetter(4, 3, 2))
+        if values.CONF_SELECTION_STRATEGY == "deterministic":
+            selected_pair = ranked_list[0]
+            selected_path = selected_pair[1]
+            control_loc = selected_pair[0]
+        else:
+            selected_pair = (random.choice(ranked_list))
+            selected_path = selected_pair[1]
+            control_loc = selected_pair[0]
         list_path_detected.remove(selected_pair)
 
     return selected_path, control_loc
@@ -142,12 +154,8 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
         for control_loc, generated_path, ppc_len in generated_path_list:
             path_str = str(generated_path.serialize())
             if path_str not in (list_path_observed + list_path_explored):
-                reach_patch_loc = False
-                if "angelic!" in path_str:
-                    reach_patch_loc = True
-                reach_obs_loc = False
-                if "obs!" in path_str:
-                    reach_obs_loc = True
+                reach_patch_loc = path_str.count("angelic!")
+                reach_obs_loc = path_str.count("obs!")
                 list_path_detected.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
                 list_path_observed.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
