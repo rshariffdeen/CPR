@@ -139,8 +139,15 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
 
     if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
         for control_loc, generated_path, ppc_len in generated_path_list:
-            if str(generated_path.serialize()) not in (list_path_observed + list_path_explored):
-                list_path_detected.append((control_loc, generated_path, ppc_len))
+            path_str = str(generated_path.serialize())
+            if path_str not in (list_path_observed + list_path_explored):
+                reach_patch_loc = False
+                if "angelic!" in path_str:
+                    reach_patch_loc = True
+                reach_obs_loc = False
+                if "obs!" in path_str:
+                    reach_obs_loc = True
+                list_path_detected.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
                 list_path_observed.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
 

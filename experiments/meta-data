@@ -133,25 +133,25 @@
  },
  {
    "id": 23,
-   "bug_id": "Bugzilla-26545",
+   "bug_id": "bugzilla-26545",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 24,
-   "bug_id": "GNUBug-25003",
+   "bug_id": "gnubug-25003",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 25,
-   "bug_id": "GNUBug-25023",
+   "bug_id": "gnubug-25023",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
  {
    "id": 26,
-   "bug_id": "Bugzilla-19784",
+   "bug_id": "bugzilla-19784",
    "benchmark": "extractfix",
    "subject": "coreutils"
  },
@@ -175,7 +175,7 @@
  },
  {
    "id": 30,
-   "bug_id": "Bugzilla-1404",
+   "bug_id": "bugzilla-1404",
    "benchmark": "extractfix",
    "subject": "ffmpeg"
  }
