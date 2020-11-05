@@ -64,6 +64,7 @@ CONF_STACK_SIZE = "stack_size:"
 CONF_MASK_ARG = "mask_arg:"
 CONF_IS_CPP = "is_cpp:"
 CONF_IS_CRASH = "is_crash:"
+CONF_TIMEOUT_SAT = "timeout_sat:"
 
 
 # ----------------- KEY DEFINITIONS -------------------
