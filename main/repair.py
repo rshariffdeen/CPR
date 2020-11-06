@@ -262,6 +262,8 @@ def run_cegis(program_path, project_path, patch_list):
             counter_example_list.append((klee_test_file, klee_out_dir))
             emitter.highlight("\t\tnew counter-example added")
         else:
+            klee_test_file = output_dir + "/klee-test-FINAL"
+            write_smtlib(violation_check, klee_test_file)
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
         if satisfied:
