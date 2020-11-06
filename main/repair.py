@@ -2,7 +2,7 @@ from main.concolic import run_concolic_execution, select_new_input
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from pysmt.shortcuts import Not, And, is_sat, write_smtlib
+from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader
 import time
 import sys
@@ -263,6 +263,7 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.highlight("\t\tnew counter-example added")
         else:
             klee_test_file = output_dir + "/klee-test-FINAL"
+            print(to_smtlib(violation_check, False))
             write_smtlib(violation_check, klee_test_file)
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
