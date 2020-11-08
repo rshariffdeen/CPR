@@ -156,6 +156,25 @@ def collect_trace(file_path, project_path):
     return list_trace
 
 
+def collect_symbolic_path_loc(log_path, project_path):
+    """
+       This function will read the output log of a klee concolic execution and
+       extract the partial path condition insert locations (i.e. control location)
+    """
+    emitter.normal("\textracting path conditions")
+    ppc_loc_list = list()
+    if os.path.exists(log_path):
+        with open(log_path, 'r') as trace_file:
+            for line in trace_file:
+                if '[path:ppc]' in line:
+                    if project_path in line or definitions.DIRECTORY_LIB in line:
+                        source_path = str(line.replace("[path:ppc]", '')).split(" : ")[0]
+                        source_path = source_path.strip()
+                        source_path = os.path.abspath(source_path)
+                        ppc_loc_list.append(source_path)
+    return ppc_loc_list
+
+
 def collect_concretized_bytes(log_path):
     concretized_info = dict()
     if os.path.exists(log_path):
