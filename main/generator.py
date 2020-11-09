@@ -460,7 +460,7 @@ def generate_path_for_negation():
 
 def generate_negated_path(path_condition):
     negated_path = None
-    while path_condition:
+    while path_condition.is_and():
         constraint = path_condition.arg(1)
         constraint_str = constraint.serialize()
         if "angelic!bool!" in constraint_str:
