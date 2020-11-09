@@ -202,8 +202,8 @@ def read_conf_file():
 
 def print_configuration():
     # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
-    assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
-    emitter.note("\tconfiguration.assertion:" + str(assertion_formula.serialize()))
+    # assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
+    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
     emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
     emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
     emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
