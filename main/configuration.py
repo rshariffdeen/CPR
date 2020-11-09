@@ -16,6 +16,8 @@ def read_conf(arg_list):
             elif definitions.ARG_DIST_METRIC in arg:
                 option = int(arg.replace(definitions.ARG_DIST_METRIC, ''))
                 values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
+            elif definitions.ARG_RANK_LIMIT in arg:
+                values.CONF_RANK_LIMIT = int(arg.replace(definitions.ARG_RANK_LIMIT, ""))
             elif definitions.ARG_SELECTION_METHOD in arg:
                 option = int(arg.replace(definitions.ARG_SELECTION_METHOD, ''))
                 if option not in values.OPTIONS_SELECT_METHOD:
