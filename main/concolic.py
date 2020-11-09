@@ -183,6 +183,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     selected_control_loc = ""
     if patch_list:
         while not patch_constraint:
+            emitter.normal("\tfinding a feasible path for current patch set")
             if not list_path_inprogress:
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
