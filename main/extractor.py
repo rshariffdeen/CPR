@@ -129,3 +129,21 @@ def extract_input_arg_list(argument_str):
         argument_str = argument_str.replace("[", "").replace("]", "")
         argument_list = str(argument_str).split(",")
     return argument_list
+
+
+def extract_largest_path_condition(dir_path):
+    largest_path_condition = None
+    pc_formula_len = 0
+    file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+    for file_name in file_list:
+        if ".smt2" in file_name:
+            file_path = os.path.join(dir_path, file_name)
+            path_condition = extract_formula_from_file(file_path)
+            if ".err" in file_name:
+                largest_path_condition = path_condition
+                break
+            pc_formula_str = str(path_condition.serialize())
+            if len(pc_formula_str) > pc_formula_len:
+                pc_formula_len = pc_formula_str
+                largest_path_condition = path_condition
+    return largest_path_condition

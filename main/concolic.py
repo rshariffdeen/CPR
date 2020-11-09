@@ -254,21 +254,24 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     else:
         values.LIST_BIT_LENGTH = bit_length_list
     emitter.normal("\texecuting klee in concolic mode")
-    hit_location_flag = " "
+    # hit_location_flag = " "
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
-    if values.CONF_DISTANCE_METRIC == "control-loc":
-        hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
+    # if values.CONF_DISTANCE_METRIC == "control-loc":
+    hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
+    ppc_log_flag = ""
+    if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+        ppc_log_flag = "--log--ppc "
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
                    "-allow-seed-extension " \
                    "-named-seed-matching " \
-                   "--log-ppc " \
                    "--log-trace " \
                    + "--external-calls=all " \
                    + "--link-llvm-lib={0} " .format(runtime_lib_path) \
                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
+                   + "{0}".format(ppc_log_flag) \
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + values.CONF_KLEE_FLAGS + " " \
@@ -284,12 +287,20 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # collect artifacts
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
-    values.LIST_PPC, values.LAST_PPC_FORMULA = reader.collect_symbolic_path(ppc_log_path, project_path)
-    values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
+    if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+        values.LIST_PPC, values.LAST_PPC_FORMULA = reader.collect_symbolic_path(ppc_log_path, project_path)
+        values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
+    else:
+        klee_dir_path = directory_path + "/klee-last/"
+        values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_dir_path)
+        values.LIST_PPC = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG) and oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-        values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
+        if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+            values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
+        else:
+            values.NEGATED_PPC_FORMULA == generator.generate_negated_path(values.LAST_PPC_FORMULA)
     else:
         values.NEGATED_PPC_FORMULA = None
     return return_code

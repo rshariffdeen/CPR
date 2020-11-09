@@ -453,8 +453,24 @@ def generate_path_for_negation():
             negated_path = constraint
         else:
             negated_path = And(negated_path, constraint)
-            last_sym_path = last_sym_path.arg(0)
+        last_sym_path = last_sym_path.arg(0)
     negated_path = And(negated_path, last_sym_path)
+    return negated_path
+
+
+def generate_negated_path(path_condition):
+    negated_path = None
+    while path_condition:
+        constraint = path_condition.arg(1)
+        constraint_str = constraint.serialize()
+        if "angelic!bool!" in constraint_str:
+            constraint = Not(constraint)
+        if negated_path is None:
+            negated_path = constraint
+        else:
+            negated_path = And(negated_path, constraint)
+        path_condition = path_condition.arg(0)
+    negated_path = And(negated_path, path_condition)
     return negated_path
 
 
@@ -882,3 +898,13 @@ def generate_program_specification(binary_path):
                     program_specification = Or(program_specification, path_condition)
 
     return program_specification
+
+
+def generate_ppc_from_formula(path_condition):
+    ppc_list = list()
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = constraint.serialize()
+        path_condition = path_condition.arg(0)
+        ppc_list.append("-no-info-", constraint_str)
+    return ppc_list
