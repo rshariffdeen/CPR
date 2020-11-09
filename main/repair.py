@@ -381,7 +381,7 @@ def run_fitreduce(program_path, patch_list):
 
             distance.update_distance_map()
             ## Reduces the set of patch candidates based on the current path constraint
-            assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
+            assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
             # print(assertion.serialize())
             patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
             emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))

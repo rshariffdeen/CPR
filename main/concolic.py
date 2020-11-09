@@ -176,6 +176,10 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     selected_control_loc = ""
     if patch_list:
         while not patch_constraint:
+            if not list_path_inprogress:
+                emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
+                emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
+                return None, None, patch_list
             selected_new_path, selected_control_loc = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
