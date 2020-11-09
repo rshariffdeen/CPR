@@ -251,6 +251,7 @@ def run_cegis(program_path, project_path, patch_list):
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
             model = generator.generate_model(violation_check)
+            print(model)
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
