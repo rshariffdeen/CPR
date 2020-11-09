@@ -126,8 +126,15 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
     emitter.emit_patch(selected_patch, message="\t\tSelected patch: ")
     patch_formula = extractor.extract_formula_from_patch(selected_patch)
     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, selected_new_path)
+    patch_formula_str = str(patch_formula.serialize())
+    patch_index = utilities.get_hash(patch_formula_str)
+    patch_space = values.LIST_PATCH_SPACE[patch_index]
+    parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+    patch_space_constraint = patch_formula
+    if parameter_constraint:
+        patch_space_constraint = And(patch_formula_extended, parameter_constraint)
     # add patch constraint and user-input->prog-var relationship
-    return patch_formula_extended
+    return patch_space_constraint
 
 
 def select_new_input(argument_list, second_var_list, patch_list=None):
