@@ -24,7 +24,7 @@ def create_directories():
 
 def load_component_list():
     emitter.normal("loading custom/general components")
-    gen_comp_files = []
+    gen_comp_files = ["equal.smt2", "not-equal.smt2", "less-than.smt2", "less-or-smt2"]
     os.chdir(definitions.DIRECTORY_COMPONENTS)
     if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
         for component_name in values.CONF_GENERAL_COMP_LIST:
@@ -38,6 +38,7 @@ def load_component_list():
                     continue
                 gen_comp_files.append(Path(comp_file))
                 emitter.note("\tloading component: " + str(comp_file))
+    gen_comp_files = list(set(gen_comp_files))
     general_components = synthesis.load_components(gen_comp_files)
 
     proj_comp_files = []
