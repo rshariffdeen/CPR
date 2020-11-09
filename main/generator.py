@@ -1,4 +1,4 @@
-from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_one_parallel
+from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
@@ -47,18 +47,18 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
 
-    result = synthesize_one_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+    result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
-    list_of_patches = [_ for _ in result]
-    generated_patch = None
-    if list_of_patches:
-        generated_patch = list_of_patches[0]
+    # list_of_patches = [_ for _ in result]
+    # generated_patch = None
+    # if list_of_patches:
+    #     generated_patch = list_of_patches[0]
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     # emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     # filtered_list_of_patches = list(set(list_of_patches))
     # emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
-    return generated_patch
+    return result
 
 
 def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]]:
@@ -453,8 +453,24 @@ def generate_path_for_negation():
             negated_path = constraint
         else:
             negated_path = And(negated_path, constraint)
-            last_sym_path = last_sym_path.arg(0)
+        last_sym_path = last_sym_path.arg(0)
     negated_path = And(negated_path, last_sym_path)
+    return negated_path
+
+
+def generate_negated_path(path_condition):
+    negated_path = None
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = constraint.serialize()
+        if "angelic!bool!" in constraint_str:
+            constraint = Not(constraint)
+        if negated_path is None:
+            negated_path = constraint
+        else:
+            negated_path = And(negated_path, constraint)
+        path_condition = path_condition.arg(0)
+    negated_path = And(negated_path, path_condition)
     return negated_path
 
 
@@ -809,12 +825,15 @@ def generate_assertion(assertion_temp, klee_dir):
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
+    angelic_count = len(list(set(re.findall("angelic!bool!(.+?) \(\)", path_condition.serialize()))))
+    if angelic_count == 0:
+        return patch_formula
     model_path = generate_model(path_condition)
-    var_list = list(model_path.keys())
-    count = 0
-    for var in var_list:
-        if "angelic!bool" in var:
-            count = count + 1
+    # var_list = list(model_path.keys())
+    # count = 0
+    # for var in var_list:
+    #     if "angelic!bool" in var:
+    #         count = count + 1
     input_list = list()
 
     path_script = "/tmp/z3_script"
@@ -829,7 +848,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
 
     formula_txt = script
     formula_list = []
-    for index in range(1, count):
+    for index in range(1, angelic_count):
         postfix = "_" + str(index)
         substituted_formula_txt = formula_txt
         for input_var in input_list:
@@ -879,3 +898,16 @@ def generate_program_specification(binary_path):
                     program_specification = Or(program_specification, path_condition)
 
     return program_specification
+
+
+def generate_ppc_from_formula(path_condition):
+    ppc_list = list()
+    while path_condition.is_and():
+        path_condition = path_condition.arg(0)
+        path_script = "/tmp/z3_script"
+        write_smtlib(path_condition, path_script)
+        with open(path_script, "r") as script_file:
+            script_lines = script_file.readlines()
+        script = "".join(script_lines)
+        ppc_list.append(("-no-info-", script))
+    return ppc_list

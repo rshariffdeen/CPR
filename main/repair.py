@@ -1,4 +1,4 @@
-from main.concolic import run_concolic_execution, select_new_input
+from main.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -219,6 +219,10 @@ def run(project_path, program_path):
     elif values.CONF_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, patch_list)
 
+    values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
+    values.COUNT_PATHS_DETECTED = len(concolic.list_path_detected)
+    values.COUNT_PATHS_SKIPPED = len(concolic.list_path_infeasible)
+
 
 def run_cegis(program_path, project_path, patch_list):
     test_output_list = values.CONF_TEST_OUTPUT
@@ -238,19 +242,23 @@ def run_cegis(program_path, project_path, patch_list):
     counter_example_list = []
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
+    patch_generator = generator.generate_patch(project_path, counter_example_list)
+    if not patch_generator:
+        emitter.error("[error] cannot generate a patch")
+    patch = None
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-        patch = generator.generate_patch(project_path, counter_example_list)
-        if not patch:
-            emitter.error("[error] cannot generate a patch")
+        if patch is None:
+            patch = next(patch_generator, None)
         patch_formula = extractor.extract_formula_from_patch(patch)
         emitter.emit_patch(patch, message="\tgenerated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
             model = generator.generate_model(violation_check)
+            print(model)
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
@@ -373,7 +381,7 @@ def run_fitreduce(program_path, patch_list):
 
             distance.update_distance_map()
             ## Reduces the set of patch candidates based on the current path constraint
-            assertion, count_obs = generator.generate_assertion(assertion_template,Path(binary_dir_path + "/klee-last/").resolve())
+            assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
             # print(assertion.serialize())
             patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
             emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
@@ -386,6 +394,7 @@ def run_fitreduce(program_path, patch_list):
         values.COUNT_PATCH_END = len(patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
+        check_infeasible_paths(patch_list)
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
@@ -457,7 +466,7 @@ def concolic_exploration(program_path, patch_list):
             second_var_list = values.SECOND_VAR_LIST
             if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-            gen_arg_list, gen_var_list, patch_list = concolic.select_new_input(argument_list, second_var_list, patch_list)
+            gen_arg_list, gen_var_list, _ = concolic.select_new_input(argument_list, second_var_list, [])
 
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")

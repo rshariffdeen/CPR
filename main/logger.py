@@ -105,6 +105,9 @@ def end(time_duration):
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         output("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         output("Template End Count: " + str(values.COUNT_TEMPLATE_END))
+    output("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))
+    output("Paths Explored: " + str(values.COUNT_PATHS_EXPLORED))
+    output("Paths Skipped: " + str(values.COUNT_PATHS_SKIPPED))
     output("Component Count: " + str(values.COUNT_COMPONENTS))
     output("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
     output("Component Count Cust: " + str(values.COUNT_COMPONENTS_CUS))

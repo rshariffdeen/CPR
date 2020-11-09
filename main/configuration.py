@@ -1,5 +1,6 @@
 import os
-from main import emitter, definitions, values, reader, logger
+import sys
+from main import emitter, definitions, values, reader, logger, generator
 from main.utilities import error_exit
 
 
@@ -16,6 +17,8 @@ def read_conf(arg_list):
             elif definitions.ARG_DIST_METRIC in arg:
                 option = int(arg.replace(definitions.ARG_DIST_METRIC, ''))
                 values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
+            elif definitions.ARG_RANK_LIMIT in arg:
+                values.CONF_RANK_LIMIT = int(arg.replace(definitions.ARG_RANK_LIMIT, ""))
             elif definitions.ARG_SELECTION_METHOD in arg:
                 option = int(arg.replace(definitions.ARG_SELECTION_METHOD, ''))
                 if option not in values.OPTIONS_SELECT_METHOD:
@@ -195,3 +198,18 @@ def read_conf_file():
         exit()
     values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
+
+
+def print_configuration():
+    # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
+    # assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
+    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
+    emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
+    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
+    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
+    emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
+    emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
+    emitter.note("\tconfiguration.patch_type:" + str(values.CONF_PATCH_TYPE))
+    emitter.note("\tconfiguration.repair_method:" + str(values.CONF_REDUCE_METHOD))
+    emitter.note("\tconfiguration.timeout_sat:" + str(values.DEFAULT_TIMEOUT_SAT))
+    emitter.note("\tconfiguration.distance_metric:" + str(values.CONF_DISTANCE_METRIC))
