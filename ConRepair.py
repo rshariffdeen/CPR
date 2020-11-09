@@ -55,19 +55,6 @@ def load_component_list():
     values.COUNT_COMPONENTS_GEN = len(general_components)
 
 
-def print_configuration():
-    # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
-    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
-    emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
-    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
-    emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
-    emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
-    emitter.note("\tconfiguration.patch_type:" + str(values.CONF_PATCH_TYPE))
-    emitter.note("\tconfiguration.repair_method:" + str(values.CONF_REDUCE_METHOD))
-    emitter.note("\tconfiguration.timeout_sat:" + str(values.DEFAULT_TIMEOUT_SAT))
-
-
 def bootstrap(arg_list):
     emitter.title("Starting " + values.TOOL_NAME)
     emitter.sub_title("Loading Configurations")
@@ -113,7 +100,7 @@ def bootstrap(arg_list):
 
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
     load_component_list()
-    print_configuration()
+    configuration.print_configuration()
 
 
 def initialize():
