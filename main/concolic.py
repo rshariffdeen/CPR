@@ -395,10 +395,15 @@ def run_concolic_exploration(program, argument_list, second_var_list):
 
 
 def check_infeasible_paths(patch_list):
-    global list_path_inprogress, list_path_infeasible
+    global list_path_inprogress, list_path_infeasible, list_path_detected
+    emitter.sub_title("Evaluating Path Pool")
     for path in list_path_inprogress:
         control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc = path
+        emitter.sub_title(control_loc)
         feasible_patch_list = select_patch_constraint_for_input(patch_list, generated_path)
         if not feasible_patch_list:
             list_path_infeasible.append(path)
             list_path_inprogress.remove(path)
+        emitter.highlight("\ttotal discovered: " + str(len(list_path_detected)) + " path(s)")
+        emitter.highlight("\ttotal remaining: " + str(len(list_path_inprogress)) + " path(s)")
+        emitter.highlight("\ttotal infeasible: " + str(len(list_path_infeasible)) + " path(s)")
