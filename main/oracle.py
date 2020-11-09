@@ -82,16 +82,16 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                 patch_score = 2
                 is_under_approx = not is_unsat(And(path_constraint, Not(assertion)))
                 if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
-                    emitter.debug("refining for universal quantification")
                     if is_under_approx:
+                        emitter.debug("removing due to universal quantification")
                         result = False
 
                 negated_path_condition = values.NEGATED_PPC_FORMULA
                 path_constraint = And(negated_path_condition, patch_constraint)
                 is_over_approx = not is_unsat(And(path_constraint, assertion))
                 if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
-                    emitter.debug("refining for existential quantification")
                     if is_over_approx:
+                        emitter.debug("removing due to existential quantification")
                         result = False
             else:
                 patch_score = 1
