@@ -238,13 +238,16 @@ def run_cegis(program_path, project_path, patch_list):
     counter_example_list = []
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
+    patch_generator = generator.generate_patch(project_path, counter_example_list)
+    if not patch_generator:
+        emitter.error("[error] cannot generate a patch")
+    patch = None
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-        patch = generator.generate_patch(project_path, counter_example_list)
-        if not patch:
-            emitter.error("[error] cannot generate a patch")
+        if patch is None:
+            patch = next(patch_generator, None)
         patch_formula = extractor.extract_formula_from_patch(patch)
         emitter.emit_patch(patch, message="\tgenerated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
