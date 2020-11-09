@@ -903,11 +903,16 @@ def generate_program_specification(binary_path):
 def generate_ppc_from_formula(path_condition):
     ppc_list = list()
     while path_condition.is_and():
-        path_condition = path_condition.arg(0)
+        constraint = path_condition.arg(1)
+        constraint_str = str(constraint.serialize())
+        if "!rvalue!" in constraint_str or "!obs!" in constraint_str:
+            path_condition = path_condition.arg(0)
+            continue
         path_script = "/tmp/z3_script"
         write_smtlib(path_condition, path_script)
         with open(path_script, "r") as script_file:
             script_lines = script_file.readlines()
         script = "".join(script_lines)
         ppc_list.append(("-no-info-", script))
+        path_condition = path_condition.arg(0)
     return ppc_list
