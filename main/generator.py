@@ -904,6 +904,10 @@ def generate_ppc_from_formula(path_condition):
     ppc_list = list()
     while path_condition.is_and():
         path_condition = path_condition.arg(0)
-        constraint_str = to_smtlib(path_condition, False)
-        ppc_list.append(("-no-info-", constraint_str))
+        path_script = "/tmp/z3_script"
+        write_smtlib(path_condition, path_script)
+        with open(path_script, "r") as script_file:
+            script_lines = script_file.readlines()
+        script = "".join(script_lines)
+        ppc_list.append(("-no-info-", script))
     return ppc_list
