@@ -23,6 +23,7 @@ File_Log_Path = "/tmp/log_sym_path"
 
 list_path_explored = list()
 list_path_observed = list()
+list_path_infeasible = list()
 list_path_detected = list()
 count_discovered = 0
 
@@ -172,12 +173,18 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     patch_constraint = None
     selected_new_path = ""
     selected_control_loc = ""
-    while not patch_constraint:
+    if patch_list:
+        while not patch_constraint:
+            selected_new_path, selected_control_loc = select_new_path_condition()
+            patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
+            if patch_constraint:
+                list_path_explored.append(str(selected_new_path.serialize()))
+                selected_new_path = And(selected_new_path, patch_constraint)
+            else:
+                list_path_infeasible.append(str(selected_new_path.serialize()))
+    else:
         selected_new_path, selected_control_loc = select_new_path_condition()
         list_path_explored.append(str(selected_new_path.serialize()))
-        patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
-        if patch_constraint:
-            selected_new_path = And(selected_new_path, patch_constraint)
 
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
