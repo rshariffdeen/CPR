@@ -22,9 +22,9 @@ File_Log_Path = "/tmp/log_sym_path"
 
 
 list_path_explored = list()
-list_path_observed = list()
-list_path_infeasible = list()
 list_path_detected = list()
+list_path_infeasible = list()
+list_path_inprogress = list()
 count_discovered = 0
 
 
@@ -47,7 +47,7 @@ count_discovered = 0
 
 def select_nearest_control_loc():
     selection = None
-    control_loc_list = numpy.array(list_path_detected)[:, 0]
+    control_loc_list = numpy.array(list_path_inprogress)[:, 0]
     control_loc_dist_map = dict(
         filter(lambda elem: elem[0] in control_loc_list, values.MAP_LOC_DISTANCE.items()))
     min_distance = min(list(control_loc_dist_map.values()))
@@ -60,22 +60,22 @@ def select_nearest_control_loc():
 
 
 def select_new_path_condition():
-    global list_path_detected
+    global list_path_inprogress
     if values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
-        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_detected if p[0] == values.CONF_LOC_PATCH]
+        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
             selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
             selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
         else:
-            selected_pair = max(list_path_detected, key=lambda item: item[2])
+            selected_pair = max(list_path_inprogress, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-        list_path_detected.remove(selected_pair)
+        list_path_inprogress.remove(selected_pair)
     elif values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
-        path_list_at_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_detected if p[0] == control_loc]
+        path_list_at_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == control_loc]
         if values.CONF_SELECTION_STRATEGY == "deterministic":
             selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
@@ -85,9 +85,9 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
-        list_path_detected.remove(selected_pair)
+        list_path_inprogress.remove(selected_pair)
     else:
-        ranked_list = sorted(list_path_detected, key=operator.itemgetter(4, 3, 2))
+        ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
         if values.CONF_SELECTION_STRATEGY == "deterministic":
             selected_pair = ranked_list[0]
             selected_path = selected_pair[1]
@@ -96,7 +96,7 @@ def select_new_path_condition():
             selected_pair = (random.choice(ranked_list))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-        list_path_detected.remove(selected_pair)
+        list_path_inprogress.remove(selected_pair)
 
     return selected_path, control_loc
 
@@ -137,7 +137,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
            project_path: project path is the root directory of the program to filter PPC from libraries
     """
     logger.info("generating new input for new path")
-    global list_path_explored, list_path_detected, count_discovered
+    global list_path_explored, list_path_inprogress, count_discovered
 
     # input_file_byte_list = list()
     # input_file_stat_byte_list = list()
@@ -154,20 +154,20 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
         for control_loc, generated_path, ppc_len in generated_path_list:
             path_str = str(generated_path.serialize())
-            if path_str not in (list_path_observed + list_path_explored):
+            if path_str not in (list_path_detected + list_path_explored):
                 reach_patch_loc = path_str.count("angelic!")
                 reach_obs_loc = path_str.count("obs!")
-                list_path_detected.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
-                list_path_observed.append(str(generated_path.serialize()))
+                list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
+                list_path_detected.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
 
     count_discovered = count_discovered + new_path_count
     emitter.highlight("\tidentified " + str(new_path_count) + " new path(s)")
     emitter.highlight("\ttotal discovered: " + str(count_discovered) + " path(s)")
 
-    if not list_path_detected:
+    if not list_path_inprogress:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
-        emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
+        emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
         return None, None, patch_list
 
     patch_constraint = None
@@ -380,14 +380,23 @@ def run_concolic_exploration(program, argument_list, second_var_list):
         second_var_list: a list of tuples where a tuple is (var identifier, var size, var value)
     """
     logger.info("running concolic exploration")
-    global list_path_explored, list_path_detected
+    global list_path_explored, list_path_inprogress
     run_concolic_execution(program, argument_list, second_var_list, print_output=False)
     is_initial = True
     path_count = 1
-    while list_path_detected or is_initial:
+    while list_path_inprogress or is_initial:
         is_initial = False
         path_count = path_count + 1
         gen_arg_list, gen_var_list = generator.generate_new_input(argument_list, second_var_list)
         run_concolic_execution(program, gen_arg_list, gen_var_list)
 
     print("Explored {0} number of paths".format(path_count))
+
+
+def check_infeasible_paths(patch_list):
+    global list_path_inprogress, list_path_infeasible
+    for path in list_path_inprogress:
+        feasible_patch_list = select_patch_constraint_for_input(patch_list, path)
+        if not feasible_patch_list:
+            list_path_infeasible.append(path)
+            list_path_inprogress.remove(path)

@@ -1,4 +1,4 @@
-from main.concolic import run_concolic_execution, select_new_input
+from main.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -219,6 +219,10 @@ def run(project_path, program_path):
     elif values.CONF_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, patch_list)
 
+    values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
+    values.COUNT_PATHS_DETECTED = len(concolic.list_path_detected)
+    values.COUNT_PATHS_SKIPPED = len(concolic.list_path_infeasible)
+
 
 def run_cegis(program_path, project_path, patch_list):
     test_output_list = values.CONF_TEST_OUTPUT
@@ -390,6 +394,7 @@ def run_fitreduce(program_path, patch_list):
         values.COUNT_PATCH_END = len(patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
+        check_infeasible_paths(patch_list)
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
