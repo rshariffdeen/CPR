@@ -397,7 +397,8 @@ def run_concolic_exploration(program, argument_list, second_var_list):
 def check_infeasible_paths(patch_list):
     global list_path_inprogress, list_path_infeasible
     for path in list_path_inprogress:
-        feasible_patch_list = select_patch_constraint_for_input(patch_list, path)
+        control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc = path
+        feasible_patch_list = select_patch_constraint_for_input(patch_list, generated_path)
         if not feasible_patch_list:
             list_path_infeasible.append(path)
             list_path_inprogress.remove(path)
