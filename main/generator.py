@@ -903,8 +903,7 @@ def generate_program_specification(binary_path):
 def generate_ppc_from_formula(path_condition):
     ppc_list = list()
     while path_condition.is_and():
-        constraint = path_condition.arg(1)
-        constraint_str = constraint.serialize()
         path_condition = path_condition.arg(0)
+        constraint_str = to_smtlib(path_condition, False)
         ppc_list.append(("-no-info-", constraint_str))
     return ppc_list
