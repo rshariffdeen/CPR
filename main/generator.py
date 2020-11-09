@@ -906,5 +906,5 @@ def generate_ppc_from_formula(path_condition):
         constraint = path_condition.arg(1)
         constraint_str = constraint.serialize()
         path_condition = path_condition.arg(0)
-        ppc_list.append("-no-info-", constraint_str)
+        ppc_list.append(("-no-info-", constraint_str))
     return ppc_list
