@@ -300,7 +300,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
             values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
         else:
-            values.NEGATED_PPC_FORMULA == generator.generate_negated_path(values.LAST_PPC_FORMULA)
+            values.NEGATED_PPC_FORMULA = generator.generate_negated_path(values.LAST_PPC_FORMULA)
     else:
         values.NEGATED_PPC_FORMULA = None
     return return_code
