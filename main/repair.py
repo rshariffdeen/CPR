@@ -370,9 +370,7 @@ def run_fitreduce(program_path, patch_list):
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
             time_check = time.time()
             # check if new path hits patch location / fault location
-            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH) or not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                 continue
 
             distance.update_distance_map()
