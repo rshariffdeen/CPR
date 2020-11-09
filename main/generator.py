@@ -809,12 +809,15 @@ def generate_assertion(assertion_temp, klee_dir):
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
+    angelic_count = len(list(set(re.findall("angelic!bool!(.+?) \(\)", path_condition.serialize()))))
+    if angelic_count == 0:
+        return patch_formula
     model_path = generate_model(path_condition)
-    var_list = list(model_path.keys())
-    count = 0
-    for var in var_list:
-        if "angelic!bool" in var:
-            count = count + 1
+    # var_list = list(model_path.keys())
+    # count = 0
+    # for var in var_list:
+    #     if "angelic!bool" in var:
+    #         count = count + 1
     input_list = list()
 
     path_script = "/tmp/z3_script"
@@ -829,7 +832,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
 
     formula_txt = script
     formula_list = []
-    for index in range(1, count):
+    for index in range(1, angelic_count):
         postfix = "_" + str(index)
         substituted_formula_txt = formula_txt
         for input_var in input_list:
