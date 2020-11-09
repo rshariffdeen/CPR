@@ -164,6 +164,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     count_discovered = count_discovered + new_path_count
     emitter.highlight("\tidentified " + str(new_path_count) + " new path(s)")
     emitter.highlight("\ttotal discovered: " + str(count_discovered) + " path(s)")
+    emitter.highlight("\ttotal remaining: " + str(len(list_path_inprogress)) + " path(s)")
     emitter.highlight("\ttotal infeasible: " + str(len(list_path_infeasible)) + " path(s)")
     if not list_path_inprogress:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
