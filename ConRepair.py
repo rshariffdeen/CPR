@@ -28,10 +28,8 @@ def load_component_list():
     gen_comp_files = []
     os.chdir(definitions.DIRECTORY_COMPONENTS)
     if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
-        for component_name in values.CONF_GENERAL_COMP_LIST:
-            gen_comp_files.append(Path(component_name))
-            emitter.note("\tloading component: " + str(component_name))
-        for component_name in base_list:
+        comp_list = list(set(values.CONF_GENERAL_COMP_LIST + base_list))
+        for component_name in comp_list:
             gen_comp_files.append(Path(component_name))
             emitter.note("\tloading component: " + str(component_name))
     else:
