@@ -5,6 +5,7 @@
 import pickle
 import json
 from main import generator, utilities, values, emitter
+from main.synthesis import program_to_code
 
 
 def write_as_json(data, output_file_path):
@@ -25,7 +26,9 @@ def write_patch_set(patch_list, output_file_path):
         for patch in patch_list:
             template_count = template_count + 1
             out_file.writelines("Patch #" + str(template_count))
-            out_file.writelines(patch, message="\t\t")
+            for (lid, prog) in patch.items():
+                code = lid + ": " + (program_to_code(prog))
+            out_file.writelines(code)
             patch_formula = generator.generate_formula_from_patch(patch)
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
