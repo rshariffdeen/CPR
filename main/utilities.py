@@ -4,6 +4,8 @@ import sys
 import signal
 import random
 from contextlib import contextmanager
+
+import main.generator
 from main import logger, emitter, values, definitions, extractor
 import base64
 import hashlib
@@ -176,7 +178,7 @@ def check_budget(time_budget):  # TODO implement time budget
 def count_concrete_patches_per_template(abstract_patch):
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
-    patch_formula = extractor.extract_formula_from_patch(abstract_patch)
+    patch_formula = main.generator.generate_formula_from_patch(abstract_patch)
     patch_formula_str = patch_formula.serialize()
     patch_index = get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]

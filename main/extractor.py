@@ -6,7 +6,6 @@ import os
 from main import emitter, utilities
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
-from main.synthesis import program_to_formula, collect_symbols, RuntimeSymbol, ComponentSymbol
 from main.utilities import execute_command
 
 
@@ -75,27 +74,6 @@ def extract_formula_from_file(spec_file_path):
         assertion_formula = script.get_last_formula()
     os.chdir(current_dir)
     return assertion_formula
-
-
-def extract_formula_from_patch(patch):
-    lid = list(patch.keys())[0]
-    eid = 0
-    patch_component = patch[lid]
-    patch_constraint = program_to_formula(patch_component)
-    program_substitution = {}
-    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
-        kind = ComponentSymbol.check(program_symbol)
-        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
-        if kind == ComponentSymbol.RRETURN:
-            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
-        elif kind == ComponentSymbol.RVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
-        elif kind == ComponentSymbol.LVALUE:
-            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
-        else:
-            pass  # FIXME: do I need to handle it somehow?
-    substituted_patch = patch_constraint.substitute(program_substitution)
-    return substituted_patch
 
 
 def extract_input_list(model):

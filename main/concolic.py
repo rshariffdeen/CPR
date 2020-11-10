@@ -11,6 +11,8 @@ import pysmt.environment
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol
+
+import main.generator
 from main.utilities import execute_command
 from main import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor
 import numpy
@@ -124,7 +126,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
         selected_patch = random.choice(filtered_patch_list)
 
     emitter.emit_patch(selected_patch, message="\t\tSelected patch: ")
-    patch_formula = extractor.extract_formula_from_patch(selected_patch)
+    patch_formula = main.generator.generate_formula_from_patch(selected_patch)
     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, selected_new_path)
     patch_space_constraint = patch_formula_extended
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:

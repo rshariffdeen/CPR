@@ -1,3 +1,4 @@
+import main.generator
 from main.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
 from main.synthesis import load_specification, Program
 from pathlib import Path
@@ -62,7 +63,7 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
         patch = patch_list[index]
-        patch_constraint = extractor.extract_formula_from_patch(patch)
+        patch_constraint = main.generator.generate_formula_from_patch(patch)
         patch_constraint_str = patch_constraint.serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         values.LIST_PATCH_SCORE[patch_index] += patch_score
@@ -114,7 +115,7 @@ def print_patch_list(patch_list):
         emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
         concrete_patch_count = 1
-        patch_formula = extractor.extract_formula_from_patch(patch)
+        patch_formula = main.generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
@@ -145,7 +146,7 @@ def rank_patches(patch_list):
     filtered_list = []
     # rank first based on coverage
     for patch in patch_list:
-        patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
+        patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
@@ -167,7 +168,7 @@ def run(project_path, program_path):
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
     for patch in patch_list:
-        patch_constraint_str = extractor.extract_formula_from_patch(patch).serialize()
+        patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")
@@ -223,7 +224,7 @@ def run_cegis(program_path, project_path, patch_list):
         emitter.sub_sub_title("Iteration: " + str(iteration))
         if patch is None:
             patch = next(patch_generator, None)
-        patch_formula = extractor.extract_formula_from_patch(patch)
+        patch_formula = main.generator.generate_formula_from_patch(patch)
         emitter.emit_patch(patch, message="\tgenerated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)

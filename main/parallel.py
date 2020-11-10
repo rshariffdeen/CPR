@@ -1,4 +1,6 @@
 import multiprocessing as mp
+
+import main.generator
 from main import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
@@ -142,7 +144,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     var_relationship = TRUE
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
             result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_formula_extended, path_condition, index))
@@ -151,7 +153,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
         pool = mp.Pool(mp.cpu_count())
         lock = None
         for patch in patch_list:
-            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
             pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_formula_extended, path_condition, index), callback=collect_result)
@@ -189,7 +191,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
     if values.CONF_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
@@ -201,7 +203,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
         pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
@@ -259,7 +261,7 @@ def validate_input_generation(patch_list, new_path):
     result_list = []
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_formula = extractor.extract_formula_from_patch(patch)
+            patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
             patch_space_constraint = patch_formula_extended
             if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
@@ -279,7 +281,7 @@ def validate_input_generation(patch_list, new_path):
         interrupt_event = threading.Event()
         for patch in patch_list:
             try:
-                patch_formula = extractor.extract_formula_from_patch(patch)
+                patch_formula = main.generator.generate_formula_from_patch(patch)
                 patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
                 patch_formula_str = str(patch_formula.serialize())
                 patch_index = utilities.get_hash(patch_formula_str)

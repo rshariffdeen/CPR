@@ -1,4 +1,5 @@
-from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy
+from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy, program_to_formula, \
+    collect_symbols, ComponentSymbol, RuntimeSymbol
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
@@ -493,7 +494,7 @@ def generate_negated_path(path_condition):
 def generate_patch_space(patch):
     partition_list = []
     partition = dict()
-    patch_formula = extractor.extract_formula_from_patch(patch)
+    patch_formula = generate_formula_from_patch(patch)
     var_list = list(patch_formula.get_free_variables())
     for var in var_list:
         if "const_" in str(var):
@@ -932,3 +933,24 @@ def generate_ppc_from_formula(path_condition):
         ppc_list.append(("-no-info-", script))
         path_condition = path_condition.arg(0)
     return ppc_list
+
+
+def generate_formula_from_patch(patch):
+    lid = list(patch.keys())[0]
+    eid = 0
+    patch_component = patch[lid]
+    patch_constraint = program_to_formula(patch_component)
+    program_substitution = {}
+    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+        kind = ComponentSymbol.check(program_symbol)
+        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+        if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+        elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+        elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+        else:
+            pass  # FIXME: do I need to handle it somehow?
+    substituted_patch = patch_constraint.substitute(program_substitution)
+    return substituted_patch
