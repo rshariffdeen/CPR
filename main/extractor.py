@@ -6,7 +6,7 @@ import os
 from main import emitter, utilities
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
-from main.utilities import execute_command
+
 
 
 def extract_var_relationship(var_expr_map):
@@ -58,7 +58,7 @@ def extract_byte_code(binary_path):
     binary_name = binary_path.split("/")[-1]
     extract_command = "cd " + directory_path + ";"
     extract_command += "extract-bc " + binary_name
-    execute_command(extract_command)
+    utilities.execute_command(extract_command)
 
 
 def extract_formula_from_file(spec_file_path):
