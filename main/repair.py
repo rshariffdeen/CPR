@@ -240,6 +240,8 @@ def run_cegis(program_path, project_path, patch_list):
             write_smtlib(test_assertion, klee_test_file)
             counter_example_list.append((klee_test_file, klee_out_dir))
             emitter.highlight("\t\tnew counter-example added")
+            patch = None
+            emitter.highlight("\t\tremoving current patch")
         else:
             klee_test_file = output_dir + "/klee-test-FINAL"
             # print(to_smtlib(violation_check, False))
