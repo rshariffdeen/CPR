@@ -106,8 +106,8 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     list_of_patches = [_ for _ in result]
     filtered_patch_list = []
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
-    values.COUNT_TEMPLATE_GEN = len(list_of_patches)
-    values.COUNT_PATCH_GEN = utilities.count_concrete_patches(list_of_patches)
+    # values.COUNT_TEMPLATE_GEN = len(list_of_patches)
+    # values.COUNT_PATCH_GEN = utilities.count_concrete_patches(list_of_patches)
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     result_list = parallel.remove_duplicate_patches_parallel(list_of_patches)
     for result in result_list:
