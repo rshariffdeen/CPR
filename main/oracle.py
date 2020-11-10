@@ -122,6 +122,7 @@ def is_component_constant(patch_comp):
         return True
     return False
 
+
 def is_same_children(patch_comp):
     (_, _), children = patch_comp
     right_child = children['right']
@@ -133,8 +134,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_patch_redundant(patch, index):
-    program = patch[list(patch.keys())[0]]
+def is_patch_redundant(program, index):
     tree, constants = program
     (cid, semantics), children = tree
     if len(children) == 2:

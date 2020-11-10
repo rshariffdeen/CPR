@@ -168,14 +168,16 @@ def remove_redundant_patches_parallel(patch_list):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            result_list.append(oracle.is_patch_redundant(patch, index))
+            program = patch[list(patch.keys())[0]]
+            result_list.append(oracle.is_patch_redundant(program, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
 
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            pool.apply_async(oracle.is_patch_redundant, args=(patch, index), callback=collect_result)
+            program = patch[list(patch.keys())[0]]
+            pool.apply_async(oracle.is_patch_redundant, args=(program, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
