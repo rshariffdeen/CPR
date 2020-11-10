@@ -139,13 +139,8 @@ def is_tree_duplicate(tree):
     if len(children) == 2:
         right_child = children['right']
         left_child = children['left']
-        if cid in ["addition", "division", "multiplication", "subtraction"]:
-            is_right_constant = is_component_constant(right_child)
-            is_left_constant = is_component_constant(left_child)
-            if is_right_constant and is_left_constant:
-                return True
 
-        if cid in ["less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal"]:
+        if cid in ["less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
             is_right_constant = is_component_constant(right_child)
             is_left_constant = is_component_constant(left_child)
             if is_right_constant and is_left_constant:
