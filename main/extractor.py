@@ -147,3 +147,15 @@ def extract_largest_path_condition(dir_path):
                 pc_formula_len = pc_formula_str
                 largest_path_condition = path_condition
     return largest_path_condition
+
+
+def extract_child_expressions(patch_tree):
+    (cid, semantics), children = patch_tree
+    child_list = list()
+    right_child = children['right']
+    left_child = children['left']
+    if cid in ["logical-or", "logical-and"]:
+        right_list = extract_child_expressions(right_child)
+        left_list = extract_child_expressions(left_child)
+        child_list = right_list + left_list
+    return child_list

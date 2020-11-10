@@ -134,7 +134,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_tree_redundant(tree):
+def is_tree_duplicate(tree):
     (cid, semantics), children = tree
     if len(children) == 2:
         right_child = children['right']
@@ -148,15 +148,23 @@ def is_tree_redundant(tree):
                 return True
 
         if cid in ["logical-or", "logical-and"]:
-            is_right_redundant = is_tree_redundant(right_child)
-            is_left_redundant = is_tree_redundant(left_child)
+            is_right_redundant = is_tree_duplicate(right_child)
+            is_left_redundant = is_tree_duplicate(left_child)
             if is_right_redundant or is_left_redundant:
                 return True
     return False
 
 
-def is_patch_redundant(patch, index):
+def is_tree_redundant(tree):
+    child_node_list = extractor.extract_child_expressions(tree)
+    unique_child_node_list = list(set(child_node_list))
+    if len(unique_child_node_list) == len(child_node_list):
+        return False
+    return True
+
+
+def is_patch_duplicate(patch, index):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_redundant(tree)
+    result = is_tree_duplicate(tree)
     return result, index

@@ -161,21 +161,21 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     return result_list
 
 
-def remove_redundant_patches_parallel(patch_list):
+def remove_duplicate_patches_parallel(patch_list):
     global pool, result_list
     result_list = []
     emitter.normal("\tremoving redundancy in patch pool")
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            result_list.append(oracle.is_patch_redundant(patch, index))
+            result_list.append(oracle.is_patch_duplicate(patch, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
 
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            pool.apply_async(oracle.is_patch_redundant, args=(patch, index), callback=collect_result)
+            pool.apply_async(oracle.is_patch_duplicate, args=(patch, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()
