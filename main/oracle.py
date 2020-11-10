@@ -166,5 +166,5 @@ def is_tree_redundant(tree):
 def is_patch_duplicate(patch, index):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree)
+    result = is_tree_duplicate(tree) or is_tree_redundant(tree)
     return result, index
