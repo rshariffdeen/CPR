@@ -1,18 +1,6 @@
-from main.synthesis import load_specification, synthesize_parallel, Program
-from pathlib import Path
-from typing import List, Dict, Tuple
-from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
-import os
-from pysmt.smtlib.parser import SmtLibParser
-from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, Equals, Int, BVConcat, Select, BV
-from main.utilities import execute_command
-from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, generator
-import re
-import struct
-import random
-import copy
+from pysmt.shortcuts import is_unsat
+from main import utilities, generator
 
 
 def get_sorted_space(partition_list):
