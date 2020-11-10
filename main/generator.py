@@ -98,7 +98,10 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
     emitter.normal("\tcreating patch pool")
-    result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+        result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+    else:
+        result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
     filtered_patch_list = []
