@@ -255,7 +255,6 @@ def run_cegis(program_path, project_path, patch_list):
         values.COUNT_PATCH_END = len(final_patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
-        print_patch_list(final_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(final_patch_list)
             values.COUNT_TEMPLATE_END = len(final_patch_list)
