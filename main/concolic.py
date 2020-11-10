@@ -380,7 +380,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         klee_command = "klee "
     klee_command += "--posix-runtime " \
                     "--libc=uclibc " \
-                    "--write-smt2s " \                 
+                    "--write-smt2s " \
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
