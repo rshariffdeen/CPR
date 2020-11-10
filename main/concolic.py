@@ -260,7 +260,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
     ppc_log_flag = ""
     if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
-        ppc_log_flag = "--log--ppc "
+        ppc_log_flag = "--log-ppc "
     klee_command = "klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
