@@ -175,9 +175,9 @@ def run(project_path, program_path):
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
-    emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+    emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-        values.COUNT_PATCH_START = count_concrete_patches(patch_list)
+        values.COUNT_PATCH_START = utilities.count_concrete_patches(patch_list)
         values.COUNT_TEMPLATE_START = len(patch_list)
     else:
         values.COUNT_PATCH_START = len(patch_list)
@@ -257,7 +257,7 @@ def run_cegis(program_path, project_path, patch_list):
     else:
         print_patch_list(final_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            values.COUNT_PATCH_END = count_concrete_patches(final_patch_list)
+            values.COUNT_PATCH_END = utilities.count_concrete_patches(final_patch_list)
             values.COUNT_TEMPLATE_END = len(final_patch_list)
         else:
             values.COUNT_PATCH_END = len(final_patch_list)
@@ -308,7 +308,7 @@ def run_fitreduce(program_path, patch_list):
                                                                     Path(binary_dir_path + "/klee-last/").resolve())
                 # print(assertion.serialize())
                 patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-                emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+                emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
                 duration = (time.time() - time_check) / 60
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
                 satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
@@ -355,7 +355,7 @@ def run_fitreduce(program_path, patch_list):
             assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
             # print(assertion.serialize())
             patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
-            emitter.note("\t\t|P|=" + str(count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+            emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             duration = (time.time() - time_check) / 60
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
@@ -369,7 +369,7 @@ def run_fitreduce(program_path, patch_list):
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            values.COUNT_PATCH_END = count_concrete_patches(ranked_patch_list)
+            values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
         else:
             values.COUNT_PATCH_END = len(ranked_patch_list)
