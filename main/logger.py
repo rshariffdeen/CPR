@@ -100,9 +100,11 @@ def end(time_duration):
     output("Reduce: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
     output("Repair: " + time_duration[definitions.KEY_DURATION_REPAIR] + " minutes")
     output("Iteration Count: " + str(values.ITERATION_NO))
+    output("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))
     output("Patch End Count: " + str(values.COUNT_PATCH_END))
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        output("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
         output("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         output("Template End Count: " + str(values.COUNT_TEMPLATE_END))
     output("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))

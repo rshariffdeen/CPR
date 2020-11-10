@@ -176,9 +176,11 @@ def end(time_info):
     statistics("Reduce: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
     statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " minutes")
     statistics("Iteration Count: " + str(values.ITERATION_NO))
+    statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
     statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
         statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
 
