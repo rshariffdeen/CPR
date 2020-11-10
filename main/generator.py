@@ -314,7 +314,7 @@ def generate_new_input(sym_path, argument_list):
             arg_len = len(str(argument_list[index]))
             random_value = ""
             for j in range(0, arg_len):
-                random_value += chr(random.randint(0, 128))
+                random_value += chr(random.randint(32, 128))
             input_arg_list.append(random_value)
 
     for var_name in gen_var_list:
