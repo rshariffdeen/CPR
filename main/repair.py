@@ -4,7 +4,7 @@ from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
 from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader
+from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
 import time
 import sys
 import operator
@@ -367,6 +367,8 @@ def run_fitreduce(program_path, patch_list):
         check_infeasible_paths(patch_list)
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
+        definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
+        writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
