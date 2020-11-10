@@ -213,3 +213,4 @@ def print_configuration():
     emitter.note("\tconfiguration.repair_method:" + str(values.CONF_REDUCE_METHOD))
     emitter.note("\tconfiguration.timeout_sat:" + str(values.DEFAULT_TIMEOUT_SAT))
     emitter.note("\tconfiguration.distance_metric:" + str(values.CONF_DISTANCE_METRIC))
+    emitter.note("\tconfiguration.mode:" + str(values.CONF_OPERATION_MODE))
