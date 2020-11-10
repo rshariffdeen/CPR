@@ -8,7 +8,6 @@ import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
-from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser
 from main.utilities import count_concrete_patches
 import re
@@ -360,7 +359,7 @@ def generate_model_cli(formula):
     with open(path_script, "a") as script_file:
         script_file.writelines(["(get-model)\n", "(exit)\n"])
     z3_command = "z3 " + path_script + " > " + path_result
-    execute_command(z3_command)
+    utilities.execute_command(z3_command)
     with open(path_result, "r") as result_file:
         z3_output = result_file.readlines()
 
@@ -441,7 +440,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
 
     for var in second_var_list:
         ktest_command += " --second-var \'{0}\' {1} {2}".format(var['identifier'], var['size'], var['value'])
-    return_code = execute_command(ktest_command)
+    return_code = utilities.execute_command(ktest_command)
     return ktest_path, return_code
 
 
