@@ -143,6 +143,7 @@ def print_patch_list(patch_list):
 def rank_patches(patch_list):
     filtered_list = []
     # rank first based on coverage
+    emitter.normal("\tcomputing rank for each patch")
     for patch in patch_list:
         patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)

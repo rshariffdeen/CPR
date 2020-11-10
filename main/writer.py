@@ -4,7 +4,7 @@
 
 import pickle
 import json
-from main import generator, utilities, values
+from main import generator, utilities, values, emitter
 
 
 def write_as_json(data, output_file_path):
@@ -19,6 +19,7 @@ def write_as_pickle(data, output_file_path):
 
 
 def write_patch_set(patch_list, output_file_path):
+    emitter.normal("\twriting patch list to file")
     template_count = 0
     with open(output_file_path, 'w') as out_file:
         for patch in patch_list:
