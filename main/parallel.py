@@ -164,7 +164,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
 def remove_redundant_patches_parallel(patch_list):
     global pool, result_list
     result_list = []
-    emitter.normal("\tupdating patch pool")
+    emitter.normal("\tremoving redundancy in patch pool")
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)

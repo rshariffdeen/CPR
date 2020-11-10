@@ -97,24 +97,25 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
-
+    emitter.normal("\tcreating patch pool")
     result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
 
     list_of_patches = [_ for _ in result]
+    fileterd_patch_list = []
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
 
     result_list = parallel.remove_redundant_patches_parallel(list_of_patches)
     for result in result_list:
         is_redundant, index = result
         patch = list_of_patches[index]
-        if is_redundant:
-            list_of_patches.remove(patch)
+        if not is_redundant:
+            fileterd_patch_list.append(patch)
 
-    emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
+    emitter.normal("\tnumber of patches in pool: " + str(len(fileterd_patch_list)))
     # filtered_list_of_patches = list(set(list_of_patches))
     # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
 
-    return list_of_patches
+    return fileterd_patch_list
 
 
 def generate_flipped_path(ppc):
