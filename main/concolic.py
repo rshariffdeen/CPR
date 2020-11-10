@@ -1,19 +1,13 @@
 import logging
 from typing import Union
 import os
-import re
+
 import random
 import operator
-import struct
-from six.moves import cStringIO
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
-from pysmt.smtlib.parser import SmtLibParser
-from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol
 
 import main.generator
-from main.utilities import execute_command
 from main import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor
 import numpy
 
@@ -245,7 +239,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     ktest_path, return_code = generator.generate_ktest(argument_list, second_var_list)
     ktest_log_file = "/tmp/ktest.log"
     ktest_command = "ktest-tool " + ktest_path + " > " + ktest_log_file
-    execute_command(ktest_command)
+    utilities.execute_command(ktest_command)
     bit_length_list = reader.read_bit_length(ktest_log_file)
     if values.LIST_BIT_LENGTH:
         for var in bit_length_list:
@@ -283,7 +277,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
-    return_code = execute_command(klee_command)
+    return_code = utilities.execute_command(klee_command)
     emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
 
@@ -348,7 +342,7 @@ def run_symbolic_execution(program, argument_list, print_output=False):
 
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
-    return_code = execute_command(klee_command)
+    return_code = utilities.execute_command(klee_command)
     emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
     return return_code
@@ -392,7 +386,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
-    return_code = execute_command(klee_command)
+    return_code = utilities.execute_command(klee_command)
     emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
     return return_code
