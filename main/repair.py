@@ -229,7 +229,7 @@ def run_cegis(program_path, project_path, patch_list):
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
             model = generator.generate_model(violation_check)
-            print(model)
+            # print(model)
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
@@ -242,7 +242,7 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.highlight("\t\tnew counter-example added")
         else:
             klee_test_file = output_dir + "/klee-test-FINAL"
-            print(to_smtlib(violation_check, False))
+            # print(to_smtlib(violation_check, False))
             write_smtlib(violation_check, klee_test_file)
             break
         satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
