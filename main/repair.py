@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List, Dict, Tuple
 from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader
-from main.utilities import count_concrete_patches
 import time
 import sys
 import operator
@@ -152,7 +151,7 @@ def rank_patches(patch_list):
         is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
         is_under_approx = 1 - values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
         patch_len = 10000 - len(patch_constraint_str)
-        patch_count = len(range(values.DEFAULT_PATCH_LOWER_BOUND, values.DEFAULT_PATCH_UPPER_BOUND)) - count_concrete_patches_per_template(patch)
+        patch_count = utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, is_under_approx, is_over_approx, patch_score, patch_count, patch_len))
 
     ranked_list = sorted(filtered_list, key=operator.itemgetter(3, 1, 2, 4, 5))
