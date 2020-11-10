@@ -53,4 +53,4 @@ def write_patch_set(patch_list, output_file_path):
         txt_lines.append("\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
         txt_lines.append("\t\tIs Over-approximating: " + str(values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]))
     with open(output_file_path, 'w') as out_file:
-        out_file.writelines(txt_lines)
+        out_file.writelines(line + "\n" for line in txt_lines)
