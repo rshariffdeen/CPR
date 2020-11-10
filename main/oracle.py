@@ -114,3 +114,26 @@ def is_valid_range(check_range):
     if lower_bound <= upper_bound:
         return True
     return False
+
+
+def is_component_constant(patch_comp):
+    (cid, semantics), children = patch_comp
+    if "constant" in cid:
+        return True
+    return False
+
+
+def is_patch_redundant(patch, index):
+    program = patch[list(patch.keys())[0]]
+    tree, constants = program
+    (cid, semantics), children = tree
+    if len(children) == 2:
+        right_child = children['right']
+        left_child = children['left']
+        if cid in ["less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal"]:
+            is_right_constant = is_component_constant(right_child)
+            is_left_constant = is_component_constant(left_child)
+            if is_right_constant or is_left_constant:
+                return True, index
+
+    return False, index
