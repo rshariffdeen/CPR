@@ -113,7 +113,6 @@ def print_patch_list(patch_list):
         template_count = template_count + 1
         emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
-        concrete_patch_count = 1
         patch_formula = main.generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
         patch_index = utilities.get_hash(patch_formula_str)
@@ -132,7 +131,7 @@ def print_patch_list(patch_list):
                     emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
                     dimension = len(range(int(lower_bound), int(upper_bound) + 1))
                     emitter.highlight("\t\t\tDimension: " + str(dimension))
-                    concrete_patch_count = concrete_patch_count * dimension
+                    concrete_patch_count = utilities.count_concrete_patches_per_template(patch)
         emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
         emitter.highlight("\t\tPath Coverage: " + str(patch_score))
         emitter.highlight("\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
