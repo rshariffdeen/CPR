@@ -1,4 +1,4 @@
-from main import definitions, values, emitter, utilities
+from main import definitions, values, emitter, utilities, extractor
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
@@ -122,6 +122,16 @@ def is_component_constant(patch_comp):
         return True
     return False
 
+def is_same_children(patch_comp):
+    (_, _), children = patch_comp
+    right_child = children['right']
+    left_child = children['left']
+    (cid_right, _), _ = right_child
+    (cid_left, _), _ = left_child
+    if cid_left == cid_right:
+        return True
+    return False
+
 
 def is_patch_redundant(patch, index):
     program = patch[list(patch.keys())[0]]
@@ -135,5 +145,13 @@ def is_patch_redundant(patch, index):
             is_left_constant = is_component_constant(left_child)
             if is_right_constant or is_left_constant:
                 return True, index
+            if is_same_children(patch):
+                return True, index
+
+        if cid in ["logical-or", "logical-and"]:
+            is_right_redundant = is_patch_redundant(right_child)
+            is_left_redundant = is_patch_redundant(left_child)
+            if is_right_redundant or is_left_redundant:
+                return True
 
     return False, index
