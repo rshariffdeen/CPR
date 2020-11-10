@@ -157,10 +157,13 @@ def is_tree_duplicate(tree):
 
 def is_tree_redundant(tree):
     child_node_list = extractor.extract_child_expressions(tree)
-    unique_child_node_list = list(set(child_node_list))
-    if len(unique_child_node_list) == len(child_node_list):
-        return False
-    return True
+    unique_child_node_list = []
+    for child in child_node_list:
+        if child not in unique_child_node_list:
+            unique_child_node_list.append(child)
+        else:
+            return True
+    return False
 
 
 def is_patch_duplicate(patch, index):
