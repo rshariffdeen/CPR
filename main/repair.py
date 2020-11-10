@@ -91,10 +91,10 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-    valid_input_space = parallel.partition_input_space(path_condition, assertion)
-    if valid_input_space:
-        valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
-    values.VALID_INPUT_SPACE = valid_input_space
+    # valid_input_space = parallel.partition_input_space(path_condition, assertion)
+    # if valid_input_space:
+    #     valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
+    values.VALID_INPUT_SPACE = None
     if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
