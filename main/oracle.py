@@ -149,8 +149,8 @@ def is_patch_redundant(patch, index):
                 return True, index
 
         if cid in ["logical-or", "logical-and"]:
-            is_right_redundant = is_patch_redundant(right_child)
-            is_left_redundant = is_patch_redundant(left_child)
+            is_right_redundant = is_patch_redundant(right_child, index)
+            is_left_redundant = is_patch_redundant(left_child, index)
             if is_right_redundant or is_left_redundant:
                 return True
 
