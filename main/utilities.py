@@ -4,7 +4,7 @@ import sys
 import signal
 import random
 from contextlib import contextmanager
-from main import logger, emitter, values, definitions
+from main import logger, emitter, values, definitions, extractor
 import base64
 import hashlib
 import time
@@ -171,3 +171,33 @@ def check_budget(time_budget):  # TODO implement time budget
     #     return False
     # else:
     #     return True
+
+
+def count_concrete_patches_per_template(abstract_patch):
+    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+        return 1
+    patch_formula = extractor.extract_formula_from_patch(abstract_patch)
+    patch_formula_str = patch_formula.serialize()
+    patch_index = get_hash(patch_formula_str)
+    patch_space = values.LIST_PATCH_SPACE[patch_index]
+    total_concrete_count = 0
+
+    if patch_space:
+        for partition in patch_space:
+            partition_concrete_count = 1
+            for parameter_name in partition:
+                constraint_info = partition[parameter_name]
+                lower_bound = str(constraint_info['lower-bound'])
+                upper_bound = str(constraint_info['upper-bound'])
+                parameter_dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+                partition_concrete_count = partition_concrete_count * parameter_dimension
+            total_concrete_count = total_concrete_count + partition_concrete_count
+    return total_concrete_count
+
+
+def count_concrete_patches(patch_list):
+    patch_count = 0
+    for abstract_patch in patch_list:
+        concrete_count = count_concrete_patches_per_template(abstract_patch)
+        patch_count = patch_count + concrete_count
+    return patch_count

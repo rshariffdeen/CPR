@@ -9,7 +9,7 @@ from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
 from main.utilities import execute_command
 from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser
-from main.repair import count_concrete_patches
+from main.utilities import count_concrete_patches
 import re
 import struct
 import random
