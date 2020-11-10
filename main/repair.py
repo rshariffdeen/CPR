@@ -117,6 +117,7 @@ def print_patch_list(patch_list):
         patch_formula_str = patch_formula.serialize()
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
+        concrete_patch_count = 1
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_space = values.LIST_PATCH_SPACE[patch_index]
             partition_count = 0
