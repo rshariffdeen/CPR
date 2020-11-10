@@ -158,4 +158,6 @@ def extract_child_expressions(patch_tree):
         right_list = extract_child_expressions(right_child)
         left_list = extract_child_expressions(left_child)
         child_list = right_list + left_list
+    else:
+        child_list = [patch_tree]
     return child_list
