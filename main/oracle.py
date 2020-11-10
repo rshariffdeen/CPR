@@ -152,11 +152,11 @@ def is_tree_redundant(tree):
             is_left_redundant = is_tree_redundant(left_child)
             if is_right_redundant or is_left_redundant:
                 return True
-
     return False
 
 
 def is_patch_redundant(patch, index):
     program = patch[list(patch.keys())[0]]
-    result = is_tree_redundant(program)
+    tree, _ = program
+    result = is_tree_redundant(tree)
     return result, index
