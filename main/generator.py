@@ -106,8 +106,9 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     result_list = parallel.remove_redundant_patches_parallel(list_of_patches)
     for result in result_list:
         is_redundant, index = result
+        patch = list_of_patches[index]
         if is_redundant:
-            result_list.remove(result_list[index])
+            list_of_patches.remove(patch)
 
     emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
     # filtered_list_of_patches = list(set(list_of_patches))
