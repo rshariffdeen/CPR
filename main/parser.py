@@ -1,19 +1,3 @@
-from main.synthesis import load_specification, synthesize_parallel, Program
-from pathlib import Path
-from typing import List, Dict, Tuple
-from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals, BVConcat, Select, BV
-import os
-from pysmt.smtlib.parser import SmtLibParser
-from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat
-from main.utilities import execute_command
-from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities
-import re
-import struct
-import random
-
-
 def parse_z3_output(z3_output):
     """
            This function will read the output log of z3 cli interface and extract/parse the values of the model
