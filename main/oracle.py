@@ -134,8 +134,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_patch_redundant(program, index):
-    tree, constants = program
+def is_tree_redundant(tree):
     (cid, semantics), children = tree
     if len(children) == 2:
         right_child = children['right']
@@ -144,14 +143,20 @@ def is_patch_redundant(program, index):
             is_right_constant = is_component_constant(right_child)
             is_left_constant = is_component_constant(left_child)
             if is_right_constant or is_left_constant:
-                return True, index
-            if is_same_children(patch):
-                return True, index
+                return True
+            if is_same_children(tree):
+                return True
 
         if cid in ["logical-or", "logical-and"]:
-            is_right_redundant = is_patch_redundant(right_child, index)
-            is_left_redundant = is_patch_redundant(left_child, index)
+            is_right_redundant = is_tree_redundant(right_child)
+            is_left_redundant = is_tree_redundant(left_child)
             if is_right_redundant or is_left_redundant:
                 return True
 
-    return False, index
+    return False
+
+
+def is_patch_redundant(patch, index):
+    program = patch[list(patch.keys())[0]]
+    result = is_tree_redundant(program)
+    return result, index
