@@ -142,7 +142,7 @@ def is_tree_redundant(tree):
         if cid in ["less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal"]:
             is_right_constant = is_component_constant(right_child)
             is_left_constant = is_component_constant(left_child)
-            if is_right_constant or is_left_constant:
+            if is_right_constant and is_left_constant:
                 return True
             if is_same_children(tree):
                 return True
