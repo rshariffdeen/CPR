@@ -145,6 +145,7 @@ RUN apt-get install -y  \
     libjpeg-dev \
     libtool \
     libxml2-dev \
+    liblzma-dev \
     nasm \
     pkg-config \
     texinfo \
