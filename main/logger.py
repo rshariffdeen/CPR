@@ -52,12 +52,13 @@ def command(message):
 
 
 def data(message, data=None):
-    message = str(message).strip()
-    message = "[DATA]: " + str(message) + "\n"
-    log(message)
-    if data:
-        data = "[DATA]: " + str(data) + "\n"
-        log(data)
+    if values.DEBUG:
+        message = str(message).strip()
+        message = "[DATA]: " + str(message) + "\n"
+        log(message)
+        if data:
+            data = "[DATA]: " + str(data) + "\n"
+            log(data)
 
 
 def debug(message):
