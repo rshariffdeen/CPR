@@ -258,7 +258,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     ppc_log_flag = ""
     if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_log_flag = "--log-ppc "
-    klee_command = "klee " \
+    klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE) + " klee " \
                    "--posix-runtime " \
                    "--libc=uclibc " \
                    "--write-smt2s " \
