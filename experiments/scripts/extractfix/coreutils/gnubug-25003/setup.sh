@@ -14,7 +14,7 @@ cd src
 git checkout $commit_id
 
 sed -i '987i klee_assert(initial_read > start);' src/split.c
-sed -i '987i TRIDENT_OUTPUT("observation", "i32", initial_read - start);\n' src/split.c
+sed -i '987i TRIDENT_OUTPUT("obs", "i32", initial_read - start);\n' src/split.c
 sed -i '985d' src/split.c
 sed -i '985i if(__trident_choice("L290", "bool", (int[]){start, initial_read}, (char*[]){"start","initial_read"}, 2, (int*[]){}, (char*[]){}, 0))' src/split.c
 sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/split.c
