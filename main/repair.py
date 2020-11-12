@@ -299,8 +299,8 @@ def run_fitreduce(program_path, patch_list):
                 assert exit_code == 0
                 duration = (time.time() - time_check) / 60
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
-                if values.IS_CRASH:
-                    values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
+
+                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
@@ -428,6 +428,7 @@ def concolic_exploration(program_path, patch_list):
 
                 satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
                 # check if new path hits patch location / fault location
+                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
                 if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
