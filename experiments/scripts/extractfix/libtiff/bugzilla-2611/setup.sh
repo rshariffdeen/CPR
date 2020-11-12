@@ -23,7 +23,7 @@ git commit -m 'replace fabs with proxy function'
 make CFLAGS="-ltrident_proxy -L/concolic-repair/lib" -j32
 
 sed -i '816i TRIDENT_OUTPUT("obs", "i32", sp->bytes_per_line);' libtiff/tif_ojpeg.c
-sed -i '816i if(__trident_choice("L816", "bool", (int[]){sp->bytes_per_line}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0)) return -1;\n' libtiff/tif_ojpeg.c
+sed -i '816i if(__trident_choice("L816", "bool", (int[]){sp->bytes_per_line, cc}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) return -1;\n' libtiff/tif_ojpeg.c
 sed -i '178i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' libtiff/tif_ojpeg.c
 git add libtiff/tif_ojpeg.c
 git commit -m "instrument trident"

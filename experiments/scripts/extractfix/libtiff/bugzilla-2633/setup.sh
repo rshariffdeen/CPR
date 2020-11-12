@@ -31,7 +31,7 @@ git commit -m 'remove longjmp calls'
 make CFLAGS="-ltrident_proxy -L/concolic-repair/lib" -j32
 
 sed -i '2470i TRIDENT_OUTPUT("obs", "i32", es);' tools/tiff2ps.c
-sed -i '2441i if(__trident_choice("L1634", "bool", (int[]){es}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0)) return;' tools/tiff2ps.c
+sed -i '2441i if(__trident_choice("L1634", "bool", (int[]){es, breaklen}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) return;' tools/tiff2ps.c
 sed -i '44i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' tools/tiff2ps.c
 git add tools/tiff2ps.c
 git commit -m "instrument trident"
