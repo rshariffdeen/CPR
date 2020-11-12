@@ -3,7 +3,7 @@ from main.concolic import run_concolic_execution, select_new_input, check_infeas
 from main.synthesis import load_specification, Program
 from pathlib import Path
 from typing import List, Dict, Tuple
-from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib
+from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib, is_unsat
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
 import time
 import sys
@@ -253,16 +253,15 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
     duration = (time.time() - time_check) / 60
     values.TIME_TO_REDUCE = duration
-    final_patch_list = generator.generate_patch_set(project_path, counter_example_list)
-    if not final_patch_list:
-        values.COUNT_PATCH_END = len(final_patch_list)
-        emitter.warning("\t\t[warning] unable to generate a patch")
-    else:
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            values.COUNT_PATCH_END = utilities.count_concrete_patches(final_patch_list)
-            values.COUNT_TEMPLATE_END = len(final_patch_list)
-        else:
-            values.COUNT_PATCH_END = len(final_patch_list)
+    count_final = 1
+    while patch is not None:
+        patch = next(patch_generator, None)
+        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
+        violation_check = And(complete_specification, patch_formula_extended)
+        if is_unsat(violation_check):
+            count_final = count_final + 1
+    values.COUNT_PATCH_END = count_final
 
 
 def run_fitreduce(program_path, patch_list):

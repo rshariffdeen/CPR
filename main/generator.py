@@ -892,8 +892,8 @@ def generate_program_specification(binary_path):
             continue
         dir_path = os.path.join(binary_path, dir_name)
         klee_index = int(dir_name.split("-")[-1])
-        if klee_index <= max_skip_index:
-            continue
+        # if klee_index <= max_skip_index:
+        #     continue
         file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
         for file_name in file_list:
             if ".smt2" in file_name:
