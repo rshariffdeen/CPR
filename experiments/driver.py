@@ -76,6 +76,8 @@ def evaluate(conf_path, bug_id):
     execute_command(copy_output)
     copy_log = "{ cp " + CONF_TOOL_PATH + "/logs/log-latest " + exp_dir + ";} 2> " + FILE_ERROR_LOG
     execute_command(copy_log)
+    copy_log = "cp " + FILE_ERROR_LOG + " " + exp_dir
+    execute_command(copy_log)
 
 
 def load_experiment():
