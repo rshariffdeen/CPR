@@ -214,6 +214,7 @@ def run_cegis(program_path, project_path, patch_list):
     counter_example_list = []
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
+    count_throw = 0
     patch_generator = generator.generate_patch(project_path, counter_example_list)
     if not patch_generator:
         emitter.error("[error] cannot generate a patch")
@@ -243,6 +244,7 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.highlight("\t\tnew counter-example added")
             patch = None
             emitter.highlight("\t\tremoving current patch")
+            count_throw = count_throw + 1
         else:
             klee_test_file = output_dir + "/klee-test-FINAL"
             # print(to_smtlib(violation_check, False))
@@ -253,16 +255,16 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
     duration = (time.time() - time_check) / 60
     values.TIME_TO_REDUCE = duration
-    count_final = 1
-    patch = next(patch_generator, None)
-    while patch is not None:
-        patch_formula = main.generator.generate_formula_from_patch(patch)
-        patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
-        violation_check = And(complete_specification, patch_formula_extended)
-        if is_unsat(violation_check):
-            count_final = count_final + 1
-        patch = next(patch_generator, None)
-    values.COUNT_PATCH_END = count_final
+
+    # patch = next(patch_generator, None)
+    # while patch is not None:
+    #     patch_formula = main.generator.generate_formula_from_patch(patch)
+    #     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
+    #     violation_check = And(complete_specification, patch_formula_extended)
+    #     if is_unsat(violation_check):
+    #         count_final = count_final + 1
+    #     patch = next(patch_generator, None)
+    values.COUNT_PATCH_END = values.COUNT_PATCH_START - count_throw
 
 
 def run_fitreduce(program_path, patch_list):
