@@ -254,13 +254,14 @@ def run_cegis(program_path, project_path, patch_list):
     duration = (time.time() - time_check) / 60
     values.TIME_TO_REDUCE = duration
     count_final = 1
+    patch = next(patch_generator, None)
     while patch is not None:
-        patch = next(patch_generator, None)
         patch_formula = main.generator.generate_formula_from_patch(patch)
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_unsat(violation_check):
             count_final = count_final + 1
+        patch = next(patch_generator, None)
     values.COUNT_PATCH_END = count_final
 
 
