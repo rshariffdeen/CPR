@@ -236,7 +236,7 @@ def run_cegis(program_path, project_path, patch_list):
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
-            assert exit_code == 0
+            # assert exit_code == 0
             emitter.normal("\t\tgenerating new assertion")
             test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
@@ -296,7 +296,7 @@ def run_fitreduce(program_path, patch_list):
                             second_var_list.append(var)
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
-                assert exit_code == 0
+                # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
 
@@ -342,7 +342,7 @@ def run_fitreduce(program_path, patch_list):
 
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
             exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-            assert exit_code == 0
+            # assert exit_code == 0
             duration = (time.time() - time_check) / 60
             values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
             # Checks for the current coverage.
@@ -417,7 +417,7 @@ def concolic_exploration(program_path, patch_list):
                             second_var_list.append(var)
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
-                assert exit_code == 0
+                # assert exit_code == 0
                 klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
                 assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
                 if count_obs > max_count:
@@ -458,7 +458,7 @@ def concolic_exploration(program_path, patch_list):
 
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
             exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-            assert exit_code == 0
+            # assert exit_code == 0
             klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
             assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
             if count_obs > max_count:
