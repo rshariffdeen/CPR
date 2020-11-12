@@ -71,7 +71,8 @@ def evaluate(conf_path, bug_id):
     tool_command = "{ cd " + CONF_TOOL_PATH + ";" + CONF_TOOL_NAME + " --conf=" + conf_path + " "+ CONF_TOOL_PARAMS + ";} 2> " + FILE_ERROR_LOG
     execute_command(tool_command)
     exp_dir = DIR_RESULT + "/" + str(bug_id)
-
+    mk_command = "mkdir " + exp_dir
+    execute_command(mk_command)
     copy_output = "{ cp -rf " + CONF_TOOL_PATH + "/output/" + bug_id + " " + exp_dir + ";} 2> " + FILE_ERROR_LOG
     execute_command(copy_output)
     copy_log = "{ cp " + CONF_TOOL_PATH + "/logs/log-latest " + exp_dir + ";} 2> " + FILE_ERROR_LOG
