@@ -1470,6 +1470,8 @@ def contains_constant(tree_content: Dict[str, 'ComponentTree']) -> bool:
     """
     Checks the tree content (incl. sub-trees, ergo it is recursive) for constant values.
     """
+    if "left" not in tree_content or "right" not in tree_content:
+        return False
     left_name = tree_content['left'][0][0]
     left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
     right_name = tree_content['right'][0][0]
