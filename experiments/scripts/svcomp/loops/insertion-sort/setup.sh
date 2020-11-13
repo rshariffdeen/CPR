@@ -2,14 +2,14 @@ bug_id=insertion-sort
 dir_name=$1/svcomp/config/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/loops
-bench_dir = "/data/svcomp/sv-benchmarks"
-[ ! -d $bench_dir ] && git clone $project_url bench_dir
+bench_dir=/data/svcomp/sv-benchmarks
+[ ! -d $bench_dir ] && git clone $project_url $bench_dir
 mkdir -p $1/svcomp/config
 current_dir=$PWD
 
 cp insertion_sort-1.c $program_dir
 cd $program_dir
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/concolic-repair/lib -lkleeRuntest" -j32 insertion_sort-1
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 insertion_sort-1
 
 
 mkdir -p $dir_name
