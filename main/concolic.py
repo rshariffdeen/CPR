@@ -102,8 +102,9 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
     # relationship = TRUE
     # selected_new_path = And(selected_new_path, relationship)
     result_list = parallel.validate_input_generation(patch_list, selected_new_path)
+    sorted_result_list = sorted(result_list, key=operator.itemgetter(1))
     filtered_patch_list = list()
-    for result in result_list:
+    for result in sorted_result_list:
         is_valid, index = result
         selected_patch = patch_list[index]
         if is_valid:
