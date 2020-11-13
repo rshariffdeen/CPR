@@ -158,6 +158,10 @@ def get_hash(str_value):
 
 
 def check_budget(time_budget):  # TODO implement time budget
+    # if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
+    #     return False
+    # else:
+    #     return True
     if values.CONF_TIME_CHECK is None:
         values.CONF_TIME_CHECK = time.time()
         return False
@@ -168,11 +172,6 @@ def check_budget(time_budget):  # TODO implement time budget
             values.CONF_TIME_CHECK = None
             return True
     return False
-
-    # if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
-    #     return False
-    # else:
-    #     return True
 
 
 def count_concrete_patches_per_template(abstract_patch):
