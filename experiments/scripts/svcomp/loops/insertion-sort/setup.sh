@@ -11,7 +11,7 @@ cp insertion_sort-1.c $program_dir
 cd $program_dir
 make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 insertion_sort-1
 
-
+cd $current_dir
 mkdir -p $dir_name
 cp repair.conf $dir_name
 cp spec.smt2 $dir_name
