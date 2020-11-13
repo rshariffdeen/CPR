@@ -152,7 +152,7 @@ def rank_patches(patch_list):
         is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
         is_under_approx = 1 - values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
         patch_len = 10000 - len(patch_constraint_str)
-        patch_count = utilities.count_concrete_patches_per_template(patch)
+        patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, is_under_approx, is_over_approx, patch_score, patch_count, patch_len))
 
     ranked_list = sorted(filtered_list, key=operator.itemgetter(3, 1, 2, 4, 5))
