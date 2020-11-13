@@ -218,7 +218,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     current_dir = os.getcwd()
     directory_path = "/".join(str(program).split("/")[:-1])
     emitter.debug("changing directory:" + directory_path)
-    project_path = values.CONF_PATH_PROJECT
+    project_path = values.CONF_DIR_SRC
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
     input_argument = ""
