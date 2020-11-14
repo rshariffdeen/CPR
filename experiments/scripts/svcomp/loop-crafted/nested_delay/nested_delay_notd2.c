@@ -35,7 +35,7 @@ int main() {
 		if(c==last && st==0) {
 			a = a+1;
 		}
-		else if(st==1 && __trident_choice("L9", "bool", (int[]){distance[y], Weight[j]}, (char*[]){"last", "SIZE"}, 2, (int*[]){}, (char*[]){}, 0)) {
+		else if(st==1 && __trident_choice("L9", "bool", (int[]){last, SIZE}, (char*[]){"last", "SIZE"}, 2, (int*[]){}, (char*[]){}, 0)) {
 			d++;
 		}
 		if(d == SIZE) {
