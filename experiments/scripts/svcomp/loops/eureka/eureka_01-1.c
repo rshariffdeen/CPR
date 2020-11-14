@@ -17,11 +17,11 @@ void __VERIFIER_assert(int cond) {
   return;
 }
 int INFINITY = 899;
-int main(){
-  int nodecount = 10;
-  int edgecount = 10;
-  klee_make_symbolic(&nodecount, sizeof(int), "nodecount");
-  klee_make_symbolic(&edgecount, sizeof(int), "edgecount");
+int main(int argc, char** argv){
+  int nodecount = atoi(argv[1]);
+  int edgecount = atoi(argv[2]);
+//  klee_make_symbolic(&nodecount, sizeof(int), "nodecount");
+//  klee_make_symbolic(&edgecount, sizeof(int), "edgecount");
   if (!(0 <= nodecount && nodecount <= 4)) return 0;
   if (!(0 <= edgecount && edgecount <= 19)) return 0;
   int source = 0;
