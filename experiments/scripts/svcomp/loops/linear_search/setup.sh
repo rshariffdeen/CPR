@@ -1,4 +1,4 @@
-bug_id=linear-search
+bug_id=linear_search
 dir_name=$1/svcomp/config/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/loops

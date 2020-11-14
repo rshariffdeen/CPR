@@ -1,4 +1,4 @@
-bug_id=insertion-sort
+bug_id=insertion_sort
 dir_name=$1/svcomp/config/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/loops
