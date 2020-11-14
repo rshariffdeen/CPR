@@ -478,7 +478,7 @@ def generate_negated_path(path_condition):
     while path_condition.is_and():
         constraint = path_condition.arg(1)
         constraint_str = constraint.serialize()
-        if "angelic!bool!" in constraint_str:
+        if "angelic!" in constraint_str:
             constraint = Not(constraint)
         if negated_path is None:
             negated_path = constraint
@@ -840,7 +840,7 @@ def generate_assertion(assertion_temp, klee_dir):
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
-    angelic_count = int(len(re.findall("angelic!bool!(.+?)!0", str(path_condition.serialize()))) / 4)
+    angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
     if angelic_count == 0:
         print("COUNT", angelic_count)
         print("PATH", str(path_condition.serialize()))
