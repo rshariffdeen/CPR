@@ -7,15 +7,15 @@ void reach_error() { assert(0); }
 void __VERIFIER_assert(int cond) { if(!(cond)) { ERROR: {reach_error();abort();} } }
 extern int __VERIFIER_nondet_int();
 
-#define N 100000
+#define N 10
 
 int main( ) {
   int a[ N ];
-
-	for(int j = 0; j < N; j++)
-	{
-	  a[j] = __VERIFIER_nondet_int();
-	}
+  klee_make_symbolic(&a, sizeof(a), "a");
+//	for(int j = 0; j < N; j++)
+//	{
+//	  a[j] = __VERIFIER_nondet_int();
+//	}
 
   int swapped = 1;
   while ( swapped ) {
