@@ -840,9 +840,11 @@ def generate_assertion(assertion_temp, klee_dir):
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
-    angelic_count = int(len(re.findall("angelic!bool!(.+?)!0", path_condition.serialize())) / 4)
+    angelic_count = int(len(re.findall("angelic!bool!(.+?)!0", str(path_condition.serialize()))) / 4)
     if angelic_count == 0:
-        return patch_formula
+        print("COUNT", angelic_count)
+        print("PATH", str(path_condition.serialize()))
+        utilities.error_exit("angelic count is zero in extending")
     model_path = generate_model(path_condition)
     # var_list = list(model_path.keys())
     # count = 0
