@@ -14,6 +14,7 @@ import time
 
 def execute_command(command, show_output=True):
     # Print executed command and execute it in console
+    command = command.encode().decode('ascii', 'ignore')
     emitter.command(command)
     command = "{ " + command + " ;} 2> " + definitions.FILE_ERROR_LOG
     if not show_output:
