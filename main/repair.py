@@ -7,6 +7,7 @@ from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib, is_unsat
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
 import time
 import sys
+import os
 import operator
 import numpy
 
@@ -89,6 +90,8 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
+    if not os.path.isfile(path_constraint_file_path):
+        return patch_list
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
     # valid_input_space = parallel.partition_input_space(path_condition, assertion)
@@ -304,7 +307,7 @@ def run_fitreduce(program_path, patch_list):
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
-                if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
                 distance.update_distance_map()
                 time_check = time.time()
@@ -351,7 +354,7 @@ def run_fitreduce(program_path, patch_list):
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                 continue
 
             distance.update_distance_map()
@@ -431,7 +434,7 @@ def concolic_exploration(program_path, patch_list):
                 values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
-                if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
                 distance.update_distance_map()
                 if satisfied:
@@ -473,7 +476,7 @@ def concolic_exploration(program_path, patch_list):
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                 continue
             distance.update_distance_map()
             if satisfied:
