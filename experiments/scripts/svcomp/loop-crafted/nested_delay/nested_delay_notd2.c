@@ -23,7 +23,7 @@ int main() {
 	klee_make_symbolic(&last, sizeof(last), "last");
 	last = 20;
 	assume_abort_if_not(last > 0);
-	int a=0,b=0,c=0,st=0,d=0;
+	int a=0,b=0,c=0,st=0,d=20;
 	while(1) {
 		st=1;
 		for(c=0;c<SIZE;c++) {
