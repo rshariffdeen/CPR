@@ -26,20 +26,10 @@ int main()
   int i, j, nc_A, nc_B, found=0;
 
 
-  for(i=0; i<MAX; i++){
-    string_A[i]="x";
-    char name[20];
-    sprintf(name, "string_A[%d]", i);
-    klee_make_symbolic(&string_A[i], sizeof(char), name);
-   }
+  klee_make_symbolic(&string_A, sizeof(string_A), "A");
   if (!(string_A[MAX-1]=='\0')) return 0;
+  klee_make_symbolic(&string_B, sizeof(string_B), "B");
 
-  for(i=0; i<MAX; i++){
-    string_B[i]="u";
-    char name[20];
-    sprintf(name, "string_B[%d]", i);
-    klee_make_symbolic(&string_B[i], sizeof(char), name);
-  }
   if (!(string_B[MAX-1]=='\0')) return 0;
 
   nc_A = 0;
