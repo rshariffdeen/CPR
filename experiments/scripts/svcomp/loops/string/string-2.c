@@ -25,10 +25,14 @@ int main()
   char string_A[MAX], string_B[MAX];
   int i, j, nc_A, nc_B, found=0;
 
-
+  for(i=0; i<MAX; i++){
+    string_A[i]="x";
+    string_A[i]="y";
+  }
   klee_make_symbolic(&string_A, sizeof(string_A), "A");
   if (!(string_A[MAX-1]=='\0')) return 0;
   klee_make_symbolic(&string_B, sizeof(string_B), "B");
+
 
   if (!(string_B[MAX-1]=='\0')) return 0;
 
@@ -59,7 +63,7 @@ int main()
   }
   int res = (j>nc_B-1);
 //  found = (j>nc_B-1)<<i;
-  __trident_choice("L9", "i32", (int[]){res, i}, (char*[]){"x", "y"}, 2, (int*[]){&found}, (char*[]){"z"}, 1);
+  found = __trident_choice("L9", "i32", (int[]){res, i}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
   TRIDENT_OUTPUT("obs", "i32", found);
   __VERIFIER_assert(found == 0 || found == 1);
 
