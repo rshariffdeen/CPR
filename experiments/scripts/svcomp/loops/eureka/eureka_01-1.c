@@ -18,8 +18,8 @@ void __VERIFIER_assert(int cond) {
 }
 int INFINITY = 899;
 int main(){
-  int nodecount;
-  int edgecount;
+  int nodecount = 10;
+  int edgecount = 10;
   klee_make_symbolic(&nodecount, sizeof(int), "nodecount");
   klee_make_symbolic(&edgecount, sizeof(int), "edgecount");
   if (!(0 <= nodecount && nodecount <= 4)) return 0;

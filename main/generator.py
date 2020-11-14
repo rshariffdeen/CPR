@@ -185,7 +185,7 @@ def generate_model(formula):
     model = get_model(formula)
     if model is None:
         return None
-    path_script = "/tmp/z3_script"
+    path_script = "/tmp/z3_script_model"
     write_smtlib(formula, path_script)
     with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
@@ -352,8 +352,8 @@ def generate_model_cli(formula):
                formula: smtlib formatted formula
     """
     emitter.normal("\textracting z3 model")
-    path_script = "/tmp/z3_script"
-    path_result = "/tmp/z3_output"
+    path_script = "/tmp/z3_script_model_cli"
+    path_result = "/tmp/z3_output_model_cli"
     write_smtlib(formula, path_script)
     with open(path_script, "a") as script_file:
         script_file.writelines(["(get-model)\n", "(exit)\n"])
@@ -927,7 +927,7 @@ def generate_ppc_from_formula(path_condition):
         if "!rvalue!" in constraint_str or "!obs!" in constraint_str:
             path_condition = path_condition.arg(0)
             continue
-        path_script = "/tmp/z3_script"
+        path_script = "/tmp/z3_script_ppc"
         write_smtlib(path_condition, path_script)
         with open(path_script, "r") as script_file:
             script_lines = script_file.readlines()
