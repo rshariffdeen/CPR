@@ -160,8 +160,9 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
         for control_loc, generated_path, ppc_len in generated_path_list:
             path_str = str(generated_path.serialize())
             if path_str not in (list_path_detected + list_path_explored):
-                reach_patch_loc = path_str.count("angelic!")
-                reach_obs_loc = path_str.count("obs!")
+                reach_patch_loc = 100 - path_str.count("angelic!")
+                reach_obs_loc = 100 - path_str.count("obs!")
+                ppc_len = 10000 - ppc_len
                 list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
                 list_path_detected.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
