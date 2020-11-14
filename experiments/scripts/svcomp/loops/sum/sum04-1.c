@@ -19,10 +19,10 @@ int main() {
   klee_make_symbolic(&size, sizeof(int), "size");
   a = 2;
   size = 8;
-  for(i=1; i<=SIZE; i++) {
+  for(i=1; i<=size; i++) {
     if (__trident_choice("L9", "bool", (int[]){i, sn}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
     sn = sn + a;
   }
-  TRIDENT_OUTPUT("obs", "i32", sn==SIZE*a || sn == 0);
-  __VERIFIER_assert(sn==SIZE*a || sn == 0);
+  TRIDENT_OUTPUT("obs", "i32", sn==size*a || sn == 0);
+  __VERIFIER_assert(sn==size*a || sn == 0);
 }
