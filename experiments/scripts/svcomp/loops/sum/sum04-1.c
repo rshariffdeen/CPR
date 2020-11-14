@@ -12,11 +12,11 @@ void __VERIFIER_assert(int cond) {
   return;
 }
 
-int main() {
+int main(int argc, char** argv) {
   int i, sn=0;
-  int a, size;
-  klee_make_symbolic(&a, sizeof(int), "a");
-  klee_make_symbolic(&size, sizeof(int), "size");
+  int a = atoi(argv[1]);
+  int size = atoi(argv[2]);
+
   a = 2;
   size = 8;
   for(i=1; i<=size; i++) {
