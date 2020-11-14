@@ -158,7 +158,7 @@ def rank_patches(patch_list):
         patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, is_under_approx, is_over_approx, patch_score, patch_count, patch_len))
 
-    ranked_list = sorted(filtered_list, key=operator.itemgetter(3, 1, 2, 4, 5))
+    ranked_list = sorted(filtered_list, key=operator.itemgetter(1, 2, 3, 4, 5))
     ranked_list.reverse()
     patch_list = numpy.array(ranked_list)[:, 0]
     return list(patch_list)
