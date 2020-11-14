@@ -847,7 +847,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
         utilities.error_exit("angelic count is zero in extending")
     if angelic_count == 1:
         return patch_formula
-    model_path = generate_model(path_condition)
+    # model_path = generate_model(path_condition)
     # var_list = list(model_path.keys())
     # count = 0
     # for var in var_list:
@@ -855,7 +855,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     #         count = count + 1
     input_list = list()
 
-    path_script = "/tmp/z3_script"
+    path_script = "/tmp/z3_script_patch"
     write_smtlib(patch_formula, path_script)
     with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
