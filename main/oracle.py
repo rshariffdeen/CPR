@@ -148,7 +148,7 @@ def is_tree_duplicate(tree):
             if is_same_children(tree):
                 return True
 
-        if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal"]:
+        if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
             is_right_redundant = is_tree_duplicate(right_child)
             is_left_redundant = is_tree_duplicate(left_child)
             if is_right_redundant or is_left_redundant:
