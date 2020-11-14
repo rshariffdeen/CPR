@@ -295,14 +295,18 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     else:
         klee_dir_path = directory_path + "/klee-last/"
         values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_dir_path)
-        values.LIST_PPC = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
+        if values.LAST_PPC_FORMULA:
+            values.LIST_PPC = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
+        else:
+            values.LIST_PPC = []
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG) and oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
         if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
             values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
         else:
-            values.NEGATED_PPC_FORMULA = generator.generate_negated_path(values.LAST_PPC_FORMULA)
+            if values.LAST_PPC_FORMULA:
+                values.NEGATED_PPC_FORMULA = generator.generate_negated_path(values.LAST_PPC_FORMULA)
     else:
         values.NEGATED_PPC_FORMULA = None
     return return_code

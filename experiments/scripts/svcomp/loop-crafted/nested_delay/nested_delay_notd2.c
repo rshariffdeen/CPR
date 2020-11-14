@@ -20,8 +20,8 @@ void __VERIFIER_assert(int cond) {
 
 int SIZE = 20;
 int main() {
-	last = 5;
 	klee_make_symbolic(&last, sizeof(last), "last");
+	last = 5;
 	assume_abort_if_not(last > 0);
 	int a=0,b=0,c=0,st=0,d=0;
 	while(1) {
