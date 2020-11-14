@@ -190,7 +190,10 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
                 list_path_explored.append(str(selected_new_path.serialize()))
-                selected_new_path = And(selected_new_path, patch_constraint)
+                if is_sat(And(selected_new_path, patch_constraint)):
+                    selected_new_path = And(selected_new_path, patch_constraint)
+                else:
+                    emitter.warning("\t[warning] no model generated")
             else:
                 list_path_infeasible.append(str(selected_new_path.serialize()))
     else:
