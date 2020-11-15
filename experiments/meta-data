@@ -220,7 +220,26 @@
    "bug_id": "bubblesort",
    "benchmark": "svcomp",
    "subject": "array"
+ },
+ {
+   "id": 38,
+   "bug_id": "selectionsort",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 39,
+   "bug_id": "standard_run",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 40,
+   "bug_id": "addition",
+   "benchmark": "svcomp",
+   "subject": "recursive"
  }
+
 
 
 ]
