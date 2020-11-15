@@ -25,7 +25,7 @@ int main ( ) {
   i = 0;
   while ( i < N ) {
     if ( a[i] >= 0 && !b[i] ) f = 0;
-    if ( __trident_choice("L290", "i32", (int[]){a[i],b[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ) f = 0;
+    if ( __trident_choice("L290", "bool", (int[]){a[i],b[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ) f = 0;
     i = i + 1;
   }
   TRIDENT_OUTPUT("obs", "i32", f);
