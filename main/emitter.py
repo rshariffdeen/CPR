@@ -97,7 +97,7 @@ def emit_patch(patch_tree, jump_line=True, message=""):
     prefix = "\t" * indent_length
     output = output + code
     write(output, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
-    logger.data(message, code)
+    logger.data(message, code, True)
 
 
 def information(message, jump_line=True):

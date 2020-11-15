@@ -51,8 +51,8 @@ def command(message):
     log(message)
 
 
-def data(message, data=None):
-    if values.DEBUG:
+def data(message, data=None, is_patch=False):
+    if values.DEBUG or is_patch:
         message = str(message).strip()
         message = "[DATA]: " + str(message) + "\n"
         log(message)
