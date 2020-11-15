@@ -11,11 +11,6 @@ from multiprocessing.dummy import Pool as ThreadPool
 import threading
 import time
 
-found_one = False
-pool = mp.Pool(mp.cpu_count())
-result_list = []
-expected_count = -1
-
 
 def collect_result(result):
     global result_list

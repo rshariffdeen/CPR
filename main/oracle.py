@@ -2,6 +2,66 @@ from main import definitions, values, emitter, utilities, extractor
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
+from threading import Lock
+
+found_one = False
+pool = mp.Pool(mp.cpu_count())
+result_list = []
+expected_count = -1
+
+tautology_included = False
+contradiction_included = False
+tautology_lock = Lock()
+contradiction_lock = Lock()
+
+
+def is_tautology_included():
+    global tautology_included
+    tautology_lock.acquire()
+    res = tautology_included
+    tautology_lock.release()
+    return res
+
+
+def is_contradiction_included():
+    global contradiction_included
+    contradiction_lock.acquire()
+    res = contradiction_included
+    contradiction_lock.release()
+    return res
+
+
+def is_tautology_and_contradiction_included():
+    global tautology_included, contradiction_included
+    tautology_lock.acquire()
+    contradiction_lock.acquire()
+    res = tautology_included and contradiction_included
+    contradiction_lock.release()
+    tautology_lock.release()
+    return res
+
+
+def update_tautology_included():
+    global tautology_included
+    res = False
+    tautology_lock.acquire()
+    if not tautology_included:
+        tautology_included = True
+        res = True
+    tautology_lock.release()
+    return res
+
+
+def update_contradiction_included():
+    global contradiction_included
+    res = False
+    contradiction_lock.acquire()
+    if not contradiction_included:
+        contradiction_included = True
+        res = True
+    contradiction_lock.release()
+    return res
+
 
 
 import sys
@@ -146,7 +206,10 @@ def is_tree_duplicate(tree):
             if is_right_constant and is_left_constant:
                 return True
             if is_same_children(tree):
-                return True
+                if not (is_left_constant or is_right_constant):
+                    return True
+                else:
+                    return not update_tautology_included()
 
         if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
             is_right_redundant = is_tree_duplicate(right_child)
@@ -156,7 +219,7 @@ def is_tree_duplicate(tree):
     return False
 
 
-def is_tree_redundant(tree):
+def is_tree_logic_redundant(tree):
     child_node_list = extractor.extract_child_expressions(tree)
     unique_child_node_list = []
     for child in child_node_list:
@@ -170,5 +233,5 @@ def is_tree_redundant(tree):
 def is_patch_duplicate(patch, index):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree) or is_tree_redundant(tree)
+    result = is_tree_duplicate(tree) or is_tree_logic_redundant(tree)
     return result, index
