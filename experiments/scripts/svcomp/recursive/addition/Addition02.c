@@ -28,16 +28,16 @@ int addition(int m, int n) {
 }
 
 
-int main() {
-    int m ;
-    klee_make_symbolic(&m, sizeof(int), "m");
+int main(int argc, char** argv) {
+    int m =atoi(argv[1]);
+//    klee_make_symbolic(&m, sizeof(int), "m");
     if (m < 0 || m > 1073741823) {
         // additional branch to avoid undefined behavior
         // (because of signed integer overflow)
         return 0;
     }
-    int n ;
-    klee_make_symbolic(&n, sizeof(int), "n");
+    int n =atoi(argv[2]);
+//    klee_make_symbolic(&n, sizeof(int), "n");
     if (n < 0 || n > 1073741823) {
         // additional branch to avoid undefined behavior
         // (because of signed integer overflow)
