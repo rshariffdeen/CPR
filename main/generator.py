@@ -194,7 +194,7 @@ def generate_model(formula):
     sym_var_list = dict()
     for var_name in var_list:
         # sym_var_list[var_name] = dict()
-        if "const_" in var_name:
+        if "const_" in var_name and not "const_arr" in var_name:
             sym_def = Symbol(var_name, BV32)
             if sym_def not in model:
                 continue
