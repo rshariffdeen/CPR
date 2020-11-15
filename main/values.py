@@ -82,8 +82,8 @@ DEFAULT_TIMEOUT_CEGIS_REFINE = 30
 DEFAULT_TIME_DURATION = 60
 
 
-IS_TAUTOLOGIES_INCLUDED = False
-IS_CONTRADICTIONS_INCLUDED = False
+IS_TAUTOLOGIES_INCLUDED = True
+IS_CONTRADICTIONS_INCLUDED = True
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 
