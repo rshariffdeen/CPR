@@ -184,6 +184,42 @@
    "bug_id": "insertion_sort",
    "benchmark": "svcomp",
    "subject": "loops"
+ },
+ {
+   "id": 32,
+   "bug_id": "linear_search",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 33,
+   "bug_id": "string",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 34,
+   "bug_id": "eureka",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 35,
+   "bug_id": "nested_delay",
+   "benchmark": "svcomp",
+   "subject": "loop-crafted"
+ },
+ {
+   "id": 36,
+   "bug_id": "sum",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 37,
+   "bug_id": "bubblesort",
+   "benchmark": "svcomp",
+   "subject": "array"
  }
 
 
