@@ -178,6 +178,12 @@
    "bug_id": "bugzilla-1404",
    "benchmark": "extractfix",
    "subject": "ffmpeg"
+ },
+  {
+   "id": 31,
+   "bug_id": "insertion_sort",
+   "benchmark": "svcomp",
+   "subject": "loops"
  }
 
 
