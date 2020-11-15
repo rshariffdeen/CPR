@@ -201,7 +201,7 @@ def is_tree_duplicate(tree):
             if is_right_constant and is_left_constant:
                 return True
             if is_same_children(tree):
-                if not (is_left_constant or is_right_constant):
+                if is_left_constant or is_right_constant:
                     return True
                 else:
                     if cid in ['not-equal', 'less-than', 'greater-than']:
