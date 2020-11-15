@@ -258,7 +258,9 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
     duration = (time.time() - time_check) / 60
     values.TIME_TO_REDUCE = duration
-
+    patch_list = [patch]
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-cegis"
+    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
     # patch = next(patch_generator, None)
     # while patch is not None:
     #     patch_formula = main.generator.generate_formula_from_patch(patch)
