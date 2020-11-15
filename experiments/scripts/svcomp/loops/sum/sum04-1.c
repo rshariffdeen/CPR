@@ -17,8 +17,8 @@ int main(int argc, char** argv) {
   int a = atoi(argv[1]);
   int size = atoi(argv[2]);
 
-  a = 2;
-  size = 8;
+//  a = 2;
+//  size = 8;
   for(i=1; i<=size; i++) {
     if (__trident_choice("L9", "bool", (int[]){i, sn}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
     sn = sn + a;
