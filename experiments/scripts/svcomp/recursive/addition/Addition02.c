@@ -45,9 +45,9 @@ int main(int argc, char** argv) {
     }
     int result = addition(m,n);
     if (__trident_choice("L290", "bool", (int[]){m,n, result}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0) ) {
-         TRIDENT_OUTPUT("obs", "i32", result - (m + n));
         return 0;
     } else {
+        TRIDENT_OUTPUT("obs", "i32", result - (m + n));
         ERROR: {reach_error();abort();}
     }
 }
