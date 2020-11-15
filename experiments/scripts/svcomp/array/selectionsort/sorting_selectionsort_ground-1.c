@@ -16,6 +16,8 @@ int main( ) {
   int y;
 
   klee_make_symbolic(&a, sizeof(a), "a");
+  klee_make_symbolic(&x, sizeof(x), "x");
+  klee_make_symbolic(&y, sizeof(y), "y");
 //	for(int i = 0; i < N; i++)
 //	{
 //	    a[i] = __VERIFIER_nondet_int();
@@ -42,7 +44,7 @@ int main( ) {
         __VERIFIER_assert(  a[x] <= a[y]  );
       }
     }
-    for ( __trident_choice("L290", "i32", (int[]){i,k}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ; x < N ; x++ ) {
+    for ( __trident_choice("L290", "i32", (int[]){i,k}, (char*[]){"x", "y"}, 2, (int*[]){&x}, (char*[]){"z"}, 1) ; x < N ; x++ ) {
       TRIDENT_OUTPUT("obs", "i32", a[x] - a[i]);
       __VERIFIER_assert(  a[x] >= a[i]  );
     }
