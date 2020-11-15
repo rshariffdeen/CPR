@@ -44,7 +44,7 @@ int main( ) {
         __VERIFIER_assert(  a[x] <= a[y]  );
       }
     }
-    for ( __trident_choice("L290", "i32", (int[]){i,k}, (char*[]){"x", "y"}, 2, (int*[]){&x}, (char*[]){"z"}, 1) ; x < N ; x++ ) {
+    for ( x = __trident_choice("L290", "i32", (int[]){i,k}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ; x < N ; x++ ) {
       TRIDENT_OUTPUT("obs", "i32", a[x] - a[i]);
       __VERIFIER_assert(  a[x] >= a[i]  );
     }
