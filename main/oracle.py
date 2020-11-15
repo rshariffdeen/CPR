@@ -4,11 +4,6 @@ from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
 from threading import Lock
 
-found_one = False
-pool = mp.Pool(mp.cpu_count())
-result_list = []
-expected_count = -1
-
 tautology_included = False
 contradiction_included = False
 tautology_lock = Lock()
