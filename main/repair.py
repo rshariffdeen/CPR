@@ -170,8 +170,6 @@ def run(project_path, program_path):
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
-    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
-    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
 
     for patch in patch_list:
         patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
@@ -191,7 +189,8 @@ def run(project_path, program_path):
 
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
-
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
+    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
     if values.CONF_REDUCE_METHOD == "fitreduce":
         run_fitreduce(program_path, patch_list)
     elif values.CONF_REDUCE_METHOD == "cegis":
