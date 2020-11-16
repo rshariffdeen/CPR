@@ -109,7 +109,9 @@ def refine_for_over_fit(patch_formula, path_condition, negated_path_condition, p
     refined_patch_space, is_under_approx = refine_for_under_approx(patch_formula, path_condition, patch_space, Not(p_specification))
     if not refined_patch_space:
         return None, False, False
-    refined_patch_space, is_over_approx = refine_for_over_approx(patch_formula, negated_path_condition, refined_patch_space, p_specification)
+    is_over_approx = False
+    if negated_path_condition:
+        refined_patch_space, is_over_approx = refine_for_over_approx(patch_formula, negated_path_condition, refined_patch_space, p_specification)
     return refined_patch_space, is_under_approx, is_over_approx
 
 
