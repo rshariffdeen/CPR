@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
   int v;
 	for (v = 0; v < SIZE; v++)
 	{
-	  values[v] = v + 2;
+	  values[v] = 2;
 	}
   for ( v = 0 ; v < SIZE ; v++ ) {
     // check if the element exists, if not insert it.
