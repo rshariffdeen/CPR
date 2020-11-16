@@ -16,23 +16,18 @@ int insert( int set [] , int size , int value ) {
 int elem_exists( int set [ ] , int size , int value ) {
   int i;
   for ( i = 0 ; i < size ; i++ ) {
-    if ( set[ i ] == value ) return 0;
+    if ( set[ i ] == value ) return  __trident_choice("L290", "i32", (int[]){i,size}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
   }
   return 0;
 }
 
-int main( ) {
+int main(int argc, char** argv) {
   int n = 0;
   int set[ SIZE ];
-
+  klee_make_symbolic(set, sizeof(set), "set");
   // this is trivial
   int x;
   int y;
-
-	for (x = 0; x < SIZE; x++)
-	{
-	  set[x] = __VERIFIER_nondet_int();
-	}
 
   for ( x = 0 ; x < n ; x++ ) {
     for ( y = x + 1 ; y < n ; y++ ) {
@@ -42,14 +37,13 @@ int main( ) {
 
   // we have an array of values to insert
   int values[ SIZE ];
-
+   klee_make_symbolic(values, sizeof(values), "values");
   // insert them in the array -- note that nothing ensures that values is not containing duplicates!
   int v;
-
-	for (v = 0; v < SIZE; v++)
-	{
-	  values[v] = __VERIFIER_nondet_int();
-	}
+//	for (v = 0; v < SIZE; v++)
+//	{
+//	  values[v] = __VERIFIER_nondet_int();
+//	}
   for ( v = 0 ; v < SIZE ; v++ ) {
     // check if the element exists, if not insert it.
     if ( !elem_exists( set , n , values[ v ] ) ) {
@@ -61,6 +55,7 @@ int main( ) {
   // this is not trivial!
   for ( x = 0 ; x < n ; x++ ) {
     for ( y = x + 1 ; y < n ; y++ ) {
+    TRIDENT_OUTPUT("obs", "i32",  set[ x ]  - set[ y ]);
       __VERIFIER_assert(  set[ x ] != set[ y ]  );
     }
   }
