@@ -30,9 +30,7 @@ int main(int argc, char** argv) {
   int y;
 
   for ( x = 0 ; x < n ; x++ ) {
-    for ( y = x + 1 ; y < n ; y++ ) {
-      __VERIFIER_assert(  set[ x ] != set[ y ]  );
-    }
+     set[ x ] = x;
   }
 
   // we have an array of values to insert
@@ -40,10 +38,10 @@ int main(int argc, char** argv) {
    klee_make_symbolic(values, sizeof(values), "values");
   // insert them in the array -- note that nothing ensures that values is not containing duplicates!
   int v;
-//	for (v = 0; v < SIZE; v++)
-//	{
-//	  values[v] = __VERIFIER_nondet_int();
-//	}
+	for (v = 0; v < SIZE; v++)
+	{
+	  values[v] = v + 2;
+	}
   for ( v = 0 ; v < SIZE ; v++ ) {
     // check if the element exists, if not insert it.
     if ( !elem_exists( set , n , values[ v ] ) ) {
