@@ -114,7 +114,7 @@ def read_conf_file():
              input_list = configuration.replace(definitions.CONF_TEST_INPUT, '').split("],[")
              processed_list = []
              for input in input_list:
-                 processed_list.append(input.replace("[").replace("]"))
+                 processed_list.append(input.replace("[", "").replace("]", ""))
              values.CONF_TEST_INPUT = processed_list
         elif definitions.CONF_PATH_SPECIFICATION in configuration:
             values.CONF_PATH_SPECIFICATION = configuration.replace(definitions.CONF_PATH_SPECIFICATION, '')
