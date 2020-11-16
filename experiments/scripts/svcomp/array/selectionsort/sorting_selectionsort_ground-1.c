@@ -7,9 +7,9 @@ void reach_error() { assert(0); }
 void __VERIFIER_assert(int cond) { if(!(cond)) { ERROR: {reach_error();abort();} } }
 extern int __VERIFIER_nondet_int();
 
-#define N 10
+#define N 20
 
-int main( ) {
+int main(int argc, char** argv) {
   int a[ N ];
   int i = 0;
   int x;
