@@ -14,7 +14,7 @@ void __VERIFIER_assert(int cond) {
 }
 unsigned int __VERIFIER_nondet_uint();
 unsigned int  SIZE;
-const unsigned int MAX = 100000;
+const unsigned int MAX = 100;
 int linear_search(int *a, int n, int q) {
   unsigned int j=0;
   int constant = -1;
