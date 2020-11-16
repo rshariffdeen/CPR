@@ -27,12 +27,13 @@ int linear_search(int *a, int n, int q) {
 }
 int main(int argc, char** argv) {
   int x = atoi(argv[1]);
+  int y = atoi(argv[2]);
   SIZE=(x/2)+1;
 
   if (SIZE > 1 && SIZE < MAX) {
-    int *a = malloc(sizeof(int)*SIZE);
-    a[SIZE/2]=3;
-    int ret = linear_search(a,SIZE,3);
+     int *a = malloc(sizeof(int)*SIZE);
+    a[SIZE/2]=y;
+    int ret = linear_search(a,SIZE,y);
      TRIDENT_OUTPUT("obs", "i32", ret);
     __VERIFIER_assert(ret);
   }
