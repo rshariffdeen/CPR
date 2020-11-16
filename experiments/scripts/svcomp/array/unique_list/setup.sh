@@ -1,4 +1,4 @@
-bug_id=nested_delay
+bug_id=unique_list
 dir_name=$1/svcomp/config/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/array-examples
