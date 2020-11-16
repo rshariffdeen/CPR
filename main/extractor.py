@@ -101,10 +101,10 @@ def extract_parameter_list(model):
 
 
 def extract_input_arg_list(argument_str):
-    if "[" not in argument_str:
+    if "," not in argument_str:
         argument_list = str(argument_str).split(" ")
     else:
-        argument_str = argument_str.replace("[", "").replace("]", "")
+        # argument_str = argument_str.replace("[", "").replace("]", "")
         argument_list = str(argument_str).split(",")
     return argument_list
 
