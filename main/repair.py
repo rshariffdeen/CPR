@@ -374,13 +374,13 @@ def run_fitreduce(program_path, patch_list):
         values.COUNT_PATCH_END = len(patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
-        check_infeasible_paths(patch_list)
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-original"
         writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked"
         writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
+        check_infeasible_paths(patch_list)
         if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
