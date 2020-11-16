@@ -4,7 +4,7 @@ void reach_error() { assert(0); }
 void __VERIFIER_assert(int cond) { if(!(cond)) { ERROR: {reach_error();abort();} } }
 extern int __VERIFIER_nondet_int();
 
-#define SIZE 100000
+#define SIZE 10
 
 // implements a set and checks that the insert and remove function maintain the structure
 
