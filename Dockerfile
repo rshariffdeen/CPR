@@ -140,6 +140,7 @@ RUN apt-get install -y  \
     flex \
     gettext \
     gperf \
+    libass-dev \
     libfreetype6 \
     libfreetype6-dev \
     libjpeg-dev \
