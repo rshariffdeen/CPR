@@ -141,6 +141,12 @@ RUN apt-get install -y  \
     gettext \
     gperf \
     libass-dev \
+    libfdk-aac-dev \
+    libmp3lame-dev \
+    libopus-dev \
+    libtheora-dev \
+    libvorbis-dev \
+    libvpx-dev  \
     libfreetype6 \
     libfreetype6-dev \
     libjpeg-dev \
