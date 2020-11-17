@@ -79,7 +79,7 @@ PKG_CONFIG_PATH="$FFMPEG_DEPS_PATH/lib/pkgconfig" CFLAGS="-I$FFMPEG_DEPS_PATH/in
     --target-os=linux
 
 make -j32 > /dev/null
-subject=tools/target_dec_dfa_fuzzer
+subject=tools/target_dec_cavs_fuzzer
 make ${subject}
 cp ${subject} ./
 KLEE_CFLAGS="-L/concolic-repair/lib -ltrident_runtime -L/klee/build/lib  -lkleeRuntest -lkleeBasic -lhook -L${dir_name}/deps/"
