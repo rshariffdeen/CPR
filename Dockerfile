@@ -147,6 +147,12 @@ RUN apt-get install -y  \
     libtheora-dev \
     libvorbis-dev \
     libvpx-dev  \
+    libfuzzer-3.9-dev \
+    libasan2 \
+    libva-dev \
+    libxcb1-dev \
+    libxcb-xfixes0-dev \
+    libnuma-dev \
     libfreetype6 \
     libfreetype6-dev \
     libjpeg-dev \
@@ -157,3 +163,5 @@ RUN apt-get install -y  \
     pkg-config \
     texinfo \
     yasm
+
+
