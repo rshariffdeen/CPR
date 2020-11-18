@@ -11,5 +11,5 @@ mv lighttpd-bug-2661-2662 src
 cd src/lighttpd
 
 make clean
-CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=no
+CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0'
 CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32

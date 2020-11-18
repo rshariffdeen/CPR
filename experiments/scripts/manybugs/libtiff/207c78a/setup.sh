@@ -1,21 +1,18 @@
 project_name=libtiff
 bug_id=207c78a
 dir_name=$1/manybugs/$project_name/$bug_id
-
-project_url=https://github.com/vadz/libtiff.git
-commit_id=b2ce5d8
-
+download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/libtiff-bug-2006-02-23-b2ce5d8-207c78a.tar.gz
 current_dir=$PWD
 mkdir -p $dir_name
 cd $dir_name
-git clone $project_url src
-cd src
-git checkout $commit_id
+wget $download_url
+tar xfz libtiff-bug-2006-02-23-b2ce5d8-207c78a.tar.gz
+mv libtiff-bug-2006-02-23-b2ce5d8-207c78a src
+cd src/libtiff
 
-
-./autogen.sh
+make clean
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared
-CC=wllvm CXX=wllvm++ make -j32
+CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
 
 sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
 sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
