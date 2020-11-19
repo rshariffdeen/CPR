@@ -95,4 +95,4 @@ cp repair.conf $dir_name
 cp spec.smt2 $dir_name
 cp t1.smt2 $dir_name
 cp -rf components $dir_name
-cp exploit $dir_name
+cp exploit.mpg $dir_name
