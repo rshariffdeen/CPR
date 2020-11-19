@@ -43,7 +43,7 @@ git commit -m "instrument trident"
 
 
 
-cflags="-g -D__NO_STRING_INLINES  -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__  -I${dir_name}/deps/  -L${dir_name}/deps/ -lhook -Wno-everything"
+cflags="-g -D__NO_STRING_INLINES  -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__ -Wno-everything"
 CC=$TRIDENT_CC
 CXX=$TRIDENT_CXX
 CFLAGS="$cflags"
