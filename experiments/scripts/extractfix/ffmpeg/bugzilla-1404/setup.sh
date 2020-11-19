@@ -25,11 +25,12 @@ cp $current_dir/configure $dir_name/src
 cp $current_dir/../afl_driver.cpp $dir_name/src
 #
 #
-#grep -rl 'fabs' . | grep "\.c" | xargs sed -i -e 's/fabs(/fabs_fk(/g'
-#grep -rl 'fabs' . | grep "\.c" | xargs sed -i "1i #include<hook.h>"
-#git add -A
-#git commit -m 'change fabs to fabs_fk'
-#
+grep -rl 'fabs' . | grep "\.c" | xargs sed -i -e 's/fabs(/fabs_fk(/g'
+grep -rl 'fabs' . | grep "\.c" | xargs sed -i "1i #include<hook.h>"
+git add -A
+git commit -m 'change fabs to fabs_fk'
+
+
 #sed -i 's/av_mallocz(avctx->width \* avctx->height)/malloc(avctx->width * avctx->height)/' libavcodec/dfa.c
 #sed -i 's/av_cold //' libavcodec/dfa.c
 #sed -i 's/NULL_IF_CONFIG_SMALL("Chronomaster DFA")/"Chronomaster DFA"/' libavcodec/dfa.c
@@ -43,7 +44,8 @@ cp $current_dir/../afl_driver.cpp $dir_name/src
 
 
 
-cflags="-g -D__NO_STRING_INLINES  -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__ -Wno-everything"
+cflags="-g -D__NO_STRING_INLINES  -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__  -I${dir_name}/deps/  -L${dir_name}/deps/ -lhook -Wno-everything"
+
 CC=$TRIDENT_CC
 CXX=$TRIDENT_CXX
 CFLAGS="$cflags"
@@ -51,6 +53,7 @@ CXXFLAGS="$cflags"
 
 
 FFMPEG_DEPS_PATH=/data/extractfix/ffmpeg/ffmpeg-deps/libs/
+LIB_FUZZING_ENGINE=/llvm-6/llvm/compiler-rt/lib/fuzzer/libFuzzer.a
 
 PKG_CONFIG_PATH="$FFMPEG_DEPS_PATH/lib/pkgconfig" CFLAGS="-I$FFMPEG_DEPS_PATH/include $CFLAGS" ./configure \
     --cc=$CC --cxx=$CXX --ld="$CXX $CXXFLAGS -std=c++11" \
@@ -82,8 +85,8 @@ make -j32 > /dev/null
 subject=tools/target_dec_cavs_fuzzer
 make ${subject}
 cp ${subject} ./
-KLEE_CFLAGS="-L/concolic-repair/lib -ltrident_runtime -L/klee/build/lib  -lkleeRuntest -lkleeBasic -lhook -L${dir_name}/deps/"
-PROJECT_CFALGS="-std=c++11 -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavresample -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -L/data/ffmpeg/libs/lib  -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil:libavresample -Qunused-arguments   libavdevice/libavdevice.a libavfilter/libavfilter.a libavformat/libavformat.a libavcodec/libavcodec.a libpostproc/libpostproc.a libswresample/libswresample.a libswscale/libswscale.a libavutil/libavutil.a -lavdevice -lavfilter -lavformat -lavcodec -lpostproc -lswresample -lswscale -lavutil -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lva -lva-drm -lva-x11 -lxcb -lXau -lXdmcp -lxcb -lXau -lXdmcp -lxcb-xfixes -lxcb-render -lxcb-shape -lxcb -lXau -lXdmcp -lxcb-shape -lxcb -lXau -lXdmcp -L /data/ffmpeglibs/lib -lstdc++ -lm -lrt -ldl -lnuma -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -lvorbisenc -lvorbis -logg -ltheoraenc -ltheoradec -logg -L/data/ffmpeg/libs/lib -lopus -lm -L/data/ffmpeg/libs/lib -lopus -lm -lmp3lame -lfreetype -lz -lpng12 -lz -lm -L/data/ffmpeg/libs/lib -lfdk-aac -lm -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lm -llzma -lz"
+KLEE_CFLAGS="-L/concolic-repair/lib -ltrident_runtime -L/klee/build/lib  -lkleeRuntest -lkleeBasic -lhook  -L${dir_name}/deps/"
+PROJECT_CFALGS="-g -std=c++11 ${LIB_FUZZING_ENGINE} -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavresample -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -L/data/ffmpeg/libs/lib  -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil:libavresample -Qunused-arguments   libavdevice/libavdevice.a libavfilter/libavfilter.a libavformat/libavformat.a libavcodec/libavcodec.a libpostproc/libpostproc.a libswresample/libswresample.a libswscale/libswscale.a libavutil/libavutil.a -lavdevice -lavfilter -lavformat -lavcodec -lpostproc -lswresample -lswscale -lavutil -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lva -lva-drm -lva-x11 -lxcb -lXau -lXdmcp -lxcb -lXau -lXdmcp -lxcb-xfixes -lxcb-render -lxcb-shape -lxcb -lXau -lXdmcp -lxcb-shape -lxcb -lXau -lXdmcp -L /data/ffmpeglibs/lib -lstdc++ -lm -lrt -ldl -lnuma -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -L/data/ffmpeg/libs/lib -lvpx -lm -lpthread -lvorbisenc -lvorbis -logg -ltheoraenc -ltheoradec -logg -L/data/ffmpeg/libs/lib -lopus -lm -L/data/ffmpeg/libs/lib -lopus -lm -lmp3lame -lfreetype -lz -lpng12 -lz -lm -L/data/ffmpeg/libs/lib -lfdk-aac -lm -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lm -llzma -lz"
 make ${subject}
 wllvm -ggdb3 -Wall -W -o tools/target_dec_cavs_fuzzer tools/target_dec_cavs_fuzzer.o afl_driver.o ${PROJECT_CFALGS} ${KLEE_CFLAGS} -Wl,-rpath
 extract-bc  ${subject}
