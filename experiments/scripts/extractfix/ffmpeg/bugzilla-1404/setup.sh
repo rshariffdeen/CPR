@@ -23,23 +23,23 @@ git checkout $commit_id
 cp $current_dir/Makefile $dir_name/src
 cp $current_dir/configure $dir_name/src
 cp $current_dir/../afl_driver.cpp $dir_name/src
-
-
-grep -rl 'fabs' . | grep "\.c" | xargs sed -i -e 's/fabs(/fabs_fk(/g'
-grep -rl 'fabs' . | grep "\.c" | xargs sed -i "1i #include<hook.h>"
-git add -A
-git commit -m 'change fabs to fabs_fk'
+#
+#
+#grep -rl 'fabs' . | grep "\.c" | xargs sed -i -e 's/fabs(/fabs_fk(/g'
+#grep -rl 'fabs' . | grep "\.c" | xargs sed -i "1i #include<hook.h>"
+#git add -A
+#git commit -m 'change fabs to fabs_fk'
 #
 #sed -i 's/av_mallocz(avctx->width \* avctx->height)/malloc(avctx->width * avctx->height)/' libavcodec/dfa.c
 #sed -i 's/av_cold //' libavcodec/dfa.c
 #sed -i 's/NULL_IF_CONFIG_SMALL("Chronomaster DFA")/"Chronomaster DFA"/' libavcodec/dfa.c
 
-sed -i '180i TRIDENT_OUTPUT("obs", "i32", frame_end - frame - width - 4);' libavcodec/dfa.c
-sed -i "178d" libavcodec/dfa.c
-sed -i '178i if (__trident_choice("L816", "i32", (int[]){width, frame_end, frame}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' libavcodec/dfa.c
-sed -i '32i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' libavcodec/dfa.c
-git add libavcodec/dfa.c
-git commit -m "instrument trident"
+#sed -i '180i TRIDENT_OUTPUT("obs", "i32", frame_end - frame - width - 4);' libavcodec/dfa.c
+#sed -i "178d" libavcodec/dfa.c
+#sed -i '178i if (__trident_choice("L816", "i32", (int[]){width, frame_end, frame}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' libavcodec/dfa.c
+#sed -i '32i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' libavcodec/dfa.c
+#git add libavcodec/dfa.c
+#git commit -m "instrument trident"
 
 
 
