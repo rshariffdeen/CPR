@@ -27,7 +27,7 @@ CONF_DEBUG = False
 CONF_BUG_ID = None
 CONF_START_ID = None
 CONF_SETUP_ONLY = False
-CONF_SKIP_LIST = ["2","4","8","13","14","15","16","21","25","26"]
+CONF_SKIP_LIST = ["2","8","13","14","15","16","21"]
 
 FILE_META_DATA = "meta-data"
 FILE_ERROR_LOG = "error-log"
