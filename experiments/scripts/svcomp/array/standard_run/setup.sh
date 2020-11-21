@@ -1,5 +1,5 @@
 bug_id=standard_run
-dir_name=$1/svcomp/$bug_id
+dir_name=$1/svcomp/array/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/array-examples
 bench_dir=/data/svcomp/sv-benchmarks

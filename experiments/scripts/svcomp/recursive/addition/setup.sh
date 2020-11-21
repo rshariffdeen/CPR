@@ -1,5 +1,5 @@
 bug_id=addition
-dir_name=$1/svcomp/$bug_id
+dir_name=$1/svcomp/recursive/$bug_id
 project_url=https://github.com/sosy-lab/sv-benchmarks.git
 program_dir=/data/svcomp/sv-benchmarks/c/recursive
 bench_dir=/data/svcomp/sv-benchmarks
