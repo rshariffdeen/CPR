@@ -223,7 +223,7 @@
  },
  {
    "id": 38,
-   "bug_id": "selectionsort",
+   "bug_id": "uniquelist",
    "benchmark": "svcomp",
    "subject": "array"
  },
