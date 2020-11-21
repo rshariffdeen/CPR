@@ -217,13 +217,13 @@
  },
  {
    "id": 37,
-   "bug_id": "bubblesort",
+   "bug_id": "bubble_sort",
    "benchmark": "svcomp",
    "subject": "array"
  },
  {
    "id": 38,
-   "bug_id": "uniquelist",
+   "bug_id": "unique_list",
    "benchmark": "svcomp",
    "subject": "array"
  },
