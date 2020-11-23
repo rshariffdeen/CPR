@@ -12,10 +12,10 @@ extern int __VERIFIER_nondet_int();
 int main( ) {
   int a[ N ];
   klee_make_symbolic(&a, sizeof(a), "a");
-	for(int j = 0; j < N; j++)
-	{
-	  a[j] = N-j;
-	}
+//	for(int j = 0; j < N; j++)
+//	{
+//	  a[j] = N-j;
+//	}
 
   int swapped = 1;
   while ( swapped ) {
