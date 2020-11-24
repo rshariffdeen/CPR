@@ -206,7 +206,7 @@ def run_cegis(program_path, project_path, patch_list):
     test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
     time_check = time.time()
-    assertion, largest_path_condition = concolic_exploration(program_path, patch_list)
+    assertion, largest_path_condition = concolic.run_concolic_exploration(program_path, patch_list)
     duration = (time.time() - time_check) / 60
     values.TIME_TO_EXPLORE = duration
     emitter.normal("\tcombining explored program paths")
@@ -390,99 +390,4 @@ def run_fitreduce(program_path, patch_list):
             values.COUNT_PATCH_END = len(ranked_patch_list)
 
 
-def symbolic_exploration(program_path):
-    argument_list = values.ARGUMENT_LIST
-    second_var_list = values.SECOND_VAR_LIST
-    exit_code = concolic.run_symbolic_execution(program_path + ".bc", argument_list, second_var_list)
-    assert exit_code == 0
 
-
-def concolic_exploration(program_path, patch_list):
-    satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-    iteration = 0
-    emitter.sub_title("Concolic Path Exploration")
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
-    assertion_template = values.SPECIFICATION_TXT
-    max_count = 0
-    largest_assertion = None
-    largest_path_condition = None
-    while not satisfied:
-        if iteration == 0:
-            test_input_list = values.CONF_TEST_INPUT
-            second_var_list = list()
-            for argument_list in test_input_list:
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
-                argument_list = extractor.extract_input_arg_list(argument_list)
-                iteration = iteration + 1
-                values.ITERATION_NO = iteration
-                emitter.sub_sub_title("Iteration: " + str(iteration))
-                if values.IS_CRASH:
-                    arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
-                    for var in var_list:
-                        var_name = var["identifier"]
-                        if "angelic" in var_name:
-                            second_var_list.append(var)
-                # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
-                exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
-                # assert exit_code == 0
-                klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-                assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
-                if count_obs > max_count:
-                    max_count = count_obs
-                    largest_assertion = assertion
-                    path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-                    largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-
-                satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-                # check if new path hits patch location / fault location
-                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
-                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                    continue
-                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                    continue
-                distance.update_distance_map()
-                if satisfied:
-                    emitter.warning(
-                        "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
-        else:
-            iteration = iteration + 1
-            values.ITERATION_NO = iteration
-            emitter.sub_sub_title("Iteration: " + str(iteration))
-            ## Pick new input and patch candidate for next concolic execution step.
-            argument_list = values.ARGUMENT_LIST
-            second_var_list = values.SECOND_VAR_LIST
-            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-            gen_arg_list, gen_var_list, _ = concolic.select_new_input(argument_list, second_var_list, [])
-
-            if not patch_list:
-                emitter.warning("\t\t[warning] unable to generate a patch")
-                break
-            elif not gen_arg_list and not gen_var_list:
-                emitter.warning("\t\t[warning] no more paths to generate new input")
-                break
-            assert gen_arg_list  # there should be a concrete input
-
-            ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-            exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-            # assert exit_code == 0
-            klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-            assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
-            if count_obs > max_count:
-                max_count = count_obs
-                largest_assertion = assertion
-                path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-                largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-
-
-            # Checks for the current coverage.
-            satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-            # check if new path hits patch location / fault location
-            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                continue
-            if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                continue
-            distance.update_distance_map()
-            if satisfied:
-                emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
-    return largest_assertion, largest_path_condition
