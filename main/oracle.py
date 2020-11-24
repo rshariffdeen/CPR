@@ -186,14 +186,14 @@ def is_tree_duplicate(tree, lock_t, lock_c):
                         return True
 
         if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
-            is_right_redundant = is_tree_duplicate(right_child)
-            is_left_redundant = is_tree_duplicate(left_child)
+            is_right_redundant = is_tree_duplicate(right_child, lock_t, lock_c)
+            is_left_redundant = is_tree_duplicate(left_child, lock_t, lock_c)
             if is_right_redundant or is_left_redundant:
                 return True
     return False
 
 
-def is_tree_logic_redundant(tree, lock_t, lock_c):
+def is_tree_logic_redundant(tree):
     child_node_list = extractor.extract_child_expressions(tree)
     unique_child_node_list = []
     for child in child_node_list:
@@ -207,5 +207,5 @@ def is_tree_logic_redundant(tree, lock_t, lock_c):
 def is_patch_duplicate(patch, index, lock_t, lock_c):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree, lock_t, lock_c) or is_tree_logic_redundant(tree, lock_t, lock_c)
+    result = is_tree_duplicate(tree, lock_t, lock_c) or is_tree_logic_redundant(tree)
     return result, index
