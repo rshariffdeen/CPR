@@ -142,6 +142,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_formula_extended, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
@@ -151,6 +152,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_formula_extended, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
@@ -165,6 +167,7 @@ def remove_duplicate_patches_parallel(patch_list):
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             result_list.append(oracle.is_patch_duplicate(patch, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
@@ -172,6 +175,7 @@ def remove_duplicate_patches_parallel(patch_list):
 
         for patch in patch_list:
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             pool.apply_async(oracle.is_patch_duplicate, args=(patch, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
@@ -188,7 +192,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
-            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -200,7 +204,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
-            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -226,7 +230,7 @@ def partition_input_space(path_condition, assertion):
             partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
             if values.CONF_OPERATION_MODE in ["sequential"]:
                 for partition in partition_list:
-                    # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+                    # emitter.emit_patch(patch, message="\tabstract patch: ")
                     result_list.append(refine.refine_input_partition(path_condition, assertion, partition, is_multi_dimension))
             else:
                 emitter.normal("\t\tstarting parallel computing")
@@ -267,6 +271,7 @@ def validate_input_generation(patch_list, new_path):
                 if parameter_constraint:
                     patch_space_constraint = And(patch_formula_extended, parameter_constraint)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             result_list.append(oracle.check_input_feasibility(index, patch_space_constraint, new_path))
     else:
         emitter.normal("\t\tstarting parallel computing")
@@ -287,6 +292,7 @@ def validate_input_generation(patch_list, new_path):
                     if parameter_constraint:
                         patch_space_constraint = And(patch_formula_extended, parameter_constraint)
                 index = list(patch_list).index(patch)
+                # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
                 thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_space_constraint, new_path), callback=collect_result_one)
                 thread_list.append(thread)
             except ValueError:
