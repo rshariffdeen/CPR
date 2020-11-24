@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 //  a = 2;
 //  size = 8;
   for(i=1; i<=size; i++) {
-    if (__trident_choice("L9", "bool", (int[]){i, sn}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
+    if (__trident_choice("L9", "bool", (int[]){i, a}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
     sn = sn + a;
   }
   TRIDENT_OUTPUT("obs", "i32", sn==size*a || sn == 0);
