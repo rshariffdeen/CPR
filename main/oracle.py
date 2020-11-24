@@ -206,8 +206,10 @@ def is_tree_duplicate(tree):
                 else:
                     if cid in ['not-equal', 'less-than', 'greater-than']:
                         return not update_contradiction_included()
-                    else:
+                    elif cid in ['equal', 'less-or-equal', 'greater-or-equal']:
                         return not update_tautology_included()
+                    else:
+                        return True
 
         if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
             is_right_redundant = is_tree_duplicate(right_child)
