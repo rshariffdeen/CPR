@@ -57,6 +57,65 @@ def abortable_worker(func, *args, **kwargs):
         return default_value, index
 
 
+def generate_special_paths_parallel(ppc_list):
+    global pool, result_list, expected_count
+    result_list = []
+    path_list = []
+    filtered_list = []
+    lock = None
+    count = 0
+    ppc_list.reverse()
+    if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_LIB in control_loc:
+                continue
+            ppc_str = ppc
+            count = count + 1
+            new_path = generator.generate_flipped_path(ppc)
+            new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            if new_path_str not in values.LIST_PATH_CHECK:
+                values.LIST_PATH_CHECK.append(new_path_str)
+                result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
+
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        thread_list = []
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_LIB in control_loc:
+                expected_count = expected_count - 1
+                continue
+            count = count + 1
+            new_path = generator.generate_flipped_path(ppc)
+            new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            if new_path_str not in values.LIST_PATH_CHECK:
+                values.LIST_PATH_CHECK.append(new_path_str)
+                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, default=False,
+                                         index=count - 1)
+                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1),
+                                 callback=collect_result_timeout)
+                # thread_list.append(thread)
+        emitter.normal("\t\twaiting for thread completion")
+        # for thread in thread_list:
+        #     try:
+        #         thread.get(values.DEFAULT_TIMEOUT_SAT)
+        #     except TimeoutError:
+        #         emitter.warning("\t[warning] timeout raised on a thread")
+        #         thread.successful()
+        time.sleep(1.3 * values.DEFAULT_TIMEOUT_SAT)
+        pool.terminate()
+    # assert(len(result_list) == len(path_list))
+    for result in result_list:
+        is_feasible, index = result
+        if is_feasible:
+            filtered_list.append(path_list[index])
+    return filtered_list
+
+
 def generate_symbolic_paths_parallel(ppc_list):
     global pool, result_list, expected_count
     result_list = []

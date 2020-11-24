@@ -141,6 +141,121 @@ def generate_flipped_path(ppc):
     return new_path
 
 
+def generate_true_constraint(path_constraint):
+    true_constraint = None
+    if path_constraint.is_and() or path_constraint.is_or():
+        prefix = None
+        while path_constraint.is_and() or path_constraint.is_or():
+            constraint = path_constraint.arg(1)
+            constraint_str = str(constraint.serialize())
+            if "angelic!bool" in constraint_str:
+                model = generate_model(constraint)
+                for var_name, byte_list in model:
+                    if "angelic!bool" in var_name:
+                        value = utilities.get_signed_value(byte_list)
+                        if value == 0:
+                            constraint = Not(constraint)
+
+            if true_constraint:
+                if path_constraint.is_and():
+                    true_constraint = And(true_constraint, constraint)
+                elif  path_constraint.is_or():
+                    true_constraint = Or(true_constraint, constraint)
+            else:
+                true_constraint = constraint
+            prefix= path_constraint.arg(0)
+            if prefix.is_and() or prefix.is_or():
+                path_constraint = prefix
+            else:
+                prefix_str = str(prefix.serialize())
+                if "angelic!bool" in prefix_str:
+                    model = generate_model(prefix)
+                    for var_name, byte_list in model:
+                        if "angelic!bool" in var_name:
+                            value = utilities.get_signed_value(byte_list)
+                            if value == 0:
+                                prefix = Not(prefix)
+        if path_constraint.is_and():
+            true_constraint = And(true_constraint, prefix)
+        elif path_constraint.is_or():
+            true_constraint = Or(true_constraint, prefix)
+
+    else:
+        model = generate_model(path_constraint)
+        for var_name, byte_list in model:
+            if "angelic!bool" in var_name:
+                value = utilities.get_signed_value(byte_list)
+                if value == 0:
+                    true_constraint = Not(path_constraint)
+    return true_constraint
+
+
+def generate_false_constraint(path_constraint):
+    true_constraint = None
+    if path_constraint.is_and() or path_constraint.is_or():
+        prefix = None
+        while path_constraint.is_and() or path_constraint.is_or():
+            constraint = path_constraint.arg(1)
+            constraint_str = str(constraint.serialize())
+            if "angelic!bool" in constraint_str:
+                model = generate_model(constraint)
+                for var_name, byte_list in model:
+                    if "angelic!bool" in var_name:
+                        value = utilities.get_signed_value(byte_list)
+                        if value == 0:
+                            constraint = Not(constraint)
+
+            if true_constraint:
+                if path_constraint.is_and():
+                    true_constraint = And(true_constraint, constraint)
+                elif path_constraint.is_or():
+                    true_constraint = Or(true_constraint, constraint)
+            else:
+                true_constraint = constraint
+            prefix = path_constraint.arg(0)
+            if prefix.is_and() or prefix.is_or():
+                path_constraint = prefix
+            else:
+                prefix_str = str(prefix.serialize())
+                if "angelic!bool" in prefix_str:
+                    model = generate_model(prefix)
+                    for var_name, byte_list in model:
+                        if "angelic!bool" in var_name:
+                            value = utilities.get_signed_value(byte_list)
+                            if value != 0:
+                                prefix = Not(prefix)
+        if path_constraint.is_and():
+            true_constraint = And(true_constraint, prefix)
+        elif path_constraint.is_or():
+            true_constraint = Or(true_constraint, prefix)
+
+    else:
+        model = generate_model(path_constraint)
+        for var_name, byte_list in model:
+            if "angelic!bool" in var_name:
+                value = utilities.get_signed_value(byte_list)
+                if value == 0:
+                    true_constraint = Not(path_constraint)
+    return true_constraint
+
+
+def generate_special_path_list(ppc_list):
+    parser = SmtLibParser()
+    special_list = []
+    for con_loc, ppc in ppc_list:
+        script = parser.get_script(cStringIO(ppc))
+        path_condition = script.get_last_formula()
+        angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
+        if angelic_count > 1:
+            false_path = generate_false_path(path_condition)
+            true_path = generate_true_path(path_condition)
+            if true_path:
+                special_list.append(true_path)
+            if false_path:
+                special_list.append(false_path)
+    return special_list
+
+
 def generate_angelic_val_for_crash(klee_out_dir):
     file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if os.path.isfile(os.path.join(klee_out_dir,f))]
     error_file_path = None
@@ -405,6 +520,8 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = list()
     path_count = 0
+    generate_special_path_list(ppc_list)
+    exit()
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         path_count = path_count + 1
@@ -488,6 +605,38 @@ def generate_negated_path(path_condition):
         path_condition = path_condition.arg(0)
     negated_path = And(negated_path, path_condition)
     return negated_path
+
+
+def generate_true_path(path_condition):
+    true_path = None
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = str(constraint.serialize())
+        if "angelic!bool" in constraint_str:
+            constraint = generate_true_constraint(constraint)
+        if true_path is None:
+            true_path = constraint
+        else:
+            true_path = And(true_path, constraint)
+        path_condition = path_condition.arg(0)
+    true_path = And(true_path, path_condition)
+    return true_path
+
+
+def generate_false_path(path_condition):
+    false_path = None
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = str(constraint.serialize())
+        if "angelic!bool" in constraint_str:
+            constraint = generate_false_constraint(constraint)
+        if false_path is None:
+            false_path = constraint
+        else:
+            false_path = And(false_path, constraint)
+        path_condition = path_condition.arg(0)
+    false_path = And(false_path, path_condition)
+    return false_path
 
 
 def generate_patch_space(patch):
