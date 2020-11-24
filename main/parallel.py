@@ -164,11 +164,14 @@ def remove_duplicate_patches_parallel(patch_list):
     global pool, result_list
     result_list = []
     emitter.normal("\tremoving redundancy in patch pool")
+    tautology_lock = mp.Lock()
+    contradiction_lock = mp.Lock()
+
     if values.CONF_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             index = list(patch_list).index(patch)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
-            result_list.append(oracle.is_patch_duplicate(patch, index))
+            result_list.append(oracle.is_patch_duplicate(patch, index, tautology_lock, contradiction_lock))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count())
@@ -176,7 +179,7 @@ def remove_duplicate_patches_parallel(patch_list):
         for patch in patch_list:
             index = list(patch_list).index(patch)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
-            pool.apply_async(oracle.is_patch_duplicate, args=(patch, index), callback=collect_result)
+            pool.apply_async(oracle.is_patch_duplicate, args=(patch, index, tautology_lock, contradiction_lock), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
         pool.join()

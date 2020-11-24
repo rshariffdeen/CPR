@@ -10,51 +10,25 @@ tautology_lock = Lock()
 contradiction_lock = Lock()
 
 
-def is_tautology_included():
-    global tautology_included
-    tautology_lock.acquire()
-    res = tautology_included
-    tautology_lock.release()
-    return res
-
-
-def is_contradiction_included():
-    global contradiction_included
-    contradiction_lock.acquire()
-    res = contradiction_included
-    contradiction_lock.release()
-    return res
-
-
-def is_tautology_and_contradiction_included():
-    global tautology_included, contradiction_included
-    tautology_lock.acquire()
-    contradiction_lock.acquire()
-    res = tautology_included and contradiction_included
-    contradiction_lock.release()
-    tautology_lock.release()
-    return res
-
-
-def update_tautology_included():
+def update_tautology_included(lock):
     global tautology_included
     res = False
-    tautology_lock.acquire()
+    lock.acquire()
     if not tautology_included:
         tautology_included = True
         res = True
-    tautology_lock.release()
+    lock.release()
     return res
 
 
-def update_contradiction_included():
+def update_contradiction_included(lock):
     global contradiction_included
     res = False
-    contradiction_lock.acquire()
+    lock.acquire()
     if not contradiction_included:
         contradiction_included = True
         res = True
-    contradiction_lock.release()
+    lock.release()
     return res
 
 
@@ -189,7 +163,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_tree_duplicate(tree):
+def is_tree_duplicate(tree, lock_t, lock_c):
     (cid, semantics), children = tree
     if len(children) == 2:
         right_child = children['right']
@@ -205,9 +179,9 @@ def is_tree_duplicate(tree):
                     return True
                 else:
                     if cid in ['not-equal', 'less-than', 'greater-than']:
-                        return not update_contradiction_included()
+                        return not update_contradiction_included(lock_c)
                     elif cid in ['equal', 'less-or-equal', 'greater-or-equal']:
-                        return not update_tautology_included()
+                        return not update_tautology_included(lock_t)
                     else:
                         return True
 
@@ -219,7 +193,7 @@ def is_tree_duplicate(tree):
     return False
 
 
-def is_tree_logic_redundant(tree):
+def is_tree_logic_redundant(tree, lock_t, lock_c):
     child_node_list = extractor.extract_child_expressions(tree)
     unique_child_node_list = []
     for child in child_node_list:
@@ -230,8 +204,8 @@ def is_tree_logic_redundant(tree):
     return False
 
 
-def is_patch_duplicate(patch, index):
+def is_patch_duplicate(patch, index, lock_t, lock_c):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree) or is_tree_logic_redundant(tree)
+    result = is_tree_duplicate(tree, lock_t, lock_c) or is_tree_logic_redundant(tree, lock_t, lock_c)
     return result, index
