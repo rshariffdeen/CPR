@@ -1,13 +1,8 @@
 from main import definitions, values, emitter, utilities, extractor
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
-from pysmt.smtlib.parser import SmtLibParser
-from six.moves import cStringIO
-from threading import Lock
 
 tautology_included = False
 contradiction_included = False
-tautology_lock = Lock()
-contradiction_lock = Lock()
 
 
 def update_tautology_included(lock):
@@ -163,7 +158,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_tree_duplicate(tree, lock_t, lock_c):
+def is_tree_duplicate(tree, lock):
     (cid, semantics), children = tree
     if len(children) == 2:
         right_child = children['right']
@@ -179,15 +174,15 @@ def is_tree_duplicate(tree, lock_t, lock_c):
                     return True
                 else:
                     if cid in ['not-equal', 'less-than', 'greater-than']:
-                        return not update_contradiction_included(lock_c)
+                        return not update_contradiction_included(lock)
                     elif cid in ['equal', 'less-or-equal', 'greater-or-equal']:
-                        return not update_tautology_included(lock_t)
+                        return not update_tautology_included(lock)
                     else:
                         return True
 
         if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
-            is_right_redundant = is_tree_duplicate(right_child, lock_t, lock_c)
-            is_left_redundant = is_tree_duplicate(left_child, lock_t, lock_c)
+            is_right_redundant = is_tree_duplicate(right_child, lock)
+            is_left_redundant = is_tree_duplicate(left_child, lock)
             if is_right_redundant or is_left_redundant:
                 return True
     return False
@@ -204,8 +199,8 @@ def is_tree_logic_redundant(tree):
     return False
 
 
-def is_patch_duplicate(patch, index, lock_t, lock_c):
+def is_patch_duplicate(patch, index, lock):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree, lock_t, lock_c) or is_tree_logic_redundant(tree)
+    result = is_tree_duplicate(tree, lock) or is_tree_logic_redundant(tree)
     return result, index
