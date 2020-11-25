@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-TOOL_NAME = "ConRepair"
+TOOL_NAME = "CPR"
 DEBUG = False
 ARGUMENT_LIST = []
 SECOND_VAR_LIST = []
