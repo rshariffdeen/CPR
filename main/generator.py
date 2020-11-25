@@ -188,6 +188,8 @@ def generate_true_constraint(path_constraint):
                 value = utilities.get_signed_value(byte_list)
                 if value == 0:
                     true_constraint = Not(path_constraint)
+                else:
+                    true_constraint = path_constraint
     return true_constraint
 
 
