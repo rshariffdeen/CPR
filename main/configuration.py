@@ -200,9 +200,12 @@ def read_conf_file():
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
         exit()
-    if "/" != values.CONF_DIR_SRC[0]:
-        values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
-    if "/" != values.CONF_PATH_PROGRAM:
+    if values.CONF_DIR_SRC:
+        if "/" != values.CONF_DIR_SRC[0]:
+            values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
+    else:
+        values.CONF_DIR_SRC = values.CONF_PATH_PROJECT
+    if "/" != values.CONF_PATH_PROGRAM[0]:
         values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
 
 
