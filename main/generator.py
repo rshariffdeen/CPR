@@ -250,9 +250,9 @@ def generate_special_path_list(ppc_list):
             false_path = generate_false_path(path_condition)
             true_path = generate_true_path(path_condition)
             if true_path:
-                special_list.append(true_path)
+                special_list.append((con_loc, true_path, len(str(true_path.serialize()))))
             if false_path:
-                special_list.append(false_path)
+                special_list.append((con_loc, false_path, len(str(false_path.serialize()))))
     return special_list
 
 
@@ -520,7 +520,8 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = list()
     path_count = 0
-    generate_special_path_list(ppc_list)
+    path_list = generate_special_path_list(ppc_list)
+    print(path_list)
     exit()
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
@@ -620,6 +621,8 @@ def generate_true_path(path_condition):
             true_path = And(true_path, constraint)
         path_condition = path_condition.arg(0)
     true_path = And(true_path, path_condition)
+    if is_unsat(true_path):
+        true_path = None
     return true_path
 
 
@@ -636,6 +639,8 @@ def generate_false_path(path_condition):
             false_path = And(false_path, constraint)
         path_condition = path_condition.arg(0)
     false_path = And(false_path, path_condition)
+    if is_unsat(false_path):
+        false_path = None
     return false_path
 
 
