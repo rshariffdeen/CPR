@@ -196,7 +196,7 @@ def end(time_info):
 
 
 def help():
-    write("Usage: python3.6 ConRepair.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
+    write("Usage: python3.6 CPR.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", RED)
     write("\t" + definitions.ARG_CEGIS_TIME_SPLIT + "\t| " + "specify time split ratio for CEGIS mode; explore:refine  in minutes(default=1:1)", RED)

@@ -22,7 +22,7 @@ ARG_SKIP_LIST = "--skip-list="
 CONF_DATA_PATH = "/data"
 CONF_TOOL_PATH = "/concolic-repair"
 CONF_TOOL_PARAMS = "--mode=2"
-CONF_TOOL_NAME = "python3.6 ConRepair.py"
+CONF_TOOL_NAME = "python3.6 CPR.py"
 CONF_DEBUG = False
 CONF_BUG_ID = None
 CONF_START_ID = None

@@ -26,13 +26,13 @@ in the 'tests' directory. TODO: restructure test cases to a meaningful order
 
 Run examples:
 
-    python3.6 ConRepair.py --conf=tests/div-zero-1/repair.conf
-    python3.6 ConRepair.py --conf=tests/div-zero-2/repair.conf
+    python3.6 CPR.py --conf=tests/div-zero-1/repair.conf
+    python3.6 CPR.py --conf=tests/div-zero-2/repair.conf
 
 # Runtime Configuration Options
 The tool supports the following functionality:
 
-    Usage: python3.6 ConRepair.py [OPTIONS] --conf=$FILE_PATH
+    Usage: python3.6 CPR.py [OPTIONS] --conf=$FILE_PATH
 	Options are:
 		--debug	            | enable debugging information
 		--mode=             | execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)
