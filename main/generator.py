@@ -622,6 +622,8 @@ def generate_true_path(path_condition):
         constraint_str = str(constraint.serialize())
         if "angelic!bool" in constraint_str:
             constraint = generate_true_constraint(constraint)
+        elif true_path is None:
+            return
         if true_path is None:
             true_path = constraint
         else:
@@ -640,6 +642,8 @@ def generate_false_path(path_condition):
         constraint_str = str(constraint.serialize())
         if "angelic!bool" in constraint_str:
             constraint = generate_false_constraint(constraint)
+        elif false_path is None:
+            return
         if false_path is None:
             false_path = constraint
         else:
