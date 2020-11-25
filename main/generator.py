@@ -182,7 +182,8 @@ def generate_true_constraint(path_constraint):
 
     else:
         model = generate_model(path_constraint)
-        for var_name, byte_list in model:
+        for var_name in model:
+            byte_list = model[var_name]
             if "angelic!bool" in var_name:
                 value = utilities.get_signed_value(byte_list)
                 if value == 0:
