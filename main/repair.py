@@ -335,8 +335,9 @@ def run_fitreduce(program_path, patch_list):
             time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
-            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            values.LIST_PPC = []
             gen_arg_list, gen_var_list, patch_list = select_new_input(argument_list, second_var_list, patch_list)  # TODO (later) patch candidate missing
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")

@@ -290,15 +290,18 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
     if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
-        values.LIST_PPC, values.LAST_PPC_FORMULA = reader.collect_symbolic_path(ppc_log_path, project_path)
+        ppc_list, path_formula = reader.collect_symbolic_path(ppc_log_path, project_path)
+        values.LIST_PPC = values.LIST_PPC = ppc_list
+        values.LAST_PPC_FORMULA = path_formula
         values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     else:
         klee_dir_path = directory_path + "/klee-last/"
         values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_dir_path)
         if values.LAST_PPC_FORMULA:
-            values.LIST_PPC = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
-        else:
-            values.LIST_PPC = []
+            ppc_list = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
+            values.LIST_PPC = values.LIST_PPC + ppc_list
+        # else:
+        #     values.LIST_PPC = []
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG) and oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -477,8 +480,9 @@ def run_concolic_exploration(program_path, patch_list):
             ## Pick new input and patch candidate for next concolic execution step.
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
-            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            values.LIST_PPC = []
             gen_arg_list, gen_var_list, _ =  select_new_input(argument_list, second_var_list, [])
 
             if not patch_list:
