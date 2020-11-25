@@ -248,8 +248,11 @@ def generate_false_constraint(path_constraint):
 def generate_special_path_list(ppc_list):
     parser = SmtLibParser()
     special_list = []
-    for con_loc, ppc in ppc_list:
-        script = parser.get_script(cStringIO(ppc))
+    for con_loc, ppc_str in ppc_list:
+        if ppc_str in values.LIST_PATH_READ:
+            continue
+        values.LIST_PATH_READ.append(ppc_str)
+        script = parser.get_script(cStringIO(ppc_str))
         path_condition = script.get_last_formula()
         angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
         if angelic_count > 1:
@@ -527,8 +530,6 @@ def generate_symbolic_paths(ppc_list):
     path_list = list()
     path_count = 0
     path_list = generate_special_path_list(ppc_list)
-    print(path_list)
-    exit()
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         path_count = path_count + 1
