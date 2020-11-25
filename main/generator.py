@@ -191,7 +191,7 @@ def generate_true_constraint(path_constraint):
 
 
 def generate_false_constraint(path_constraint):
-    true_constraint = None
+    false_constraint = None
     if path_constraint.is_and() or path_constraint.is_or():
         prefix = None
         while path_constraint.is_and() or path_constraint.is_or():
@@ -202,16 +202,16 @@ def generate_false_constraint(path_constraint):
                 for var_name, byte_list in model:
                     if "angelic!bool" in var_name:
                         value = utilities.get_signed_value(byte_list)
-                        if value == 0:
+                        if value != 0:
                             constraint = Not(constraint)
 
-            if true_constraint:
+            if false_constraint:
                 if path_constraint.is_and():
-                    true_constraint = And(true_constraint, constraint)
+                    false_constraint = And(false_constraint, constraint)
                 elif path_constraint.is_or():
-                    true_constraint = Or(true_constraint, constraint)
+                    false_constraint = Or(false_constraint, constraint)
             else:
-                true_constraint = constraint
+                false_constraint = constraint
             prefix = path_constraint.arg(0)
             if prefix.is_and() or prefix.is_or():
                 path_constraint = prefix
@@ -225,18 +225,21 @@ def generate_false_constraint(path_constraint):
                             if value != 0:
                                 prefix = Not(prefix)
         if path_constraint.is_and():
-            true_constraint = And(true_constraint, prefix)
+            false_constraint = And(false_constraint, prefix)
         elif path_constraint.is_or():
-            true_constraint = Or(true_constraint, prefix)
+            false_constraint = Or(false_constraint, prefix)
 
     else:
         model = generate_model(path_constraint)
-        for var_name, byte_list in model:
+        for var_name in model:
+            byte_list = model[var_name]
             if "angelic!bool" in var_name:
                 value = utilities.get_signed_value(byte_list)
-                if value == 0:
-                    true_constraint = Not(path_constraint)
-    return true_constraint
+                if value != 0:
+                    false_constraint = Not(path_constraint)
+                else:
+                    false_constraint = path_constraint
+    return false_constraint
 
 
 def generate_special_path_list(ppc_list):
