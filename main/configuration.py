@@ -196,6 +196,8 @@ def read_conf_file():
             values.CONF_MASK_ARG = configuration.replace(definitions.CONF_MASK_ARG, '').split(",")
         elif definitions.CONF_TIMEOUT_SAT in configuration:
             values.CONF_TIMEOUT_SAT = int(configuration.replace(definitions.CONF_TIMEOUT_SAT, ''))
+        elif definitions.CONF_TIMEOUT_KLEE in configuration:
+            values.CONF_TIMEOUT_KLEE = int(configuration.replace(definitions.CONF_TIMEOUT_KLEE, ''))
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

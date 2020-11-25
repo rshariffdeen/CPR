@@ -90,6 +90,8 @@ def bootstrap(arg_list):
         values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
     if values.CONF_TIMEOUT_SAT:
         values.DEFAULT_TIMEOUT_SAT = values.CONF_TIMEOUT_SAT
+    if values.CONF_TIMEOUT_KLEE:
+        values.DEFAULT_TIMEOUT_KLEE = values.CONF_TIMEOUT_KLEE
     if values.CONF_RANK_LIMIT:
         values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
     if values.CONF_TIME_SPLIT:
