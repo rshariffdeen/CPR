@@ -249,9 +249,6 @@ def generate_special_path_list(ppc_list):
     parser = SmtLibParser()
     special_list = []
     for con_loc, ppc_str in ppc_list:
-        if ppc_str in values.LIST_PATH_READ:
-            continue
-        values.LIST_PATH_READ.append(ppc_str)
         script = parser.get_script(cStringIO(ppc_str))
         path_condition = script.get_last_formula()
         angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
