@@ -287,7 +287,7 @@ def update_configuration():
         values.DEFAULT_MAX_FORK = values.CONF_MAX_FORK
     if values.CONF_GEN_SEARCH_LIMIT:
         values.DEFAULT_GEN_SEARCH_LIMIT = values.CONF_GEN_SEARCH_LIMIT
-    if values.CONF_ITERATION_LIMIT:
+    if values.CONF_ITERATION_LIMIT >= 0:
         values.DEFAULT_ITERATION_LIMIT = values.CONF_ITERATION_LIMIT
     if values.CONF_STACK_SIZE:
         values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
