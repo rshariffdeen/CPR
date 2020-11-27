@@ -65,7 +65,7 @@ def generate_special_paths_parallel(ppc_list):
     lock = None
     count = 0
     ppc_list.reverse()
-    if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
@@ -125,7 +125,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     count = 0
     expected_count = len(ppc_list)
     ppc_list.reverse()
-    if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
@@ -196,7 +196,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     # sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
     # var_relationship = extractor.extract_var_relationship(sym_expr_map)
     var_relationship = TRUE
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
@@ -254,7 +254,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
     global pool, result_list
     result_list = []
     emitter.normal("\tupdating patch pool")
-    if values.CONF_OPERATION_MODE in ["sequential"] or force_sequential:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
@@ -295,7 +295,7 @@ def partition_input_space(path_condition, assertion):
             partition_model = generator.generate_model(is_exist)
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
-            if values.CONF_OPERATION_MODE in ["sequential"]:
+            if values.DEFAULT_OPERATION_MODE in ["sequential"]:
                 for partition in partition_list:
                     # emitter.emit_patch(patch, message="\tabstract patch: ")
                     result_list.append(refine.refine_input_partition(path_condition, assertion, partition, is_multi_dimension))
@@ -325,12 +325,12 @@ def partition_input_space(path_condition, assertion):
 def validate_input_generation(patch_list, new_path):
     global pool, result_list, found_one
     result_list = []
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
             patch_space_constraint = patch_formula_extended
-            if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
                 patch_formula_str = str(patch_formula.serialize())
                 patch_index = utilities.get_hash(patch_formula_str)
                 patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -351,7 +351,7 @@ def validate_input_generation(patch_list, new_path):
                 patch_formula = main.generator.generate_formula_from_patch(patch)
                 patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
                 patch_space_constraint = patch_formula
-                if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+                if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
                     patch_formula_str = str(patch_formula.serialize())
                     patch_index = utilities.get_hash(patch_formula_str)
                     patch_space = values.LIST_PATCH_SPACE[patch_index]

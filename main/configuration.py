@@ -87,6 +87,7 @@ def read_conf(arg_list):
 
 def read_conf_file():
     emitter.normal("reading configuration values form configuration file")
+    emitter.note("\t[file]" + values.FILE_CONFIGURATION)
     logger.information(values.FILE_CONFIGURATION)
     if not os.path.exists(values.FILE_CONFIGURATION):
         emitter.error("[NOT FOUND] Configuration file " + values.FILE_CONFIGURATION)
@@ -251,18 +252,18 @@ def load_component_list():
 def print_configuration():
     # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     # assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
-    emitter.configuration("\t[config] assertion:", values.SPECIFICATION_TXT[1])
-    emitter.configuration("\t[config] generation_limit:", values.DEFAULT_GEN_SEARCH_LIMIT)
-    emitter.configuration("\t[config] max_bound:", values.DEFAULT_PATCH_UPPER_BOUND)
-    emitter.configuration("\t[config] low_bound:", values.DEFAULT_PATCH_LOWER_BOUND)
-    emitter.configuration("\t[config] stack_size:", sys.getrecursionlimit())
-    emitter.configuration("\t[config] refine_strategy:", values.CONF_REFINE_METHOD)
-    emitter.configuration("\t[config] patch_type:", values.CONF_PATCH_TYPE)
-    emitter.configuration("\t[config] repair_method:", values.CONF_REDUCE_METHOD)
-    emitter.configuration("\t[config] timeout_sat:", values.DEFAULT_TIMEOUT_SAT)
-    emitter.configuration("\t[config] timeout_klee:", values.DEFAULT_TIMEOUT_KLEE)
-    emitter.configuration("\t[config] distance_metric:", values.CONF_DISTANCE_METRIC)
-    emitter.configuration("\t[config] mode:", values.CONF_OPERATION_MODE)
+    emitter.configuration("\t[config] program specification:", values.SPECIFICATION_TXT[1])
+    emitter.configuration("\t[config] path generation limit:", values.DEFAULT_GEN_SEARCH_LIMIT)
+    emitter.configuration("\t[config] synthesis max bound:", values.DEFAULT_PATCH_UPPER_BOUND)
+    emitter.configuration("\t[config] synthesis low bound:", values.DEFAULT_PATCH_LOWER_BOUND)
+    emitter.configuration("\t[config] stack size:", sys.getrecursionlimit())
+    emitter.configuration("\t[config] refine strategy:", values.CONF_REFINE_METHOD)
+    emitter.configuration("\t[config] patch type:", values.CONF_PATCH_TYPE)
+    emitter.configuration("\t[config] repair method:", values.CONF_REDUCE_METHOD)
+    emitter.configuration("\t[config] timeout for sat:", values.DEFAULT_TIMEOUT_SAT)
+    emitter.configuration("\t[config] timeout for klee:", values.DEFAULT_TIMEOUT_KLEE)
+    emitter.configuration("\t[config] distance metric:", values.CONF_DISTANCE_METRIC)
+    emitter.configuration("\t[config] operation mode:", values.CONF_OPERATION_MODE)
 
 
 def update_configuration():
@@ -299,6 +300,19 @@ def update_configuration():
         values.DEFAULT_TIMEOUT_KLEE = values.CONF_TIMEOUT_KLEE
     if values.CONF_RANK_LIMIT:
         values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
+    if values.CONF_SELECTION_STRATEGY:
+        values.DEFAULT_SELECTION_STRATEGY = values.CONF_SELECTION_STRATEGY
+    if values.CONF_DISTANCE_METRIC:
+        values.DEFAULT_DISTANCE_METRIC = values.CONF_DISTANCE_METRIC
+    if values.CONF_PATCH_TYPE:
+        values.DEFAULT_PATCH_TYPE = values.CONF_PATCH_TYPE
+    if values.CONF_REFINE_METHOD:
+        values.DEFAULT_REFINE_METHOD = values.CONF_REFINE_METHOD
+    if values.CONF_OPERATION_MODE:
+        values.DEFAULT_OPERATION_MODE = values.CONF_OPERATION_MODE
+    if values.CONF_REDUCE_METHOD:
+        values.DEFAULT_REDUCE_METHOD = values.CONF_REDUCE_METHOD
+
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)

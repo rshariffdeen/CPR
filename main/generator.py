@@ -42,7 +42,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
@@ -93,12 +93,12 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
     emitter.normal("\tcreating patch pool")
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
     else:
         result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)

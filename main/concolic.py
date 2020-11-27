@@ -48,7 +48,7 @@ def select_nearest_control_loc():
         filter(lambda elem: elem[0] in control_loc_list, values.MAP_LOC_DISTANCE.items()))
     min_distance = min(list(control_loc_dist_map.values()))
     loc_list = list(dict(filter(lambda elem: elem[1] == min_distance, control_loc_dist_map.items())).keys())
-    if values.CONF_SELECTION_STRATEGY == "deterministic":
+    if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
         selection = list(set(loc_list) & set(control_loc_list))[0]
     else:
         selection = random.choice(list(set(loc_list) & set(control_loc_list)))
@@ -57,7 +57,7 @@ def select_nearest_control_loc():
 
 def select_new_path_condition():
     global list_path_inprogress
-    if values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
+    if values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
         path_list_at_patch_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
@@ -69,10 +69,10 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
         list_path_inprogress.remove(selected_pair)
-    elif values.CONF_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
+    elif values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
         path_list_at_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == control_loc]
-        if values.CONF_SELECTION_STRATEGY == "deterministic":
+        if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
             selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
             selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
@@ -84,7 +84,7 @@ def select_new_path_condition():
         list_path_inprogress.remove(selected_pair)
     else:
         ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
-        if values.CONF_SELECTION_STRATEGY == "deterministic":
+        if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
             selected_pair = ranked_list[0]
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
@@ -115,7 +115,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
         # emitter.note("\t\tCount paths remaining: " + str(len(list_path_detected)))
         return None
 
-    if values.CONF_SELECTION_STRATEGY == "deterministic":
+    if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
         selected_patch = filtered_patch_list[0]
     else:
         selected_patch = random.choice(filtered_patch_list)
@@ -124,7 +124,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
     patch_formula = main.generator.generate_formula_from_patch(selected_patch)
     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, selected_new_path)
     patch_space_constraint = patch_formula_extended
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         patch_formula_str = str(patch_formula.serialize())
         patch_index = utilities.get_hash(patch_formula_str)
         patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -261,7 +261,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # if values.CONF_DISTANCE_METRIC == "control-loc":
     hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
     ppc_log_flag = ""
-    if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+    if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_log_flag = "--log-ppc "
     klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE) + " klee " \
                    "--posix-runtime " \
@@ -289,7 +289,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # collect artifacts
     ppc_log_path = directory_path + "/klee-last/ppc.log"
     trace_log_path = directory_path + "/klee-last/trace.log"
-    if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+    if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_list, path_formula = reader.collect_symbolic_path(ppc_log_path, project_path)
         values.LIST_PPC = values.LIST_PPC = ppc_list
         values.LAST_PPC_FORMULA = path_formula
@@ -305,7 +305,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     values.PREFIX_PPC_FORMULA = generator.generate_formula(values.PREFIX_PPC_STR)
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG) and oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-        if values.CONF_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
+        if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
             values.NEGATED_PPC_FORMULA = generator.generate_path_for_negation()
         else:
             if values.LAST_PPC_FORMULA:

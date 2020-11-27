@@ -132,7 +132,7 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
     is_under_approx = False
     if is_sat(path_feasibility):
         is_under_approx = True
-        if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
+        if values.DEFAULT_REFINE_METHOD in ["under-approx", "overfit"]:
             emitter.debug("refining for universal quantification")
             if parameter_constraint:
                 refined_patch_space = refine_parameter_space(path_constraint, patch_space, p_specification)
@@ -157,7 +157,7 @@ def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specifi
     is_over_approx = False
     if is_sat(path_feasibility):
         is_over_approx = True
-        if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
+        if values.DEFAULT_REFINE_METHOD in ["over-approx", "overfit"]:
             emitter.debug("refining for existential quantification")
             if parameter_constraint:
                 refined_patch_space = refine_parameter_space(path_constraint, patch_space, p_specification)

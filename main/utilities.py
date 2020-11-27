@@ -178,7 +178,7 @@ def check_budget(time_budget):  # TODO implement time budget
 
 
 def count_concrete_patches_per_template(abstract_patch):
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
     patch_formula = main.generator.generate_formula_from_patch(abstract_patch)
     patch_formula_str = patch_formula.serialize()

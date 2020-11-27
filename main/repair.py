@@ -72,7 +72,7 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         if is_over_approx is not None:
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = is_over_approx
 
-        if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
+        if values.DEFAULT_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             updated_patch_list.append(patch)
         else:
             if refined_space:
@@ -98,7 +98,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # if valid_input_space:
     #     valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
     values.VALID_INPUT_SPACE = None
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
@@ -121,7 +121,7 @@ def print_patch_list(patch_list):
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         concrete_patch_count = 1
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_space = values.LIST_PATCH_SPACE[patch_index]
             partition_count = 0
             for partition in patch_space:
@@ -181,7 +181,7 @@ def run(project_path, program_path):
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
     emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = utilities.count_concrete_patches(patch_list)
         values.COUNT_TEMPLATE_START = len(patch_list)
     else:
@@ -191,9 +191,9 @@ def run(project_path, program_path):
     values.TIME_TO_GENERATE = str(duration)
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
     writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
-    if values.CONF_REDUCE_METHOD == "fitreduce":
+    if values.DEFAULT_REDUCE_METHOD == "fitreduce":
         run_fitreduce(program_path, patch_list)
-    elif values.CONF_REDUCE_METHOD == "cegis":
+    elif values.DEFAULT_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, patch_list)
 
     values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
@@ -384,7 +384,7 @@ def run_fitreduce(program_path, patch_list):
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked"
         writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
         check_infeasible_paths(patch_list)
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
         else:
