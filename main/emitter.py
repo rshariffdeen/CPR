@@ -166,7 +166,7 @@ def configuration(setting, value):
 def start():
     logger.create()
     write("\n" + "#"*100 + "\n", BLUE)
-    write("\t" + values.TOOL_NAME + " - Concolic Repair", BLUE)
+    write("\t" + values.TOOL_NAME + " (CardioPulmonary Resuscitation) - Concolic Program Repair", BLUE)
     write("\tAutomated Program Repair Tool", BLUE)
     write("\tCopyright National University of Singapore", BLUE)
     write("\n" + "#" * 100, BLUE)

@@ -23,7 +23,7 @@ def create_directories():
 
 
 def bootstrap(arg_list):
-    emitter.title("Starting " + values.TOOL_NAME)
+    emitter.title("Starting " + values.TOOL_NAME + " (CardioPulmonary Resuscitation) ")
     emitter.sub_title("Loading Configurations")
 
     configuration.read_conf(arg_list)
