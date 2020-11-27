@@ -158,10 +158,8 @@ def note(message):
 
 
 def configuration(setting, value):
-    indent_length = len(setting)
-    prefix = " " * indent_length
-    write(setting, WHITE, True)
-    write(str(value), WHITE, False, indent_level=indent_length, prefix=prefix)
+    message = "\t[config] " + setting + ": " + str(value)
+    write(message, WHITE, True, indent_level=indent_length, prefix=prefix)
     logger.configuration(setting + ":" + str(value))
 
 
