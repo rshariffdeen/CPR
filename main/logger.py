@@ -79,6 +79,12 @@ def note(message):
     log(message)
 
 
+def configuration(message):
+    message = str(message).strip().lower().replace("[config]", "")
+    message = "[CONFIGURATION]: " + str(message) + "\n"
+    log(message)
+
+
 def output(message):
     message = str(message).strip()
     message = "[LOG]: " + message

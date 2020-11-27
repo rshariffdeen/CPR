@@ -157,6 +157,14 @@ def note(message):
     logger.note(message)
 
 
+def configuration(setting, value):
+    indent_length = len(setting)
+    prefix = " " * indent_length
+    write(setting, WHITE, True)
+    write(str(value), WHITE, False, indent_level=indent_length, prefix=prefix)
+    logger.configuration(setting + ":" + str(value))
+
+
 def start():
     logger.create()
     write("\n" + "#"*100 + "\n", BLUE)

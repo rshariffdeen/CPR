@@ -1,6 +1,8 @@
 import os
 import sys
-from main import emitter, definitions, values, reader, logger, generator
+import shutil
+from pathlib import Path
+from main import emitter, logger, definitions, values, reader, synthesis
 from main.utilities import error_exit
 
 
@@ -211,18 +213,96 @@ def read_conf_file():
         values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
 
 
+def load_component_list():
+    emitter.normal("loading custom/general components")
+    base_list = ["equal.smt2", "not-equal.smt2", "less-than.smt2", "less-or-equal.smt2"]
+    if definitions.DIRECTORY_TESTS in values.CONF_PATH_PROJECT:
+        base_list = []
+    gen_comp_files = []
+    os.chdir(definitions.DIRECTORY_COMPONENTS)
+    if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
+        comp_list = list(set(values.CONF_GENERAL_COMP_LIST + base_list))
+        for component_name in comp_list:
+            gen_comp_files.append(Path(component_name))
+            emitter.note("\tloading component: " + str(component_name))
+    else:
+        component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
+        for comp_file in component_file_list:
+            if ".smt2" in comp_file:
+                if any(x in comp_file for x in ["logical-not", "post-decrement", "post-increment", "minus", "constant", "assignment", "sequence", "greater", "remainder"]):
+                    continue
+                gen_comp_files.append(Path(comp_file))
+                emitter.note("\tloading component: " + str(comp_file))
+    gen_comp_files = list(set(gen_comp_files))
+    general_components = synthesis.load_components(gen_comp_files)
+
+    proj_comp_files = []
+    os.chdir(values.CONF_PATH_PROJECT)
+    for component_name in values.CONF_CUSTOM_COMP_LIST:
+        proj_comp_files.append(Path(component_name))
+        emitter.note("\tloading component: " + str(component_name))
+    project_components = synthesis.load_components(proj_comp_files)
+    values.LIST_COMPONENTS = project_components + general_components
+    values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
+    values.COUNT_COMPONENTS_CUS = len(project_components)
+    values.COUNT_COMPONENTS_GEN = len(general_components)
+
+
 def print_configuration():
     # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     # assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
-    emitter.note("\tconfiguration.assertion:" + str(values.SPECIFICATION_TXT[1]))
-    emitter.note("\tconfiguration.generation_limit:" + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    emitter.note("\tconfiguration.max_bound:" + str(values.DEFAULT_PATCH_UPPER_BOUND))
-    emitter.note("\tconfiguration.low_bound:" + str(values.DEFAULT_PATCH_LOWER_BOUND))
-    emitter.note("\tconfiguration.stack_size:" + str(sys.getrecursionlimit()))
-    emitter.note("\tconfiguration.refine_strategy:" + str(values.CONF_REFINE_METHOD))
-    emitter.note("\tconfiguration.patch_type:" + str(values.CONF_PATCH_TYPE))
-    emitter.note("\tconfiguration.repair_method:" + str(values.CONF_REDUCE_METHOD))
-    emitter.note("\tconfiguration.timeout_sat:" + str(values.DEFAULT_TIMEOUT_SAT))
-    emitter.note("\tconfiguration.timeout_klee:" + str(values.DEFAULT_TIMEOUT_KLEE))
-    emitter.note("\tconfiguration.distance_metric:" + str(values.CONF_DISTANCE_METRIC))
-    emitter.note("\tconfiguration.mode:" + str(values.CONF_OPERATION_MODE))
+    emitter.configuration("\t[config] assertion:", values.SPECIFICATION_TXT[1])
+    emitter.configuration("\t[config] generation_limit:", values.DEFAULT_GEN_SEARCH_LIMIT)
+    emitter.configuration("\t[config] max_bound:", values.DEFAULT_PATCH_UPPER_BOUND)
+    emitter.configuration("\t[config] low_bound:", values.DEFAULT_PATCH_LOWER_BOUND)
+    emitter.configuration("\t[config] stack_size:", sys.getrecursionlimit())
+    emitter.configuration("\t[config] refine_strategy:", values.CONF_REFINE_METHOD)
+    emitter.configuration("\t[config] patch_type:", values.CONF_PATCH_TYPE)
+    emitter.configuration("\t[config] repair_method:", values.CONF_REDUCE_METHOD)
+    emitter.configuration("\t[config] timeout_sat:", values.DEFAULT_TIMEOUT_SAT)
+    emitter.configuration("\t[config] timeout_klee:", values.DEFAULT_TIMEOUT_KLEE)
+    emitter.configuration("\t[config] distance_metric:", values.CONF_DISTANCE_METRIC)
+    emitter.configuration("\t[config] mode:", values.CONF_OPERATION_MODE)
+
+
+def update_configuration():
+    emitter.normal("updating configuration values")
+    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
+    values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
+    values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
+    values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
+    values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
+    definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
+    if os.path.isdir(definitions.DIRECTORY_OUTPUT):
+        shutil.rmtree(definitions.DIRECTORY_OUTPUT)
+    os.mkdir(definitions.DIRECTORY_OUTPUT)
+
+    if values.CONF_MAX_BOUND:
+        values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
+    if values.CONF_LOW_BOUND:
+        values.DEFAULT_PATCH_LOWER_BOUND = values.CONF_LOW_BOUND
+    if values.CONF_MAX_FORK:
+        values.DEFAULT_MAX_FORK = values.CONF_MAX_FORK
+    if values.CONF_GEN_SEARCH_LIMIT:
+        values.DEFAULT_GEN_SEARCH_LIMIT = values.CONF_GEN_SEARCH_LIMIT
+    if values.CONF_ITERATION_LIMIT:
+        values.DEFAULT_ITERATION_LIMIT = values.CONF_ITERATION_LIMIT
+    if values.CONF_STACK_SIZE:
+        values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
+    if values.CONF_IS_CRASH:
+        values.IS_CRASH = values.CONF_IS_CRASH
+    if values.CONF_TIME_DURATION:
+        values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
+    if values.CONF_TIMEOUT_SAT:
+        values.DEFAULT_TIMEOUT_SAT = values.CONF_TIMEOUT_SAT
+    if values.CONF_TIMEOUT_KLEE:
+        values.DEFAULT_TIMEOUT_KLEE = values.CONF_TIMEOUT_KLEE
+    if values.CONF_RANK_LIMIT:
+        values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
+    if values.CONF_TIME_SPLIT:
+        explore, refine = values.CONF_TIME_SPLIT.split(":")
+        total = int(explore) + int(refine)
+        values.CONF_TIME_CEGIS_EXPLORE = (int(explore) / total) * values.DEFAULT_TIME_DURATION
+        values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
+    sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
+
