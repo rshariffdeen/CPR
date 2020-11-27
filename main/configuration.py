@@ -257,13 +257,14 @@ def print_configuration():
     emitter.configuration("synthesis max bound", values.DEFAULT_PATCH_UPPER_BOUND)
     emitter.configuration("synthesis low bound", values.DEFAULT_PATCH_LOWER_BOUND)
     emitter.configuration("stack size", sys.getrecursionlimit())
-    emitter.configuration("refine strategy", values.CONF_REFINE_METHOD)
-    emitter.configuration("patch type", values.CONF_PATCH_TYPE)
-    emitter.configuration("repair method", values.CONF_REDUCE_METHOD)
+    emitter.configuration("refine strategy", values.DEFAULT_REFINE_METHOD)
+    emitter.configuration("patch type", values.DEFAULT_PATCH_TYPE)
+    emitter.configuration("repair method", values.DEFAULT_REDUCE_METHOD)
     emitter.configuration("timeout for sat", values.DEFAULT_TIMEOUT_SAT)
     emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE)
-    emitter.configuration("distance metric", values.CONF_DISTANCE_METRIC)
-    emitter.configuration("operation mode", values.CONF_OPERATION_MODE)
+    emitter.configuration("distance metric", values.DEFAULT_DISTANCE_METRIC)
+    emitter.configuration("operation mode", values.DEFAULT_OPERATION_MODE)
+    emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
 
 
 def update_configuration():
