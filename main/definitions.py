@@ -67,6 +67,7 @@ CONF_IS_CPP = "is_cpp:"
 CONF_IS_CRASH = "is_crash:"
 CONF_TIMEOUT_SAT = "timeout_sat:"
 CONF_TIMEOUT_KLEE = "timeout_klee:"
+CONF_RANK_LIMIT = "rank_limit:"
 
 
 # ----------------- KEY DEFINITIONS -------------------

@@ -107,6 +107,8 @@ def read_conf_file():
             values.CONF_COMMAND_BUILD = configuration.replace(definitions.CONF_COMMAND_BUILD, '')
         elif definitions.CONF_COMMAND_CONFIG in configuration:
             values.CONF_COMMAND_CONFIG = configuration.replace(definitions.CONF_COMMAND_CONFIG, '')
+        elif definitions.CONF_RANK_LIMIT in configuration:
+            values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
         elif definitions.CONF_TEST_FILE in configuration:
             values.CONF_TEST_FILE = configuration.replace(definitions.CONF_TEST_FILE, '')
             if not os.path.isfile(values.CONF_TEST_FILE):
