@@ -252,7 +252,7 @@ def load_component_list():
 def print_configuration():
     # emitter.note("\tconfiguration.is_crash:" + str(values.IS_CRASH))
     # assertion_formula = generator.generate_formula(values.SPECIFICATION_TXT[1])
-    emitter.configuration("\t[config] program specification:", values.SPECIFICATION_TXT[1])
+    # emitter.configuration("\t[config] program specification:", values.SPECIFICATION_TXT[1])
     emitter.configuration("\t[config] path generation limit:", values.DEFAULT_GEN_SEARCH_LIMIT)
     emitter.configuration("\t[config] synthesis max bound:", values.DEFAULT_PATCH_UPPER_BOUND)
     emitter.configuration("\t[config] synthesis low bound:", values.DEFAULT_PATCH_LOWER_BOUND)
