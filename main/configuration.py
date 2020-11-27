@@ -87,7 +87,7 @@ def read_conf(arg_list):
 
 def read_conf_file():
     emitter.normal("reading configuration values form configuration file")
-    emitter.note("\t[file]" + values.FILE_CONFIGURATION)
+    emitter.note("\t[file] " + values.FILE_CONFIGURATION)
     logger.information(values.FILE_CONFIGURATION)
     if not os.path.exists(values.FILE_CONFIGURATION):
         emitter.error("[NOT FOUND] Configuration file " + values.FILE_CONFIGURATION)
