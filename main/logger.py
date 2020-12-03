@@ -46,7 +46,7 @@ def trace(function_name, arguments):
 
 
 def command(message):
-    message = str(message).strip().lower().replace("[command]", "")
+    message = str(message).strip().replace("[command]", "")
     message = "[COMMAND]: " + str(message) + "\n"
     log(message)
 
