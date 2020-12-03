@@ -14,6 +14,7 @@ import time
 
 def execute_command(command, show_output=True):
     # Print executed command and execute it in console
+    command = command.encode().decode('ascii', 'ignore')
     emitter.command(command)
     command = "{ " + command + " ;} 2> " + definitions.FILE_ERROR_LOG
     if not show_output:
@@ -158,24 +159,26 @@ def get_hash(str_value):
 
 
 def check_budget(time_budget):  # TODO implement time budget
-    # if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
-    #     return False
-    # else:
-    #     return True
-    if values.CONF_TIME_CHECK is None:
-        values.CONF_TIME_CHECK = time.time()
-        return False
-    else:
-        time_start = values.CONF_TIME_CHECK
-        duration = float(format((time.time() - time_start) / 60, '.3f'))
-        if int(duration) > int(time_budget):
-            values.CONF_TIME_CHECK = None
+    if values.DEFAULT_ITERATION_LIMIT >= 0:
+        if values.ITERATION_NO < values.DEFAULT_ITERATION_LIMIT:  # Only for testing purpose.
+            return False
+        else:
             return True
-    return False
+    else:
+        if values.CONF_TIME_CHECK is None:
+            values.CONF_TIME_CHECK = time.time()
+            return False
+        else:
+            time_start = values.CONF_TIME_CHECK
+            duration = float(format((time.time() - time_start) / 60, '.3f'))
+            if int(duration) > int(time_budget):
+                values.CONF_TIME_CHECK = None
+                return True
+        return False
 
 
 def count_concrete_patches_per_template(abstract_patch):
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
     patch_formula = main.generator.generate_formula_from_patch(abstract_patch)
     patch_formula_str = patch_formula.serialize()

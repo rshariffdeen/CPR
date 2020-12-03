@@ -42,7 +42,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
@@ -93,12 +93,12 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     specification = load_specification(spec_files)
     values.TEST_SPECIFICATION = specification
     concrete_enumeration = False
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
     emitter.normal("\tcreating patch pool")
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
     else:
         result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
@@ -139,6 +139,127 @@ def generate_flipped_path(ppc):
 
     assert str(new_path.serialize()) != str(formula.serialize())
     return new_path
+
+
+def generate_true_constraint(path_constraint):
+    true_constraint = None
+    if path_constraint.is_and() or path_constraint.is_or():
+        prefix = None
+        while path_constraint.is_and() or path_constraint.is_or():
+            constraint = path_constraint.arg(1)
+            constraint_str = str(constraint.serialize())
+            if "angelic!bool" in constraint_str:
+                model = generate_model(constraint)
+                for var_name, byte_list in model:
+                    if "angelic!bool" in var_name:
+                        value = utilities.get_signed_value(byte_list)
+                        if value == 0:
+                            constraint = Not(constraint)
+
+            if true_constraint:
+                if path_constraint.is_and():
+                    true_constraint = And(true_constraint, constraint)
+                elif  path_constraint.is_or():
+                    true_constraint = Or(true_constraint, constraint)
+            else:
+                true_constraint = constraint
+            prefix= path_constraint.arg(0)
+            if prefix.is_and() or prefix.is_or():
+                path_constraint = prefix
+            else:
+                prefix_str = str(prefix.serialize())
+                if "angelic!bool" in prefix_str:
+                    model = generate_model(prefix)
+                    for var_name, byte_list in model:
+                        if "angelic!bool" in var_name:
+                            value = utilities.get_signed_value(byte_list)
+                            if value == 0:
+                                prefix = Not(prefix)
+        if path_constraint.is_and():
+            true_constraint = And(true_constraint, prefix)
+        elif path_constraint.is_or():
+            true_constraint = Or(true_constraint, prefix)
+
+    else:
+        model = generate_model(path_constraint)
+        for var_name in model:
+            byte_list = model[var_name]
+            if "angelic!bool" in var_name:
+                value = utilities.get_signed_value(byte_list)
+                if value == 0:
+                    true_constraint = Not(path_constraint)
+                else:
+                    true_constraint = path_constraint
+    return true_constraint
+
+
+def generate_false_constraint(path_constraint):
+    false_constraint = None
+    if path_constraint.is_and() or path_constraint.is_or():
+        prefix = None
+        while path_constraint.is_and() or path_constraint.is_or():
+            constraint = path_constraint.arg(1)
+            constraint_str = str(constraint.serialize())
+            if "angelic!bool" in constraint_str:
+                model = generate_model(constraint)
+                for var_name, byte_list in model:
+                    if "angelic!bool" in var_name:
+                        value = utilities.get_signed_value(byte_list)
+                        if value != 0:
+                            constraint = Not(constraint)
+
+            if false_constraint:
+                if path_constraint.is_and():
+                    false_constraint = And(false_constraint, constraint)
+                elif path_constraint.is_or():
+                    false_constraint = Or(false_constraint, constraint)
+            else:
+                false_constraint = constraint
+            prefix = path_constraint.arg(0)
+            if prefix.is_and() or prefix.is_or():
+                path_constraint = prefix
+            else:
+                prefix_str = str(prefix.serialize())
+                if "angelic!bool" in prefix_str:
+                    model = generate_model(prefix)
+                    for var_name, byte_list in model:
+                        if "angelic!bool" in var_name:
+                            value = utilities.get_signed_value(byte_list)
+                            if value != 0:
+                                prefix = Not(prefix)
+        if path_constraint.is_and():
+            false_constraint = And(false_constraint, prefix)
+        elif path_constraint.is_or():
+            false_constraint = Or(false_constraint, prefix)
+
+    else:
+        model = generate_model(path_constraint)
+        for var_name in model:
+            byte_list = model[var_name]
+            if "angelic!bool" in var_name:
+                value = utilities.get_signed_value(byte_list)
+                if value != 0:
+                    false_constraint = Not(path_constraint)
+                else:
+                    false_constraint = path_constraint
+    return false_constraint
+
+
+def generate_special_path_list(ppc_list):
+    parser = SmtLibParser()
+    special_list = []
+    for con_loc, ppc_str in ppc_list:
+        script = parser.get_script(cStringIO(ppc_str))
+        path_condition = script.get_last_formula()
+        angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
+        if angelic_count > 1:
+            false_path = generate_false_path(path_condition)
+            true_path = generate_true_path(path_condition)
+            if true_path:
+                special_list.append((con_loc, true_path, len(str(true_path.serialize()))))
+            if false_path:
+                special_list.append((con_loc, false_path, len(str(false_path.serialize()))))
+    return special_list
 
 
 def generate_angelic_val_for_crash(klee_out_dir):
@@ -185,7 +306,7 @@ def generate_model(formula):
     model = get_model(formula)
     if model is None:
         return None
-    path_script = "/tmp/z3_script"
+    path_script = "/tmp/z3_script_model"
     write_smtlib(formula, path_script)
     with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
@@ -194,7 +315,7 @@ def generate_model(formula):
     sym_var_list = dict()
     for var_name in var_list:
         # sym_var_list[var_name] = dict()
-        if "const_" in var_name:
+        if "const_" in var_name and not "const_arr" in var_name:
             sym_def = Symbol(var_name, BV32)
             if sym_def not in model:
                 continue
@@ -352,8 +473,8 @@ def generate_model_cli(formula):
                formula: smtlib formatted formula
     """
     emitter.normal("\textracting z3 model")
-    path_script = "/tmp/z3_script"
-    path_result = "/tmp/z3_output"
+    path_script = "/tmp/z3_script_model_cli"
+    path_result = "/tmp/z3_output_model_cli"
     write_smtlib(formula, path_script)
     with open(path_script, "a") as script_file:
         script_file.writelines(["(get-model)\n", "(exit)\n"])
@@ -405,6 +526,7 @@ def generate_symbolic_paths(ppc_list):
     emitter.normal("\tgenerating new paths")
     path_list = list()
     path_count = 0
+    path_list = generate_special_path_list(ppc_list)
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         path_count = path_count + 1
@@ -453,7 +575,8 @@ def generate_path_for_negation():
             formula = script.get_last_formula()
             patch_constraint = formula.arg(1)
             constraint_list.append(patch_constraint.serialize())
-
+    if not constraint_list:
+        return None
     last_sym_path = values.LAST_PPC_FORMULA
     # script = parser.get_script(cStringIO(last_sym_path))
     # formula = script.get_last_formula()
@@ -478,7 +601,7 @@ def generate_negated_path(path_condition):
     while path_condition.is_and():
         constraint = path_condition.arg(1)
         constraint_str = constraint.serialize()
-        if "angelic!bool!" in constraint_str:
+        if "angelic!" in constraint_str:
             constraint = Not(constraint)
         if negated_path is None:
             negated_path = constraint
@@ -487,6 +610,46 @@ def generate_negated_path(path_condition):
         path_condition = path_condition.arg(0)
     negated_path = And(negated_path, path_condition)
     return negated_path
+
+
+def generate_true_path(path_condition):
+    true_path = None
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = str(constraint.serialize())
+        if "angelic!bool" in constraint_str:
+            constraint = generate_true_constraint(constraint)
+        elif true_path is None:
+            return
+        if true_path is None:
+            true_path = constraint
+        else:
+            true_path = And(true_path, constraint)
+        path_condition = path_condition.arg(0)
+    true_path = And(true_path, path_condition)
+    if is_unsat(true_path):
+        true_path = None
+    return true_path
+
+
+def generate_false_path(path_condition):
+    false_path = None
+    while path_condition.is_and():
+        constraint = path_condition.arg(1)
+        constraint_str = str(constraint.serialize())
+        if "angelic!bool" in constraint_str:
+            constraint = generate_false_constraint(constraint)
+        elif false_path is None:
+            return
+        if false_path is None:
+            false_path = constraint
+        else:
+            false_path = And(false_path, constraint)
+        path_condition = path_condition.arg(0)
+    false_path = And(false_path, path_condition)
+    if is_unsat(false_path):
+        false_path = None
+    return false_path
 
 
 def generate_patch_space(patch):
@@ -840,10 +1003,14 @@ def generate_assertion(assertion_temp, klee_dir):
 
 
 def generate_extended_patch_formula(patch_formula, path_condition):
-    angelic_count = int(len(re.findall("angelic!bool!(.+?)!0", path_condition.serialize())) / 4)
-    if angelic_count == 0:
+    angelic_count = int(len(re.findall("angelic!(.+?)!0", str(path_condition.serialize()))) / 4)
+    # if angelic_count == 0:
+    #     print("COUNT", angelic_count)
+    #     print("PATH", str(path_condition.serialize()))
+    #     utilities.error_exit("angelic count is zero in extending")
+    if angelic_count <= 1:
         return patch_formula
-    model_path = generate_model(path_condition)
+    # model_path = generate_model(path_condition)
     # var_list = list(model_path.keys())
     # count = 0
     # for var in var_list:
@@ -851,7 +1018,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     #         count = count + 1
     input_list = list()
 
-    path_script = "/tmp/z3_script"
+    path_script = "/tmp/z3_script_patch"
     write_smtlib(patch_formula, path_script)
     with open(path_script, "r") as script_file:
         script_lines = script_file.readlines()
@@ -923,7 +1090,7 @@ def generate_ppc_from_formula(path_condition):
         if "!rvalue!" in constraint_str or "!obs!" in constraint_str:
             path_condition = path_condition.arg(0)
             continue
-        path_script = "/tmp/z3_script"
+        path_script = "/tmp/z3_script_ppc"
         write_smtlib(path_condition, path_script)
         with open(path_script, "r") as script_file:
             script_lines = script_file.readlines()

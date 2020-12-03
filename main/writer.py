@@ -34,7 +34,7 @@ def write_patch_set(patch_list, output_file_path):
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         concrete_patch_count = 1
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_space = values.LIST_PATCH_SPACE[patch_index]
             partition_count = 0
             for partition in patch_space:

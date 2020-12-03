@@ -178,7 +178,68 @@
    "bug_id": "bugzilla-1404",
    "benchmark": "extractfix",
    "subject": "ffmpeg"
+ },
+  {
+   "id": 31,
+   "bug_id": "insertion_sort",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 32,
+   "bug_id": "linear_search",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 33,
+   "bug_id": "string",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 34,
+   "bug_id": "eureka",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 35,
+   "bug_id": "nested_delay",
+   "benchmark": "svcomp",
+   "subject": "loop-crafted"
+ },
+ {
+   "id": 36,
+   "bug_id": "sum",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 37,
+   "bug_id": "bubble_sort",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+ {
+   "id": 38,
+   "bug_id": "unique_list",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 39,
+   "bug_id": "standard_run",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 40,
+   "bug_id": "addition",
+   "benchmark": "svcomp",
+   "subject": "recursive"
  }
+
 
 
 ]

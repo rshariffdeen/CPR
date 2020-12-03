@@ -97,7 +97,7 @@ def emit_patch(patch_tree, jump_line=True, message=""):
     prefix = "\t" * indent_length
     output = output + code
     write(output, WHITE, jump_line, indent_level=indent_length, prefix=prefix)
-    logger.data(message, code)
+    logger.data(message, code, True)
 
 
 def information(message, jump_line=True):
@@ -157,10 +157,16 @@ def note(message):
     logger.note(message)
 
 
+def configuration(setting, value):
+    message = "\t[config] " + setting + ": " + str(value)
+    write(message, WHITE, True)
+    logger.configuration(setting + ":" + str(value))
+
+
 def start():
     logger.create()
     write("\n" + "#"*100 + "\n", BLUE)
-    write("\t" + values.TOOL_NAME + " - Concolic Repair", BLUE)
+    write("\t" + values.TOOL_NAME + " (CardioPulmonary Resuscitation) - Concolic Program Repair", BLUE)
     write("\tAutomated Program Repair Tool", BLUE)
     write("\tCopyright National University of Singapore", BLUE)
     write("\n" + "#" * 100, BLUE)
@@ -173,13 +179,13 @@ def end(time_info):
     statistics("Testing: " + time_info[definitions.KEY_DURATION_INITIALIZATION] + " minutes")
     statistics("Synthesis: " + values.TIME_TO_GENERATE + " minutes")
     statistics("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
-    statistics("Reduce: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
-    statistics("Repair: " + time_info[definitions.KEY_DURATION_REPAIR] + " minutes")
+    statistics("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
+    statistics("Reduce: " + time_info[definitions.KEY_DURATION_REPAIR] + " minutes")
     statistics("Iteration Count: " + str(values.ITERATION_NO))
     statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
     statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
         statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
@@ -196,7 +202,7 @@ def end(time_info):
 
 
 def help():
-    write("Usage: python3.6 ConRepair.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
+    write("Usage: python3.6 CPR.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", RED)
     write("\t" + definitions.ARG_CEGIS_TIME_SPLIT + "\t| " + "specify time split ratio for CEGIS mode; explore:refine  in minutes(default=1:1)", RED)

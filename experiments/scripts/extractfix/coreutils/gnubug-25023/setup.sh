@@ -14,9 +14,10 @@ cd src
 git checkout $commit_id
 
 
-sed -i '2227i TRIDENT_OUTPUT("obs", "i32", l - strlen(s));\n' src/pr.c
+sed -i '1238i }' src/pr.c
 sed -i '1236d' src/pr.c
-sed -i '1236i else if (!join_lines && *col_sep_string == \x27\\t\x27 && __trident_choice("L290", "bool", (int[]){col_sep_length}, (char*[]){"col_sep_length"}, 1, (int*[]){}, (char*[]){}, 0))' src/pr.c
+sed -i '1236i TRIDENT_OUTPUT("obs", "i32", col_sep_length);\n' src/pr.c
+sed -i '1236i else if (!join_lines && *col_sep_string == \x27\\t\x27 && __trident_choice("L290", "bool", (int[]){col_sep_length}, (char*[]){"col_sep_length"}, 1, (int*[]){}, (char*[]){}, 0)){' src/pr.c
 sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/pr.c
 sed -i '97i #include <klee/klee.h>' src/pr.c
 git add src/pr.c

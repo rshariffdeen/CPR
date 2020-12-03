@@ -22,12 +22,12 @@ ARG_SKIP_LIST = "--skip-list="
 CONF_DATA_PATH = "/data"
 CONF_TOOL_PATH = "/concolic-repair"
 CONF_TOOL_PARAMS = "--mode=2"
-CONF_TOOL_NAME = "python3.6 ConRepair.py"
+CONF_TOOL_NAME = "python3.6 CPR.py"
 CONF_DEBUG = False
 CONF_BUG_ID = None
 CONF_START_ID = None
 CONF_SETUP_ONLY = False
-CONF_SKIP_LIST = ["2","4","8","13","14","15","16","21","25","26"]
+CONF_SKIP_LIST = ["2","13","15","16","21"]
 
 FILE_META_DATA = "meta-data"
 FILE_ERROR_LOG = "error-log"

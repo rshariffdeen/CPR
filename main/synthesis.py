@@ -616,7 +616,8 @@ def verify(programs: Union[Dict[str, Program], Dict[str, Formula]],
 
         for path in paths:
             lids = extract_lids(path).keys()
-
+            if not lids:
+                continue
             assert len(lids) == 1
             lid = list(lids)[0]
             eids = extract_eids(path, lid)
@@ -684,7 +685,8 @@ def verify_parallel(programs: Union[Dict[str, Program], Dict[str, Formula]],
 
         for path in paths:
             lids = extract_lids(path).keys()
-
+            if not lids:
+                continue
             assert len(lids) == 1
             lid = list(lids)[0]
             eids = extract_eids(path, lid)

@@ -51,8 +51,8 @@ def command(message):
     log(message)
 
 
-def data(message, data=None):
-    if values.DEBUG:
+def data(message, data=None, is_patch=False):
+    if values.DEBUG or is_patch:
         message = str(message).strip()
         message = "[DATA]: " + str(message) + "\n"
         log(message)
@@ -79,6 +79,12 @@ def note(message):
     log(message)
 
 
+def configuration(message):
+    message = str(message).strip().lower().replace("[config]", "")
+    message = "[CONFIGURATION]: " + str(message) + "\n"
+    log(message)
+
+
 def output(message):
     message = str(message).strip()
     message = "[LOG]: " + message
@@ -98,13 +104,13 @@ def end(time_duration):
     output("Testing: " + time_duration[definitions.KEY_DURATION_INITIALIZATION] + " minutes")
     output("Synthesis: " + values.TIME_TO_GENERATE + " minutes")
     output("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
-    output("Reduce: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
-    output("Repair: " + time_duration[definitions.KEY_DURATION_REPAIR] + " minutes")
+    output("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
+    output("Reduce: " + time_duration[definitions.KEY_DURATION_REPAIR] + " minutes")
     output("Iteration Count: " + str(values.ITERATION_NO))
     output("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))
     output("Patch End Count: " + str(values.COUNT_PATCH_END))
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         output("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
         output("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
         output("Template End Count: " + str(values.COUNT_TEMPLATE_END))

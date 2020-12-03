@@ -7,6 +7,7 @@ from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib, is_unsat
 from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
 import time
 import sys
+import os
 import operator
 import numpy
 
@@ -71,7 +72,7 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         if is_over_approx is not None:
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = is_over_approx
 
-        if values.CONF_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
+        if values.DEFAULT_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             updated_patch_list.append(patch)
         else:
             if refined_space:
@@ -89,13 +90,15 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
+    if not os.path.isfile(path_constraint_file_path):
+        return patch_list
     expr_log_path = str(path_to_concolic_exec_result) + "/expr.log"
     path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
     # valid_input_space = parallel.partition_input_space(path_condition, assertion)
     # if valid_input_space:
     #     valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
     values.VALID_INPUT_SPACE = None
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
@@ -118,7 +121,7 @@ def print_patch_list(patch_list):
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         concrete_patch_count = 1
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             patch_space = values.LIST_PATCH_SPACE[patch_index]
             partition_count = 0
             for partition in patch_space:
@@ -167,6 +170,7 @@ def run(project_path, program_path):
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     patch_list = generator.generate_patch_set(project_path)
+
     for patch in patch_list:
         patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
@@ -177,7 +181,7 @@ def run(project_path, program_path):
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
     emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-    if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = utilities.count_concrete_patches(patch_list)
         values.COUNT_TEMPLATE_START = len(patch_list)
     else:
@@ -185,10 +189,11 @@ def run(project_path, program_path):
 
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
-
-    if values.CONF_REDUCE_METHOD == "fitreduce":
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
+    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
+    if values.DEFAULT_REDUCE_METHOD == "fitreduce":
         run_fitreduce(program_path, patch_list)
-    elif values.CONF_REDUCE_METHOD == "cegis":
+    elif values.DEFAULT_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, patch_list)
 
     values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
@@ -201,7 +206,7 @@ def run_cegis(program_path, project_path, patch_list):
     test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
     time_check = time.time()
-    assertion, largest_path_condition = concolic_exploration(program_path, patch_list)
+    assertion, largest_path_condition = concolic.run_concolic_exploration(program_path, patch_list)
     duration = (time.time() - time_check) / 60
     values.TIME_TO_EXPLORE = duration
     emitter.normal("\tcombining explored program paths")
@@ -255,7 +260,9 @@ def run_cegis(program_path, project_path, patch_list):
             emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_REFINE) + " minutes")
     duration = (time.time() - time_check) / 60
     values.TIME_TO_REDUCE = duration
-
+    patch_list = [patch]
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-cegis"
+    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
     # patch = next(patch_generator, None)
     # while patch is not None:
     #     patch_formula = main.generator.generate_formula_from_patch(patch)
@@ -304,7 +311,7 @@ def run_fitreduce(program_path, patch_list):
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
-                if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
                 distance.update_distance_map()
                 time_check = time.time()
@@ -328,8 +335,9 @@ def run_fitreduce(program_path, patch_list):
             time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
-            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            values.LIST_PPC = []
             gen_arg_list, gen_var_list, patch_list = select_new_input(argument_list, second_var_list, patch_list)  # TODO (later) patch candidate missing
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
@@ -351,7 +359,7 @@ def run_fitreduce(program_path, patch_list):
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+            if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                 continue
 
             distance.update_distance_map()
@@ -369,113 +377,18 @@ def run_fitreduce(program_path, patch_list):
         values.COUNT_PATCH_END = len(patch_list)
         emitter.warning("\t\t[warning] unable to generate a patch")
     else:
-        check_infeasible_paths(patch_list)
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-original"
         writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
         ranked_patch_list = rank_patches(patch_list)
         print_patch_list(ranked_patch_list)
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked"
         writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
-        if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        check_infeasible_paths(patch_list)
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
         else:
             values.COUNT_PATCH_END = len(ranked_patch_list)
 
 
-def symbolic_exploration(program_path):
-    argument_list = values.ARGUMENT_LIST
-    second_var_list = values.SECOND_VAR_LIST
-    exit_code = concolic.run_symbolic_execution(program_path + ".bc", argument_list, second_var_list)
-    assert exit_code == 0
 
-
-def concolic_exploration(program_path, patch_list):
-    satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-    iteration = 0
-    emitter.sub_title("Concolic Path Exploration")
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
-    assertion_template = values.SPECIFICATION_TXT
-    max_count = 0
-    largest_assertion = None
-    largest_path_condition = None
-    while not satisfied:
-        if iteration == 0:
-            test_input_list = values.CONF_TEST_INPUT
-            second_var_list = list()
-            for argument_list in test_input_list:
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
-                argument_list = extractor.extract_input_arg_list(argument_list)
-                iteration = iteration + 1
-                values.ITERATION_NO = iteration
-                emitter.sub_sub_title("Iteration: " + str(iteration))
-                if values.IS_CRASH:
-                    arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
-                    for var in var_list:
-                        var_name = var["identifier"]
-                        if "angelic" in var_name:
-                            second_var_list.append(var)
-                # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
-                exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
-                # assert exit_code == 0
-                klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-                assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
-                if count_obs > max_count:
-                    max_count = count_obs
-                    largest_assertion = assertion
-                    path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-                    largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-
-                satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-                # check if new path hits patch location / fault location
-                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
-                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                    continue
-                if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                    continue
-                distance.update_distance_map()
-                if satisfied:
-                    emitter.warning(
-                        "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
-        else:
-            iteration = iteration + 1
-            values.ITERATION_NO = iteration
-            emitter.sub_sub_title("Iteration: " + str(iteration))
-            ## Pick new input and patch candidate for next concolic execution step.
-            argument_list = values.ARGUMENT_LIST
-            second_var_list = values.SECOND_VAR_LIST
-            if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-            gen_arg_list, gen_var_list, _ = concolic.select_new_input(argument_list, second_var_list, [])
-
-            if not patch_list:
-                emitter.warning("\t\t[warning] unable to generate a patch")
-                break
-            elif not gen_arg_list and not gen_var_list:
-                emitter.warning("\t\t[warning] no more paths to generate new input")
-                break
-            assert gen_arg_list  # there should be a concrete input
-
-            ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-            exit_code = concolic.run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
-            # assert exit_code == 0
-            klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-            assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
-            if count_obs > max_count:
-                max_count = count_obs
-                largest_assertion = assertion
-                path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
-                largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
-
-
-            # Checks for the current coverage.
-            satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-            # check if new path hits patch location / fault location
-            if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                continue
-            if not values.IS_CRASH and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                continue
-            distance.update_distance_map()
-            if satisfied:
-                emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE) + " minutes")
-    return largest_assertion, largest_path_condition

@@ -1,7 +1,31 @@
 from main import definitions, values, emitter, utilities, extractor
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
-from pysmt.smtlib.parser import SmtLibParser
-from six.moves import cStringIO
+
+tautology_included = False
+contradiction_included = False
+
+
+def update_tautology_included(lock):
+    global tautology_included
+    res = False
+    lock.acquire()
+    if not tautology_included:
+        tautology_included = True
+        res = True
+    lock.release()
+    return res
+
+
+def update_contradiction_included(lock):
+    global contradiction_included
+    res = False
+    lock.acquire()
+    if not contradiction_included:
+        contradiction_included = True
+        res = True
+    lock.release()
+    return res
+
 
 
 import sys
@@ -81,7 +105,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
             if is_loc_in_trace(values.CONF_LOC_BUG):
                 patch_score = 2
                 is_under_approx = not is_unsat(And(path_constraint, Not(assertion)))
-                if values.CONF_REFINE_METHOD in ["under-approx", "overfit"]:
+                if values.DEFAULT_REFINE_METHOD in ["under-approx", "overfit"]:
                     if is_under_approx:
                         emitter.debug("removing due to universal quantification")
                         result = False
@@ -89,7 +113,7 @@ def check_patch_feasibility(assertion, var_relationship, patch_constraint, path_
                 negated_path_condition = values.NEGATED_PPC_FORMULA
                 path_constraint = And(negated_path_condition, patch_constraint)
                 is_over_approx = not is_unsat(And(path_constraint, assertion))
-                if values.CONF_REFINE_METHOD in ["over-approx", "overfit"]:
+                if values.DEFAULT_REFINE_METHOD in ["over-approx", "overfit"]:
                     if is_over_approx:
                         emitter.debug("removing due to existential quantification")
                         result = False
@@ -134,7 +158,7 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_tree_duplicate(tree):
+def is_tree_duplicate(tree, lock):
     (cid, semantics), children = tree
     if len(children) == 2:
         right_child = children['right']
@@ -146,17 +170,25 @@ def is_tree_duplicate(tree):
             if is_right_constant and is_left_constant:
                 return True
             if is_same_children(tree):
-                return True
+                if is_left_constant or is_right_constant:
+                    return True
+                else:
+                    if cid in ['not-equal', 'less-than', 'greater-than']:
+                        return not update_contradiction_included(lock)
+                    elif cid in ['equal', 'less-or-equal', 'greater-or-equal']:
+                        return not update_tautology_included(lock)
+                    else:
+                        return True
 
-        if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal"]:
-            is_right_redundant = is_tree_duplicate(right_child)
-            is_left_redundant = is_tree_duplicate(left_child)
+        if cid in ["logical-or", "logical-and", "less-than", "less-or-equal", "greater-than", "greater-or-equal", "equal", "not-equal", "addition", "division", "multiplication", "subtraction"]:
+            is_right_redundant = is_tree_duplicate(right_child, lock)
+            is_left_redundant = is_tree_duplicate(left_child, lock)
             if is_right_redundant or is_left_redundant:
                 return True
     return False
 
 
-def is_tree_redundant(tree):
+def is_tree_logic_redundant(tree):
     child_node_list = extractor.extract_child_expressions(tree)
     unique_child_node_list = []
     for child in child_node_list:
@@ -167,8 +199,8 @@ def is_tree_redundant(tree):
     return False
 
 
-def is_patch_duplicate(patch, index):
+def is_patch_duplicate(patch, index, lock):
     program = patch[list(patch.keys())[0]]
     tree, _ = program
-    result = is_tree_duplicate(tree) or is_tree_redundant(tree)
+    result = is_tree_duplicate(tree, lock) or is_tree_logic_redundant(tree)
     return result, index

@@ -11,11 +11,6 @@ from multiprocessing.dummy import Pool as ThreadPool
 import threading
 import time
 
-found_one = False
-pool = mp.Pool(mp.cpu_count())
-result_list = []
-expected_count = -1
-
 
 def collect_result(result):
     global result_list
@@ -62,6 +57,65 @@ def abortable_worker(func, *args, **kwargs):
         return default_value, index
 
 
+def generate_special_paths_parallel(ppc_list):
+    global pool, result_list, expected_count
+    result_list = []
+    path_list = []
+    filtered_list = []
+    lock = None
+    count = 0
+    ppc_list.reverse()
+    if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_LIB in control_loc:
+                continue
+            ppc_str = ppc
+            count = count + 1
+            new_path = generator.generate_flipped_path(ppc)
+            new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            if new_path_str not in values.LIST_PATH_CHECK:
+                values.LIST_PATH_CHECK.append(new_path_str)
+                result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
+
+    else:
+        emitter.normal("\t\tstarting parallel computing")
+        pool = mp.Pool(mp.cpu_count())
+        thread_list = []
+        for control_loc, ppc in ppc_list:
+            if definitions.DIRECTORY_LIB in control_loc:
+                expected_count = expected_count - 1
+                continue
+            count = count + 1
+            new_path = generator.generate_flipped_path(ppc)
+            new_path_str = new_path.serialize()
+            ppc_len = len(str(new_path.serialize()))
+            path_list.append((control_loc, new_path, ppc_len))
+            if new_path_str not in values.LIST_PATH_CHECK:
+                values.LIST_PATH_CHECK.append(new_path_str)
+                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, default=False,
+                                         index=count - 1)
+                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1),
+                                 callback=collect_result_timeout)
+                # thread_list.append(thread)
+        emitter.normal("\t\twaiting for thread completion")
+        # for thread in thread_list:
+        #     try:
+        #         thread.get(values.DEFAULT_TIMEOUT_SAT)
+        #     except TimeoutError:
+        #         emitter.warning("\t[warning] timeout raised on a thread")
+        #         thread.successful()
+        time.sleep(1.3 * values.DEFAULT_TIMEOUT_SAT)
+        pool.terminate()
+    # assert(len(result_list) == len(path_list))
+    for result in result_list:
+        is_feasible, index = result
+        if is_feasible:
+            filtered_list.append(path_list[index])
+    return filtered_list
+
+
 def generate_symbolic_paths_parallel(ppc_list):
     global pool, result_list, expected_count
     result_list = []
@@ -71,7 +125,7 @@ def generate_symbolic_paths_parallel(ppc_list):
     count = 0
     expected_count = len(ppc_list)
     ppc_list.reverse()
-    if values.CONF_OPERATION_MODE in ["sequential", "semi-parallel"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
@@ -142,11 +196,12 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     # sym_expr_map = reader.collect_symbolic_expression(expr_log_path)
     # var_relationship = extractor.extract_var_relationship(sym_expr_map)
     var_relationship = TRUE
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_formula_extended, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
@@ -156,6 +211,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             pool.apply_async(oracle.check_patch_feasibility, args=(assertion, var_relationship, patch_formula_extended, path_condition, index), callback=collect_result)
         pool.close()
         emitter.normal("\t\twaiting for thread completion")
@@ -167,20 +223,30 @@ def remove_duplicate_patches_parallel(patch_list):
     global pool, result_list
     result_list = []
     emitter.normal("\tremoving redundancy in patch pool")
-    if values.CONF_OPERATION_MODE in ["sequential"]:
-        for patch in patch_list:
-            index = list(patch_list).index(patch)
-            result_list.append(oracle.is_patch_duplicate(patch, index))
-    else:
-        emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+    mp_lock = mp.Lock()
+    for patch in patch_list:
+        index = list(patch_list).index(patch)
+        # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
+        result_list.append(oracle.is_patch_duplicate(patch, index, mp_lock))
 
-        for patch in patch_list:
-            index = list(patch_list).index(patch)
-            pool.apply_async(oracle.is_patch_duplicate, args=(patch, index), callback=collect_result)
-        pool.close()
-        emitter.normal("\t\twaiting for thread completion")
-        pool.join()
+    # mp_lock = mp.Lock()
+    #
+    # if values.CONF_OPERATION_MODE in ["sequential"]:
+    #     for patch in patch_list:
+    #         index = list(patch_list).index(patch)
+    #         # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
+    #         result_list.append(oracle.is_patch_duplicate(patch, index, mp_lock))
+    # else:
+    #     emitter.normal("\t\tstarting parallel computing")
+    #     pool = mp.Pool(mp.cpu_count())
+    #
+    #     for patch in patch_list:
+    #         index = list(patch_list).index(patch)
+    #         # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
+    #         pool.apply_async(oracle.is_patch_duplicate, args=(patch, index, mp_lock), callback=collect_result)
+    #     pool.close()
+    #     emitter.normal("\t\twaiting for thread completion")
+    #     pool.join()
     return result_list
 
 
@@ -188,12 +254,12 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
     global pool, result_list
     result_list = []
     emitter.normal("\tupdating patch pool")
-    if values.CONF_OPERATION_MODE in ["sequential"] or force_sequential:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
-            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -205,7 +271,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
-            # emitter.emit_patch(patch, message="\trefining abstract patch " + str(index) + " :")
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
             patch_index = utilities.get_hash(patch_formula_str)
             patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -229,9 +295,9 @@ def partition_input_space(path_condition, assertion):
             partition_model = generator.generate_model(is_exist)
             partition_model, is_multi_dimension = extractor.extract_input_list(partition_model)
             partition_list = generator.generate_partition_for_input_space(partition_model, input_space, is_multi_dimension)
-            if values.CONF_OPERATION_MODE in ["sequential"]:
+            if values.DEFAULT_OPERATION_MODE in ["sequential"]:
                 for partition in partition_list:
-                    # emitter.emit_patch(patch, message="\trefining abstract patch: ")
+                    # emitter.emit_patch(patch, message="\tabstract patch: ")
                     result_list.append(refine.refine_input_partition(path_condition, assertion, partition, is_multi_dimension))
             else:
                 emitter.normal("\t\tstarting parallel computing")
@@ -259,12 +325,12 @@ def partition_input_space(path_condition, assertion):
 def validate_input_generation(patch_list, new_path):
     global pool, result_list, found_one
     result_list = []
-    if values.CONF_OPERATION_MODE in ["sequential"]:
+    if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
             patch_formula = main.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
             patch_space_constraint = patch_formula_extended
-            if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
                 patch_formula_str = str(patch_formula.serialize())
                 patch_index = utilities.get_hash(patch_formula_str)
                 patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -272,6 +338,7 @@ def validate_input_generation(patch_list, new_path):
                 if parameter_constraint:
                     patch_space_constraint = And(patch_formula_extended, parameter_constraint)
             index = list(patch_list).index(patch)
+            # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             result_list.append(oracle.check_input_feasibility(index, patch_space_constraint, new_path))
     else:
         emitter.normal("\t\tstarting parallel computing")
@@ -284,7 +351,7 @@ def validate_input_generation(patch_list, new_path):
                 patch_formula = main.generator.generate_formula_from_patch(patch)
                 patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
                 patch_space_constraint = patch_formula
-                if values.CONF_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+                if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
                     patch_formula_str = str(patch_formula.serialize())
                     patch_index = utilities.get_hash(patch_formula_str)
                     patch_space = values.LIST_PATCH_SPACE[patch_index]
@@ -292,6 +359,7 @@ def validate_input_generation(patch_list, new_path):
                     if parameter_constraint:
                         patch_space_constraint = And(patch_formula_extended, parameter_constraint)
                 index = list(patch_list).index(patch)
+                # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
                 thread = pool.apply_async(oracle.check_input_feasibility, args=(index, patch_space_constraint, new_path), callback=collect_result_one)
                 thread_list.append(thread)
             except ValueError:
