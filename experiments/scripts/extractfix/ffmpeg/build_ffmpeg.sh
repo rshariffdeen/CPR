@@ -138,7 +138,7 @@ make clean
 make -j$(nproc)
 make install
 
-cd $SRC/x265/build/linux
+cd $SRC/x265_git/build/linux
 cmake -G "Unix Makefiles" \
     -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX \
     -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
