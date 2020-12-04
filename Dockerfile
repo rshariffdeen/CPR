@@ -141,18 +141,6 @@ RUN apt-get install -y  \
     gettext \
     gperf \
     libass-dev \
-    libfdk-aac-dev \
-    libmp3lame-dev \
-    libopus-dev \
-    libtheora-dev \
-    libvorbis-dev \
-    libvpx-dev  \
-    libfuzzer-3.9-dev \
-    libasan2 \
-    libva-dev \
-    libxcb1-dev \
-    libxcb-xfixes0-dev \
-    libnuma-dev \
     libfreetype6 \
     libfreetype6-dev \
     libjpeg-dev \
@@ -162,6 +150,14 @@ RUN apt-get install -y  \
     nasm \
     pkg-config \
     texinfo \
-    yasm
+    yasm \
+    xutils-dev \
+    libpciaccess-dev \
+    libx11-dev \
+    libxcb-xfixes0-dev \
+    libxcb1-dev \
+    libxcb-shm0-dev \
+    libsdl1.2-dev  \
+    libvdpau-dev
 
 

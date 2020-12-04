@@ -1,5 +1,5 @@
 wget https://www.alsa-project.org/files/pub/lib/alsa-lib-1.1.0.tar.bz2
-git clone --depth 1 git://anongit.freedesktop.org/mesa/drm
+git clone --depth 1 --branch libdrm-2.4.100 git://anongit.freedesktop.org/mesa/drm
 git clone https://github.com/mstorsjo/fdk-aac.git
 wget https://sourceforge.net/projects/lame/files/latest/download/lame.tar.gz
 git clone --depth 1 git://anongit.freedesktop.org/xorg/lib/libXext
@@ -41,6 +41,8 @@ cd $SRC/drm
 make clean
 make -j$(nproc)
 make install
+export PKG_CONFIG_PATH=$PWD
+pkg-config --debug libdrm
 
 cd $SRC/fdk-aac
 git checkout a30bfced6b6d6d976c728552d247cb30dd86e238
