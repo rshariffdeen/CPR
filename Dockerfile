@@ -133,7 +133,7 @@ RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 #    cd /lowfat; bash build.sh
 
 # install experiment dependencies
-RUN apt-get install -y  \
+RUN apt-get update && apt-get install -y  \
     autopoint \
     automake \
     bison \
