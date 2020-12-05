@@ -158,6 +158,7 @@ RUN apt-get update && apt-get install -y  \
     libxcb1-dev \
     libxcb-shm0-dev \
     libsdl1.2-dev  \
-    libvdpau-dev
+    libvdpau-dev \
+    libnuma-dev
 
 
