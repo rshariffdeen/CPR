@@ -44,10 +44,10 @@ sed -i 's#cd lighttpd/tests#pushd /data/manybugs/lighttpd/1914/src/tests#g' test
 sed -i 's#cd ../../#popd#g' test.sh
 
 # fix an obnoxious bug in tests/core-request.t
-sed -i 's#image.JPG#image.jpg#g' lighttpd/tests/core-request.t
+sed -i 's#image.JPG#image.jpg#g' src/tests/core-request.t
 
 # fix broken symlinks
-cd lighttpd/tests/tmp/lighttpd/servers/www.example.org/pages
+cd src/tests/tmp/lighttpd/servers/www.example.org/pages
 rm symlinked index.xhtml
 ln -s expire symlinked
 ln -s index.html index.xhtml
