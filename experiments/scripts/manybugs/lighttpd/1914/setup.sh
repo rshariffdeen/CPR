@@ -26,10 +26,10 @@ ln -s expire symlinked
 ln -s index.html index.xhtml
 
 # fix broken test file
-mv $dir_name/mod-cgi.t /data/manybugs/lighttpd/1914/src/lighttpd/tests/mod-cgi.t
+cp $current_dir/mod-cgi.t /data/manybugs/lighttpd/1914/src/lighttpd/tests/mod-cgi.t
 
 # compile program
-cd $dir_name/cd/lighttpd
+cd $dir_name/src/lighttpd
 make clean
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=no
 CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
