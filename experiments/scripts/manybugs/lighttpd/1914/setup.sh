@@ -15,6 +15,8 @@ sed -i "s#/root/mountpoint-genprog/genprog-many-bugs/lighttpd-bug-1913-1914#/dat
 sed -i "s#/data/manybugs/lighttpd/1914/src/limit#timeout 5#g" test.sh
 sed -i "s#/usr/bin/perl#perl#g" test.sh
 sed -i 's#lt-\.\*#lt-\.\* \&\> /dev/null#g' test.sh
+sed -i 's#cd lighttpd/tests#pushd /data/manybugs/lighttpd/1914/src/lighttpd/tests#g' test.sh
+sed -i 's#cd ../../#popd#g' test.sh
 
 # fix an obnoxious bug in tests/core-request.t
 sed -i 's#image.JPG#image.jpg#g' lighttpd/tests/core-request.t
@@ -31,9 +33,11 @@ cp $current_dir/mod-cgi.t /data/manybugs/lighttpd/1914/src/lighttpd/tests/mod-cg
 # compile program
 cd $dir_name/src/lighttpd
 make clean
-CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=no
+#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=no
+#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=yes
+#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --with-pcre=yes
+CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --with-pcre=yes --with-ldap --with-bzip2 --with-openssl --with-gdbm --with-memcache --with-webdav-props --with-webdav-locks
 CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
-
 
 #sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
 #sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
