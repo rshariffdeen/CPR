@@ -32,6 +32,7 @@ cd $dir_name/src
 make distclean
 svn upgrade
 svn revert $(cat $dir_name/manifest.txt)
+chown -R root $dir_name
 
 cd $dir_name
 
