@@ -106,13 +106,13 @@ def warning(message):
 
 def end(time_duration, is_error=False):
     output("\nTime duration\n----------------------\n\n")
-    output("Startup: " + time_duration[definitions.KEY_DURATION_BOOTSTRAP] + " minutes")
-    output("Build: " + time_duration[definitions.KEY_DURATION_BUILD] + " minutes")
-    output("Testing: " + time_duration[definitions.KEY_DURATION_INITIALIZATION] + " minutes")
-    output("Synthesis: " + values.TIME_TO_GENERATE + " minutes")
+    output("Startup: " + str(time_duration[definitions.KEY_DURATION_BOOTSTRAP]) + " minutes")
+    output("Build: " + str(time_duration[definitions.KEY_DURATION_BUILD]) + " minutes")
+    output("Testing: " + str(time_duration[definitions.KEY_DURATION_INITIALIZATION]) + " minutes")
+    output("Synthesis: " + str(values.TIME_TO_GENERATE) + " minutes")
     output("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
     output("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
-    output("Reduce: " + time_duration[definitions.KEY_DURATION_REPAIR] + " minutes")
+    output("Reduce: " + str(time_duration[definitions.KEY_DURATION_REPAIR]) + " minutes")
     output("Iteration Count: " + str(values.ITERATION_NO))
     output("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))

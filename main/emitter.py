@@ -165,13 +165,13 @@ def configuration(setting, value):
 
 def end(time_info, is_error=False):
     statistics("\nRun time statistics:\n-----------------------\n")
-    statistics("Startup: " + time_info[definitions.KEY_DURATION_BOOTSTRAP].format() + " minutes")
-    statistics("Build: " + time_info[definitions.KEY_DURATION_BUILD] + " minutes")
-    statistics("Testing: " + time_info[definitions.KEY_DURATION_INITIALIZATION] + " minutes")
-    statistics("Synthesis: " + values.TIME_TO_GENERATE + " minutes")
+    statistics("Startup: " + str(time_info[definitions.KEY_DURATION_BOOTSTRAP].format()) + " minutes")
+    statistics("Build: " + str(time_info[definitions.KEY_DURATION_BUILD]) + " minutes")
+    statistics("Testing: " + str(time_info[definitions.KEY_DURATION_INITIALIZATION]) + " minutes")
+    statistics("Synthesis: " + str(values.TIME_TO_GENERATE) + " minutes")
     statistics("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
     statistics("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
-    statistics("Reduce: " + time_info[definitions.KEY_DURATION_REPAIR] + " minutes")
+    statistics("Reduce: " + str(time_info[definitions.KEY_DURATION_REPAIR]) + " minutes")
     statistics("Iteration Count: " + str(values.ITERATION_NO))
     statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
