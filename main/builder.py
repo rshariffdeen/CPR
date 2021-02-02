@@ -15,7 +15,7 @@ LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime  -lkleeRuntest"
 
 
 def config_project(project_path, is_llvm, custom_config_command=None):
-    emitter.sub_sub_title("configuring program")
+    emitter.normal("\tconfiguring program")
     dir_command = "cd " + project_path + ";"
    
     config_command = None
@@ -164,7 +164,7 @@ def apply_flags(build_command):
 
 
 def build_project(project_path, build_command=None):
-    emitter.sub_sub_title("building program")
+    emitter.normal("\tbuilding program")
     dir_command = "cd " + project_path + ";"
     if build_command is None:
         build_command = "CC=" + CC + " CXX=" + CXX + " "
@@ -197,6 +197,7 @@ def build_normal():
     global CC, CXX, CXX_FLAGS, C_FLAGS, LD_FLAGS
 
     emitter.sub_title("Building Program")
+    emitter.normal("\tsetting environment variables")
     execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
     execute_command("export TRIDENT_CXX=" + definitions.DIRECTORY_TOOLS + "/trident-cxx")
 
@@ -366,7 +367,7 @@ def soft_restore_project(project_path):
 
 
 def clean_project(project_path, binary_path):
-    emitter.sub_sub_title("cleaning files")
+    emitter.normal("\tcleaning files")
     binary_dir_path = "/".join(str(binary_path).split("/")[:-1])
 
     if values.CONF_COMMAND_BUILD != "skip":

@@ -55,8 +55,9 @@ def sub_sub_title(sub_title):
 
 
 def command(message):
-    prefix = "\t\t[command] "
-    write(message, ROSE, prefix=prefix, indent_level=2)
+    if values.DEBUG:
+        prefix = "\t\t[command] "
+        write(message, ROSE, prefix=prefix, indent_level=2)
     logger.command(message)
 
 
