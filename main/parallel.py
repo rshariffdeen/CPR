@@ -15,6 +15,8 @@ import sys
 
 def mute():
     sys.stdout = open(os.devnull, 'w')
+    sys.stderr = open(os.devnull, 'w')
+
 
 pool = mp.Pool(mp.cpu_count(), initializer=mute)
 
@@ -153,7 +155,7 @@ def generate_symbolic_paths_parallel(ppc_list):
 
     else:
         emitter.normal("\t\tstarting parallel computing")
-        ppool = mp.Pool(mp.cpu_count(), initializer=mute)
+        pool = mp.Pool(mp.cpu_count(), initializer=mute)
         thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
