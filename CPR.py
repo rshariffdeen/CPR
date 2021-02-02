@@ -123,6 +123,7 @@ if __name__ == "__main__":
         run(sys.argv[1:])
     except KeyboardInterrupt as e:
         parallel.pool.terminate()
+        parallel.pool.join()
         logger.error(traceback.format_exc())
         is_error = True
     except Exception as e:

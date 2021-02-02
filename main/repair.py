@@ -38,7 +38,7 @@ def recover_patch_list(result_list, patch_list, path_condition, assertion):
     emitter.error("\t[error] something went wrong with patch validation, attempting to recover")
     emitter.debug("result list size: " + str(len(result_list)))
     emitter.debug("patch list size: " + str(len(patch_list)))
-    emitter.warning("\t[warning] attempting to re-run parallel refinement: " + str(len(patch_list) - len(result_list)))
+    emitter.warning("\t[warning] attempting to re-run parallel refinement: missing" + str(len(patch_list) - len(result_list)))
 
     diff_list_a = get_diff_list(result_list, patch_list)
     result_list_a = parallel.refine_patch_space(diff_list_a, path_condition, assertion)
@@ -48,7 +48,7 @@ def recover_patch_list(result_list, patch_list, path_condition, assertion):
         emitter.debug("result list size: " + str(len(result_list)))
         emitter.debug("patch list size: " + str(len(patch_list)))
         emitter.warning(
-            "\t[warning] attempting to re-run sequential refinement: " + str(len(diff_list_a) - len(result_list_a)))
+            "\t[warning] attempting to re-run sequential refinement: missing" + str(len(diff_list_a) - len(result_list_a)))
         diff_list_b = get_diff_list(result_list_a, diff_list_a)
         result_list_b = parallel.refine_patch_space(diff_list_b, path_condition, assertion, True)
         recover_list = recover_list + update_index(result_list_b, diff_list_b, patch_list)
