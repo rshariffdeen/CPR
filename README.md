@@ -1,6 +1,6 @@
-# FitReduce
-Concolic Program Repair: A new automated program repair technique based on concolic execution
-which works on patch abstraction with the sub-optimal goal of refinning the patch to less over-fit 
+# CPR - CardioPulmonary Resuscitation
+CPR: A new automated program repair technique based on concolic execution
+which works on patch abstraction with the sub-optimal goal of refining the patch to less over-fit 
 the initial test cases. 
 
 
