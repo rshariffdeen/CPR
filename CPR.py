@@ -1,11 +1,22 @@
 import os
 import shutil
 import time
+import traceback
+import signal
 from pathlib import Path
 from main import emitter, logger, definitions, values, builder, repair, \
     configuration, reader, distance, synthesis, parallel, extractor, generator
 from main.utilities import error_exit
 from main.concolic import run_concrete_execution, run_concolic_execution
+
+start_time = 0
+time_info = {
+    definitions.KEY_DURATION_INITIALIZATION: '0',
+    definitions.KEY_DURATION_BUILD: '0',
+    definitions.KEY_DURATION_BOOTSTRAP: '0',
+    definitions.KEY_DURATION_REPAIR: '0',
+    definitions.KEY_DURATION_TOTAL: '0'
+    }
 
 
 def create_directories():
@@ -22,10 +33,14 @@ def create_directories():
         os.makedirs(definitions.DIRECTORY_TMP)
 
 
+def timeout_handler(signum, frame):
+    emitter.error("TIMEOUT Exception")
+    raise Exception("end of time")
+
+
 def bootstrap(arg_list):
     emitter.title("Starting " + values.TOOL_NAME + " (CardioPulmonary Resuscitation) ")
     emitter.sub_title("Loading Configurations")
-
     configuration.read_conf(arg_list)
     configuration.read_conf_file()
     configuration.update_configuration()
@@ -69,11 +84,12 @@ def initialize():
         # distance.update_distance_map()
 
 
-def main(arg_list):
+def run(arg_list):
+    global start_time, time_info
     create_directories()
-    emitter.start()
+    logger.create()
     start_time = time.time()
-    time_info = dict()
+
     time_check = time.time()
     bootstrap(arg_list)
     duration = format((time.time() - time_check) / 60, '.3f')
@@ -98,18 +114,28 @@ def main(arg_list):
     duration = format(((time.time() - time_check) / 60 - float(values.TIME_TO_GENERATE)), '.3f')
     time_info[definitions.KEY_DURATION_REPAIR] = str(duration)
 
-    # Final running time and exit message
-    duration = format((time.time() - start_time) / 60, '.3f')
-    time_info[definitions.KEY_DURATION_TOTAL] = str(duration)
-    emitter.end(time_info)
-    logger.end(time_info)
-
 
 if __name__ == "__main__":
     import sys
+    is_error = False
+    signal.signal(signal.SIGALRM, timeout_handler)
     try:
-        main(sys.argv[1:])
+        run(sys.argv[1:])
     except KeyboardInterrupt as e:
         parallel.pool.terminate()
-        os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
+        logger.error(traceback.format_exc())
+        is_error = True
         error_exit("Program Interrupted by User")
+    except Exception as e:
+        emitter.error("Runtime Error")
+        emitter.error(str(e))
+        logger.error(traceback.format_exc())
+        is_error = True
+    finally:
+        # Final running time and exit message
+        # os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
+        total_duration = format((time.time() - start_time) / 60, '.3f')
+        time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
+        emitter.end(time_info, is_error)
+        logger.end(time_info, is_error)
+        logger.store()

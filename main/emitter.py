@@ -163,16 +163,7 @@ def configuration(setting, value):
     logger.configuration(setting + ":" + str(value))
 
 
-def start():
-    logger.create()
-    write("\n" + "#"*100 + "\n", BLUE)
-    write("\t" + values.TOOL_NAME + " (CardioPulmonary Resuscitation) - Concolic Program Repair", BLUE)
-    write("\tAutomated Program Repair Tool", BLUE)
-    write("\tCopyright National University of Singapore", BLUE)
-    write("\n" + "#" * 100, BLUE)
-
-
-def end(time_info):
+def end(time_info, is_error=False):
     statistics("\nRun time statistics:\n-----------------------\n")
     statistics("Startup: " + time_info[definitions.KEY_DURATION_BOOTSTRAP].format() + " minutes")
     statistics("Build: " + time_info[definitions.KEY_DURATION_BUILD] + " minutes")
@@ -198,10 +189,15 @@ def end(time_info):
     statistics("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
     statistics("Component Count Cus: " + str(values.COUNT_COMPONENTS_CUS))
     statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[definitions.KEY_DURATION_TOTAL] + " minutes \n")
+    if is_error:
+        error("\n" + values.TOOL_NAME + " exited with an error after " + time_info[
+            definitions.KEY_DURATION_TOTAL] + " minutes \n")
+    else:
+        success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[
+            definitions.KEY_DURATION_TOTAL] + " minutes \n")
 
 
-def help():
+def emit_help():
     write("Usage: python3.6 CPR.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", RED)

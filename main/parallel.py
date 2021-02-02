@@ -1,5 +1,4 @@
 import multiprocessing as mp
-
 import main.generator
 from main import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
 from typing import List, Dict, Optional
@@ -10,6 +9,8 @@ from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 import threading
 import time
+
+pool = mp.Pool(mp.cpu_count())
 
 
 def collect_result(result):
@@ -81,7 +82,7 @@ def generate_special_paths_parallel(ppc_list):
 
     else:
         emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+        # pool = mp.Pool(mp.cpu_count())
         thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
@@ -146,7 +147,7 @@ def generate_symbolic_paths_parallel(ppc_list):
 
     else:
         emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+        # pool = mp.Pool(mp.cpu_count())
         thread_list = []
         for control_loc, ppc in ppc_list:
             if definitions.DIRECTORY_LIB in control_loc:
@@ -205,7 +206,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
             result_list.append(oracle.check_patch_feasibility(assertion, var_relationship, patch_formula_extended, path_condition, index))
     else:
         emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+        # pool = mp.Pool(mp.cpu_count())
         lock = None
         for patch in patch_list:
             patch_formula = main.generator.generate_formula_from_patch(patch)
@@ -266,7 +267,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
             result_list.append(refine.refine_patch(assertion, patch_formula_extended, path_condition, index, patch_space))
     else:
         emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+        # pool = mp.Pool(mp.cpu_count())
         for patch in patch_list:
             index = list(patch_list).index(patch)
             patch_formula = main.generator.generate_formula_from_patch(patch)
@@ -301,7 +302,7 @@ def partition_input_space(path_condition, assertion):
                     result_list.append(refine.refine_input_partition(path_condition, assertion, partition, is_multi_dimension))
             else:
                 emitter.normal("\t\tstarting parallel computing")
-                pool = mp.Pool(mp.cpu_count())
+                # pool = mp.Pool(mp.cpu_count())
                 for partition in partition_list:
                     pool.apply_async(refine.refine_input_partition, args=(path_condition, assertion, partition, is_multi_dimension),
                                      callback=collect_result)
@@ -342,7 +343,7 @@ def validate_input_generation(patch_list, new_path):
             result_list.append(oracle.check_input_feasibility(index, patch_space_constraint, new_path))
     else:
         emitter.normal("\t\tstarting parallel computing")
-        pool = mp.Pool(mp.cpu_count())
+        # pool = mp.Pool(mp.cpu_count())
         lock = None
         thread_list = []
         interrupt_event = threading.Event()

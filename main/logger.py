@@ -9,7 +9,7 @@ from shutil import copyfile
 
 def create():
     log_file_name = "log-" + str(time.time())
-    log_file_path = definitions.DIRECTORY_LOG + "/" + log_file_name
+    log_file_path = definitions.DIRECTORY_LOG_BASE + "/" + log_file_name
     definitions.FILE_MAIN_LOG = log_file_path
     with open(definitions.FILE_MAIN_LOG, 'w+') as log_file:
         log_file.write("[Start] " + values.TOOL_NAME + " started at " + str(datetime.datetime.now()) + "\n")
@@ -21,6 +21,13 @@ def create():
         os.remove(definitions.FILE_COMMAND_LOG)
     with open(definitions.FILE_LAST_LOG, 'w+') as last_log:
         last_log.write("[Start] " + values.TOOL_NAME + " started at " + str(datetime.datetime.now()) + "\n")
+
+
+def store():
+    copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_LOG + "/log-latest")
+    copyfile(definitions.FILE_COMMAND_LOG, definitions.DIRECTORY_LOG + "/log-command")
+    copyfile(definitions.FILE_ERROR_LOG, definitions.DIRECTORY_LOG + "/log-error")
+    copyfile(definitions.FILE_MAKE_LOG, definitions.DIRECTORY_LOG + "/log-make")
 
 
 def log(log_message):
@@ -97,7 +104,7 @@ def warning(message):
     log(message)
 
 
-def end(time_duration):
+def end(time_duration, is_error=False):
     output("\nTime duration\n----------------------\n\n")
     output("Startup: " + time_duration[definitions.KEY_DURATION_BOOTSTRAP] + " minutes")
     output("Build: " + time_duration[definitions.KEY_DURATION_BUILD] + " minutes")
@@ -121,7 +128,12 @@ def end(time_duration):
     output("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
     output("Component Count Cust: " + str(values.COUNT_COMPONENTS_CUS))
     output("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    output("\n" + values.TOOL_NAME + " finished successfully after " + time_duration[definitions.KEY_DURATION_TOTAL] + " minutes \n")
+    if is_error:
+        output(values.TOOL_NAME + " exited with an error after " + time_duration[
+            definitions.KEY_DURATION_TOTAL] + " minutes")
+    else:
+        output(values.TOOL_NAME + " finished successfully after " + time_duration[
+            definitions.KEY_DURATION_TOTAL] + " minutes")
     log("[END] " + values.TOOL_NAME + " ended at  " + str(datetime.datetime.now()) + "\n\n")
-    copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_OUTPUT + "/main-log")
+
 

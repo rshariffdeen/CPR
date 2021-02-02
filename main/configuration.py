@@ -25,7 +25,7 @@ def read_conf(arg_list):
                 option = int(arg.replace(definitions.ARG_SELECTION_METHOD, ''))
                 if option not in values.OPTIONS_SELECT_METHOD:
                     emitter.error("Invalid option for " + definitions.ARG_SELECTION_METHOD.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 values.CONF_SELECTION_STRATEGY = values.OPTIONS_SELECT_METHOD[option]
             elif definitions.ARG_OPERATION_MODE in arg:
@@ -33,28 +33,28 @@ def read_conf(arg_list):
                 if option not in values.OPTIONS_OPERATION_MODE:
                     emitter.error(
                         "Invalid option for " + definitions.ARG_OPERATION_MODE.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 values.CONF_OPERATION_MODE = values.OPTIONS_OPERATION_MODE[option]
             elif definitions.ARG_PATCH_TYPE in arg:
                 option = int(arg.replace(definitions.ARG_PATCH_TYPE, ''))
                 if option not in values.OPTIONS_PATCH_TYPE:
                     emitter.error("Invalid option for " + definitions.ARG_PATCH_TYPE.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 values.CONF_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[option]
             elif definitions.ARG_REFINE_METHOD in arg:
                 option = int(arg.replace(definitions.ARG_REFINE_METHOD, ''))
                 if option not in values.OPTIONS_REFINE_METHOD:
                     emitter.error("Invalid option for " + definitions.ARG_REFINE_METHOD.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 values.CONF_REFINE_METHOD = values.OPTIONS_REFINE_METHOD[option]
             elif definitions.ARG_REDUCE_METHOD in arg:
                 option = int(arg.replace(definitions.ARG_REDUCE_METHOD, ''))
                 if option not in values.OPTIONS_REDUCE_METHOD:
                     emitter.error("Invalid option for " + definitions.ARG_REDUCE_METHOD.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 values.CONF_REDUCE_METHOD = values.OPTIONS_REDUCE_METHOD[option]
             elif definitions.ARG_SKIP_BUILD in arg:
@@ -70,7 +70,7 @@ def read_conf(arg_list):
             elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
                 if ":" not in arg:
                     emitter.error("Invalid option for " + definitions.ARG_CEGIS_TIME_SPLIT.replace("=", "") + " : " + arg)
-                    emitter.help()
+                    emitter.emit_help()
                     exit()
                 else:
                     time_split = arg.replace(definitions.ARG_CEGIS_TIME_SPLIT, "")
@@ -78,10 +78,10 @@ def read_conf(arg_list):
 
             else:
                 emitter.error("Invalid argument: " + arg)
-                emitter.help()
+                emitter.emit_help()
                 exit()
     else:
-        emitter.help()
+        emitter.emit_help()
         exit()
 
 
@@ -277,9 +277,15 @@ def update_configuration():
     values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
     values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
+    definitions.DIRECTORY_LOG = definitions.DIRECTORY_LOG_BASE + "/" + values.CONF_TAG_ID
+
     if os.path.isdir(definitions.DIRECTORY_OUTPUT):
         shutil.rmtree(definitions.DIRECTORY_OUTPUT)
     os.mkdir(definitions.DIRECTORY_OUTPUT)
+
+    if os.path.isdir(definitions.DIRECTORY_LOG):
+        shutil.rmtree(definitions.DIRECTORY_LOG)
+    os.mkdir(definitions.DIRECTORY_LOG)
 
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
@@ -321,5 +327,5 @@ def update_configuration():
         total = int(explore) + int(refine)
         values.CONF_TIME_CEGIS_EXPLORE = (int(explore) / total) * values.DEFAULT_TIME_DURATION
         values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
-    sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
 
+    sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
