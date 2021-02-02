@@ -125,7 +125,6 @@ if __name__ == "__main__":
         parallel.pool.terminate()
         logger.error(traceback.format_exc())
         is_error = True
-        error_exit("Program Interrupted by User")
     except Exception as e:
         emitter.error("Runtime Error")
         emitter.error(str(e))

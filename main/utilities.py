@@ -26,11 +26,10 @@ def execute_command(command, show_output=True):
     return int(process.returncode)
 
 
-def error_exit(*args):
-    print("\n")
-    for i in args:
-        logger.error(i)
-        emitter.error(i)
+def error_exit(*arg_list):
+    emitter.error("Repair Failed")
+    for arg in arg_list:
+        emitter.error(str(arg))
     raise Exception("Error. Exiting...")
 
 
