@@ -122,15 +122,15 @@ if __name__ == "__main__":
     try:
         run(sys.argv[1:])
     except KeyboardInterrupt as e:
+        is_error = True
         parallel.pool.terminate()
         parallel.pool.join()
         logger.error(traceback.format_exc())
-        is_error = True
     except Exception as e:
+        is_error = True
         emitter.error("Runtime Error")
         emitter.error(str(e))
         logger.error(traceback.format_exc())
-        is_error = True
     finally:
         # Final running time and exit message
         # os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")

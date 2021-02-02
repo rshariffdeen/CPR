@@ -75,6 +75,8 @@ def debug(message):
 
 
 def error(message):
+    with open(definitions.FILE_ERROR_LOG, 'a') as last_log:
+        last_log.write(str(message) + "\n")
     message = str(message).strip().lower().replace("[error]", "")
     message = "[ERROR]: " + str(message) + "\n"
     log(message)
