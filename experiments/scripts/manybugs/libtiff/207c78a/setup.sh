@@ -70,10 +70,10 @@ sed -i '84d' src/test/short_tag.c
 
 sed -i '124i \\n'  src/test/short_tag.c
 sed -i '125i \\tuint32 symDotRangeTag;'  src/test/short_tag.c
-sed -i '126i \\tklee_make_symbolic(&symDotRangeTag, sizeof(symDotRangeTag), "symDotRangeTag");'  src/test/short_tag.c
+#sed -i '126i \\tklee_make_symbolic(&symDotRangeTag, sizeof(symDotRangeTag), "symDotRangeTag");'  src/test/short_tag.c
 #sed -i '127i \\t//symDotRangeTag = TIFFTAG_DOTRANGE;'  src/test/short_tag.c
 sed -i '127i \\tsymDotRangeTag = atoi(argv[1]);'  src/test/short_tag.c
-sed -i '128i \\tklee_print_expr("symVal=", symDotRangeTag);'  src/test/short_tag.c
+#sed -i '128i \\tklee_print_expr("symVal=", symDotRangeTag);'  src/test/short_tag.c
 sed -i '129i \\n'  src/test/short_tag.c
 #sed -i '130i \\tint symLowBound, symHighBound;'  src/test/short_tag.c
 #sed -i '131i \\tklee_make_symbolic(&symLowBound, sizeof(symLowBound), "symLowBound");'  src/test/short_tag.c
