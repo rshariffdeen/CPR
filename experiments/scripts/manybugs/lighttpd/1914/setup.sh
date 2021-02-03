@@ -59,10 +59,8 @@ cp $current_dir/mod-cgi.t /data/manybugs/lighttpd/1914/src/tests/mod-cgi.t
 # compile program
 cd $dir_name/src
 make clean
-#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=no
-#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=yes
-#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --with-pcre=yes
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --with-pcre=yes --with-ldap --with-bzip2 --with-openssl --with-gdbm --with-memcache --with-webdav-props --with-webdav-locks
+#CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=yes --with-ldap --with-bzip2 --with-openssl --with-gdbm --with-memcache --with-webdav-props --with-webdav-locks
 CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
 
 #sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
@@ -76,9 +74,12 @@ CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
 #git add libtiff/tif_ojpeg.c libtiff/tif_jpeg.c
 #git commit -m 'remove longjmp calls'
 
-
-#make CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32
-#sed -i '358i }' tools/gif2tiff.c
+make CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32
+# Patch
+#sed -i '748i if (con->request.content_length > 0) {' mod_cgi.c
+# Trident
+#sed -i '748i if (__trident_choice("L748", "bool", (int[]){con->request.content_length, i}, (char*[]){"con->request.content_length","i"}, 2, (int*[]){}, (char*[]){}, 0))) {' mod_cgi.c
+#sed -i '750i }' mod_cgi.c
 #sed -i '353i { TRIDENT_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
 #sed -i '352d' tools/gif2tiff.c
 #sed -i '352i while ((count = getc(infile)) &&  count <= 255 && (__trident_choice("L65", "bool", (int[]){count, status}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) )' tools/gif2tiff.c

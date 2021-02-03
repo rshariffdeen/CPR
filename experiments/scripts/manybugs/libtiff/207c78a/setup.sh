@@ -51,15 +51,13 @@ sed -i "s#/data/manybugs/libtiff/207c78a/src/limit#timeout 5#g" test.sh
 sed -i "s#/usr/bin/perl#perl#g" test.sh
 sed -i "s#cd libtiff#cd src#g" test.sh
 
-
-
 ## Prepare for KLEE
 # Fix fabs calls (not supported by KLEE).
 sed -i 's/fabs/fabs_trident/g' src/libtiff/tif_luv.c
 sed -i 's/fabs/fabs_trident/g' src/tools/tiff2ps.c
 
-#CC=$TRIDENT_CC ./configure --enable-static --disable-shared
-# klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
+cd src
+make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
 
 cd $dir_name
 
@@ -91,7 +89,7 @@ sed -i '144i \\t\t//    { TIFFTAG_DOTRANGE, {8, 16} }, //, {8, 16} }, // uint32 
 sed -i '145i \\t\t{ TIFFTAG_YCBCRSUBSAMPLING, {2, 1} }'  src/test/short_tag.c
 sed -i '146i \\t};'  src/test/short_tag.c
 
-# Instrument libtiff component.
+## Instrument libtiff component.
 sed -i '33i // KLEE' src/libtiff/tif_dirwrite.c
 sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirwrite.c
 sed -i '35i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirwrite.c
@@ -106,15 +104,24 @@ sed -i '344i \\t\t\t\tgoto bad;' src/libtiff/tif_dirwrite.c
 sed -i '345i \\t\t\t} else if (!TIFFWriteNormalTag(tif, dir, fip))' src/libtiff/tif_dirwrite.c
 sed -i '346d' src/libtiff/tif_dirwrite.c
 
-make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
+cd src
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32
 cd ./test
-make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 short_tag.log
-make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 long_tag.log
-extract-bc ./short_tag
-extract-bc ./long_tag
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
+extract-bc short_tag
+extract-bc long_tag
+#klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
 
-#make CC=$TRIDENT_CC -j32 short_tag.log
-#make CC=$TRIDENT_CC -j32 long_tag.log
+cd $current_dir
+cp repair.conf $dir_name
+cp spec.smt2 $dir_name
+cp t1.smt2 $dir_name
+cp -rf components $dir_name
+
+
+
+
 
 #test
 #%
