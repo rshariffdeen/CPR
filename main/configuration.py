@@ -101,8 +101,8 @@ def read_conf_file():
     for configuration in configuration_list:
         if definitions.CONF_PATH_PROJECT in configuration:
             values.CONF_PATH_PROJECT = configuration.replace(definitions.CONF_PATH_PROJECT, '')
-        elif definitions.CONF_NAME_PROGRAM in configuration:
-            values.CONF_PATH_PROGRAM = configuration.replace(definitions.CONF_NAME_PROGRAM, '')
+        elif definitions.CONF_BINARY_PATH in configuration:
+            values.CONF_PATH_PROGRAM = configuration.replace(definitions.CONF_BINARY_PATH, '')
         elif definitions.CONF_COMMAND_BUILD in configuration:
             values.CONF_COMMAND_BUILD = configuration.replace(definitions.CONF_COMMAND_BUILD, '')
         elif definitions.CONF_COMMAND_CONFIG in configuration:
@@ -132,7 +132,9 @@ def read_conf_file():
         elif definitions.CONF_DEPTH_VALUE in configuration:
             values.CONF_DEPTH_VALUE = configuration.replace(definitions.CONF_DEPTH_VALUE, '')
         elif definitions.CONF_DIR_SRC in configuration:
-            values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '')
+            values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '').replace("//", "/")
+            if values.CONF_DIR_SRC[-1] == "/":
+                values.CONF_DIR_SRC = values.CONF_DIR_SRC[:-1]
         elif definitions.CONF_LOC_BUG in configuration:
             values.CONF_LOC_BUG = configuration.replace(definitions.CONF_LOC_BUG, '')
         elif definitions.CONF_LOC_PATCH in configuration:
