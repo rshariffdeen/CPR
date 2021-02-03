@@ -6,3 +6,4 @@ main/__pycache__/
 logs
 output
 venv
+*.DS_Store
