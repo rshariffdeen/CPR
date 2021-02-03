@@ -59,60 +59,59 @@ sed -i 's/fabs/fabs_trident/g' src/libtiff/tif_luv.c
 sed -i 's/fabs/fabs_trident/g' src/tools/tiff2ps.c
 
 #CC=$TRIDENT_CC ./configure --enable-static --disable-shared
+# klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
+
+cd $dir_name
+
+## Instrument test driver.
+sed -i '33i #include <klee/klee.h>' src/test/short_tag.c
+sed -i '70,79 s/^/\/\//' src/test/short_tag.c
+sed -i '80i #define NPAIREDTAGS   4' src/test/short_tag.c
+sed -i '124i \\n'  src/test/short_tag.c
+sed -i '125i \\tuint32 symDotRangeTag;'  src/test/short_tag.c
+sed -i '126i \\tklee_make_symbolic(&symDotRangeTag, sizeof(symDotRangeTag), "symDotRangeTag");'  src/test/short_tag.c
+sed -i '127i \\t//symDotRangeTag = TIFFTAG_DOTRANGE;'  src/test/short_tag.c
+sed -i '128i \\tklee_print_expr("symVal=", symDotRangeTag);'  src/test/short_tag.c
+sed -i '129i \\n'  src/test/short_tag.c
+sed -i '130i \\tint symLowBound, symHighBound;'  src/test/short_tag.c
+sed -i '131i \\tklee_make_symbolic(&symLowBound, sizeof(symLowBound), "symLowBound");'  src/test/short_tag.c
+sed -i '132i \\tklee_make_symbolic(&symHighBound, sizeof(symHighBound), "symHighBound");'  src/test/short_tag.c
+sed -i '133i \\t//symLowBound = 8;'  src/test/short_tag.c
+sed -i '134i \\t//symHighBound = 16;'  src/test/short_tag.c
+sed -i '135i \\tklee_print_expr("symLowBound=", symLowBound+symHighBound);'  src/test/short_tag.c
+sed -i '136i \\n'  src/test/short_tag.c
+sed -i '137i \\tconst struct {'  src/test/short_tag.c
+sed -i '138i \\t\tconst ttag_t    tag;'  src/test/short_tag.c
+sed -i '139i \\t\tconst uint16    values[2];'  src/test/short_tag.c
+sed -i '140i \\t} short_paired_tags[] = {'  src/test/short_tag.c
+sed -i '141i \\t\t{ TIFFTAG_PAGENUMBER, {1, 1} },'  src/test/short_tag.c
+sed -i '142i \\t\t{ TIFFTAG_HALFTONEHINTS, {0, 255} },'  src/test/short_tag.c
+sed -i '143i \\t\t{ symDotRangeTag, {symLowBound, symHighBound} },'  src/test/short_tag.c
+sed -i '144i \\t\t//    { TIFFTAG_DOTRANGE, {8, 16} }, //, {8, 16} }, // uint32 ttag_t TIFFTAG_DOTRANGE'  src/test/short_tag.c
+sed -i '145i \\t\t{ TIFFTAG_YCBCRSUBSAMPLING, {2, 1} }'  src/test/short_tag.c
+sed -i '146i \\t};'  src/test/short_tag.c
+
+# Instrument libtiff component.
+sed -i '33i // KLEE' src/libtiff/tif_dirwrite.c
+sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirwrite.c
+sed -i '35i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirwrite.c
+sed -i '36i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirwrite.c
+sed -i '37i #endif' src/libtiff/tif_dirwrite.c
+
+sed -i '810i \\t\t\tklee_print_expr("val=",v[0]);' src/libtiff/tif_dirwrite.c
+sed -i '811i \\t\t\tTRIDENT_OUTPUT("obs", "i32", v[0]);' src/libtiff/tif_dirwrite.c
+
+sed -i '343i \\t\t\tif(__trident_choice("L1634", "bool", (int[]){fip->field_tag, TIFFTAG_DOTRANGE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirwrite.c
+sed -i '344i \\t\t\t\tgoto bad;' src/libtiff/tif_dirwrite.c
+sed -i '345i \\t\t\t} else if (!TIFFWriteNormalTag(tif, dir, fip))' src/libtiff/tif_dirwrite.c
+sed -i '346d' src/libtiff/tif_dirwrite.c
+
 make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
 cd ./test
 make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 short_tag.log
 make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 long_tag.log
 extract-bc ./short_tag
 extract-bc ./long_tag
-# klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
-
-cd $dir_name
-
-## Instrument test driver.
-#sed -i '33i #include <klee/klee.h>' src/test/short_tag.c
-#sed -i '70,79 s/^/\/\//' src/test/short_tag.c
-#sed -i '80i #define NPAIREDTAGS   4' src/test/short_tag.c
-#sed -i '124i \\n'  src/test/short_tag.c
-#sed -i '125i \\tuint32 symDotRangeTag;'  src/test/short_tag.c
-#sed -i '126i \\tklee_make_symbolic(&symDotRangeTag, sizeof(symDotRangeTag), "symDotRangeTag");'  src/test/short_tag.c
-#sed -i '127i \\t//symDotRangeTag = TIFFTAG_DOTRANGE;'  src/test/short_tag.c
-#sed -i '128i \\tklee_print_expr("symVal=", symDotRangeTag);'  src/test/short_tag.c
-#sed -i '129i \\n'  src/test/short_tag.c
-#sed -i '130i \\tint symLowBound, symHighBound;'  src/test/short_tag.c
-#sed -i '131i \\tklee_make_symbolic(&symLowBound, sizeof(symLowBound), "symLowBound");'  src/test/short_tag.c
-#sed -i '132i \\tklee_make_symbolic(&symHighBound, sizeof(symHighBound), "symHighBound");'  src/test/short_tag.c
-#sed -i '133i \\t//symLowBound = 8;'  src/test/short_tag.c
-#sed -i '134i \\t//symHighBound = 16;'  src/test/short_tag.c
-#sed -i '135i \\tklee_print_expr("symLowBound=", symLowBound+symHighBound);'  src/test/short_tag.c
-#sed -i '136i \\n'  src/test/short_tag.c
-#sed -i '137i \\tconst struct {'  src/test/short_tag.c
-#sed -i '138i \\t\tconst ttag_t    tag;'  src/test/short_tag.c
-#sed -i '139i \\t\tconst uint16    values[2];'  src/test/short_tag.c
-#sed -i '140i \\t} short_paired_tags[] = {'  src/test/short_tag.c
-#sed -i '141i \\t\t{ TIFFTAG_PAGENUMBER, {1, 1} },'  src/test/short_tag.c
-#sed -i '142i \\t\t{ TIFFTAG_HALFTONEHINTS, {0, 255} },'  src/test/short_tag.c
-#sed -i '143i \\t\t{ symDotRangeTag, {symLowBound, symHighBound} },'  src/test/short_tag.c
-#sed -i '144i \\t\t//    { TIFFTAG_DOTRANGE, {8, 16} }, //, {8, 16} }, // uint32 ttag_t TIFFTAG_DOTRANGE'  src/test/short_tag.c
-#sed -i '145i \\t\t{ TIFFTAG_YCBCRSUBSAMPLING, {2, 1} }'  src/test/short_tag.c
-#sed -i '146i \\t};'  src/test/short_tag.c
-#
-## Instrument libtiff component.
-#sed -i '33i // KLEE' src/libtiff/tif_dirwrite.c
-#sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirwrite.c
-#sed -i '35i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirwrite.c
-#sed -i '36i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirwrite.c
-#sed -i '37i #endif' src/libtiff/tif_dirwrite.c
-#
-#sed -i '810i \\t\t\tklee_print_expr("val=",v[0]);' src/libtiff/tif_dirwrite.c
-#sed -i '811i \\t\t\tTRIDENT_OUTPUT("obs", "i32", v[0]);' src/libtiff/tif_dirwrite.c
-#
-#sed -i '343i \\t\t\tif(__trident_choice("L1634", "bool", (int[]){fip->field_tag, TIFFTAG_DOTRANGE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirwrite.c
-#sed -i '344i \\t\t\t\tgoto bad;' src/libtiff/tif_dirwrite.c
-#sed -i '345i \\t\t\t} else if (!TIFFWriteNormalTag(tif, dir, fip))' src/libtiff/tif_dirwrite.c
-#sed -i '346d' src/libtiff/tif_dirwrite.c
-
-
 
 #make CC=$TRIDENT_CC -j32 short_tag.log
 #make CC=$TRIDENT_CC -j32 long_tag.log
