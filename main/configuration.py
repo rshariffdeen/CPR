@@ -135,8 +135,9 @@ def read_conf_file():
             values.CONF_DEPTH_VALUE = configuration.replace(definitions.CONF_DEPTH_VALUE, '')
         elif definitions.CONF_DIR_SRC in configuration:
             values.CONF_DIR_SRC = configuration.replace(definitions.CONF_DIR_SRC, '').replace("//", "/")
-            if values.CONF_DIR_SRC[-1] == "/":
-                values.CONF_DIR_SRC = values.CONF_DIR_SRC[:-1]
+            if values.CONF_DIR_SRC:
+                if values.CONF_DIR_SRC[-1] == "/":
+                    values.CONF_DIR_SRC = values.CONF_DIR_SRC[:-1]
         elif definitions.CONF_LOC_BUG in configuration:
             values.CONF_LOC_BUG = configuration.replace(definitions.CONF_LOC_BUG, '')
         elif definitions.CONF_LOC_PATCH in configuration:
