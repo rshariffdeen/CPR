@@ -97,6 +97,7 @@ ARG_COMP_ALL = "--all-comps"
 ARG_CEGIS_TIME_SPLIT = "--cegis-time-split="
 ARG_TIME_DURATION = "--time-duration="
 ARG_RANK_LIMIT = "--top-n="
+ARG_ITERATION_COUNT = "--iterations="
 
 
 # ----------------- TOOLS --------------------------------

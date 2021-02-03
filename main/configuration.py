@@ -59,6 +59,8 @@ def read_conf(arg_list):
                 values.CONF_REDUCE_METHOD = values.OPTIONS_REDUCE_METHOD[option]
             elif definitions.ARG_SKIP_BUILD in arg:
                 values.CONF_SKIP_BUILD = True
+            elif definitions.ARG_ITERATION_COUNT in arg:
+                values.CONF_ITERATION_LIMIT = int(arg.replace(definitions.ARG_ITERATION_COUNT, ""))
             elif definitions.ARG_COMP_ALL in arg:
                 values.CONF_ALL_COMPS = True
             elif definitions.ARG_SKIP_GENERATION in arg:
