@@ -58,13 +58,13 @@ sed -i "s#cd libtiff#cd src#g" test.sh
 sed -i 's/fabs/fabs_trident/g' src/libtiff/tif_luv.c
 sed -i 's/fabs/fabs_trident/g' src/tools/tiff2ps.c
 
-CC=$TRIDENT_CC ./configure --enable-static --disable-shared
-make CC=$TRIDENT_CC -j32
+#CC=$TRIDENT_CC ./configure --enable-static --disable-shared
+make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
 cd ./test
 make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 short_tag.log
 make CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32 long_tag.log
-extract-bc ./src/test/short_tag
-extract-bc ./src/test/long_tag
+extract-bc ./short_tag
+extract-bc ./long_tag
 # klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
 
 cd $dir_name
