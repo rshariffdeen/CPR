@@ -68,9 +68,13 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         patch_index = utilities.get_hash(patch_constraint_str)
         values.LIST_PATCH_SCORE[patch_index] += patch_score
         if is_under_approx is not None:
-            values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = is_under_approx
+            current_state = values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
+            final_state = current_state or is_under_approx
+            values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = final_state
         if is_over_approx is not None:
-            values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = is_over_approx
+            current_state = values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
+            final_state = current_state or is_under_approx
+            values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = final_state
 
         if values.DEFAULT_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
             updated_patch_list.append(patch)
@@ -152,11 +156,15 @@ def rank_patches(patch_list):
         patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
-        is_over_approx = 1 - values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
-        is_under_approx = 1 - values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
+        over_approx_score = 10
+        if values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]:
+            over_approx_score = 0
+        under_approx_score = 10
+        if values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]:
+            under_approx_score = 0
         patch_len = 10000 - len(patch_constraint_str)
         patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
-        filtered_list.append((patch, is_under_approx, is_over_approx, patch_score, patch_count, patch_len))
+        filtered_list.append((patch, under_approx_score, over_approx_score, patch_score, patch_count, patch_len))
 
     ranked_list = sorted(filtered_list, key=operator.itemgetter(3, 1, 2, 4, 5))
     ranked_list.reverse()
@@ -177,8 +185,8 @@ def run(project_path, program_path):
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")
         values.LIST_PATCH_SCORE[patch_index] = 0
-        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = 0
-        values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = 0
+        values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = False
+        values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = False
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
     emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:

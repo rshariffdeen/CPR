@@ -3,7 +3,6 @@ from pysmt.shortcuts import is_sat
 from main import emitter, values, extractor, merger, oracle, generator
 
 
-
 def refine_input_partition(path_condition, assertion, input_partition, is_multi_dimension):
     input_constraints = generator.generate_constraint_for_input_partition(input_partition)
     path_constraints = And(path_condition, input_constraints)
@@ -95,10 +94,10 @@ def refine_patch(p_specification, patch_formula, path_condition, index, patch_sp
             patch_space_constraint = And(patch_formula, parameter_constraint)
         path_constraint = And(path_condition, patch_space_constraint)
         negated_path_condition = values.NEGATED_PPC_FORMULA
-        if is_sat(path_constraint):
-            patch_score = 2
-            refined_patch_space, is_under_approx, is_over_approx = refine_for_over_fit(patch_formula, path_condition,
-                                                                                       negated_path_condition, patch_space, p_specification)
+        patch_score = 2
+        refined_patch_space, is_under_approx, is_over_approx = refine_for_over_fit(patch_formula, path_condition,
+                                                                                   negated_path_condition, patch_space, p_specification)
+
     else:
         patch_score = 1
         refined_patch_space = patch_space
