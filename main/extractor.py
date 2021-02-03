@@ -130,12 +130,15 @@ def extract_largest_path_condition(dir_path):
 def extract_child_expressions(patch_tree):
     (cid, semantics), children = patch_tree
     child_list = list()
-    right_child = children['right']
-    left_child = children['left']
-    if cid in ["logical-or", "logical-and"]:
-        right_list = extract_child_expressions(right_child)
-        left_list = extract_child_expressions(left_child)
-        child_list = right_list + left_list
-    else:
+    if "right" not in patch_tree:
         child_list = [patch_tree]
+    else:
+        right_child = children['right']
+        left_child = children['left']
+        if cid in ["logical-or", "logical-and"]:
+            right_list = extract_child_expressions(right_child)
+            left_list = extract_child_expressions(left_child)
+            child_list = right_list + left_list
+        else:
+            child_list = [patch_tree]
     return child_list
