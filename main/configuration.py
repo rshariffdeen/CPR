@@ -270,6 +270,7 @@ def print_configuration():
     emitter.configuration("refine strategy", values.DEFAULT_REFINE_METHOD)
     emitter.configuration("patch type", values.DEFAULT_PATCH_TYPE)
     emitter.configuration("repair method", values.DEFAULT_REDUCE_METHOD)
+    emitter.configuration("timeout for CPR", values.DEFAULT_TIME_DURATION)
     emitter.configuration("timeout for sat", values.DEFAULT_TIMEOUT_SAT)
     emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE)
     emitter.configuration("distance metric", values.DEFAULT_DISTANCE_METRIC)
