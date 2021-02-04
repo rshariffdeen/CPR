@@ -327,8 +327,10 @@ def run_fitreduce(program_path, patch_list):
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
+                generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC)
+                values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
+                values.LIST_PPC = []
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
-
                 values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
