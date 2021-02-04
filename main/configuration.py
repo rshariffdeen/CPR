@@ -330,7 +330,11 @@ def update_configuration():
         values.DEFAULT_OPERATION_MODE = values.CONF_OPERATION_MODE
     if values.CONF_REDUCE_METHOD:
         values.DEFAULT_REDUCE_METHOD = values.CONF_REDUCE_METHOD
-
+    if values.CONF_FILE_INPUT_LIST:
+        with open(values.CONF_FILE_INPUT_LIST, "r") as in_file:
+            content_lines = in_file.readlines()
+            for content in content_lines:
+                values.LIST_INPUT.append(content.strip().replace("\n", ""))
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)
