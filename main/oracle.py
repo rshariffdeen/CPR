@@ -189,6 +189,9 @@ def is_tree_duplicate(tree, lock):
 
 
 def is_tree_logic_redundant(tree):
+    (cid, semantics), children = tree
+    if cid in ["addition", "division", "multiplication", "subtraction", "remainder"]:
+        return False
     child_node_list = extractor.extract_child_expressions(tree)
     unique_child_node_list = []
     for child in child_node_list:
