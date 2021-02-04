@@ -310,7 +310,8 @@ def run_fitreduce(program_path, patch_list):
                 argument_list = extractor.extract_input_arg_list(argument_list)
                 iteration = iteration + 1
                 values.ITERATION_NO = iteration
-                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
+                print_arg_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
+                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(print_arg_list))
                 if values.IS_CRASH:
                     arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
                     for var in var_list:

@@ -346,7 +346,8 @@ def update_configuration():
         seed_dir = values.CONF_DIR_SEED_LIST
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
         for seed_file in file_list:
-            values.LIST_SEED_FILES.append(seed_file)
+            seed_abs_path = seed_dir + "/" + seed_file
+            values.LIST_SEED_FILES.append(seed_abs_path)
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)
