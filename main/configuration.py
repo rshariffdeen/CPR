@@ -112,9 +112,12 @@ def read_conf_file():
         elif definitions.CONF_RANK_LIMIT in configuration:
             values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
         elif definitions.CONF_TEST_FILE in configuration:
-            values.CONF_TEST_FILE = configuration.replace(definitions.CONF_TEST_FILE, '')
-            if not os.path.isfile(values.CONF_TEST_FILE):
-                error_exit("Test file " + values.CONF_TEST_FILE + " not found")
+            test_file_path = configuration.replace(definitions.CONF_TEST_FILE, '')
+            if not os.path.isfile(test_file_path):
+                test_file_path = values.CONF_PATH_PROJECT + "/" + test_file_path
+                if not os.path.isfile(test_file_path):
+                    error_exit("Test file " + values.CONF_TEST_FILE + " not found")
+            values.CONF_TEST_FILE = test_file_path
         elif definitions.CONF_TEST_OUTPUT in configuration:
             values.CONF_TEST_OUTPUT = configuration.replace(definitions.CONF_TEST_OUTPUT, '').split(",")
         elif definitions.CONF_TEST_INPUT in configuration:
