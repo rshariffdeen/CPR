@@ -176,7 +176,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
         emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
         return None, None, patch_list
-
+    values.LIST_GENERATED_PATH = None
     patch_constraint = None
     selected_new_path = ""
     selected_control_loc = ""
