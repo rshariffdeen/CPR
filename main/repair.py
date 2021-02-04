@@ -308,10 +308,6 @@ def run_fitreduce(program_path, patch_list):
                 time_check = time.time()
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
-                for arg in argument_list:
-                    if arg in values.LIST_SEED_FILES:
-                        argument_list[argument_list.index(arg)] = "$POC"
-                        values.FILE_POC_SEED = arg
                 iteration = iteration + 1
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
@@ -321,6 +317,11 @@ def run_fitreduce(program_path, patch_list):
                         var_name = var["identifier"]
                         if "angelic" in var_name:
                             second_var_list.append(var)
+                for arg in argument_list:
+                    if arg in values.LIST_SEED_FILES:
+                        argument_list[argument_list.index(arg)] = "$POC"
+                        values.FILE_POC_SEED = arg
+                        values.FILE_POC_GEN = None
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 # assert exit_code == 0
