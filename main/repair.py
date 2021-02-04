@@ -294,7 +294,7 @@ def run_fitreduce(program_path, patch_list):
 
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
-            test_input_list = values.CONF_TEST_INPUT
+            test_input_list = values.CONF_FILE_INPUT_LIST
             second_var_list = list()
             for argument_list in test_input_list:
                 time_check = time.time()
