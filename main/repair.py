@@ -297,7 +297,7 @@ def run_fitreduce(program_path, patch_list):
 
     for seed_file in values.LIST_SEED_FILES:
         seed_arg_list = values.CONF_TEST_INPUT_LIST[0]
-        seed_arg_list = [arg.replace('$POC', seed_file) for arg in seed_arg_list]
+        seed_arg_list = seed_arg_list.replace('$POC', seed_file)
         values.CONF_TEST_INPUT_LIST.append(seed_arg_list)
 
     while not satisfied and len(patch_list) > 0:
@@ -348,7 +348,7 @@ def run_fitreduce(program_path, patch_list):
                         "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
                     break
             emitter.success("\t\tend of concolic exploration using user-provided seeds")
-            emitter.success("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+            emitter.success("\t\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             values.COUNT_PATCH_END_SEED = len(patch_list)
 
         else:
