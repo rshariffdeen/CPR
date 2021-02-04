@@ -234,6 +234,8 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
             file_path = values.CONF_PATH_POC
             if values.FILE_POC_GEN:
                 file_path = values.FILE_POC_GEN
+            elif values.FILE_POC_SEED:
+                file_path = values.FILE_POC_SEED
             concrete_file = open(file_path, 'rb')
             bit_size = os.fstat(concrete_file.fileno()).st_size
             input_argument += " A --sym-files 1 " + str(bit_size) + " "

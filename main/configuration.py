@@ -112,12 +112,19 @@ def read_conf_file():
         elif definitions.CONF_RANK_LIMIT in configuration:
             values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
         elif definitions.CONF_FILE_SEED_LIST in configuration:
-            test_file_path = configuration.replace(definitions.CONF_FILE_SEED_LIST, '')
-            if not os.path.isfile(test_file_path):
-                test_file_path = values.CONF_PATH_PROJECT + "/" + test_file_path
-                if not os.path.isfile(test_file_path):
-                    error_exit("Test file " + values.CONF_FILE_SEED_LIST + " not found")
-            values.CONF_FILE_SEED_LIST = test_file_path
+            seed_file_path = configuration.replace(definitions.CONF_FILE_SEED_LIST, '')
+            if not os.path.isfile(seed_file_path):
+                seed_file_path = values.CONF_PATH_PROJECT + "/" + seed_file_path
+                if not os.path.isfile(seed_file_path):
+                    error_exit("Seed file " + seed_file_path + " not found")
+            values.CONF_FILE_SEED_LIST = seed_file_path
+        elif definitions.CONF_DIR_SEED_LIST in configuration:
+            seed_dir_path = configuration.replace(definitions.CONF_FILE_SEED_LIST, '')
+            if not os.path.isdir(seed_dir_path):
+                seed_dir_path = values.CONF_PATH_PROJECT + "/" + seed_dir_path
+                if not os.path.isfile(seed_dir_path):
+                    error_exit("Seed dir " + seed_dir_path + " not found")
+            values.CONF_DIR_SEED_LIST = seed_dir_path
         elif definitions.CONF_TEST_OUTPUT_LIST in configuration:
             values.CONF_TEST_OUTPUT_LIST = configuration.replace(definitions.CONF_TEST_OUTPUT_LIST, '').split(",")
         elif definitions.CONF_TEST_INPUT_LIST in configuration:
@@ -334,7 +341,12 @@ def update_configuration():
         with open(values.CONF_FILE_SEED_LIST, "r") as in_file:
             content_lines = in_file.readlines()
             for content in content_lines:
-                values.LIST_SEED.append(content.strip().replace("\n", ""))
+                values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
+    if values.CONF_DIR_SEED_LIST:
+        seed_dir = values.CONF_DIR_SEED_LIST
+        file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
+        for seed_file in file_list:
+            values.LIST_SEED_FILES.append(seed_file)
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)

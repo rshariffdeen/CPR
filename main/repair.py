@@ -292,8 +292,13 @@ def run_fitreduce(program_path, patch_list):
     test_output_list = values.CONF_TEST_OUTPUT_LIST
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
-    for seed in values.LIST_SEED:
+    for seed in values.LIST_SEED_INPUT:
         values.CONF_TEST_INPUT_LIST.append(seed)
+
+    for seed_file in values.LIST_SEED_FILES:
+        seed_arg_list = values.CONF_TEST_INPUT_LIST[0]
+        seed_arg_list = [arg.replace('$POC', seed_file) for arg in seed_arg_list]
+        values.CONF_TEST_INPUT_LIST.append(seed_arg_list)
 
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
@@ -303,6 +308,10 @@ def run_fitreduce(program_path, patch_list):
                 time_check = time.time()
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
+                for arg in argument_list:
+                    if arg in values.LIST_SEED_FILES:
+                        argument_list[argument_list.index(arg)] = "$POC"
+                        values.FILE_POC_SEED = arg
                 iteration = iteration + 1
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
