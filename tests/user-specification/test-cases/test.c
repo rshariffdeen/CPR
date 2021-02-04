@@ -7,6 +7,6 @@
 int main(int argc, char *argv[]) {
   int x = atoi(argv[1]);
   int y = __trident_choice("L9", "i32", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0);
-  TRIDENT_OUTPUT("obs", "i32", y);
+  TRIDENT_OUTPUT("obs", "i32", y - (x*x));
   return 0;
 }

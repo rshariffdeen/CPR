@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   y = x - 1;
 
-  TRIDENT_OUTPUT("obs", "i32", y - (x*x));
+  TRIDENT_OUTPUT("obs", "i32", y);
   res = 1000 / y;
   return 0;
 }
