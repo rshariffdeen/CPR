@@ -335,7 +335,6 @@ def update_configuration():
             content_lines = in_file.readlines()
             for content in content_lines:
                 values.LIST_SEED.append(content.strip().replace("\n", ""))
-                values.CONF_TEST_INPUT_LIST.append(content.strip().replace("\n", ""))
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)

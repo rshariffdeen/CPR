@@ -292,6 +292,9 @@ def run_fitreduce(program_path, patch_list):
     test_output_list = values.CONF_TEST_OUTPUT_LIST
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
+    for seed in values.LIST_SEED:
+        values.CONF_TEST_INPUT_LIST.append(seed)
+
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
             test_input_list = values.CONF_TEST_INPUT_LIST
