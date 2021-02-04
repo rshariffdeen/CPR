@@ -553,6 +553,8 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
             binary_file_path = values.CONF_PATH_POC
             if values.FILE_POC_GEN:
                 binary_file_path = values.FILE_POC_GEN
+            elif values.FILE_POC_SEED:
+                binary_file_path = values.FILE_POC_SEED
             ktest_command += " --sym-file " + binary_file_path
         elif str(index) in values.CONF_MASK_ARG:
             continue
