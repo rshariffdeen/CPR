@@ -1,0 +1,3 @@
+TEST CASE: Generate an input for the given CFC and derive a expected output from the CFC, use this test-case
+ to bootstrap the repair loop. Can use directed-fuzzing to find an input that violates the CFC and observe the two locations of
+ interest, bug location, patch location.
