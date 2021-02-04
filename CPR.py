@@ -52,7 +52,7 @@ def initialize():
     emitter.title("Initializing Program")
     program_path = values.CONF_PATH_PROGRAM
     extractor.extract_byte_code(program_path)
-    test_input_list = values.CONF_FILE_INPUT_LIST
+    test_input_list = values.CONF_TEST_INPUT_LIST
     second_var_list = list()
     directory_path = "/".join(str(program_path).split("/")[:-1])
     klee_out_dir = directory_path + "/klee-last"

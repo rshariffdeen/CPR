@@ -437,7 +437,7 @@ def run_concolic_exploration(program_path, patch_list):
     largest_path_condition = None
     while not satisfied:
         if iteration == 0:
-            test_input_list = values.CONF_FILE_INPUT_LIST
+            test_input_list = values.CONF_TEST_INPUT_LIST
             second_var_list = list()
             for argument_list in test_input_list:
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
