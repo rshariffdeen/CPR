@@ -82,7 +82,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
-        test_index = str((int(test_output_list.index(output_spec)) * 2))
+        test_index = str((int(test_output_list.index(output_spec))))
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
 
