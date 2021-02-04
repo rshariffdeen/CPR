@@ -118,9 +118,9 @@ def read_conf_file():
                 if not os.path.isfile(test_file_path):
                     error_exit("Test file " + values.CONF_FILE_INPUT_LIST + " not found")
             values.CONF_FILE_INPUT_LIST = test_file_path
-        elif definitions.CONF_TEST_OUTPUT in configuration:
-            values.CONF_TEST_OUTPUT_LIST = configuration.replace(definitions.CONF_TEST_OUTPUT, '').split(",")
-        elif definitions.CONF_TE in configuration:
+        elif definitions.CONF_TEST_OUTPUT_LIST in configuration:
+            values.CONF_TEST_OUTPUT_LIST = configuration.replace(definitions.CONF_TEST_OUTPUT_LIST, '').split(",")
+        elif definitions.CONF_TEST_INPUT_LIST in configuration:
              input_list = configuration.replace(definitions.CONF_TEST_INPUT_LIST, '').split("],[")
              processed_list = []
              for input in input_list:
