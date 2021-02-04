@@ -338,6 +338,10 @@ def run_fitreduce(program_path, patch_list):
                     emitter.warning(
                         "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
                     break
+            emitter.note("end of concolic exploration using user-provided seeds")
+            emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+            values.COUNT_PATCH_END_SEED = len(patch_list)
+
         else:
             iteration = iteration + 1
             values.ITERATION_NO = iteration

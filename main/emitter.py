@@ -176,6 +176,7 @@ def end(time_info, is_error=False):
     statistics("Iteration Count: " + str(values.ITERATION_NO))
     statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
+    statistics("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
     statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))

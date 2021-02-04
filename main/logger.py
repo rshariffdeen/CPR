@@ -118,6 +118,7 @@ def end(time_duration, is_error=False):
     output("Iteration Count: " + str(values.ITERATION_NO))
     output("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))
+    output("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
     output("Patch End Count: " + str(values.COUNT_PATCH_END))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         output("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
