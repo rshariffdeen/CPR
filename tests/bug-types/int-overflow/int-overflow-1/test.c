@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <limits.h>
 #ifndef TRIDENT_OUTPUT
 #define TRIDENT_OUTPUT(id, typestr, value) value
 #endif
@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   if (__trident_choice("L9", "bool", (int[]){x, a}, (char*[]){"x", "a"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
-  TRIDENT_OUTPUT("x", "i32", x);
+  TRIDENT_OUTPUT("obs", "i32", (INT_MAX/a) - x);
   b = x * a;
   return 0;
 }
