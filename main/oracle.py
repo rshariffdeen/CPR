@@ -177,6 +177,8 @@ def is_tree_duplicate(tree, lock):
                         return not update_contradiction_included(lock)
                     elif cid in ['equal', 'less-or-equal', 'greater-or-equal']:
                         return not update_tautology_included(lock)
+                    elif cid in ['addition', 'division', 'subtraction', 'remainder']:
+                        return True
                     # else:
                     #     return True
 
