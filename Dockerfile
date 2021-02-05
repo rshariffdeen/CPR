@@ -12,16 +12,17 @@ RUN apt-get install -y build-essential \
                        cmake \
                        libncurses5-dev \
                        nano \
-                       python-minimal \
-                       python-pip \
-                       python3 \
                        psmisc  \
-                       python3-pip \
                        unzip \
                        libtcmalloc-minimal4 \
                        libgoogle-perftools-dev \
                        libssl-dev \
                        zlib1g-dev
+
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
+    python3.8 \
+    python3-pip
 # WORKDIR /home
 # RUN mkdir clang-llvm
 # WORKDIR /home/clang-llvm
