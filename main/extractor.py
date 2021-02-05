@@ -122,7 +122,7 @@ def extract_largest_path_condition(dir_path):
                 break
             pc_formula_str = str(path_condition.serialize())
             if len(pc_formula_str) > pc_formula_len:
-                pc_formula_len = pc_formula_str
+                pc_formula_len = len(pc_formula_str)
                 largest_path_condition = path_condition
     return largest_path_condition
 
