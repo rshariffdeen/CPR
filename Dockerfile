@@ -24,6 +24,7 @@ RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
     python3.8 \
     python3-pip
+
 # WORKDIR /home
 # RUN mkdir clang-llvm
 # WORKDIR /home/clang-llvm
@@ -92,23 +93,19 @@ ENV PATH=/klee/build/bin/:${PATH}
 
 ENV LLVM_COMPILER=clang
 
-RUN apt-get install -y software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update \
-    && apt-get install -y python3.6 bear
 
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pylint
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install pylint
 
-RUN python -m pip --disable-pip-version-check --no-cache-dir install wllvm && \
-    python3.6 -m pip --disable-pip-version-check --no-cache-dir install pysmt
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install wllvm && \
+    python3.8 -m pip --disable-pip-version-check --no-cache-dir install pysmt
 
 RUN pysmt-install --z3 --confirm-agreement
 
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install six
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install numpy
-WORKDIR /concolic-repair
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install funcy
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install six
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install numpy
 
+WORKDIR /concolic-repair
 COPY main/ main/
 COPY lib/ lib/
 COPY tools/  tools/
