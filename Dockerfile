@@ -16,6 +16,7 @@ RUN apt-get install -y build-essential \
                        unzip \
                        libtcmalloc-minimal4 \
                        libgoogle-perftools-dev \
+                       software-properties-common \
                        libssl-dev \
                        zlib1g-dev
 
