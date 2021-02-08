@@ -93,7 +93,7 @@ ENV PATH=/klee/build/bin/:${PATH}
 
 ENV LLVM_COMPILER=clang
 
-
+RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install setuptools
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pylint
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install wllvm
 RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pysmt
