@@ -5,7 +5,8 @@ download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/libtiff-bu
 current_dir=$PWD
 mkdir -p $dir_name
 cd $dir_name
-wget $download_url
+#wget $download_url
+cp $current_dir/libtiff-bug-2006-03-03-a72cf60-0a36d7f.tar.gz .
 tar xfz libtiff-bug-2006-03-03-a72cf60-0a36d7f.tar.gz
 mv libtiff-bug-2006-03-03-a72cf60-0a36d7f src
 rm libtiff-bug-2006-03-03-a72cf60-0a36d7f.tar.gz
@@ -61,13 +62,21 @@ make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
 cd $dir_name
 
 #Instrument driver and libtiff
-#sed -i '33i #include <klee/klee.h>' src/test/short_tag.c
-
 sed -i '43i // KLEE' src/libtiff/tif_dirread.c
 sed -i '44i #include <klee/klee.h>' src/libtiff/tif_dirread.c
 sed -i '45i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirread.c
 sed -i '46i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirread.c
 sed -i '47i #endif' src/libtiff/tif_dirread.c
+
+sed -i '981i \\tif (!dir->tdir_count || !w || __trident_choice("L1634", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirread.c
+sed -i '982d' src/libtiff/tif_dirread.c
+sed -i '983i \\t}' src/libtiff/tif_dirread.c
+
+sed -i '35i #include <klee/klee.h>' src/test/long_tag.c
+sed -i '65,120 s/^/\/\//' src/test/long_tag.c
+sed -i '124i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
+sed -i '125i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
+
 
 # Compile instrumentation and test driver.
 cd src
@@ -76,10 +85,6 @@ cd ./test
 make clean
 make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
 extract-bc long_tag
-#klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s long_tag.bc
-#klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s --seed-out=file.bout long_tag.bc A --symfiles 1 156
-
-#klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s --seed-out=file.bout -allow-seed-extension -named-seed-matching long_tag.bc A --symfiles 1 156
 
 # Copy remaining files to run CPR.
 cd $current_dir
@@ -87,11 +92,12 @@ cp repair.conf $dir_name
 cp spec.smt2 $dir_name
 cp t1.smt2 $dir_name
 cp -rf components $dir_name
-#cp -rf tests $dir_name
+cp -rf tests $dir_name
 
-#sed -i '118d;221d' libtiff/tif_jpeg.c
-#sed -i '153d;2429d' libtiff/tif_ojpeg.c
-#git add libtiff/tif_ojpeg.c libtiff/tif_jpeg.c
-#git commit -m 'remove longjmp calls'
-#
-#
+cd $dir_name
+cp tests/long_test.tiff src/test/
+cd src/test/
+gen-bout --sym-file "/data/manybugs/libtiff/0a36d7f/src/test/long_test.tiff"
+
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s long_tag.bc long_test.tiff
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156
