@@ -451,8 +451,9 @@ def run_concolic_exploration(program_path, patch_list):
                     arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
                     for var in var_list:
                         var_name = var["identifier"]
-                        if "angelic" in var_name:
-                            second_var_list.append(var)
+                        # if "angelic" in var_name:
+                        #     second_var_list.append(var)
+                        second_var_list.append(var)
                 # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 # assert exit_code == 0
