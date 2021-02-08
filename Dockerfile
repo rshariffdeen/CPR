@@ -90,9 +90,11 @@ ENV LLVM_COMPILER=clang
 
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
+    bear \
     python3.7 \
     python3-pip
 
+RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pylint
 
@@ -101,7 +103,7 @@ RUN pysmt-install --z3 --confirm-agreement
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install funcy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
-#RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install wllvm
+RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
 WORKDIR /concolic-repair
 COPY main/ main/
