@@ -90,7 +90,7 @@ ENV LLVM_COMPILER=clang
 
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
-    python3.6 \
+    python3.7 \
     python3-pip
 
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
