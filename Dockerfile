@@ -20,11 +20,6 @@ RUN apt-get install -y build-essential \
                        libssl-dev \
                        zlib1g-dev
 
-RUN add-apt-repository -y ppa:deadsnakes/ppa
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
-    python3.6 \
-    python3-pip
-
 # WORKDIR /home
 # RUN mkdir clang-llvm
 # WORKDIR /home/clang-llvm
@@ -93,14 +88,20 @@ ENV PATH=/klee/build/bin/:${PATH}
 
 ENV LLVM_COMPILER=clang
 
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install setuptools
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pylint
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install wllvm
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install pysmt
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
+    python3.6 \
+    python3-pip
+
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pylint
+
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pysmt
 RUN pysmt-install --z3 --confirm-agreement
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install funcy
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install six
-RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install numpy
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install funcy
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
+#RUN python3.6 -m pip --disable-pip-version-check --no-cache-dir install wllvm
 
 WORKDIR /concolic-repair
 COPY main/ main/
