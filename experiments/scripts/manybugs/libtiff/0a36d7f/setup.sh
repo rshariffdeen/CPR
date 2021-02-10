@@ -76,6 +76,7 @@ sed -i '35i #include <klee/klee.h>' src/test/long_tag.c
 sed -i '65,120 s/^/\/\//' src/test/long_tag.c
 sed -i '124i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
 sed -i '125i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
+sed -i '126i \\tklee_assert(tif > 0);' src/test/long_tag.c
 
 
 # Compile instrumentation and test driver.
