@@ -486,7 +486,7 @@ def run_concolic_exploration(program_path, patch_list):
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
             values.LIST_PPC = []
-            gen_arg_list, gen_var_list, _ =  select_new_input(argument_list, second_var_list, [])
+            gen_arg_list, gen_var_list, _ = select_new_input(argument_list, second_var_list, [])
 
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
