@@ -73,6 +73,7 @@ sed -i '982d' src/libtiff/tif_dirread.c
 sed -i '983i \\t}' src/libtiff/tif_dirread.c
 
 sed -i '35i #include <klee/klee.h>' src/test/long_tag.c
+sed -i '64i \\tfilename = argv[1];'  src/test/long_tag.c
 sed -i '65,120 s/^/\/\//' src/test/long_tag.c
 sed -i '124i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
 sed -i '125i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
