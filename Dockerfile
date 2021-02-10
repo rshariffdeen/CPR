@@ -97,7 +97,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-in
 RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pylint
-
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pysmt
 RUN pysmt-install --z3 --confirm-agreement
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install funcy
@@ -105,25 +104,28 @@ RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
-WORKDIR /concolic-repair
+WORKDIR /CPR
 COPY main/ main/
 COPY lib/ lib/
 COPY tools/  tools/
 COPY tests/ tests/
 COPY components/ components/
+COPY experiments/ experiments/
+COPY scripts/ scripts/
+COPY CPR.py CPR.py
 
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 
 # add execution permissions
-#RUN chmod +x /concolic-repair/tools/trident-cc
-#RUN chmod +x /concolic-repair/tools/trident-cxx
-#RUN chmod +x /concolic-repair/tests/assignment/run
-#RUN chmod +x /concolic-repair/tests/iterations/run
-#RUN chmod +x /concolic-repair/tests/multipath/run
-#RUN chmod +x /concolic-repair/tests/simple-rvalue/run
+#RUN chmod +x /CPR/tools/trident-cc
+#RUN chmod +x /CPR/tools/trident-cxx
+#RUN chmod +x /CPR/tests/assignment/run
+#RUN chmod +x /CPR/tests/iterations/run
+#RUN chmod +x /CPR/tests/multipath/run
+#RUN chmod +x /CPR/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
-ENV TRIDENT_CC=/concolic-repair/tools/trident-cc
-ENV TRIDENT_CXX=/concolic-repair/tools/trident-cxx
+ENV TRIDENT_CC=/CPR/tools/trident-cc
+ENV TRIDENT_CXX=/CPR/tools/trident-cxx
 
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 
