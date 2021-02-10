@@ -57,8 +57,8 @@ def initialize():
     directory_path = "/".join(str(program_path).split("/")[:-1])
     klee_out_dir = directory_path + "/klee-last"
     for argument_list in test_input_list:
-        print_argument_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
-        emitter.sub_title("Running concrete execution for test case: " + str(print_argument_list))
+        # print_argument_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
+        emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = extractor.extract_input_arg_list(argument_list)
         values.ARGUMENT_LIST = argument_list
