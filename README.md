@@ -10,7 +10,7 @@ to deploy and run our tool. Dependencies include:
 
 * LLVM 3.4
 * KLEE 1.4
-* Python 3.6
+* Python 3.7
 * Z3Solver
 * MathSAT Solver
 
@@ -26,13 +26,13 @@ in the 'tests' directory. TODO: restructure test cases to a meaningful order
 
 Run examples:
 
-    python3.6 CPR.py --conf=tests/div-zero-1/repair.conf
-    python3.6 CPR.py --conf=tests/div-zero-2/repair.conf
+    python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-1/repair.conf
+    python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-2/repair.conf
 
 # Runtime Configuration Options
 The tool supports the following functionality:
 
-    Usage: python3.6 CPR.py [OPTIONS] --conf=$FILE_PATH
+    Usage: python3.7 CPR.py [OPTIONS] --conf=$FILE_PATH
 	Options are:
 		--debug	            | enable debugging information
 		--mode=             | execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)
