@@ -114,7 +114,8 @@ COPY components/ components/
 COPY experiments/ experiments/
 COPY scripts/ scripts/
 COPY CPR.py CPR.py
-COPY README.md
+COPY doc/ doc/
+COPY README.md README.md
 
 
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
