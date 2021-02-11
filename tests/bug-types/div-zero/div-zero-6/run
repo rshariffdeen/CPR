@@ -23,7 +23,7 @@ klee --posix-runtime --libc=uclibc --write-smt2s --output-dir=klee-t1 "${PROGRAM
 
 # python3.6 ../CPR/main/synthesis.py \
 #           --tests t1.smt2:klee-t1 \
-#           --components components/*.smt2 ../CPR/components/less-than.smt2 ../concolic-repair/components/constant_a.smt2 \
+#           --components components/*.smt2 ../CPR/components/less-than.smt2 ../CPR/components/constant_a.smt2 \
 #           --verify L9:patch.json
 
 python3.6 ../../main/synthesis.py \
