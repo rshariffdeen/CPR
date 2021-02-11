@@ -64,5 +64,3 @@ Run examples:
 * [Getting Started](doc/GetStart.md)
 * [Example Usage](doc/Examples.md)
 * [Manual](doc/Manual.md)
-* [Troubleshooting](doc/Troubleshooting.md)
-* [Experiment Replication](doc/Replication.md)
