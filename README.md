@@ -3,6 +3,35 @@ CPR: A new automated program repair technique based on concolic execution
 which works on patch abstraction with the sub-optimal goal of refining the patch to less over-fit 
 the initial test cases. 
 
+Automated program repair reduces the manual effort in fixing program errors. 
+However, existing repair techniques modify a buggy program such that it passes given tests.
+Such repair techniques do not discriminate between correct patches and patches that overfit
+the available tests and break untested but desired functionality. We attempt to solve this
+problem with a novel solution that make use of the duality of space exploration in Input 
+Space and Program Space. We implemented our technique in the form of a tool called CPR and
+evaluated its efficacy in reducing the patch space by discarding overfitting patches from 
+a pool of plausible patches. Similar to Cardio-Pulmonary Resuscitation (CPR) does to a
+patient, our tool CPR resuscitate or recover programs via appropriate fixes. 
+
+In this work, we therefore propose and implement an integrated approach for detecting and discarding 
+overfitting patches by exploiting the relationship between the patch space and input space.
+We leverage concolic path exploration to systematically traverse the input space 
+(and generate inputs), while systematically ruling out significant parts of the patch space.
+Given a long enough time budget, this approach allows a significant reduction in the 
+pool of patch candidates, as shown by our experiments. 
+
+## Workflow
+Given the buggy program, a repair budget (time limit, iteration count), the fault location(s), 
+a user specification, the language components for the synthesis, a failing test-case 
+and optionally, a set of initial functional(passing) test cases, CPR generate a 
+refined set of patches that are less over-fitting. The user specification defines 
+the desired behavior of the repaired program (in addition to satisfying the given 
+test cases). If initial tests are available, we assume that at least one failing 
+test is available, which our method seeks to repair, apart from making sure that 
+the user provided specification holds for all paths traversed via concolic exploration. 
+Finally, CPR produces a ranked set of patches based on the explored input space. 
+
+![CPR_Workflow](doc/workflow.jpg)
 
 ## Build and Dependencies
 We provide a ready-made container which includes all necessary envrionment set-up
@@ -22,39 +51,18 @@ Build and run a container:
 
 # Example
 We provide several examples you can run to test our tool, all test cases are included
-in the 'tests' directory. TODO: restructure test cases to a meaningful order
+in the 'tests' directory. 
 
 Run examples:
 
     python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-1/repair.conf
     python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-2/repair.conf
 
-# Runtime Configuration Options
-The tool supports the following functionality:
 
-    Usage: python3.7 CPR.py [OPTIONS] --conf=$FILE_PATH
-	Options are:
-		--debug	            | enable debugging information
-		--mode=             | execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)
-		--dist-cal=	    | disable distance calculation (default=enabled)
-		--selection=	    | selection strategy [0: deterministic, 1: random] (default=0)
-		--dist-metric=	    | distance metric [0: control-loc, 1: statement] (default=0)
-		--patch-type=	    | patch type [0: concrete, 1: abstract] (default=0)
-		--refine-method=    | refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)
+## Documentation ##
 
-# Configuration Settings
-The tool supports the following configuration:
-
-    project_path:    absolute path to the project directory
-    tag_id:     a tag to be used for the output files
-    src_directory:  relative path to the source directory from the project directory
-    binary_path:    relative path to the testing binary file from the project directory
-    config_command:     custom config command (can opt out for the tool to automatically configure the project)
-    build_command:      custom build command (can opt out for the tool to automatically build)
-    test_input:     list of inputs for initial testing
-    test_output:    expected output file for each test case
-    custom_comp_list:   use of custom components to be added to the language
-    spec_path:  relative path to the specification file
-    loc_patch:  source code location of the patch
-    loc_bug:    source code location of the bug
-    general_comp_list:  list of components to be used for the patch from the language we support
+* [Getting Started](doc/GetStart.md)
+* [Example Usage](doc/Examples.md)
+* [Manual](doc/Manual.md)
+* [Troubleshooting](doc/Troubleshooting.md)
+* [Experiment Replication](doc/Replication.md)
