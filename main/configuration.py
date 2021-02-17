@@ -132,6 +132,13 @@ def read_conf_file():
                 if not os.path.isdir(seed_dir_path):
                     error_exit("Seed dir " + seed_dir_path + " not found")
             values.CONF_DIR_SEED_LIST = seed_dir_path
+        elif definitions.CONF_TEST_OUTPUT_DIR in configuration:
+            output_dir_path = configuration.replace(definitions.CONF_TEST_OUTPUT_DIR, '')
+            if not os.path.isdir(output_dir_path):
+                output_dir_path = values.CONF_PATH_PROJECT + "/" + output_dir_path
+                if not os.path.isdir(output_dir_path):
+                    error_exit("Seed dir " + output_dir_path + " not found")
+            values.CONF_TEST_OUTPUT_DIR = output_dir_path
         elif definitions.CONF_TEST_OUTPUT_LIST in configuration:
             values.CONF_TEST_OUTPUT_LIST = configuration.replace(definitions.CONF_TEST_OUTPUT_LIST, '').split(",")
         elif definitions.CONF_TEST_INPUT_LIST in configuration:
@@ -307,6 +314,12 @@ def collect_test_list():
     if values.CONF_TEST_OUTPUT_LIST:
         for expected_output in values.CONF_TEST_OUTPUT_LIST:
             values.LIST_TEST_OUTPUT.append(expected_output)
+    elif values.CONF_TEST_OUTPUT_DIR:
+        expected_output_dir = values.CONF_TEST_OUTPUT_DIR
+        file_list = [f for f in os.listdir(expected_output_dir) if os.path.isfile(os.path.join(expected_output_dir, f))]
+        for expected_output_file in file_list:
+            expected_file_abs_path = expected_output_dir + "/" + expected_output_file
+            values.LIST_TEST_OUTPUT.append(expected_file_abs_path)
     else:
         error_exit("No expected output is given (at least one is required)")
 
