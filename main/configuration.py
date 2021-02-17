@@ -139,6 +139,13 @@ def read_conf_file():
                 if not os.path.isdir(output_dir_path):
                     error_exit("Seed dir " + output_dir_path + " not found")
             values.CONF_TEST_OUTPUT_DIR = output_dir_path
+        elif definitions.CONF_TEST_INPUT_DIR in configuration:
+            input_dir_path = configuration.replace(definitions.CONF_TEST_INPUT_DIR, '')
+            if not os.path.isdir(input_dir_path):
+                input_dir_path = values.CONF_PATH_PROJECT + "/" + input_dir_path
+                if not os.path.isdir(input_dir_path):
+                    error_exit("Seed dir " + input_dir_path + " not found")
+            values.CONF_TEST_INPUT_DIR = input_dir_path
         elif definitions.CONF_TEST_OUTPUT_LIST in configuration:
             values.CONF_TEST_OUTPUT_LIST = configuration.replace(definitions.CONF_TEST_OUTPUT_LIST, '').split(",")
         elif definitions.CONF_TEST_INPUT_LIST in configuration:
