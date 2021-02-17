@@ -61,8 +61,14 @@ def initialize():
         emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = extractor.extract_input_arg_list(argument_list)
-        values.ARGUMENT_LIST = argument_list
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
+        modified_arg_list = []
+        for arg in argument_list:
+            if "$POC" in arg:
+                modified_arg_list.append("$POC")
+            else:
+                modified_arg_list.append(arg)
+        values.ARGUMENT_LIST = modified_arg_list
         assert exit_code == 0
         # set location of bug/crash
         if not values.CONF_LOC_CRASH:
