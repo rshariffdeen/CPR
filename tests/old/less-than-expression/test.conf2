@@ -1,4 +1,4 @@
-project_path:/concolic-repair/tests/example/
+project_path:/CPR/tests/example/
 tag_id:test-example
 src_directory:
 binary_path:test

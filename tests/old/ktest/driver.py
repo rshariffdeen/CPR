@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sys
-sys.path.append('/concolic-repair/main')
+sys.path.append('/CPR/main')
 from concolic import generate_ktest, run_concolic_execution
 
 

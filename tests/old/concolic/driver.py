@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sys
-sys.path.append('/concolic-repair/main')
+sys.path.append('/CPR/main')
 from concolic import run_concolic_exploration
 
 ## compile the test.c
@@ -15,6 +15,6 @@ assert int(process.returncode) == 0
 
 second_var_list = [{"identifier": "k", "value": 50, "size": 4}]
 argument_list = [5, 28]
-run_concolic_exploration("test.bc", argument_list, second_var_list, "/concolic-repair/tests/concolic")
+run_concolic_exploration("test.bc", argument_list, second_var_list, "/CPR/tests/concolic")
 
 
