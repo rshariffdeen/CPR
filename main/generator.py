@@ -555,11 +555,15 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     for argument in argument_list:
         index = list(argument_list).index(argument)
         if "$POC" in argument:
-            binary_file_path = values.CONF_PATH_POC
-            if values.FILE_POC_GEN:
-                binary_file_path = values.FILE_POC_GEN
-            elif values.FILE_POC_SEED:
-                binary_file_path = values.FILE_POC_SEED
+            if "_" in argument:
+                file_index = str(argument).split("_")[1]
+                binary_file_path = values.LIST_TEST_INPUT[file_index]
+            else:
+                binary_file_path = values.CONF_PATH_POC
+                if values.FILE_POC_GEN:
+                    binary_file_path = values.FILE_POC_GEN
+                elif values.FILE_POC_SEED:
+                    binary_file_path = values.FILE_POC_SEED
             ktest_command += " --sym-file " + binary_file_path
         elif str(index) in values.CONF_MASK_ARG:
             continue

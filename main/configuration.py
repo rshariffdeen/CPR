@@ -311,6 +311,16 @@ def collect_test_list():
     else:
         error_exit("No test input is given (at least one is required)")
 
+    if values.CONF_TEST_INPUT_DIR:
+        test_file_dir = values.CONF_TEST_INPUT_DIR
+        file_list = [f for f in os.listdir(test_file_dir) if os.path.isfile(os.path.join(test_file_dir, f))]
+        for test_file in file_list:
+            test_file_index = test_file
+            if "." in test_file:
+                test_file_index = str(test_file).split(".")[0]
+            test_abs_path = test_file_dir + "/" + test_file
+            values.LIST_TEST_INPUT[test_file_index] = test_abs_path
+
     if values.CONF_TEST_OUTPUT_LIST:
         for expected_output in values.CONF_TEST_OUTPUT_LIST:
             values.LIST_TEST_OUTPUT.append(expected_output)

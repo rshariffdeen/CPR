@@ -231,11 +231,15 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     for argument in argument_list:
         index = list(argument_list).index(argument)
         if "$POC" in argument:
-            file_path = values.CONF_PATH_POC
-            if values.FILE_POC_GEN:
-                file_path = values.FILE_POC_GEN
-            elif values.FILE_POC_SEED:
-                file_path = values.FILE_POC_SEED
+            if "_" in argument:
+                file_index = str(argument).split("_")[1]
+                file_path = values.LIST_TEST_INPUT[file_index]
+            else:
+                file_path = values.CONF_PATH_POC
+                if values.FILE_POC_GEN:
+                    file_path = values.FILE_POC_GEN
+                elif values.FILE_POC_SEED:
+                    file_path = values.FILE_POC_SEED
             concrete_file = open(file_path, 'rb')
             bit_size = os.fstat(concrete_file.fileno()).st_size
             input_argument += " A --sym-files 1 " + str(bit_size) + " "
@@ -381,9 +385,13 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
         if "$POC" in argument:
-            argument = values.CONF_PATH_POC
-            if values.FILE_POC_GEN:
-                argument = values.FILE_POC_GEN
+            if "_" in argument:
+                file_index = str(argument).split("_")[1]
+                argument = values.LIST_TEST_INPUT[file_index]
+            else:
+                argument = values.CONF_PATH_POC
+                if values.FILE_POC_GEN:
+                    argument = values.FILE_POC_GEN
         input_argument += " " + str(argument)
     if output_dir:
         klee_command = "klee --output-dir=" + str(output_dir) + " "
