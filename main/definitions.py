@@ -6,7 +6,7 @@ import os
 
 DIRECTORY_ROOT = "/".join(os.path.realpath(__file__).split("/")[:-2])
 DIRECTORY_LIB = DIRECTORY_ROOT + "/lib"
-DIRECTORY_LOG = DIRECTORY_ROOT + "/logs"
+DIRECTORY_LOG = ""
 DIRECTORY_LOG_BASE = DIRECTORY_ROOT + "/logs"
 DIRECTORY_TESTS = DIRECTORY_ROOT + "/tests"
 DIRECTORY_OUTPUT_BASE = DIRECTORY_ROOT + "/output"

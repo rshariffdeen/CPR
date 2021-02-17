@@ -400,3 +400,4 @@ def update_configuration():
         values.CONF_TIME_CEGIS_EXPLORE = (int(explore) / total) * values.DEFAULT_TIME_DURATION
         values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
+

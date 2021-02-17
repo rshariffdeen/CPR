@@ -20,8 +20,8 @@ time_info = {
 
 
 def create_directories():
-    if not os.path.isdir(definitions.DIRECTORY_LOG):
-        os.makedirs(definitions.DIRECTORY_LOG)
+    if not os.path.isdir(definitions.DIRECTORY_LOG_BASE):
+        os.makedirs(definitions.DIRECTORY_LOG_BASE)
 
     if not os.path.isdir(definitions.DIRECTORY_OUTPUT_BASE):
         os.makedirs(definitions.DIRECTORY_OUTPUT_BASE)
