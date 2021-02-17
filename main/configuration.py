@@ -117,7 +117,14 @@ def read_conf_file():
                 seed_file_path = values.CONF_PATH_PROJECT + "/" + seed_file_path
                 if not os.path.isfile(seed_file_path):
                     error_exit("Seed file " + seed_file_path + " not found")
-            values.CONF_FILE_SEED_LIST = seed_file_path
+            values.CONF_SEED_FILE = seed_file_path
+        elif definitions.CONF_TEST_INPUT_FILE in configuration:
+            test_file_path = configuration.replace(definitions.CONF_TEST_INPUT_FILE, '')
+            if not os.path.isfile(test_file_path):
+                test_file_path = values.CONF_PATH_PROJECT + "/" + test_file_path
+                if not os.path.isfile(test_file_path):
+                    error_exit("Seed file " + test_file_path + " not found")
+            values.CONF_TEST_INPUT_FILE = test_file_path
         elif definitions.CONF_SEED_DIR in configuration:
             seed_dir_path = configuration.replace(definitions.CONF_SEED_DIR, '')
             if not os.path.isdir(seed_dir_path):
