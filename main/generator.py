@@ -492,7 +492,7 @@ def generate_binary_file(byte_array):
     byte_list = []
     modified_index_list = []
     with open(values.CONF_PATH_POC, "rb") as poc_file:
-        byte =poc_file.read(1)
+        byte = poc_file.read(1)
         while byte:
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)

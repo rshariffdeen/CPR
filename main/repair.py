@@ -309,6 +309,9 @@ def run_fitreduce(program_path, patch_list):
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
                 iteration = iteration + 1
+                if not values.CONF_PATH_POC:
+                    if values.LIST_TEST_FILES:
+                        values.CONF_PATH_POC = values.LIST_TEST_FILES[0]
                 values.ITERATION_NO = iteration
                 print_arg_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(print_arg_list))
@@ -333,12 +336,12 @@ def run_fitreduce(program_path, patch_list):
                     values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
                 values.LIST_PPC = []
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
-                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 # check if new path hits patch location / fault location
                 if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                     continue
                 if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
+                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
                 distance.update_distance_map()
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
