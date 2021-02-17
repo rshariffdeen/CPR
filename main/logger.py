@@ -27,7 +27,6 @@ def create():
         command_log.write("[Start] " + values.TOOL_NAME + " started at " + str(datetime.datetime.now()) + "\n")
 
 
-
 def store():
     copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_LOG + "/log-latest")
     copyfile(definitions.FILE_COMMAND_LOG, definitions.DIRECTORY_LOG + "/log-command")
