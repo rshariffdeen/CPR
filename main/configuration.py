@@ -289,13 +289,19 @@ def collect_test_list():
     if values.CONF_TEST_INPUT_LIST:
         for test_input in values.CONF_TEST_INPUT_LIST:
             values.LIST_TEST_INPUT.append(test_input)
-        if values.CONF_TEST_OUTPUT_LIST:
-            for expected_output in values.CONF_TEST_OUTPUT_LIST:
-                values.LIST_TEST_OUTPUT.append(expected_output)
-        else:
-            error_exit("No expected output is given (at least one is required)")
+    elif values.CONF_TEST_INPUT_FILE:
+        with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
+            content_lines = in_file.readlines()
+            for content in content_lines:
+                values.LIST_TEST_INPUT.append(content.strip().replace("\n", ""))
     else:
         error_exit("No test input is given (at least one is required)")
+
+    if values.CONF_TEST_OUTPUT_LIST:
+        for expected_output in values.CONF_TEST_OUTPUT_LIST:
+            values.LIST_TEST_OUTPUT.append(expected_output)
+    else:
+        error_exit("No expected output is given (at least one is required)")
 
 
 def collect_seed_list():
