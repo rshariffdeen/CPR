@@ -23,7 +23,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
 
     # emitter.sub_sub_title("Generating Patch")
-    test_output_list = values.CONF_TEST_OUTPUT_LIST
+    test_output_list = values.LIST_TEST_OUTPUT
     components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
     if values.CONF_DEPTH_VALUE.isnumeric():
@@ -72,7 +72,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         return list_of_patches
 
     emitter.sub_title("Generating Patch Pool")
-    test_output_list = values.CONF_TEST_OUTPUT_LIST
+    test_output_list = values.LIST_TEST_OUTPUT
     components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
     if values.CONF_DEPTH_VALUE.isnumeric():
@@ -1053,7 +1053,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
 
 def generate_program_specification(binary_path):
     dir_list = [f for f in os.listdir(binary_path) if not os.path.isfile(os.path.join(binary_path, f))]
-    expected_output_list = values.CONF_TEST_OUTPUT_LIST
+    expected_output_list = values.LIST_TEST_OUTPUT
     test_count = len(expected_output_list)
     max_skip_index = (test_count * 2) - 1
     program_specification = None

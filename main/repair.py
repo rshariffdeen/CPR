@@ -210,7 +210,7 @@ def run(project_path, program_path):
 
 
 def run_cegis(program_path, project_path, patch_list):
-    test_output_list = values.CONF_TEST_OUTPUT_LIST
+    test_output_list = values.LIST_TEST_OUTPUT
     test_template = reader.collect_specification(test_output_list[0])
     binary_dir_path = "/".join(program_path.split("/")[:-1])
     time_check = time.time()
@@ -289,20 +289,20 @@ def run_fitreduce(program_path, patch_list):
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
-    test_output_list = values.CONF_TEST_OUTPUT_LIST
+    test_output_list = values.LIST_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
     for seed in values.LIST_SEED_INPUT:
-        values.CONF_TEST_INPUT_LIST.append(seed)
+        values.LIST_TEST_INPUT.append(seed)
 
     for seed_file in values.LIST_SEED_FILES:
-        seed_arg_list = values.CONF_TEST_INPUT_LIST[0]
+        seed_arg_list = values.LIST_TEST_INPUT[0]
         seed_arg_list = seed_arg_list.replace('$POC', seed_file)
-        values.CONF_TEST_INPUT_LIST.append(seed_arg_list)
+        values.LIST_TEST_INPUT.append(seed_arg_list)
 
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
-            test_input_list = values.CONF_TEST_INPUT_LIST
+            test_input_list = values.LIST_TEST_INPUT
             second_var_list = list()
             for argument_list in test_input_list:
                 time_check = time.time()

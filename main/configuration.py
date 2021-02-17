@@ -285,6 +285,33 @@ def print_configuration():
     emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
 
 
+def collect_test_list():
+    if values.CONF_TEST_INPUT_LIST:
+        for test_input in values.CONF_TEST_INPUT_LIST:
+            values.LIST_TEST_INPUT.append(test_input)
+        if values.CONF_TEST_OUTPUT_LIST:
+            for expected_output in values.CONF_TEST_OUTPUT_LIST:
+                values.LIST_TEST_OUTPUT.append(expected_output)
+        else:
+            error_exit("No expected output is given (at least one is required)")
+    else:
+        error_exit("No test input is given (at least one is required)")
+
+
+def collect_seed_list():
+    if values.CONF_FILE_SEED_LIST:
+        with open(values.CONF_FILE_SEED_LIST, "r") as in_file:
+            content_lines = in_file.readlines()
+            for content in content_lines:
+                values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
+    if values.CONF_DIR_SEED_LIST:
+        seed_dir = values.CONF_DIR_SEED_LIST
+        file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
+        for seed_file in file_list:
+            seed_abs_path = seed_dir + "/" + seed_file
+            values.LIST_SEED_FILES.append(seed_abs_path)
+
+
 def update_configuration():
     emitter.normal("updating configuration values")
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
@@ -302,7 +329,8 @@ def update_configuration():
     if os.path.isdir(definitions.DIRECTORY_LOG):
         shutil.rmtree(definitions.DIRECTORY_LOG)
     os.mkdir(definitions.DIRECTORY_LOG)
-
+    collect_seed_list()
+    collect_test_list()
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
@@ -337,21 +365,9 @@ def update_configuration():
         values.DEFAULT_OPERATION_MODE = values.CONF_OPERATION_MODE
     if values.CONF_REDUCE_METHOD:
         values.DEFAULT_REDUCE_METHOD = values.CONF_REDUCE_METHOD
-    if values.CONF_FILE_SEED_LIST:
-        with open(values.CONF_FILE_SEED_LIST, "r") as in_file:
-            content_lines = in_file.readlines()
-            for content in content_lines:
-                values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
-    if values.CONF_DIR_SEED_LIST:
-        seed_dir = values.CONF_DIR_SEED_LIST
-        file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
-        for seed_file in file_list:
-            seed_abs_path = seed_dir + "/" + seed_file
-            values.LIST_SEED_FILES.append(seed_abs_path)
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)
         values.CONF_TIME_CEGIS_EXPLORE = (int(explore) / total) * values.DEFAULT_TIME_DURATION
         values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
-
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
