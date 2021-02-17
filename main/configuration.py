@@ -299,13 +299,16 @@ def collect_test_list():
 
 
 def collect_seed_list():
-    if values.CONF_FILE_SEED_LIST:
-        with open(values.CONF_FILE_SEED_LIST, "r") as in_file:
+    if values.CONF_SEED_LIST:
+        for seed_input in values.CONF_SEED_LIST:
+            values.LIST_SEED_INPUT.append(seed_input)
+    if values.CONF_SEED_FILE:
+        with open(values.CONF_SEED_FILE, "r") as in_file:
             content_lines = in_file.readlines()
             for content in content_lines:
                 values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
-    if values.CONF_DIR_SEED_LIST:
-        seed_dir = values.CONF_DIR_SEED_LIST
+    if values.CONF_SEED_DIR:
+        seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
         for seed_file in file_list:
             seed_abs_path = seed_dir + "/" + seed_file
