@@ -503,8 +503,12 @@ def generate_binary_file(byte_array):
             byte_list[index] = byte_array[index]
             modified_index_list.append(index)
     emitter.data("Modified Byte List", modified_index_list)
-    file_extension = str(values.CONF_PATH_POC).split(".")[-1]
-    values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO) + "." + file_extension
+    file_extension = ""
+    if "." in values.CONF_PATH_POC:
+        file_extension = str(values.CONF_PATH_POC).split(".")[-1]
+    values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO)
+    if file_extension:
+        values.FILE_POC_GEN = values.FILE_POC_GEN + "." + file_extension
 
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
         new_input_file.write(bytearray(byte_list))
