@@ -69,11 +69,11 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         values.LIST_PATCH_SCORE[patch_index] += patch_score
         if is_under_approx is not None:
             current_state = values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
-            final_state = current_state or is_under_approx
+            final_state = is_under_approx
             values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = final_state
         if is_over_approx is not None:
             current_state = values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]
-            final_state = current_state or is_over_approx
+            final_state = is_over_approx
             values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = final_state
 
         if values.DEFAULT_REFINE_METHOD == values.OPTIONS_REFINE_METHOD[3]:
