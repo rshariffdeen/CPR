@@ -233,7 +233,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         if "$POC" in argument:
             if "_" in argument:
                 file_index = str(argument).split("_")[1]
-                file_path = values.LIST_TEST_INPUT[file_index]
+                file_path = values.LIST_TEST_FILES[file_index]
             else:
                 file_path = values.CONF_PATH_POC
                 if values.FILE_POC_GEN:
@@ -387,7 +387,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         if "$POC" in argument:
             if "_" in argument:
                 file_index = str(argument).split("_")[1]
-                argument = values.LIST_TEST_INPUT[file_index]
+                argument = values.LIST_TEST_FILES[file_index]
             else:
                 argument = values.CONF_PATH_POC
                 if values.FILE_POC_GEN:

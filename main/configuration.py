@@ -319,7 +319,7 @@ def collect_test_list():
             if "." in test_file:
                 test_file_index = str(test_file).split(".")[0]
             test_abs_path = test_file_dir + "/" + test_file
-            values.LIST_TEST_INPUT[test_file_index] = test_abs_path
+            values.LIST_TEST_FILES[test_file_index] = test_abs_path
 
     if values.CONF_TEST_OUTPUT_LIST:
         for expected_output in values.CONF_TEST_OUTPUT_LIST:
