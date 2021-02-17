@@ -111,15 +111,15 @@ def read_conf_file():
             values.CONF_COMMAND_CONFIG = configuration.replace(definitions.CONF_COMMAND_CONFIG, '')
         elif definitions.CONF_RANK_LIMIT in configuration:
             values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
-        elif definitions.CONF_FILE_SEED_LIST in configuration:
-            seed_file_path = configuration.replace(definitions.CONF_FILE_SEED_LIST, '')
+        elif definitions.CONF_SEED_FILE in configuration:
+            seed_file_path = configuration.replace(definitions.CONF_SEED_FILE, '')
             if not os.path.isfile(seed_file_path):
                 seed_file_path = values.CONF_PATH_PROJECT + "/" + seed_file_path
                 if not os.path.isfile(seed_file_path):
                     error_exit("Seed file " + seed_file_path + " not found")
             values.CONF_FILE_SEED_LIST = seed_file_path
-        elif definitions.CONF_DIR_SEED_LIST in configuration:
-            seed_dir_path = configuration.replace(definitions.CONF_DIR_SEED_LIST, '')
+        elif definitions.CONF_SEED_DIR in configuration:
+            seed_dir_path = configuration.replace(definitions.CONF_SEED_DIR, '')
             if not os.path.isdir(seed_dir_path):
                 seed_dir_path = values.CONF_PATH_PROJECT + "/" + seed_dir_path
                 if not os.path.isdir(seed_dir_path):
