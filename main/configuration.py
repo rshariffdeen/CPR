@@ -154,6 +154,12 @@ def read_conf_file():
              for input in input_list:
                  processed_list.append(input.replace("[", "").replace("]", ""))
              values.CONF_TEST_INPUT_LIST = processed_list
+        elif definitions.CONF_SEED_LIST in configuration:
+            seed_list = configuration.replace(definitions.CONF_SEED_LIST, '').split("],[")
+            processed_list = []
+            for seed_input in seed_list:
+                processed_list.append(seed_input.replace("[", "").replace("]", ""))
+            values.CONF_SEED_LIST = processed_list
         elif definitions.CONF_PATH_SPECIFICATION in configuration:
             values.CONF_PATH_SPECIFICATION = configuration.replace(definitions.CONF_PATH_SPECIFICATION, '')
             assertion_file_path = values.CONF_PATH_PROJECT + "/" + values.CONF_PATH_SPECIFICATION
