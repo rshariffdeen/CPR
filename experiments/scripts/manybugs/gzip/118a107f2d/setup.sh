@@ -1,5 +1,5 @@
 project_name=gzip
-bug_id=1a085b1446
+bug_id=118a107f2d
 dir_name=$1/manybugs/$project_name/$bug_id
 download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
 current_dir=$PWD
@@ -30,7 +30,6 @@ mv *.lines bug-info
 mv fix-failures bug-info
 mv gzip src
 cd $dir_name/src
-cp $current_dir/tif_dirread.c ./libtiff/tif_dirread.c
 make distclean
 chown -R root $dir_name
 

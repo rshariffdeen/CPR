@@ -386,7 +386,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     for argument in argument_list:
         if "$POC" in argument:
             if "_" in argument:
-                file_index = str(argument).split("_")[1]
+                file_index = "_".join(str(argument).split("_")[1:])
                 argument = values.LIST_TEST_FILES[file_index]
             else:
                 argument = values.CONF_PATH_POC
