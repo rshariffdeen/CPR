@@ -92,14 +92,15 @@ extract-bc long_tag
 cd $current_dir
 cp repair.conf $dir_name
 cp spec.smt2 $dir_name
-cp t1.smt2 $dir_name
+cp test-input $dir_name
 cp -rf components $dir_name
-cp -rf tests $dir_name
+cp -rf test-input-files $dir_name
+cp -rf test-expected-output $dir_name
 
 cd $dir_name
-cp tests/long_test.tiff src/test/
-cd src/test/
-gen-bout --sym-file "/data/manybugs/libtiff/0a36d7f/src/test/long_test.tiff"
+#cp test-input-files/long_test.tiff src/test/
+#cd src/test/
+#gen-bout --sym-file "/data/manybugs/libtiff/0a36d7f/src/test/long_test.tiff"
 
 #klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s long_tag.bc long_test.tiff
 #klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156
