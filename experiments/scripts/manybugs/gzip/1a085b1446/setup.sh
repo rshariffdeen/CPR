@@ -36,8 +36,11 @@ chown -R root $dir_name
 
 # Compile gzip.
 make clean
-CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared
-CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
+CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0'
+CC=wllvm CXX=wllvm++ make CFLAGS="-g -O0 -static" -j32
+
+
+(echo 00 | gzip; printf '\0\0') > 00.gz || framework_failure_
 
 cd $dir_name
 
