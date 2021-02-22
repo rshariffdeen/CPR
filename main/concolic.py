@@ -232,7 +232,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         index = list(argument_list).index(argument)
         if "$POC" in argument:
             if "_" in argument:
-                file_index = str(argument).split("_")[1]
+                file_index = "_".join(str(argument).split("_")[1:])
                 file_path = values.LIST_TEST_FILES[file_index]
             else:
                 file_path = values.CONF_PATH_POC

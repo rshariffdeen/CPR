@@ -556,7 +556,7 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         index = list(argument_list).index(argument)
         if "$POC" in argument:
             if "_" in argument:
-                file_index = str(argument).split("_")[1]
+                file_index = "_".join(str(argument).split("_")[1:])
                 binary_file_path = values.LIST_TEST_FILES[file_index]
             else:
                 binary_file_path = values.CONF_PATH_POC
