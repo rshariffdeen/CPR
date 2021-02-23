@@ -1,3 +1,7 @@
--d $POC_t0
--d $POC_t1
--d $POC_t2
+-dc $POC_helin
+-dc $POC_memcpy-abuse
+---presume-input-tty -d -S '' $POC_null-suffix-clobber < yes
+-dc $POC_stdin.gz - $POC_stdin.gz < $POC_stdin.gz
+-d $POC_trailing_nul_0
+-d $POC_trailing_nul_00
+-d $POC_trailing_nul_1
