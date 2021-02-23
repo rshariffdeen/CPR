@@ -326,7 +326,7 @@ def run_fitreduce(program_path, patch_list):
                     continue
                 if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
-                gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir)
+                gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir, poc_path)
                 if values.FILE_POC_SEED not in values.MASK_BYTE_LIST:
                     values.MASK_BYTE_LIST[values.FILE_POC_SEED] = gen_masked_byte_list
                 else:

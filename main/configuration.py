@@ -332,9 +332,16 @@ def collect_test_list():
             if "." in test_file:
                 test_file_index = str(test_file).split(".")[0]
             test_abs_path = test_file_dir + "/" + test_file
-            if not values.CONF_PATH_POC:
-                values.CONF_PATH_POC = test_abs_path
+            # if not values.CONF_PATH_POC:
+            #     values.CONF_PATH_POC = test_abs_path
             values.LIST_TEST_FILES[test_file_index] = test_abs_path
+    elif values.CONF_PATH_POC:
+        test_file = values.CONF_PATH_POC
+        test_file_index = test_file
+        if "." in test_file:
+            test_file_index = str(test_file).split(".")[0]
+        test_abs_path = values.CONF_PATH_PROJECT + "/" + test_file
+        values.LIST_TEST_FILES[test_file_index] = test_abs_path
 
     if values.CONF_TEST_OUTPUT_LIST:
         for expected_output in values.CONF_TEST_OUTPUT_LIST:

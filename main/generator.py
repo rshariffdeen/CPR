@@ -285,7 +285,7 @@ def generate_angelic_val(klee_out_dir, arg_list, poc_path):
     return input_arg_list, input_var_list
 
 
-def generate_mask_bytes(klee_out_dir):
+def generate_mask_bytes(klee_out_dir, poc_path):
     mask_byte_list = list()
     log_path = klee_out_dir + "/concrete.log"
     concretized_byte_list = reader.collect_concretized_bytes(log_path)
@@ -297,8 +297,8 @@ def generate_mask_bytes(klee_out_dir):
         influence_byte_list = sorted(list(concretized_byte_list["A-data"]))
         emitter.data("Influencing Byte List", influence_byte_list)
     fixed_byte_list = control_byte_list
-    if values.CONF_PATH_POC:
-        byte_length = os.path.getsize(values.CONF_PATH_POC)
+    if poc_path:
+        byte_length = os.path.getsize(poc_path)
         for i in range(0, byte_length):
             if i not in fixed_byte_list:
                 mask_byte_list.append(i)
