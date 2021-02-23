@@ -410,8 +410,8 @@ def update_configuration():
     if os.path.isdir(definitions.DIRECTORY_LOG):
         shutil.rmtree(definitions.DIRECTORY_LOG)
     os.mkdir(definitions.DIRECTORY_LOG)
-    collect_seed_list()
     collect_test_list()
+    collect_seed_list()
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
