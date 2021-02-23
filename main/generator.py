@@ -499,8 +499,11 @@ def generate_binary_file(byte_array):
             byte = poc_file.read(1)
     emitter.data("Masked Byte List", values.MASK_BYTE_LIST)
     for index in byte_array:
-        if index not in values.MASK_BYTE_LIST:
-            byte_list[index] = byte_array[index]
+        # if index not in values.MASK_BYTE_LIST:
+        #     byte_list[index] = byte_array[index]
+        #     modified_index_list.append(index)
+        if index in values.MASK_BYTE_LIST:
+            byte_array[index] = byte_list[index]
             modified_index_list.append(index)
     emitter.data("Modified Byte List", modified_index_list)
     file_extension = ""
@@ -511,7 +514,7 @@ def generate_binary_file(byte_array):
         values.FILE_POC_GEN = values.FILE_POC_GEN + "." + file_extension
 
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
-        new_input_file.write(bytearray(byte_list))
+        new_input_file.write(bytearray(byte_array))
 
 
 def generate_formula(formula_str):
