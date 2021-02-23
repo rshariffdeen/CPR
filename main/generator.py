@@ -584,7 +584,9 @@ def generate_path_for_negation():
         if control_loc == values.CONF_LOC_PATCH:
             script = parser.get_script(cStringIO(sym_path))
             formula = script.get_last_formula()
-            patch_constraint = formula.arg(1)
+            patch_constraint = formula
+            if formula.is_and():
+                patch_constraint = formula.arg(1)
             constraint_list.append(patch_constraint.serialize())
     if not constraint_list:
         return None
@@ -593,7 +595,9 @@ def generate_path_for_negation():
     # formula = script.get_last_formula()
     negated_path = None
     while constraint_list:
-        constraint = last_sym_path.arg(1)
+        constraint = last_sym_path
+        if last_sym_path.is_and():
+            constraint = last_sym_path.arg(1)
         constraint_str = constraint.serialize()
         if constraint_str in constraint_list:
             constraint_list.remove(constraint_str)
@@ -602,7 +606,10 @@ def generate_path_for_negation():
             negated_path = constraint
         else:
             negated_path = And(negated_path, constraint)
-        last_sym_path = last_sym_path.arg(0)
+        if last_sym_path.is_and():
+            last_sym_path = last_sym_path.arg(0)
+        else:
+            break
     negated_path = And(negated_path, last_sym_path)
     return negated_path
 
