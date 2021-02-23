@@ -292,13 +292,13 @@ def run_fitreduce(program_path, patch_list):
     test_output_list = values.LIST_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
 
-    for seed in values.LIST_SEED_INPUT:
-        values.LIST_TEST_INPUT.append(seed)
-
-    for seed_file in values.LIST_SEED_FILES:
-        seed_arg_list = values.LIST_TEST_INPUT[0]
-        seed_arg_list = seed_arg_list.replace('$POC', seed_file)
-        values.LIST_TEST_INPUT.append(seed_arg_list)
+    for seed_arg_list in values.LIST_SEED_INPUT:
+        if "$POC" in seed_arg_list:
+            for seed_file in values.LIST_SEED_FILES:
+                arg_list = seed_arg_list.replace('$POC', seed_file)
+                values.LIST_TEST_INPUT.append(arg_list)
+        else:
+            values.LIST_TEST_INPUT.append(seed_arg_list)
 
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
