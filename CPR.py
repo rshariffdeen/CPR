@@ -71,11 +71,13 @@ def initialize():
         values.ARGUMENT_LIST = modified_arg_list
         assert exit_code == 0
         # set location of bug/crash
-        if not values.CONF_LOC_CRASH:
-            values.CONF_LOC_CRASH = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
-            if values.CONF_LOC_CRASH:
-                values.IS_CRASH = True
-                emitter.success("\t\t\t[info] identified crash location: " + str(values.CONF_LOC_CRASH))
+
+        latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
+        if latest_crash_loc:
+            values.IS_CRASH = True
+            emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))
+            if latest_crash_loc not in values.CONF_LOC_LIST_CRASH:
+                values.CONF_LOC_LIST_CRASH.append(latest_crash_loc)
         # if values.IS_CRASH:
         #     arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
         #     for var in var_list:

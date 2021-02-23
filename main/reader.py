@@ -145,9 +145,9 @@ def collect_trace(file_path, project_path):
     if values.CONF_LOC_BUG:
         if values.CONF_LOC_BUG in list_trace:
             emitter.note("\t\t[note] fault location detected in trace")
-    if values.CONF_LOC_CRASH:
-        if values.CONF_LOC_CRASH in list_trace:
-            emitter.note("\t\t[note] crash location detected in trace")
+    if values.CONF_LOC_LIST_CRASH:
+        if any(values.CONF_LOC_LIST_CRASH) in list_trace:
+            emitter.note("\t\t[note] a crash location detected in trace")
     is_crash = collect_crash_point(values.FILE_MESSAGE_LOG)
     if is_crash:
         emitter.note("\t\t[note] program crashed")

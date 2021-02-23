@@ -265,7 +265,8 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # hit_location_flag = " "
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     # if values.CONF_DISTANCE_METRIC == "control-loc":
-    hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + values.CONF_LOC_CRASH + " "
+    crash_locations = ', '.join(['{}'.format(loc) for loc in values.CONF_LOC_LIST_CRASH])
+    hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + crash_locations + " "
     ppc_log_flag = ""
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_log_flag = "--log-ppc "
