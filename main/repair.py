@@ -245,7 +245,7 @@ def run_cegis(program_path, project_path, patch_list):
         if is_sat(violation_check):
             model = generator.generate_model(violation_check)
             # print(model)
-            input_arg_list, input_var_list = generator.generate_new_input(violation_check, values.ARGUMENT_LIST)
+            input_arg_list, input_var_list = generator.generate_new_input(violation_check)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
@@ -289,47 +289,34 @@ def run_fitreduce(program_path, patch_list):
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
-    test_output_list = values.LIST_TEST_OUTPUT
     binary_dir_path = "/".join(program_path.split("/")[:-1])
-
-    for seed_arg_list in values.LIST_SEED_INPUT:
-        if "$POC" in seed_arg_list:
-            for seed_file in values.LIST_SEED_FILES:
-                arg_list = seed_arg_list.replace('$POC', seed_file)
-                values.LIST_TEST_INPUT.append(arg_list)
-        else:
-            values.LIST_TEST_INPUT.append(seed_arg_list)
 
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
             test_input_list = values.LIST_TEST_INPUT
-            second_var_list = list()
             for argument_list in test_input_list:
                 time_check = time.time()
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
+                values.ARGUMENT_LIST = argument_list
+                poc_path = None
+                generalized_arg_list = []
+                for arg in argument_list:
+                    if arg in (values.LIST_SEED_FILES + values.LIST_TEST_FILES):
+                        poc_path = arg
+                        values.FILE_POC_SEED = arg
+                        values.FILE_POC_GEN = arg
+                        generalized_arg_list.append("$POC")
+                    else:
+                        generalized_arg_list.append(arg)
                 iteration = iteration + 1
                 values.ITERATION_NO = iteration
-                # print_arg_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
-                if values.IS_CRASH:
-                    arg_list, var_list = generator.generate_angelic_val_for_crash(klee_out_dir)
-                    for var in var_list:
-                        var_name = var["identifier"]
-                        # if "angelic" in var_name:
-                        #     second_var_list.append(var)
-                        second_var_list.append(var)
-                    values.IS_CRASH = False
-                for arg in argument_list:
-                    if arg in values.LIST_SEED_FILES:
-                        argument_list[argument_list.index(arg)] = "$POC"
-                        values.FILE_POC_SEED = arg
-                        values.FILE_POC_GEN = None
-                # emitter.sub_title("Running concolic execution for test case: " + str(argument_list))
+                _, second_var_list = generator.generate_angelic_val(klee_out_dir, argument_list, poc_path)
                 exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
-                generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC)
+                generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
                 values.LIST_PPC = []
@@ -339,11 +326,12 @@ def run_fitreduce(program_path, patch_list):
                     continue
                 if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
-                masked_byte_list = generator.generate_mask_bytes(klee_out_dir)
-                if not values.MASK_BYTE_LIST:
-                    values.MASK_BYTE_LIST = masked_byte_list
+                gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir)
+                if values.FILE_POC_SEED not in values.MASK_BYTE_LIST:
+                    values.MASK_BYTE_LIST[values.FILE_POC_SEED] = gen_masked_byte_list
                 else:
-                    values.MASK_BYTE_LIST = sorted(list(set(values.MASK_BYTE_LIST + masked_byte_list)))
+                    current_mask_list = values.MASK_BYTE_LIST[values.FILE_POC_SEED]
+                    values.MASK_BYTE_LIST[values.FILE_POC_SEED] = sorted(list(set(current_mask_list + gen_masked_byte_list)))
                 distance.update_distance_map()
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
@@ -371,10 +359,11 @@ def run_fitreduce(program_path, patch_list):
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            if not values.LIST_GENERATED_PATH:
-                values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
+            generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC)
+            if generated_path_list:
+                values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
             values.LIST_PPC = []
-            gen_arg_list, gen_var_list, patch_list = select_new_input(argument_list, second_var_list, patch_list)  # TODO (later) patch candidate missing
+            gen_arg_list, gen_var_list, patch_list = select_new_input(patch_list)  # TODO (later) patch candidate missing
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
                 break

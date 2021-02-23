@@ -57,30 +57,43 @@ def select_nearest_control_loc():
 
 def select_new_path_condition():
     global list_path_inprogress
+    arg_list = []
+    poc_path = None
     if values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
-        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
+        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4], p[5], p[6]) for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
             selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
-            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
+            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
+                             selected_pair[4], selected_pair[5])
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
         else:
             selected_pair = max(list_path_inprogress, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
         list_path_inprogress.remove(selected_pair)
     elif values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
-        path_list_at_loc = [(p[1], p[2], p[3], p[4]) for p in list_path_inprogress if p[0] == control_loc]
+        path_list_at_loc = [(p[1], p[2], p[3], p[4], p[5], p[6]) for p in list_path_inprogress if p[0] == control_loc]
         if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
             selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
             selected_path = selected_pair[0]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
+                             selected_pair[4], selected_pair[5])
         else:
             selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3])
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
+            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
+                             selected_pair[4], selected_pair[5])
         list_path_inprogress.remove(selected_pair)
     else:
         ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
@@ -88,13 +101,17 @@ def select_new_path_condition():
             selected_pair = ranked_list[0]
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
         else:
             selected_pair = (random.choice(ranked_list))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
+            arg_list = selected_pair[4]
+            poc_path = selected_pair[5]
         list_path_inprogress.remove(selected_pair)
 
-    return selected_path, control_loc
+    return selected_path, control_loc, arg_list, poc_path
 
 
 def select_patch_constraint_for_input(patch_list, selected_new_path):
@@ -135,7 +152,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
     return patch_space_constraint
 
 
-def select_new_input(argument_list, second_var_list, patch_list=None):
+def select_new_input(patch_list=None):
     """
     This function will select a new path for the next concolic execution and generate the inputs that satisfies the path
            log_path : log file for the previous concolic execution that captures PPC
@@ -157,13 +174,14 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
     new_path_count = 0
 
     if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-        for control_loc, generated_path, ppc_len in generated_path_list:
+        for (control_loc, generated_path, ppc_len), arg_list, poc_path in generated_path_list:
             path_str = str(generated_path.serialize())
             if path_str not in (list_path_detected + list_path_explored):
                 reach_patch_loc = 100 - path_str.count("angelic!")
                 reach_obs_loc = 100 - path_str.count("obs!")
                 ppc_len = 10000 - ppc_len
-                list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc))
+                list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc,
+                                             arg_list, poc_path))
                 list_path_detected.append(str(generated_path.serialize()))
                 new_path_count = new_path_count + 1
 
@@ -187,7 +205,7 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
                 return None, None, patch_list
-            selected_new_path, selected_control_loc = select_new_path_condition()
+            selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
                 list_path_explored.append(str(selected_new_path.serialize()))
@@ -198,13 +216,12 @@ def select_new_input(argument_list, second_var_list, patch_list=None):
             else:
                 list_path_infeasible.append(str(selected_new_path.serialize()))
     else:
-        selected_new_path, selected_control_loc = select_new_path_condition()
+        selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
         list_path_explored.append(str(selected_new_path.serialize()))
-
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
 
-    input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list)
+    input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list
     return input_arg_list, input_var_list, patch_list
@@ -231,15 +248,16 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     for argument in argument_list:
         index = list(argument_list).index(argument)
         if "$POC" in argument:
-            if "_" in argument:
-                file_index = "_".join(str(argument).split("_")[1:])
-                file_path = values.LIST_TEST_FILES[file_index]
-            else:
-                file_path = values.CONF_PATH_POC
-                if values.FILE_POC_GEN:
-                    file_path = values.FILE_POC_GEN
-                elif values.FILE_POC_SEED:
-                    file_path = values.FILE_POC_SEED
+            file_path = values.FILE_POC_GEN
+            # if "_" in argument:
+            #     file_index = "_".join(str(argument).split("_")[1:])
+            #     file_path = values.LIST_TEST_FILES[file_index]
+            # else:
+            #     file_path = values.CONF_PATH_POC
+            #     if values.FILE_POC_GEN:
+            #         file_path = values.FILE_POC_GEN
+            #     elif values.FILE_POC_SEED:
+            #         file_path = values.FILE_POC_SEED
             concrete_file = open(file_path, 'rb')
             bit_size = os.fstat(concrete_file.fileno()).st_size
             input_argument += " A --sym-files 1 " + str(bit_size) + " "
@@ -321,50 +339,50 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         values.NEGATED_PPC_FORMULA = None
     return return_code
 
-
-def run_symbolic_execution(program, argument_list, print_output=False):
-    """
-    This function will execute the program in symbolic mode using the initial test case
-        program: the absolute path of the bitcode of the program
-        argument_list : a list containing each argument in the order that should be fed to the program
-    """
-    logger.info("running symbolic execution")
-
-    global File_Log_Path
-    current_dir = os.getcwd()
-    directory_path = "/".join(str(program).split("/")[:-1])
-    emitter.debug("changing directory:" + directory_path)
-    project_path = values.CONF_PATH_PROJECT
-    os.chdir(directory_path)
-    binary_name = str(program).split("/")[-1]
-    emitter.normal("\texecuting klee in concolic mode")
-    runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
-    input_argument = ""
-    for argument in argument_list:
-        if "$POC" in argument:
-            argument = values.CONF_PATH_POC
-        input_argument += " " + str(argument)
-
-    klee_command = "/klee/build-origin/bin/klee " \
-                   "--posix-runtime " \
-                   "--libc=uclibc " \
-                   "--write-smt2s " \
-                   "--search=dfs " \
-                   "-no-exit-on-error " \
-                   + "--external-calls=all " \
-                   + "--link-llvm-lib={0} " .format(runtime_lib_path) \
-                   + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CEGIS) \
-                   + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK_CEGIS) \
-                   + values.CONF_KLEE_FLAGS + " " \
-                   + "{0} ".format(binary_name) \
-                   + input_argument
-
-    if not print_output:
-        klee_command += " > " + File_Log_Path + " 2>&1 "
-    return_code = utilities.execute_command(klee_command)
-    emitter.debug("changing directory:" + current_dir)
-    os.chdir(current_dir)
-    return return_code
+#
+# def run_symbolic_execution(program, argument_list, print_output=False):
+#     """
+#     This function will execute the program in symbolic mode using the initial test case
+#         program: the absolute path of the bitcode of the program
+#         argument_list : a list containing each argument in the order that should be fed to the program
+#     """
+#     logger.info("running symbolic execution")
+#
+#     global File_Log_Path
+#     current_dir = os.getcwd()
+#     directory_path = "/".join(str(program).split("/")[:-1])
+#     emitter.debug("changing directory:" + directory_path)
+#     project_path = values.CONF_PATH_PROJECT
+#     os.chdir(directory_path)
+#     binary_name = str(program).split("/")[-1]
+#     emitter.normal("\texecuting klee in concolic mode")
+#     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
+#     input_argument = ""
+#     for argument in argument_list:
+#         if "$POC" in argument:
+#             argument = values.CONF_PATH_POC
+#         input_argument += " " + str(argument)
+#
+#     klee_command = "/klee/build-origin/bin/klee " \
+#                    "--posix-runtime " \
+#                    "--libc=uclibc " \
+#                    "--write-smt2s " \
+#                    "--search=dfs " \
+#                    "-no-exit-on-error " \
+#                    + "--external-calls=all " \
+#                    + "--link-llvm-lib={0} " .format(runtime_lib_path) \
+#                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CEGIS) \
+#                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK_CEGIS) \
+#                    + values.CONF_KLEE_FLAGS + " " \
+#                    + "{0} ".format(binary_name) \
+#                    + input_argument
+#
+#     if not print_output:
+#         klee_command += " > " + File_Log_Path + " 2>&1 "
+#     return_code = utilities.execute_command(klee_command)
+#     emitter.debug("changing directory:" + current_dir)
+#     os.chdir(current_dir)
+#     return return_code
 
 
 def run_concrete_execution(program, argument_list, print_output=False, output_dir=None):
@@ -385,14 +403,14 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     input_argument = ""
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
-        if "$POC" in argument:
-            if "_" in argument:
-                file_index = "_".join(str(argument).split("_")[1:])
-                argument = values.LIST_TEST_FILES[file_index]
-            else:
-                argument = values.CONF_PATH_POC
-                if values.FILE_POC_GEN:
-                    argument = values.FILE_POC_GEN
+        # if "$POC" in argument:
+        #     if "_" in argument:
+        #         file_index = "_".join(str(argument).split("_")[1:])
+        #         argument = values.LIST_TEST_FILES[file_index]
+        #     else:
+        #         argument = values.CONF_PATH_POC
+        #         if values.FILE_POC_GEN:
+        #             argument = values.FILE_POC_GEN
         input_argument += " " + str(argument)
     if output_dir:
         klee_command = "klee --output-dir=" + str(output_dir) + " "

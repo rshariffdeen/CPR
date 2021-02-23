@@ -262,17 +262,26 @@ def generate_special_path_list(ppc_list):
     return special_list
 
 
-def generate_angelic_val_for_crash(klee_out_dir):
+def generate_angelic_val(klee_out_dir, arg_list, poc_path):
     file_list = [os.path.join(klee_out_dir, f) for f in os.listdir(klee_out_dir) if os.path.isfile(os.path.join(klee_out_dir,f))]
-    error_file_path = None
-    for file_name in file_list:
-        if ".err" in file_name:
-            error_file_path = file_name.split(".")[0] + ".smt2"
+    ref_file_path = None
+    largest_file_path = None
+    largest_file_size = 0
+    for file_path in file_list:
+        file_size = os.path.getsize(file_path)
+        if file_size > largest_file_size:
+            largest_file_size = file_size
+            largest_file_path = file_path
+        if ".err" in file_path:
+            ref_file_path = file_path.split(".")[0] + ".smt2"
             break
-    if error_file_path is None:
-        error_file_path = klee_out_dir + "/test000001.smt2"
-    sym_path = extractor.extract_formula_from_file(error_file_path)
-    input_arg_list, input_var_list = generate_new_input(sym_path, values.ARGUMENT_LIST)
+    if ref_file_path is None:
+        if largest_file_path:
+            ref_file_path = largest_file_path
+        else:
+            ref_file_path = klee_out_dir + "/test000001.smt2"
+    sym_path = extractor.extract_formula_from_file(ref_file_path)
+    input_arg_list, input_var_list = generate_new_input(sym_path, arg_list, poc_path)
     return input_arg_list, input_var_list
 
 
@@ -391,7 +400,7 @@ def generate_constant_value_list(sym_path):
     return const_val_list
 
 
-def generate_new_input(sym_path, argument_list):
+def generate_new_input(sym_path, argument_list=None, poc_path=None):
     gen_arg_list = dict()
     gen_var_list = dict()
     input_var_list = list()
@@ -444,7 +453,7 @@ def generate_new_input(sym_path, argument_list):
         var_size = len(bit_vector)
         if var_name in ["A-data", "A-data-stat"]:
             if var_name == "A-data":
-                generate_binary_file(bit_vector)
+                generate_binary_file(bit_vector, poc_path)
             continue
         if bit_vector:
             var_value = utilities.get_signed_value(bit_vector)
@@ -488,33 +497,30 @@ def generate_model_cli(formula):
     return model_byte_list
 
 
-def generate_binary_file(byte_array):
+def generate_binary_file(byte_array, seed_file_path):
     byte_list = []
     modified_index_list = []
-    with open(values.CONF_PATH_POC, "rb") as poc_file:
+    with open(seed_file_path, "rb") as poc_file:
         byte = poc_file.read(1)
         while byte:
             number = int(struct.unpack('>B', byte)[0])
             byte_list.append(number)
             byte = poc_file.read(1)
-    emitter.data("Masked Byte List", values.MASK_BYTE_LIST)
+    mask_byte_list = values.MASK_BYTE_LIST[seed_file_path]
+    emitter.data("Masked Byte List", mask_byte_list)
     for index in byte_array:
-        # if index not in values.MASK_BYTE_LIST:
-        #     byte_list[index] = byte_array[index]
-        #     modified_index_list.append(index)
-        if index in values.MASK_BYTE_LIST:
-            byte_array[index] = byte_list[index]
+        if index not in mask_byte_list:
+            byte_list[index] = byte_array[index]
             modified_index_list.append(index)
     emitter.data("Modified Byte List", modified_index_list)
     file_extension = ""
-    if "." in values.CONF_PATH_POC:
-        file_extension = str(values.CONF_PATH_POC).split(".")[-1]
+    if "." in seed_file_path:
+        file_extension = str(seed_file_path).split(".")[-1]
     values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO)
     if file_extension:
         values.FILE_POC_GEN = values.FILE_POC_GEN + "." + file_extension
-
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
-        new_input_file.write(bytearray(byte_array))
+        new_input_file.write(bytearray(byte_list))
 
 
 def generate_formula(formula_str):
@@ -524,7 +530,7 @@ def generate_formula(formula_str):
     return formula
 
 
-def generate_symbolic_paths(ppc_list):
+def generate_symbolic_paths(ppc_list, arg_list, poc_path):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
        the branch conditions added at each location, negate the constraint to create a new path
@@ -538,7 +544,7 @@ def generate_symbolic_paths(ppc_list):
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         path_count = path_count + 1
-        path_list.append(result)
+        path_list.append((result, arg_list, poc_path))
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list
@@ -558,15 +564,16 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
     for argument in argument_list:
         index = list(argument_list).index(argument)
         if "$POC" in argument:
-            if "_" in argument:
-                file_index = "_".join(str(argument).split("_")[1:])
-                binary_file_path = values.LIST_TEST_FILES[file_index]
-            else:
-                binary_file_path = values.CONF_PATH_POC
-                if values.FILE_POC_GEN:
-                    binary_file_path = values.FILE_POC_GEN
-                elif values.FILE_POC_SEED:
-                    binary_file_path = values.FILE_POC_SEED
+            binary_file_path = values.FILE_POC_GEN
+            # if "_" in argument:
+            #     file_index = "_".join(str(argument).split("_")[1:])
+            #     binary_file_path = values.LIST_TEST_FILES[file_index]
+            # else:
+            #     binary_file_path = values.CONF_PATH_POC
+            #     if values.FILE_POC_GEN:
+            #         binary_file_path = values.FILE_POC_GEN
+            #     elif values.FILE_POC_SEED:
+            #         binary_file_path = values.FILE_POC_SEED
             ktest_command += " --sym-file " + binary_file_path
         elif str(index) in values.CONF_MASK_ARG:
             continue

@@ -350,6 +350,22 @@ def collect_test_list():
     else:
         error_exit("No expected output is given (at least one is required)")
 
+    test_input_list = values.LIST_TEST_INPUT
+    concretized_test_input_list = []
+    for arg_list_str in test_input_list:
+        arg_list = str(arg_list_str).split(",")
+        concretized_arg_list = []
+        for arg in arg_list:
+            if "$POC_" in arg:
+                file_index = "_".join(str(arg).split("_")[1:])
+                file_path = values.LIST_TEST_FILES[file_index]
+                concretized_arg_list.append(file_path)
+            else:
+                concretized_arg_list.append(arg)
+        concretized_arg_str = ",".join(concretized_arg_list)
+        concretized_test_input_list.append(concretized_arg_str)
+    values.LIST_TEST_INPUT = concretized_test_input_list
+
 
 def collect_seed_list():
     if values.CONF_SEED_LIST:
@@ -366,6 +382,15 @@ def collect_seed_list():
         for seed_file in file_list:
             seed_abs_path = seed_dir + "/" + seed_file
             values.LIST_SEED_FILES.append(seed_abs_path)
+
+    if values.LIST_SEED_INPUT:
+        for seed_arg_list_str in values.LIST_SEED_INPUT:
+            if "$POC" in seed_arg_list_str:
+                for seed_file in values.LIST_SEED_FILES:
+                    arg_list = seed_arg_list_str.replace('$POC', seed_file)
+                    values.LIST_TEST_INPUT.append(arg_list)
+            else:
+                values.LIST_TEST_INPUT.append(seed_arg_list_str)
 
 
 def update_configuration():
