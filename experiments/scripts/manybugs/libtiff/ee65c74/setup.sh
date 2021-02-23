@@ -61,7 +61,7 @@ make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
 
 cd $dir_name
 #
-##Instrument driver and libtiff
+#Instrument driver and libtiff
 sed -i '33i // KLEE' src/libtiff/tif_dirread.c
 sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirread.c
 #
@@ -97,6 +97,7 @@ cp test-input $dir_name
 cp -rf components $dir_name
 cp -rf test-input-files $dir_name
 cp -rf test-expected-output $dir_name
+cp -rf seed-dir $dir_name
 
 cd $dir_name
 #cp test-input-files/long_test.tiff src/test/
