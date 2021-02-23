@@ -367,6 +367,9 @@ def collect_test_list():
                 file_index = "_".join(str(arg).split("_")[1:])
                 file_path = values.LIST_TEST_FILES[file_index]
                 concretized_arg_list.append(file_path)
+            elif "$POC" in arg:
+                file_path = values.LIST_TEST_FILES[0]
+                concretized_arg_list.append(file_path)
             else:
                 concretized_arg_list.append(arg)
         concretized_arg_str = ",".join(concretized_arg_list)
