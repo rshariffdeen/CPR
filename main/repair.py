@@ -339,7 +339,11 @@ def run_fitreduce(program_path, patch_list):
                     continue
                 if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                     continue
-                values.MASK_BYTE_LIST = generator.generate_mask_bytes(klee_out_dir)
+                masked_byte_list = generator.generate_mask_bytes(klee_out_dir)
+                if not values.MASK_BYTE_LIST:
+                    values.MASK_BYTE_LIST = masked_byte_list
+                else:
+                    values.MASK_BYTE_LIST = sorted(list(set(values.MASK_BYTE_LIST + masked_byte_list)))
                 distance.update_distance_map()
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
