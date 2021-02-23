@@ -1,0 +1,5 @@
+$POC_2-fail-long_test
+$POC_3-fail-short_test
+$POC_4-fail-strip_test
+$POC_22-fail-o-tiffcp-split-conjoined
+$POC_23-fail-o-tiffcp-split-join-conjoined
