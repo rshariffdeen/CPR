@@ -64,20 +64,21 @@ cd $dir_name
 #Instrument driver and libtiff
 sed -i '43i // KLEE' src/libtiff/tif_dirread.c
 sed -i '44i #include <klee/klee.h>' src/libtiff/tif_dirread.c
-sed -i '45i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirread.c
-sed -i '46i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirread.c
-sed -i '47i #endif' src/libtiff/tif_dirread.c
-
-sed -i '981i \\tif (!dir->tdir_count || !w || __trident_choice("L1634", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirread.c
-sed -i '982d' src/libtiff/tif_dirread.c
-sed -i '983i \\t}' src/libtiff/tif_dirread.c
-
-sed -i '35i #include <klee/klee.h>' src/test/long_tag.c
-sed -i '65i \\tfilename = argv[1];'  src/test/long_tag.c
-sed -i '66,121 s/^/\/\//' src/test/long_tag.c
-sed -i '125i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
-sed -i '126i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
-sed -i '127i \\tklee_assert(tif > 0);' src/test/long_tag.c
+#
+sed -i '976i \\tif (!dir->tdir_count || !w || __trident_choice("L976", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' src/libtiff/tif_dirread.c
+sed -i '977d' src/libtiff/tif_dirread.c
+#
+sed -i '35i // KLEE' src/test/long_tag.c
+sed -i '36i #include <klee/klee.h>' src/test/long_tag.c
+sed -i '37i #ifndef TRIDENT_OUTPUT' src/test/long_tag.c
+sed -i '38i #define TRIDENT_OUTPUT(id, typestr, value) value' src/test/long_tag.c
+sed -i '39i #endif' src/test/long_tag.c
+##
+sed -i '69i \\tfilename = argv[1];'  src/test/long_tag.c
+sed -i '70,125 s/^/\/\//' src/test/long_tag.c
+sed -i '129i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
+sed -i '130i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
+sed -i '131i \\tklee_assert(tif > 0);' src/test/long_tag.c
 
 
 # Compile instrumentation and test driver.
@@ -96,6 +97,7 @@ cp test-input $dir_name
 cp -rf components $dir_name
 cp -rf test-input-files $dir_name
 cp -rf test-expected-output $dir_name
+cp -rf seed-dir $dir_name
 
 cd $dir_name
 #cp test-input-files/long_test.tiff src/test/
