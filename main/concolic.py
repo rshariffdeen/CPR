@@ -224,7 +224,7 @@ def select_new_input(patch_list=None):
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list
-    return input_arg_list, input_var_list, patch_list
+    return input_arg_list, input_var_list, patch_list, argument_list, poc_path
 
 
 def run_concolic_execution(program, argument_list, second_var_list, print_output=False):

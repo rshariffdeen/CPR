@@ -354,16 +354,12 @@ def run_fitreduce(program_path, patch_list):
             iteration = iteration + 1
             values.ITERATION_NO = iteration
             emitter.sub_sub_title("Iteration: " + str(iteration))
-            ## Pick new input and patch candidate for next concolic execution step.
             time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC)
-            if generated_path_list:
-                values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
-            values.LIST_PPC = []
-            gen_arg_list, gen_var_list, patch_list = select_new_input(patch_list)  # TODO (later) patch candidate missing
+            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
+
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
                 break
@@ -381,12 +377,13 @@ def run_fitreduce(program_path, patch_list):
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
             time_check = time.time()
+            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
             if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
                 continue
-
             distance.update_distance_map()
             ## Reduces the set of patch candidates based on the current path constraint
             assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
