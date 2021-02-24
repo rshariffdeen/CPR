@@ -245,7 +245,7 @@ def generate_false_constraint(path_constraint):
     return false_constraint
 
 
-def generate_special_path_list(ppc_list):
+def generate_special_path_list(ppc_list, arg_list, poc_path):
     parser = SmtLibParser()
     special_list = []
     for con_loc, ppc_str in ppc_list:
@@ -256,9 +256,9 @@ def generate_special_path_list(ppc_list):
             false_path = generate_false_path(path_condition)
             true_path = generate_true_path(path_condition)
             if true_path:
-                special_list.append((con_loc, true_path, len(str(true_path.serialize()))))
+                special_list.append(((con_loc, true_path, len(str(true_path.serialize()))), arg_list, poc_path))
             if false_path:
-                special_list.append((con_loc, false_path, len(str(false_path.serialize()))))
+                special_list.append(((con_loc, false_path, len(str(false_path.serialize()))), arg_list, poc_path))
     return special_list
 
 
@@ -539,7 +539,7 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path):
               returns a list of new partial path conditions
     """
     emitter.normal("\tgenerating new paths")
-    path_list = generate_special_path_list(ppc_list)
+    path_list = generate_special_path_list(ppc_list, arg_list, poc_path)
     path_count = len(path_list)
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
