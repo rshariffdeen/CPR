@@ -35,18 +35,14 @@ chown -R root $dir_name
 
 # Compile gzip.
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0'
-CC=wllvm CXX=wllvm++ make CFLAGS="-g -O0 -static" -j32
+CXX=$TRIDENT_CXX CC=$TRIDENT_CC make CFLAGS="-g -O0 -static" -j32
 
 cd $dir_name/src
-
-
+cp $dir_name/diffs/gzip.c-3eb6091d69 $dir_name/src/gzip.c
 #Instrument driver and libtiff
 sed -i '168i #endif' gzip.c
 sed -i '168i #define TRIDENT_OUTPUT(id, typestr, value) value' gzip.c
 sed -i '168i #ifndef TRIDENT_OUTPUT' gzip.c
-sed -i '168i #include <klee/klee.h>' gzip.c
-sed -i '168i // KLEE' gzip.c
-
 sed -i '551i if ((z_len == 0 && __trident_choice("L1634", "bool", (int[]){z_len, MAX_SUFFIX, decompress}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)) || z_len > MAX_SUFFIX) { ' gzip.c
 sed -i '552d' gzip.c
 sed -i '556i \\tklee_assert(z_len > 0);' gzip.c
