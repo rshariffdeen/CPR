@@ -318,7 +318,7 @@ def run_fitreduce(program_path, patch_list):
                 duration = (time.time() - time_check) / 60
                 generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
                 if generated_path_list:
-                    values.LIST_GENERATED_PATH = list(set(generated_path_list + values.LIST_GENERATED_PATH))
+                    values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
                 # check if new path hits patch location / fault location

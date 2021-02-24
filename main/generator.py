@@ -539,9 +539,8 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path):
               returns a list of new partial path conditions
     """
     emitter.normal("\tgenerating new paths")
-    path_list = list()
-    path_count = 0
     path_list = generate_special_path_list(ppc_list)
+    path_count = len(path_list)
     result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
     for result in result_list:
         path_count = path_count + 1
