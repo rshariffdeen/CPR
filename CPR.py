@@ -71,7 +71,7 @@ def initialize():
         # values.ARGUMENT_LIST = modified_arg_list
         assert exit_code == 0
         # set location of bug/crash
-
+        values.IS_CRASH = False
         latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
         if latest_crash_loc:
             values.IS_CRASH = True
