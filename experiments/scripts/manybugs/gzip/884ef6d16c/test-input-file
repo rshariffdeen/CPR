@@ -1,1 +1,1 @@
----presume-input-tty -d -S '' $POC_null-suffix-clobber < yes
+---presume-input-tty -d -S '' $POC_null-suffix-clobber
