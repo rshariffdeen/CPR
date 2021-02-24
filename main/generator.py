@@ -578,6 +578,8 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         elif str(index) in values.CONF_MASK_ARG:
             continue
         else:
+            if argument in ["''"]:
+                argument = ""
             ktest_command += " --sym-arg \"" + str(argument) + "\""
 
     for var in second_var_list:

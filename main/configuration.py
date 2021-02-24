@@ -260,7 +260,8 @@ def read_conf_file():
 
 def load_component_list():
     emitter.normal("loading custom/general components")
-    base_list = ["equal.smt2", "not-equal.smt2", "less-than.smt2", "less-or-equal.smt2"]
+    # base_list = ["equal.smt2", "not-equal.smt2", "less-than.smt2", "less-or-equal.smt2"]
+    base_list = []
     if definitions.DIRECTORY_TESTS in values.CONF_PATH_PROJECT:
         base_list = []
     gen_comp_files = []
