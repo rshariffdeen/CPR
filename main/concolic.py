@@ -60,40 +60,34 @@ def select_new_path_condition():
     arg_list = []
     poc_path = None
     if values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[0]:
-        path_list_at_patch_loc = [(p[1], p[2], p[3], p[4], p[5], p[6]) for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
+        path_list_at_patch_loc = [p for p in list_path_inprogress if p[0] == values.CONF_LOC_PATCH]
         if path_list_at_patch_loc:
             control_loc = values.CONF_LOC_PATCH
-            selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[1]))
-            selected_path = selected_pair[0]
-            selected_pair = (values.CONF_LOC_PATCH, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
-                             selected_pair[4], selected_pair[5])
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
+            selected_pair = (max(path_list_at_patch_loc, key=lambda item: item[2]))
+            selected_path = selected_pair[1]
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         else:
             selected_pair = max(list_path_inprogress, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         list_path_inprogress.remove(selected_pair)
     elif values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
-        path_list_at_loc = [(p[1], p[2], p[3], p[4], p[5], p[6]) for p in list_path_inprogress if p[0] == control_loc]
+        path_list_at_loc = [p for p in list_path_inprogress if p[0] == control_loc]
         if values.DEFAULT_SELECTION_STRATEGY == "deterministic":
-            selected_pair = (max(path_list_at_loc, key=lambda item: item[1]))
-            selected_path = selected_pair[0]
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
-                             selected_pair[4], selected_pair[5])
+            selected_pair = (max(path_list_at_loc, key=lambda item: item[2]))
+            selected_path = selected_pair[1]
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         else:
             selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
-            selected_pair = (control_loc, selected_pair[0], selected_pair[1], selected_pair[2], selected_pair[3],
-                             selected_pair[4], selected_pair[5])
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         list_path_inprogress.remove(selected_pair)
     else:
         ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
@@ -101,14 +95,14 @@ def select_new_path_condition():
             selected_pair = ranked_list[0]
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         else:
             selected_pair = (random.choice(ranked_list))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
-            arg_list = selected_pair[4]
-            poc_path = selected_pair[5]
+            arg_list = selected_pair[5]
+            poc_path = selected_pair[6]
         list_path_inprogress.remove(selected_pair)
 
     return selected_path, control_loc, arg_list, poc_path
