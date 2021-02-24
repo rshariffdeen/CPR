@@ -94,6 +94,7 @@ cd $current_dir
 cp repair.conf $dir_name
 cp spec.smt2 $dir_name
 cp test-input $dir_name
+cp seed-file $dir_name
 cp -rf components $dir_name
 cp -rf test-input-files $dir_name
 cp -rf test-expected-output $dir_name
