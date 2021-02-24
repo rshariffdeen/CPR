@@ -214,7 +214,9 @@ def select_new_input(patch_list=None):
         list_path_explored.append(str(selected_new_path.serialize()))
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
-
+    emitter.highlight("\tSelected arguments: " + str(argument_list))
+    if poc_path:
+        emitter.highlight("\tSelected seed file: " + str(poc_path))
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
         return None, None, patch_list, argument_list, poc_path
