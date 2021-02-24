@@ -269,9 +269,10 @@ def generate_angelic_val(klee_out_dir, arg_list, poc_path):
     largest_file_size = 0
     for file_path in file_list:
         file_size = os.path.getsize(file_path)
-        if file_size > largest_file_size:
-            largest_file_size = file_size
-            largest_file_path = file_path
+        if ".smt2" in file_path:
+            if file_size > largest_file_size:
+                largest_file_size = file_size
+                largest_file_path = file_path
         if ".err" in file_path:
             ref_file_path = file_path.split(".")[0] + ".smt2"
             break
