@@ -550,7 +550,7 @@ def check_infeasible_paths(patch_list):
     for path in list_path_inprogress:
         count = count + 1
         emitter.sub_sub_title("Path #" + str(count))
-        control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc = path
+        control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc, _, _ = path
         feasible_patch_list = select_patch_constraint_for_input(patch_list, generated_path)
         if not feasible_patch_list:
             list_path_infeasible.append(path)
@@ -560,8 +560,8 @@ def check_infeasible_paths(patch_list):
     emitter.highlight("\ttotal infeasible: " + str(len(list_path_infeasible)) + " path(s)")
 
 
-def symbolic_exploration(program_path):
-    argument_list = values.ARGUMENT_LIST
-    second_var_list = values.SECOND_VAR_LIST
-    exit_code = run_symbolic_execution(program_path + ".bc", argument_list, second_var_list)
-    assert exit_code == 0
+# def symbolic_exploration(program_path):
+#     argument_list = values.ARGUMENT_LIST
+#     second_var_list = values.SECOND_VAR_LIST
+#     exit_code = run_symbolic_execution(program_path + ".bc", argument_list, second_var_list)
+#     assert exit_code == 0
