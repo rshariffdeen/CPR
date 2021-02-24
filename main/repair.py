@@ -300,10 +300,12 @@ def run_fitreduce(program_path, patch_list):
             test_input_list = values.LIST_TEST_INPUT
             for argument_list in test_input_list:
                 time_check = time.time()
+                poc_path = None
+                iteration = iteration + 1
+                values.ITERATION_NO = iteration
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
-                values.ARGUMENT_LIST = argument_list
-                poc_path = None
+                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
                 generalized_arg_list = []
                 for arg in argument_list:
                     if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.items())):
@@ -313,11 +315,9 @@ def run_fitreduce(program_path, patch_list):
                         generalized_arg_list.append("$POC")
                     else:
                         generalized_arg_list.append(arg)
-                iteration = iteration + 1
-                values.ITERATION_NO = iteration
-                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
-                _, second_var_list = generator.generate_angelic_val(klee_out_dir, argument_list, poc_path)
-                exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
+                values.ARGUMENT_LIST = generalized_arg_list
+                _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
+                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
                 generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
