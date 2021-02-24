@@ -50,7 +50,8 @@ sed -i '551i if ((z_len == 0 && __trident_choice("L1634", "bool", (int[]){z_len,
 sed -i '552d' gzip.c
 sed -i '556i \\tklee_assert(z_len > 0);' gzip.c
 sed -i '556i \\tTRIDENT_OUTPUT("obs", "i32", z_len);' gzip.c
-
+sed -i '1642,1648d' gzip.c
+sed -i '1642i int ok = 1;' gzip.c
 
 # Compile instrumentation and test driver.
 make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32
