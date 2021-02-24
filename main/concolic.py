@@ -193,7 +193,7 @@ def select_new_input(patch_list=None):
     if not list_path_inprogress:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
         emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-        return None, None, patch_list
+        return None, None, patch_list, None, None
     values.LIST_GENERATED_PATH = None
     patch_constraint = None
     selected_new_path = ""
@@ -204,7 +204,7 @@ def select_new_input(patch_list=None):
             if not list_path_inprogress:
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-                return None, None, patch_list
+                return None, None, patch_list, None, None
             selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
@@ -223,7 +223,7 @@ def select_new_input(patch_list=None):
 
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
-        return None, None, patch_list
+        return None, None, patch_list, argument_list, poc_path
     return input_arg_list, input_var_list, patch_list, argument_list, poc_path
 
 
