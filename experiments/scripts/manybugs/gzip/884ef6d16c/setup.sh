@@ -35,7 +35,7 @@ chown -R root $dir_name
 
 # Compile gzip.
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0'
-CXX=$TRIDENT_CXX CC=$TRIDENT_CC make CFLAGS="-g -O0 -static" -j32
+CC=wllvm CXX=wllvm++ make CFLAGS="-g -O0 -static" -j32
 
 cd $dir_name/src
 cp $dir_name/diffs/gzip.c-3eb6091d69 $dir_name/src/gzip.c
