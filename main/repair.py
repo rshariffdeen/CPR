@@ -308,7 +308,7 @@ def run_fitreduce(program_path, patch_list):
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
                 generalized_arg_list = []
                 for arg in argument_list:
-                    if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.items())):
+                    if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
