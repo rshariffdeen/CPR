@@ -302,7 +302,7 @@ def run_fitreduce(program_path, patch_list):
                 poc_path = None
                 generalized_arg_list = []
                 for arg in argument_list:
-                    if arg in (values.LIST_SEED_FILES + values.LIST_TEST_FILES):
+                    if arg in (values.LIST_SEED_FILES + values.LIST_TEST_FILES.items()):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
