@@ -102,11 +102,15 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     # if valid_input_space:
     #     valid_input_space = merger.merge_space(valid_input_space, path_condition, assertion)
     values.VALID_INPUT_SPACE = None
+    count_patches_start = utilities.count_concrete_patches(patch_list)
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         result_list = parallel.refine_patch_space(patch_list, path_condition, assertion)
     else:
         result_list = parallel.validate_patches_parallel(patch_list, path_condition, assertion)
     updated_patch_list = update_patch_list(result_list, patch_list, path_condition, assertion)
+    count_patches_end = utilities.count_concrete_patches(updated_patch_list)
+    if values.IS_CRASH and (count_patches_start == count_patches_end):
+        emitter.warning("[Warning] program crashed, but no patch removed")
     return updated_patch_list
 
 
