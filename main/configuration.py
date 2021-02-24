@@ -395,12 +395,21 @@ def collect_seed_list():
 
     if values.LIST_SEED_INPUT:
         for seed_arg_list_str in values.LIST_SEED_INPUT:
-            if "$POC" in seed_arg_list_str:
-                for seed_file in values.LIST_SEED_FILES:
-                    arg_list = seed_arg_list_str.replace('$POC', seed_file)
-                    values.LIST_TEST_INPUT.append(arg_list)
-            else:
-                values.LIST_TEST_INPUT.append(seed_arg_list_str)
+            arg_list = extractor.extract_input_arg_list(seed_arg_list_str)
+            concretized_arg_list = []
+            for arg in arg_list:
+                if "$POC_" in arg:
+                    file_index = "_".join(str(arg).split("_")[1:])
+                    file_path = values.LIST_TEST_FILES[file_index]
+                    concretized_arg_list.append(file_path)
+                elif "$POC" in arg:
+                    file_index = list(values.LIST_TEST_FILES.keys())[0]
+                    file_path = values.LIST_TEST_FILES[file_index]
+                    concretized_arg_list.append(file_path)
+                else:
+                    concretized_arg_list.append(arg)
+            concretized_arg_str = ",".join(concretized_arg_list)
+            values.LIST_TEST_INPUT.append(concretized_arg_str)
 
 
 def update_configuration():
