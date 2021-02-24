@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 from pathlib import Path
-from main import emitter, logger, definitions, values, reader, synthesis
+from main import emitter, logger, definitions, values, reader, synthesis, extractor
 from main.utilities import error_exit
 
 
@@ -359,7 +359,7 @@ def collect_test_list():
     test_input_list = values.LIST_TEST_INPUT
     concretized_test_input_list = []
     for arg_list_str in test_input_list:
-        arg_list = str(arg_list_str).split(",")
+        arg_list = extractor.extract_input_arg_list(arg_list_str)
         concretized_arg_list = []
         for arg in arg_list:
             if "$POC_" in arg:
