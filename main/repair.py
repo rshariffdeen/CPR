@@ -298,14 +298,16 @@ def run_fitreduce(program_path, patch_list):
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
             test_input_list = values.LIST_TEST_INPUT
+            seed_id = 0
             for argument_list in test_input_list:
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
+                seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = extractor.extract_input_arg_list(argument_list)
-                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed: " + str(argument_list))
+
                 generalized_arg_list = []
                 for arg in argument_list:
                     if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
@@ -315,6 +317,9 @@ def run_fitreduce(program_path, patch_list):
                         generalized_arg_list.append("$POC")
                     else:
                         generalized_arg_list.append(arg)
+                emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
+                emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
+                emitter.highlight("\tUsing Input: " + str(poc_path))
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
