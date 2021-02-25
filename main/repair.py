@@ -110,7 +110,7 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     updated_patch_list = update_patch_list(result_list, patch_list, path_condition, assertion)
     count_patches_end = utilities.count_concrete_patches(updated_patch_list)
     if values.IS_CRASH and (count_patches_start == count_patches_end):
-        emitter.warning("[Warning] program crashed, but no patch removed")
+        emitter.warning("\t[Warning] program crashed, but no patch removed")
     return updated_patch_list
 
 
