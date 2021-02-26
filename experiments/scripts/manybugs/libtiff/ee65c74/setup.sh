@@ -65,7 +65,7 @@ cd $dir_name
 sed -i '33i // KLEE' src/libtiff/tif_dirread.c
 sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirread.c
 #
-sed -i '978i \\tif (__trident_choice("978", "bool", (int[]){(tsize_t)dir->tdir_count, dir->tdir_count, w, cc}, (char*[]){"x", "y", "z", "q"}, 4, (int*[]){}, (char*[]){}, 0))' src/libtiff/tif_dirread.c
+sed -i '978i \\tif (__trident_choice("978", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' src/libtiff/tif_dirread.c
 sed -i '979d' src/libtiff/tif_dirread.c
 #
 sed -i '35i // KLEE' src/test/long_tag.c
