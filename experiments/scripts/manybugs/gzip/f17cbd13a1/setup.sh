@@ -1,15 +1,15 @@
 project_name=gzip
-bug_id=118a107f2d
+bug_id=f17cbd13a1
 dir_name=$1/manybugs/$project_name/$bug_id
-download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
+download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/gzip-bug-2009-09-26-a1d3d4019d-f17cbd13a1.tar.gz
 current_dir=$PWD
 wget $download_url
 mkdir -p $dir_name
 cd $dir_name
-cp $current_dir/gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz .
-tar xfz gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
-mv gzip-bug-2009-10-09-1a085b1446-118a107f2d src
-rm gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
+cp $current_dir/gzip-bug-2009-09-26-a1d3d4019d-f17cbd13a1.tar.gz .
+tar xfz gzip-bug-2009-09-26-a1d3d4019d-f17cbd13a1.tar.gz
+mv gzip-bug-2009-09-26-a1d3d4019d-f17cbd13a1 src
+rm gzip-bug-2009-09-26-a1d3d4019d-f17cbd13a1.tar.gz
 mv src/* .
 rm -rf src
 rm -rf  coverage* \
@@ -49,3 +49,4 @@ make null-suffix-clobber.log
 make stdin.log
 make trailing-nul.log
 make zdiff.log
+

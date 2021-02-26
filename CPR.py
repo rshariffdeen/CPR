@@ -56,9 +56,23 @@ def initialize():
     second_var_list = list()
     directory_path = "/".join(str(program_path).split("/")[:-1])
     klee_out_dir = directory_path + "/klee-last"
+    emitter.sub_title("Running Test-Suite")
+    test_case_id = 0
     for argument_list in test_input_list:
-        # print_argument_list = [arg.replace('$POC', values.CONF_PATH_POC) for arg in argument_list]
-        emitter.sub_title("Running concrete execution for test case: " + str(argument_list))
+        print_argument_list = extractor.extract_input_arg_list(argument_list)
+        generalized_arg_list = []
+        seed_file = None
+        test_case_id = test_case_id + 1
+        for arg in print_argument_list:
+            if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
+                generalized_arg_list.append("$POC")
+                seed_file = arg
+            else:
+                generalized_arg_list.append(arg)
+
+        emitter.sub_sub_title("Test Case #" + str(test_case_id))
+        emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
+        emitter.highlight("\tUsing Input: " + str(seed_file))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = extractor.extract_input_arg_list(argument_list)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)

@@ -1,15 +1,15 @@
 project_name=gzip
-bug_id=118a107f2d
+bug_id=1204630c96
 dir_name=$1/manybugs/$project_name/$bug_id
-download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
+download_url=https://repairbenchmarks.cs.umass.edu/ManyBugs/scenarios/gzip-bug-2010-01-30-fc00329e3d-1204630c96.tar.gz
 current_dir=$PWD
 wget $download_url
 mkdir -p $dir_name
 cd $dir_name
-cp $current_dir/gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz .
-tar xfz gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
-mv gzip-bug-2009-10-09-1a085b1446-118a107f2d src
-rm gzip-bug-2009-10-09-1a085b1446-118a107f2d.tar.gz
+cp $current_dir/gzip-bug-2010-01-30-fc00329e3d-1204630c96.tar.gz .
+tar xfz gzip-bug-2010-01-30-fc00329e3d-1204630c96.tar.gz
+mv gzip-bug-2010-01-30-fc00329e3d-1204630c96 src
+rm gzip-bug-2010-01-30-fc00329e3d-1204630c96.tar.gz
 mv src/* .
 rm -rf src
 rm -rf  coverage* \
@@ -32,9 +32,8 @@ mv gzip src
 cd $dir_name/src
 make distclean
 chown -R root $dir_name
-
+cp $dir_name/diffs/gzip.c-fc00329e3d $dir_name/src/gzip.c
 # Compile gzip.
-make clean
 CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0'
 CC=wllvm CXX=wllvm++ make CFLAGS="-g -O0 -static" -j32
 
