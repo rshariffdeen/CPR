@@ -104,62 +104,12 @@ RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
+RUN git clone https://47493629a358a5b8c9d5387bb4271194c71b2921:x-oauth-basic@github.com/mechtaev/concolic-repair.git /CPR
 WORKDIR /CPR
-COPY main/ main/
-COPY lib/ lib/
-COPY tools/  tools/
-COPY tests/ tests/
-COPY components/ components/
-COPY experiments/ experiments/
-COPY scripts/ scripts/
-COPY CPR.py CPR.py
-
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
-
-# add execution permissions
-#RUN chmod +x /CPR/tools/trident-cc
-#RUN chmod +x /CPR/tools/trident-cxx
-#RUN chmod +x /CPR/tests/assignment/run
-#RUN chmod +x /CPR/tests/iterations/run
-#RUN chmod +x /CPR/tests/multipath/run
-#RUN chmod +x /CPR/tests/simple-rvalue/run
 ENV DEBIAN_FRONTEND=dialog
 ENV TRIDENT_CC=/CPR/tools/trident-cc
 ENV TRIDENT_CXX=/CPR/tools/trident-cxx
 
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
-
-## install LowFat
-#RUN git clone https://github.com/GJDuck/LowFat.git /lowfat && \
-#    cd /lowfat; bash build.sh
-
-# install experiment dependencies
-RUN apt-get update && apt-get install -y  \
-    autopoint \
-    automake \
-    bison \
-    flex \
-    gettext \
-    gperf \
-    libass-dev \
-    libfreetype6 \
-    libfreetype6-dev \
-    libjpeg-dev \
-    libtool \
-    libxml2-dev \
-    liblzma-dev \
-    nasm \
-    pkg-config \
-    texinfo \
-    yasm \
-    xutils-dev \
-    libpciaccess-dev \
-    libx11-dev \
-    libxcb-xfixes0-dev \
-    libxcb1-dev \
-    libxcb-shm0-dev \
-    libsdl1.2-dev  \
-    libvdpau-dev \
-    libnuma-dev
-
 

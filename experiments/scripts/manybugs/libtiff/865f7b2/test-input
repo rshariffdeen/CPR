@@ -1,5 +1,0 @@
-$POC_1-fail-ascii_test test.tif
-$POC_13-14-15-16-17-22-43-53-63-73-fail-miniswhite-1c-1b test.tif
-$POC_22-44-54-64-74-fail-palette-1c-1b test.tif
-$POC_39-59-69-fail-logluv-3c-16b test.tif
-$POC_49-72-fail-minisblack-2c-8b-alpha test.tif

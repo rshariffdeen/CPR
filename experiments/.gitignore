@@ -1,9 +1,0 @@
-*.o
-*.bc
-*.a
-.idea
-main/__pycache__/
-logs
-output
-result
-*.DS_Store
