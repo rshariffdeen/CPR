@@ -29,9 +29,12 @@ def create():
 
 def store():
     copyfile(definitions.FILE_MAIN_LOG, definitions.DIRECTORY_LOG + "/log-latest")
-    copyfile(definitions.FILE_COMMAND_LOG, definitions.DIRECTORY_LOG + "/log-command")
-    copyfile(definitions.FILE_ERROR_LOG, definitions.DIRECTORY_LOG + "/log-error")
-    copyfile(definitions.FILE_MAKE_LOG, definitions.DIRECTORY_LOG + "/log-make")
+    if os.path.isfile(definitions.FILE_COMMAND_LOG):
+        copyfile(definitions.FILE_COMMAND_LOG, definitions.DIRECTORY_LOG + "/log-command")
+    if os.path.isfile(definitions.FILE_ERROR_LOG):
+        copyfile(definitions.FILE_ERROR_LOG, definitions.DIRECTORY_LOG + "/log-error")
+    if os.path.isfile(definitions.FILE_MAKE_LOG):
+        copyfile(definitions.FILE_MAKE_LOG, definitions.DIRECTORY_LOG + "/log-make")
 
 
 def log(log_message):
