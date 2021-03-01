@@ -136,7 +136,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     # values.COUNT_TEMPLATE_GEN = len(list_of_patches)
     # values.COUNT_PATCH_GEN = utilities.count_concrete_patches(list_of_patches)
-    emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
+    emitter.highlight("\tnumber of patches in pool: " + str(len(list_of_patches)))
     result_list = parallel.remove_duplicate_patches_parallel(list_of_patches)
     for result in result_list:
         is_redundant, index = result
@@ -144,7 +144,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         if not is_redundant:
             filtered_patch_list.append(patch)
 
-    emitter.normal("\tnumber of patches in pool: " + str(len(filtered_patch_list)))
+    emitter.highlight("\tnumber of patches in pool: " + str(len(filtered_patch_list)))
     # filtered_list_of_patches = list(set(list_of_patches))
     # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
 
