@@ -82,7 +82,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
 
     spec_files = []
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
-    emitter.sub_title("Loading Test-Results")
+    emitter.sub_sub_title("Loading Test-Results")
     test_index = -1
     for arg_list in test_input_list:
         seed_file = None
@@ -124,7 +124,8 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         concrete_enumeration = True
     lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
     upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
-    emitter.normal("\tcreating patch pool")
+    emitter.sub_sub_title("Synthesising Patches")
+    emitter.normal("\tenumerating patch space")
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
     else:
