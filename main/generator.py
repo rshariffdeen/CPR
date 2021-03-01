@@ -73,6 +73,8 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
 
     emitter.sub_title("Generating Patch Pool")
     test_output_list = values.LIST_TEST_OUTPUT
+    test_input_list = values.LIST_TEST_INPUT
+    test_file_list = values.LIST_TEST_FILES
     components = values.LIST_COMPONENTS
     depth = values.DEFAULT_DEPTH
     if values.CONF_DEPTH_VALUE.isnumeric():
@@ -80,11 +82,36 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
 
     spec_files = []
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
-    for output_spec in test_output_list:
-        output_spec_path = Path(project_path + "/" + output_spec)
-        test_index = str((int(test_output_list.index(output_spec))))
-        klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
-        spec_files.append((output_spec_path, klee_spec_path))
+    emitter.sub_title("Loading Test-Results")
+    test_index = -1
+    for arg_list in test_input_list:
+        seed_file = None
+        test_index = test_index + 1
+        expected_output_file = None
+        output_spec_path = None
+        for arg in arg_list:
+            if arg in list(test_file_list.values()):
+                seed_file = arg
+                break
+        if seed_file:
+            seed_name = seed_file.split("/")[-1].split(".")[0]
+            expected_output_file = project_path + "/" + values.CONF_TEST_OUTPUT_DIR + "/" + seed_name
+            if os.path.isfile(expected_output_file):
+                output_spec_path = Path(os.path.abspath(expected_output_file))
+            arg_list = [x.replace(seed_file, "$POC") for x in arg_list]
+        else:
+            expected_output_file = project_path + "/" + test_output_list[test_index]
+            if os.path.isfile(expected_output_file):
+                output_spec_path = Path(os.path.abspath(expected_output_file))
+        klee_spec_path = None
+        if output_spec_path:
+            klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
+            spec_files.append((output_spec_path, klee_spec_path))
+        emitter.highlight("\tInput Arg: " + str(arg_list))
+        if seed_file:
+            emitter.highlight("\tInput file: " + str(seed_file))
+        emitter.highlight("\tOutput file: " + str(expected_output_file))
+        emitter.highlight("\tKlee Run: " + str(klee_spec_path))
 
     if model_list:
         for output_spec_path, klee_spec_path in model_list:
