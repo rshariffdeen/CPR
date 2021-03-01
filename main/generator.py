@@ -105,7 +105,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
                 output_spec_path = Path(os.path.abspath(expected_output_file))
         klee_spec_path = None
         if output_spec_path:
-            klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
+            klee_spec_path = Path(binary_dir_path + "/klee-out-" + str(test_index))
             spec_files.append((output_spec_path, klee_spec_path))
         emitter.highlight("\tInput Arg: " + str(arg_list))
         if seed_file:
