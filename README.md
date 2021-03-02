@@ -45,8 +45,8 @@ to deploy and run our tool. Dependencies include:
 
 Build and run a container:
 
-    docker build -t fitreduce .
-    docker run --rm -ti fitreduce /bin/bash
+    docker build -t cpr .
+    docker run --rm -ti cpr /bin/bash
 
 
 # Example
