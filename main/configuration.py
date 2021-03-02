@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import shutil
 from pathlib import Path
 from main import emitter, logger, definitions, values, reader, synthesis, extractor
@@ -411,6 +412,21 @@ def collect_seed_list():
                     concretized_arg_list.append(arg)
             concretized_arg_str = ",".join(concretized_arg_list)
             values.LIST_TEST_INPUT.append(concretized_arg_str)
+
+
+def collect_var_mapping():
+    emitter.normal("updating mapping for program variables")
+    patch_loc = values.CONF_LOC_PATCH
+    source_file_path, line_number = patch_loc.split(":")
+    with open(source_file_path, 'r') as source_file:
+        content = source_file.readlines()
+        patch_line = content[int(line_number) - 1]
+        trident_call_str = re.findall("trident_choice\((.+?)\) ", patch_line)[0].split(",")
+        prog_var_list = trident_call_str[2].split("{")[1].replace("}", "").split(",")
+        comp_name_list = trident_call_str[3].split("{")[1].replace("}", "").split(",")
+        for i in range (0, len(prog_var_list)):
+            values.MAP_PROG_VAR[comp_name_list[i].replace("\"", "").replace("\'", "")] = prog_var_list[i]
+    print(values.MAP_PROG_VAR)
 
 
 def update_configuration():
