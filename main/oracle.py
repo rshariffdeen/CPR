@@ -158,18 +158,22 @@ def is_same_children(patch_comp):
     return False
 
 
-def is_always_true(patch_tree):
-    (cid, semantics), children = patch_tree
+def is_always_true(patch):
+    program = patch[list(patch.keys())[0]]
+    tree, _ = program
+    (cid, semantics), children = tree
     if cid not in ["equal", "greater-or-equal", "less-or-equal"]:
         return False
-    return is_same_children(patch_tree)
+    return is_same_children(tree)
 
 
-def is_always_false(patch_tree):
-    (cid, semantics), children = patch_tree
+def is_always_false(patch):
+    program = patch[list(patch.keys())[0]]
+    tree, _ = program
+    (cid, semantics), children = tree
     if cid not in ["not-equal", "greater-than", "less-than"]:
         return False
-    return is_same_children(patch_tree)
+    return is_same_children(tree)
 
 
 def is_tree_duplicate(tree, lock):
