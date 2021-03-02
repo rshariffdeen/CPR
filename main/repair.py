@@ -157,7 +157,8 @@ def rank_patches(patch_list):
     # rank first based on coverage
     emitter.normal("\tcomputing rank for each patch")
     for patch in patch_list:
-        patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
+        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_constraint_str = patch_formula.serialize()
         patch_code_str = ""
         for (lid, prog) in patch.items():
             patch_code_str = lid + ": " + (program_to_code(prog))
@@ -172,7 +173,7 @@ def rank_patches(patch_list):
         if values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]:
             under_approx_score = 0
         patch_len = 10000 - len(patch_code_str)
-        if oracle.is_always_true(patch) or oracle.is_always_false(patch):
+        if oracle.is_always_true(patch_formula) or oracle.is_always_false(patch_formula):
             patch_len = 10000 - 1
         patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, under_approx_score, over_approx_score, patch_score, patch_count, patch_len))
