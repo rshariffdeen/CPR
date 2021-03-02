@@ -1,4 +1,4 @@
-from main import definitions, values, emitter, utilities, extractor
+from main import definitions, values, emitter, utilities, extractor, generator
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 
 tautology_included = False
@@ -156,6 +156,34 @@ def is_same_children(patch_comp):
     if cid_left == cid_right:
         return True
     return False
+
+
+def is_always_true(patch_formula):
+    patch_space_constraint = patch_formula
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        patch_formula_str = str(patch_formula.serialize())
+        patch_index = utilities.get_hash(patch_formula_str)
+        patch_space = values.LIST_PATCH_SPACE[patch_index]
+        parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        if parameter_constraint:
+            patch_space_constraint = And(patch_formula, parameter_constraint)
+    can_be_true = is_sat(patch_space_constraint)
+    can_be_false = is_unsat(patch_space_constraint)
+    return can_be_true and not can_be_false
+
+
+def is_always_false(patch_formula):
+    patch_space_constraint = patch_formula
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        patch_formula_str = str(patch_formula.serialize())
+        patch_index = utilities.get_hash(patch_formula_str)
+        patch_space = values.LIST_PATCH_SPACE[patch_index]
+        parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        if parameter_constraint:
+            patch_space_constraint = And(patch_formula, parameter_constraint)
+    can_be_true = is_sat(patch_space_constraint)
+    can_be_false = is_unsat(patch_space_constraint)
+    return not can_be_true and can_be_false
 
 
 def is_tree_duplicate(tree, lock):
