@@ -314,6 +314,7 @@ def print_configuration():
     emitter.configuration("distance metric", values.DEFAULT_DISTANCE_METRIC)
     emitter.configuration("operation mode", values.DEFAULT_OPERATION_MODE)
     emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
+    emitter.configuration("collecting stats", str(values.DEFAULT_COLLECT_STAT))
 
 
 def collect_test_list():
