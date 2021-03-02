@@ -211,8 +211,8 @@ def run(project_path, program_path):
     values.TIME_TO_GENERATE = str(duration)
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
     writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
-    if values.DEFAULT_REDUCE_METHOD == "fitreduce":
-        run_fitreduce(program_path, patch_list)
+    if values.DEFAULT_REDUCE_METHOD == "cpr":
+        run_cpr(program_path, patch_list)
     elif values.DEFAULT_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, patch_list)
 
@@ -294,7 +294,7 @@ def run_cegis(program_path, project_path, patch_list):
     values.COUNT_PATCH_END = values.COUNT_PATCH_START - count_throw
 
 
-def run_fitreduce(program_path, patch_list):
+def run_cpr(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     if satisfied:

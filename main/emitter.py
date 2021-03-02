@@ -213,5 +213,5 @@ def emit_help():
     write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", RED)
     write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "patch type [0: concrete, 1: abstract] (default=0)", RED)
     write("\t" + definitions.ARG_REFINE_METHOD + "\t| " + "refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)", RED)
-    write("\t" + definitions.ARG_REDUCE_METHOD + "\t| " + "reduce method [0: fitreduce, 1: cegis] (default=0)", RED)
+    write("\t" + definitions.ARG_REDUCE_METHOD + "\t| " + "reduce method [0: cpr, 1: cegis] (default=0)", RED)
 

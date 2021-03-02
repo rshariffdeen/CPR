@@ -94,7 +94,7 @@ DEFAULT_DISTANCE_METRIC = "control-loc"
 DEFAULT_PATCH_TYPE = "abstract"
 DEFAULT_REFINE_METHOD = "under-approx"
 DEFAULT_OPERATION_MODE = "parallel"
-DEFAULT_REDUCE_METHOD = "fitreduce"
+DEFAULT_REDUCE_METHOD = "cpr"
 DEFAULT_COLLECT_STAT = False
 
 IS_TAUTOLOGIES_INCLUDED = True
@@ -109,7 +109,7 @@ OPTIONS_SELECT_METHOD = {0: "deterministic", 1: "random"}
 OPTIONS_PATCH_TYPE = {0: "concrete", 1: "abstract"}
 OPTIONS_OPERATION_MODE = {0: "sequential", 1: "semi-parallel", 2: "parallel"}
 OPTIONS_REFINE_METHOD = {0: "under-approx", 1: "over-approx", 2: "overfit", 3: "none"}
-OPTIONS_REDUCE_METHOD = {0: "fitreduce", 1: "cegis"}
+OPTIONS_REDUCE_METHOD = {0: "cpr", 1: "cegis"}
 
 
 # ------------------ Configuration Values ---------------
