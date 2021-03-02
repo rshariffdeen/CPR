@@ -120,7 +120,7 @@ def update_rank_matrix(ranked_patch_list, iteration):
         rank = rank + 1
         patch_formula = main.generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
-        patch_index = utilities.get_hash(patch_formula_str)
+        patch_index = str(utilities.get_hash(patch_formula_str))
         if patch_index in values.LIST_PATCH_RANKING:
             rank_list = values.LIST_PATCH_RANKING[patch_index]
             rank_list[iteration] = rank

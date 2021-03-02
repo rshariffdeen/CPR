@@ -71,7 +71,7 @@ def generate_patch_index_map(patch_list):
             code = lid + ": " + (program_to_code(prog))
         for comp_var, prog_var in values.MAP_PROG_VAR.items():
             code = code.replace(comp_var, prog_var)
-        index_map[patch_index] = str(code)
+        index_map[str(patch_index)] = str(code)
     return index_map
 
 
