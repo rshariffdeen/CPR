@@ -161,8 +161,8 @@ def rank_patches(patch_list):
         patch_code_str = ""
         for (lid, prog) in patch.items():
             patch_code_str = lid + ": " + (program_to_code(prog))
-        for comp_var, prog_var in values.MAP_PROG_VAR:
-            patch_code_str = patch_code_str.replace(comp_var,prog_var)
+        for comp_var, prog_var in values.MAP_PROG_VAR.items():
+            patch_code_str = patch_code_str.replace(comp_var, prog_var)
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         over_approx_score = 10
