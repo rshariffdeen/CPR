@@ -103,7 +103,7 @@ ARG_CEGIS_TIME_SPLIT = "--cegis-time-split="
 ARG_TIME_DURATION = "--time-duration="
 ARG_RANK_LIMIT = "--top-n="
 ARG_ITERATION_COUNT = "--iterations="
-
+ARG_COLLECT_STAT = "--stat"
 
 # ----------------- TOOLS --------------------------------
 TOOL_VECGEN = "third-party/deckard/cvecgen_fail "

@@ -17,6 +17,8 @@ def read_conf(arg_list):
                 values.FILE_CONFIGURATION = str(arg).replace(definitions.ARG_CONF_FILE, '')
             elif definitions.ARG_DISABLE_DISTANCE_CAL in arg:
                 values.IS_DISABLE_DISTANCE_CAL = True
+            elif definitions.ARG_COLLECT_STAT in arg:
+                values.CONF_COLLECT_STAT = True
             elif definitions.ARG_DIST_METRIC in arg:
                 option = int(arg.replace(definitions.ARG_DIST_METRIC, ''))
                 values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
@@ -483,6 +485,8 @@ def update_configuration():
         values.DEFAULT_OPERATION_MODE = values.CONF_OPERATION_MODE
     if values.CONF_REDUCE_METHOD:
         values.DEFAULT_REDUCE_METHOD = values.CONF_REDUCE_METHOD
+    if values.CONF_COLLECT_STAT:
+        values.DEFAULT_COLLECT_STAT = True
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)
