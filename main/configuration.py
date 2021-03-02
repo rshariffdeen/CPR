@@ -421,7 +421,7 @@ def collect_var_mapping():
     with open(source_file_path, 'r') as source_file:
         content = source_file.readlines()
         patch_line = content[int(line_number) - 1]
-        trident_call_str = re.findall("trident_choice\((.+?)\) ", patch_line)[0].split(",")
+        trident_call_str = re.findall("trident_choice\((.+?)\)[\),\s]", patch_line)[0].split(",")
         prog_var_list = trident_call_str[2].split("{")[1].replace("}", "").split(",")
         comp_name_list = trident_call_str[3].split("{")[1].replace("}", "").split(",")
         for i in range (0, len(prog_var_list)):
