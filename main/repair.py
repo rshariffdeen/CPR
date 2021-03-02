@@ -1,6 +1,6 @@
 import main.generator
 from main.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
-from main.synthesis import load_specification, Program
+from main.synthesis import load_specification, Program, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
 from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib, is_unsat
@@ -158,6 +158,11 @@ def rank_patches(patch_list):
     emitter.normal("\tcomputing rank for each patch")
     for patch in patch_list:
         patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
+        patch_code_str = ""
+        for (lid, prog) in patch.items():
+            patch_code_str = lid + ": " + (program_to_code(prog))
+        for comp_var, prog_var in values.MAP_PROG_VAR:
+            patch_code_str = patch_code_str.replace(comp_var,prog_var)
         patch_index = utilities.get_hash(patch_constraint_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
         over_approx_score = 10
@@ -166,7 +171,7 @@ def rank_patches(patch_list):
         under_approx_score = 10
         if values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]:
             under_approx_score = 0
-        patch_len = 10000 - len(patch_constraint_str)
+        patch_len = 10000 - len(patch_code_str)
         patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, under_approx_score, over_approx_score, patch_score, patch_count, patch_len))
 

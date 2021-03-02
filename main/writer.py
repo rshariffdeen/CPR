@@ -28,6 +28,8 @@ def write_patch_set(patch_list, output_file_path):
         txt_lines.append("Patch #" + str(template_count))
         for (lid, prog) in patch.items():
             code = lid + ": " + (program_to_code(prog))
+        for comp_var, prog_var in values.MAP_PROG_VAR:
+            code = code.replace(comp_var, prog_var)
         txt_lines.append(code)
         patch_formula = generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
