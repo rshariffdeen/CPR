@@ -1,5 +1,5 @@
 from main.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy, program_to_formula, \
-    collect_symbols, ComponentSymbol, RuntimeSymbol
+    collect_symbols, ComponentSymbol, RuntimeSymbol, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
 from six.moves import cStringIO
@@ -8,7 +8,7 @@ import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
-from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser
+from main import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser, writer
 import re
 import struct
 import random
@@ -61,9 +61,25 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     return result
 
 
+def generate_patch_index_map(patch_list):
+    index_map = dict()
+    for patch in patch_list:
+        patch_formula = generate_formula_from_patch(patch)
+        patch_formula_str = patch_formula.serialize()
+        patch_index = utilities.get_hash(patch_formula_str)
+        for (lid, prog) in patch.items():
+            code = lid + ": " + (program_to_code(prog))
+        for comp_var, prog_var in values.MAP_PROG_VAR.items():
+            code = code.replace(comp_var, prog_var)
+        index_map[patch_index] = str(code)
+    return index_map
+
+
 def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]]:
 
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
+    definitions.FILE_PATCH_RANK_INDEX = definitions.DIRECTORY_OUTPUT + "/patch-index"
+    definitions.FILE_PATCH_RANK_MATRIX = definitions.DIRECTORY_OUTPUT + "/patch-rank-matrix"
 
     if values.CONF_SKIP_GEN:
         emitter.sub_title("Loading Patch Pool")
@@ -147,7 +163,8 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     emitter.highlight("\tnumber of patches in pool: " + str(len(filtered_patch_list)))
     # filtered_list_of_patches = list(set(list_of_patches))
     # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
-
+    index_map = generate_patch_index_map(filtered_patch_list)
+    writer.write_as_json(index_map, definitions.FILE_PATCH_RANK_INDEX)
     return filtered_patch_list
 
 

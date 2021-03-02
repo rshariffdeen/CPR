@@ -114,6 +114,21 @@ def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: s
     return updated_patch_list
 
 
+def update_rank_matrix(ranked_patch_list, iteration):
+    rank = 0
+    for patch in ranked_patch_list:
+        rank = rank + 1
+        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula_str = patch_formula.serialize()
+        patch_index = utilities.get_hash(patch_formula_str)
+        if patch_index in values.LIST_PATCH_RANKING:
+            rank_list = values.LIST_PATCH_RANKING[patch_index]
+            rank_list[iteration] = rank
+        else:
+            rank_list = {iteration: rank}
+        values.LIST_PATCH_RANKING[patch_index] = rank_list
+
+
 def print_patch_list(patch_list):
     template_count = 0
     emitter.sub_title("List of Top " + str(values.DEFAULT_PATCH_RANK_LIMIT) + " Correct Patches")
@@ -411,6 +426,12 @@ def run_cpr(program_path, patch_list):
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
+        if values.DEFAULT_COLLECT_STAT:
+            ranked_patch_list = rank_patches(patch_list)
+            update_rank_matrix(ranked_patch_list, iteration)
+            definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
+            writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
+            writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)

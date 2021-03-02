@@ -27,6 +27,8 @@ FILE_COMMAND_LOG = DIRECTORY_LOG_BASE + "/log-command"
 FILE_STANDARD_FUNCTION_LIST = DIRECTORY_DATA + "/standard-function-list"
 FILE_STANDARD_MACRO_LIST = DIRECTORY_DATA + "/standard-macro-list"
 FILE_PATCH_SET = ""
+FILE_PATCH_RANK_MATRIX = ""
+FILE_PATCH_RANK_INDEX = ""
 FILE_TRIDENT_LIB_BCA = DIRECTORY_LIB + "/libtrident_runtime.bca"
 
 # ------------------- Configuration --------------------
