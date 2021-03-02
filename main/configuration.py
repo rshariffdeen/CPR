@@ -448,6 +448,7 @@ def update_configuration():
     os.mkdir(definitions.DIRECTORY_LOG)
     collect_test_list()
     collect_seed_list()
+    collect_var_mapping()
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
