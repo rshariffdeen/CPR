@@ -63,7 +63,9 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
 
 def generate_patch_index_map(patch_list):
     index_map = dict()
+    rank = 0
     for patch in patch_list:
+        rank = rank + 1
         patch_formula = generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
         patch_index = utilities.get_hash(patch_formula_str)
@@ -72,6 +74,7 @@ def generate_patch_index_map(patch_list):
         for comp_var, prog_var in values.MAP_PROG_VAR.items():
             code = code.replace(comp_var, prog_var)
         index_map[str(patch_index)] = str(code)
+        values.LIST_PATCH_RANKING[str(patch_index)] = {0: rank}
     return index_map
 
 
