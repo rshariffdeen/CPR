@@ -428,7 +428,7 @@ def collect_var_mapping():
         prog_var_list = re.findall("{(.+?)}", trident_call_str)[0].split(",")
         comp_name_list = re.findall("{(.+?)}", trident_call_str)[1].split(",")
         for i in range (0, len(prog_var_list)):
-            values.MAP_PROG_VAR[comp_name_list[i].replace("\"", "").replace("\'", "")] = prog_var_list[i]
+            values.MAP_PROG_VAR[comp_name_list[i].strip().replace("\"", "").replace("\'", "")] = prog_var_list[i]
     # print(values.MAP_PROG_VAR)
 
 
