@@ -318,6 +318,7 @@ def print_configuration():
 
 
 def collect_test_list():
+    emitter.normal("reading test configuration")
     if values.CONF_TEST_INPUT_LIST:
         for test_input in values.CONF_TEST_INPUT_LIST:
             values.LIST_TEST_INPUT.append(test_input)
@@ -383,6 +384,7 @@ def collect_test_list():
 
 
 def collect_seed_list():
+    emitter.normal("reading seed information")
     if values.CONF_SEED_LIST:
         for seed_input in values.CONF_SEED_LIST:
             values.LIST_SEED_INPUT.append(seed_input)
@@ -449,9 +451,6 @@ def update_configuration():
     if os.path.isdir(definitions.DIRECTORY_LOG):
         shutil.rmtree(definitions.DIRECTORY_LOG)
     os.mkdir(definitions.DIRECTORY_LOG)
-    collect_test_list()
-    collect_seed_list()
-    collect_var_mapping()
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
