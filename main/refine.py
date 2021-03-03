@@ -144,6 +144,8 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
 def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specification):
     parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = patch_formula
+    if not values.IS_PATCH_BOOL:
+        return False
     if parameter_constraint:
         patch_space_constraint = And(patch_formula, parameter_constraint)
     path_feasibility = And(path_condition, And(patch_space_constraint, p_specification))
