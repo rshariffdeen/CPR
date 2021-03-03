@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
       return -1;
   }
 
-  if (x > 0)
+  if (varA > 0)
     varC = varB * varA;
   else
     varC = 2;
