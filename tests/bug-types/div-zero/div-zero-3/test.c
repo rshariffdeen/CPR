@@ -5,19 +5,19 @@
 #endif
 
 int main(int argc, char *argv[]) {
-  int x = atoi(argv[1]);
-  int y = atoi(argv[2]);
+  int varA = atoi(argv[1]);
+  int varB = atoi(argv[2]);
   int res, z;
-  if (__trident_choice("L9", "bool", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))  {
+  if (__trident_choice("L9", "bool", (int[]){varA, varB}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
 
-  if (x > 5)
-    z = x - 1;
+  if (varA > 5)
+    z = varA - 1;
   else
-    z = x + 2;
+    z = varA + 2;
 
-  z = x * y;
+  z = varA * varB;
   TRIDENT_OUTPUT("obs", "i32", z);
   res = 1000 / z;
   return 0;
