@@ -188,7 +188,10 @@ def end(time_info, is_error=False):
     statistics("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))
     statistics("Paths Explored: " + str(values.COUNT_PATHS_EXPLORED))
     statistics("Paths Skipped: " + str(values.COUNT_PATHS_SKIPPED))
-
+    statistics("Paths Hit Patch Loc: " + str(values.COUNT_HIT_PATCH_LOC))
+    statistics("Paths Hit Observation Loc: " + str(values.COUNT_HIT_BUG_LOG))
+    statistics("Paths Hit Crash Loc: " + str(values.COUNT_HIT_CRASH_LOC))
+    statistics("Paths Crashed: " + str(values.COUNT_HIT_CRASH))
     statistics("Component Count: " + str(values.COUNT_COMPONENTS))
     statistics("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
     statistics("Component Count Cus: " + str(values.COUNT_COMPONENTS_CUS))

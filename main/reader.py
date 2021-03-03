@@ -142,15 +142,19 @@ def collect_trace(file_path, project_path):
     if values.CONF_LOC_PATCH:
         if values.CONF_LOC_PATCH in list_trace:
             emitter.note("\t\t[note] patch location detected in trace")
+            values.COUNT_HIT_PATCH_LOC = values.COUNT_HIT_PATCH_LOC + 1
     if values.CONF_LOC_BUG:
         if values.CONF_LOC_BUG in list_trace:
             emitter.note("\t\t[note] fault location detected in trace")
+            values.COUNT_HIT_BUG_LOG = values.COUNT_HIT_BUG_LOG + 1
     if values.CONF_LOC_LIST_CRASH:
         if not set(values.CONF_LOC_LIST_CRASH).isdisjoint(list_trace):
             emitter.note("\t\t[note] a crash location detected in trace")
+            values.COUNT_HIT_CRASH_LOC = values.COUNT_HIT_CRASH_LOC + 1
     is_crash = collect_crash_point(values.FILE_MESSAGE_LOG)
     if is_crash:
         values.IS_CRASH = True
+        values.COUNT_HIT_CRASH = values.COUNT_HIT_CRASH + 1
         emitter.note("\t\t[note] program crashed")
     else:
         values.IS_CRASH = False
