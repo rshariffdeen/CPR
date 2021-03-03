@@ -183,6 +183,7 @@ def end(time_info, is_error=False):
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
         statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
+        statistics("Template End Seed Count: " + str(values.COUNT_TEMPLATE_END_SEED))
         statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
 
     statistics("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))

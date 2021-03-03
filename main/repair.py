@@ -380,7 +380,8 @@ def run_cpr(program_path, patch_list):
                     break
             emitter.success("\t\tend of concolic exploration using user-provided seeds")
             emitter.success("\t\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-            values.COUNT_PATCH_END_SEED = len(patch_list)
+            values.COUNT_TEMPLATE_END_SEED = len(patch_list)
+            values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
 
         else:
             iteration = iteration + 1
