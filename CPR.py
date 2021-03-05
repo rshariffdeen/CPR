@@ -47,7 +47,7 @@ def bootstrap(arg_list):
     configuration.print_configuration()
     configuration.collect_test_list()
     configuration.collect_seed_list()
-    configuration.collect_var_mapping()
+    # configuration.collect_var_mapping()
     configuration.load_component_list()
 
 

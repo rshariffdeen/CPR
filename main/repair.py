@@ -187,9 +187,9 @@ def rank_patches(patch_list):
         under_approx_score = 10
         if values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]:
             under_approx_score = 0
-        patch_len = 10000 - len(patch_code_str)
-        if oracle.is_always_true(patch) or oracle.is_always_false(patch):
-            patch_len = 10000 - 1
+        patch_len = 10000 - len(patch_constraint_str)
+        # if oracle.is_always_true(patch) or oracle.is_always_false(patch):
+        #     patch_len = 10000 - 1
         patch_count = 1000 - utilities.count_concrete_patches_per_template(patch)
         filtered_list.append((patch, under_approx_score, over_approx_score, patch_score, patch_count, patch_len))
 
