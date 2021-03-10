@@ -167,17 +167,16 @@ def select_new_input(patch_list=None):
     patch_constraint = TRUE
     new_path_count = 0
 
-    if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-        for (control_loc, generated_path, ppc_len), arg_list, poc_path in generated_path_list:
-            path_str = str(generated_path.serialize())
-            if path_str not in (list_path_detected + list_path_explored):
-                reach_patch_loc = 100 - path_str.count("angelic!")
-                reach_obs_loc = 100 - path_str.count("obs!")
-                ppc_len = 10000 - ppc_len
-                list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc,
-                                             arg_list, poc_path))
-                list_path_detected.append(str(generated_path.serialize()))
-                new_path_count = new_path_count + 1
+    for (control_loc, generated_path, ppc_len), arg_list, poc_path in generated_path_list:
+        path_str = str(generated_path.serialize())
+        if path_str not in (list_path_detected + list_path_explored):
+            reach_patch_loc = 100 - path_str.count("angelic!")
+            reach_obs_loc = 100 - path_str.count("obs!")
+            ppc_len = 10000 - ppc_len
+            list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc,
+                                         arg_list, poc_path))
+            list_path_detected.append(str(generated_path.serialize()))
+            new_path_count = new_path_count + 1
 
     count_discovered = count_discovered + new_path_count
     emitter.highlight("\tidentified " + str(new_path_count) + " new path(s)")
