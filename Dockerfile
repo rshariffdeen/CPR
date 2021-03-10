@@ -104,7 +104,7 @@ RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
-RUN git clone https://47493629a358a5b8c9d5387bb4271194c71b2921:x-oauth-basic@github.com/mechtaev/concolic-repair.git /CPR
+RUN git clone https://47493629a358a5b8c9d5387bb4271194c71b2921:x-oauth-basic@github.com/rshariffdeen/CPR.git /CPR
 WORKDIR /CPR
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 ENV DEBIAN_FRONTEND=dialog
