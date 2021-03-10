@@ -354,17 +354,18 @@ def run_cpr(program_path, patch_list):
                 values.LIST_PPC = []
                 values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
                 # check if new path hits patch location / fault location
-                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                    continue
-                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-                    continue
                 gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir, poc_path)
                 if values.FILE_POC_SEED not in values.MASK_BYTE_LIST:
                     values.MASK_BYTE_LIST[values.FILE_POC_SEED] = gen_masked_byte_list
                 else:
                     current_mask_list = values.MASK_BYTE_LIST[values.FILE_POC_SEED]
-                    values.MASK_BYTE_LIST[values.FILE_POC_SEED] = sorted(list(set(current_mask_list + gen_masked_byte_list)))
+                    values.MASK_BYTE_LIST[values.FILE_POC_SEED] = sorted(
+                        list(set(current_mask_list + gen_masked_byte_list)))
                 distance.update_distance_map()
+                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                    continue
+                if not values.SPECIFICATION_TXT and not oracle.is_loc_in_trace(values.CONF_LOC_BUG):
+                    continue
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
                                                                     Path(binary_dir_path + "/klee-last/").resolve())
