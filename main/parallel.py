@@ -85,13 +85,12 @@ def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
         for con_loc, ppc_str in ppc_list:
-            abortable_func = partial(abortable_worker, generator.generate_special_paths, default=False,
-                                     index=count - 1)
-            pool.apply_async(abortable_func, args=(con_loc, ppc_str),
-                             callback=collect_result_timeout)
+            pool.apply_async(generator.generate_special_paths,
+                             args=(con_loc, ppc_str),
+                             callback=collect_result)
+        pool.close()
         emitter.normal("\t\twaiting for thread completion")
-        time.sleep(1.3 * values.DEFAULT_TIMEOUT_SAT)
-        pool.terminate()
+        pool.join()
     # assert(len(result_list) == len(path_list))
     for path_list in result_list:
         for path in path_list:
