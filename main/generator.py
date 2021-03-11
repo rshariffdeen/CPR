@@ -1050,6 +1050,7 @@ def generate_constraint_for_patch_space(patch_space):
 #     return formula
 
 def generate_assertion(assertion_temp, klee_dir):
+    emitter.normal("\tgenerating extended specification")
     largest_path_condition = None
     max_obs = 0
     file_list = [f for f in os.listdir(klee_dir) if os.path.isfile(os.path.join(klee_dir, f))]
