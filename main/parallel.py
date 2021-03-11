@@ -4,6 +4,8 @@ from main import emitter, oracle, definitions, extractor, refine, values, genera
 from typing import List, Dict, Optional
 from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
+from pysmt.smtlib.parser import SmtLibParser
+from six.moves import cStringIO
 from multiprocessing import TimeoutError
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
@@ -11,6 +13,7 @@ import threading
 import time
 import os
 import sys
+import re
 
 
 def mute():
@@ -66,7 +69,7 @@ def abortable_worker(func, *args, **kwargs):
         return default_value, index
 
 
-def generate_special_paths_parallel(ppc_list):
+def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
     global pool, result_list, expected_count
     result_list = []
     path_list = []
@@ -75,53 +78,24 @@ def generate_special_paths_parallel(ppc_list):
     count = 0
     ppc_list.reverse()
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
-        for control_loc, ppc in ppc_list:
-            if definitions.DIRECTORY_LIB in control_loc:
-                continue
-            ppc_str = ppc
-            count = count + 1
-            new_path = generator.generate_flipped_path(ppc)
-            new_path_str = new_path.serialize()
-            ppc_len = len(str(new_path.serialize()))
-            path_list.append((control_loc, new_path, ppc_len))
-            if new_path_str not in values.LIST_PATH_CHECK:
-                values.LIST_PATH_CHECK.append(new_path_str)
-                result_list.append(oracle.check_path_feasibility(control_loc, new_path, count - 1))
-
+        for con_loc, ppc_str in ppc_list:
+            result_list.append(generator.generate_special_paths(con_loc, ppc_str))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
-        thread_list = []
-        for control_loc, ppc in ppc_list:
-            if definitions.DIRECTORY_LIB in control_loc:
-                expected_count = expected_count - 1
-                continue
-            count = count + 1
-            new_path = generator.generate_flipped_path(ppc)
-            new_path_str = new_path.serialize()
-            ppc_len = len(str(new_path.serialize()))
-            path_list.append((control_loc, new_path, ppc_len))
-            if new_path_str not in values.LIST_PATH_CHECK:
-                values.LIST_PATH_CHECK.append(new_path_str)
-                abortable_func = partial(abortable_worker, oracle.check_path_feasibility, default=False,
-                                         index=count - 1)
-                pool.apply_async(abortable_func, args=(control_loc, new_path, count - 1),
-                                 callback=collect_result_timeout)
-                # thread_list.append(thread)
+        for con_loc, ppc_str in ppc_list:
+            abortable_func = partial(abortable_worker, generator.generate_special_paths, default=False,
+                                     index=count - 1)
+            pool.apply_async(abortable_func, args=(con_loc, ppc_str),
+                             callback=collect_result_timeout)
         emitter.normal("\t\twaiting for thread completion")
-        # for thread in thread_list:
-        #     try:
-        #         thread.get(values.DEFAULT_TIMEOUT_SAT)
-        #     except TimeoutError:
-        #         emitter.warning("\t[warning] timeout raised on a thread")
-        #         thread.successful()
         time.sleep(1.3 * values.DEFAULT_TIMEOUT_SAT)
         pool.terminate()
     # assert(len(result_list) == len(path_list))
-    for result in result_list:
-        is_feasible, index = result
-        if is_feasible:
-            filtered_list.append(path_list[index])
+    for path_list in result_list:
+        for path in path_list:
+            con_loc, path_smt, path_str = path
+            filtered_list.append((con_loc, path_smt, path_str, arg_list, poc_path))
     return filtered_list
 
 
