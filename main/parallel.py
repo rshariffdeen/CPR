@@ -76,6 +76,7 @@ def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
     filtered_list = []
     lock = None
     count = 0
+    expected_count = len(ppc_list)
     ppc_list.reverse()
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for con_loc, ppc_str in ppc_list:
