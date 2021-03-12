@@ -92,7 +92,8 @@ RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
     bear \
     python3.7 \
-    python3-pip
+    python3-pip \
+    python3-setuptools
 
 RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
@@ -104,12 +105,55 @@ RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install numpy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
+## Build Python from Source Code
+# RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
+#     bear \
+#     libncurses-dev \
+#     libgdbm-dev \
+#     libz-dev \
+#     tk-dev \
+#     libsqlite3-dev \
+#     libreadline-dev \
+#     liblzma-dev \
+#     libffi-dev \
+#     libssl-dev
+#
+# RUN git clone https://github.com/python/cpython.git /cpython && cd /cpython && git checkout v3.6.12
+# RUN cd /cpython && ./configure --enable-optimizations && make -j32 install
+#
+# RUN python3 -m pip install --upgrade pip
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install setuptools
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install pylint
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install pysmt
+# RUN pysmt-install --z3 --confirm-agreement
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install funcy
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install six
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install numpy
+# RUN python3 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
+
+## Install PyPy JITC
+RUN add-apt-repository -y ppa:pypy/ppa
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
+    gfortran \
+    pypy3 \
+    pypy3-dev
+
+RUN pypy3 -m easy_install cython
+RUN pypy3 -m easy_install setuptools
+RUN pypy3 -m easy_install pylint
+RUN pypy3 -m easy_install pysmt
+RUN pysmt-install --z3 --confirm-agreement
+RUN pypy3 -m easy_install funcy
+RUN pypy3 -m easy_install six
+RUN pypy3 -m easy_install numpy==1.19.1
+RUN pypy3 -m easy_install wllvm
+
+
 RUN git clone https://47493629a358a5b8c9d5387bb4271194c71b2921:x-oauth-basic@github.com/rshariffdeen/CPR.git /CPR
 WORKDIR /CPR
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 ENV DEBIAN_FRONTEND=dialog
 ENV TRIDENT_CC=/CPR/tools/trident-cc
 ENV TRIDENT_CXX=/CPR/tools/trident-cxx
-
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 
