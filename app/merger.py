@@ -1,6 +1,6 @@
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from pysmt.shortcuts import is_unsat
-from app import utilities, generator
+from app import utilities, smt2
 
 
 def get_sorted_space(partition_list):
@@ -44,9 +44,9 @@ def merge_space(partition_list, path_condition, specification):
             dimension_list = list(merged_partition.keys())
             dimension_name = dimension_list[0]
             if "const_" in dimension_name:
-                partition_constraints = generator.generate_constraint_for_patch_partition(merged_partition)
+                partition_constraints = smt2.generate_constraint_for_patch_partition(merged_partition)
             else:
-                partition_constraints = generator.generate_constraint_for_input_partition(merged_partition)
+                partition_constraints = smt2.generate_constraint_for_input_partition(merged_partition)
             if is_unsat(And(partition_constraints, And(path_condition, Not(specification)))):
                 insert_index = merged_space.index(partition_a)
                 merged_space.remove(partition_a)

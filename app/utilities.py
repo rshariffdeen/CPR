@@ -4,12 +4,33 @@ import sys
 import signal
 import random
 from contextlib import contextmanager
-
-import app.generator
-from app import logger, emitter, values, definitions, extractor
+from app.generator import generate_formula_from_patch
+from app import logger, emitter, values, definitions
 import base64
 import hashlib
 import time
+from app.synthesis import program_to_formula, collect_symbols, ComponentSymbol, RuntimeSymbol
+
+
+def generate_formula_from_patch(patch):
+    lid = list(patch.keys())[0]
+    eid = 0
+    patch_component = patch[lid]
+    patch_constraint = program_to_formula(patch_component)
+    program_substitution = {}
+    for program_symbol in collect_symbols(patch_constraint, lambda x: True):
+        kind = ComponentSymbol.check(program_symbol)
+        data = ComponentSymbol.parse(program_symbol)._replace(lid=lid)._replace(eid=eid)
+        if kind == ComponentSymbol.RRETURN:
+            program_substitution[program_symbol] = RuntimeSymbol.angelic(data)
+        elif kind == ComponentSymbol.RVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.rvalue(data)
+        elif kind == ComponentSymbol.LVALUE:
+            program_substitution[program_symbol] = RuntimeSymbol.lvalue(data)
+        else:
+            pass  # FIXME: do I need to handle it somehow?
+    substituted_patch = patch_constraint.substitute(program_substitution)
+    return substituted_patch
 
 
 def execute_command(command, show_output=True):
@@ -179,7 +200,7 @@ def check_budget(time_budget):  # TODO implement time budget
 def count_concrete_patches_per_template(abstract_patch):
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
-    patch_formula = app.generator.generate_formula_from_patch(abstract_patch)
+    patch_formula = generate_formula_from_patch(abstract_patch)
     patch_formula_str = patch_formula.serialize()
     patch_index = get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]

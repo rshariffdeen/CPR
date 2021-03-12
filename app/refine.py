@@ -1,6 +1,6 @@
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from pysmt.shortcuts import is_sat
-from app import emitter, values, extractor, merger, oracle, generator
+from app import emitter, values, extractor, merger, oracle, generator, smt2
 
 
 def refine_input_partition(path_condition, assertion, input_partition, is_multi_dimension):
@@ -34,7 +34,7 @@ def refine_input_partition(path_condition, assertion, input_partition, is_multi_
 
 
 def refine_patch_partition(path_constraint, patch_partition, p_specification, is_multi_dimension):
-    parameter_constraint = generator.generate_constraint_for_patch_partition(patch_partition)
+    parameter_constraint = smt2.generate_constraint_for_patch_partition(patch_partition)
     path_feasibility = And(path_constraint, And(parameter_constraint, p_specification))
     refined_partition_list = []
     if is_sat(path_feasibility):
