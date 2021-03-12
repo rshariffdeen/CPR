@@ -8,7 +8,7 @@ filtered_source_list = []
 for source_file in source_list:
     if source_file != __file__ and ".py" in source_file:
         filtered_source_list.append(source_file)
-ext_modules = [Extension("libcpr", filtered_source_list)]
+ext_modules = [Extension("cpr", filtered_source_list)]
 
 setup(
     cmdclass={'build_ext': build_ext},

@@ -445,7 +445,8 @@ def run_cpr(program_path, patch_list):
         print_patch_list(ranked_patch_list)
         definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked"
         writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
-        check_infeasible_paths(patch_list)
+        if values.DEFAULT_COLLECT_STAT:
+            check_infeasible_paths(patch_list)
         if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
             values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
             values.COUNT_TEMPLATE_END = len(patch_list)
