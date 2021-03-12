@@ -19,9 +19,6 @@ def get_ext_paths(root_dir, exclude_files):
             if os.path.splitext(filename)[1] != '.py':
                 continue
 
-            if filename == '__init__.py':
-                continue
-
             file_path = os.path.join(root, filename)
             if file_path in exclude_files:
                 continue
