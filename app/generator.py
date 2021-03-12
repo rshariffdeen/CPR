@@ -1,4 +1,4 @@
-from libcpr.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy, program_to_formula, \
+from app.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy, program_to_formula, \
     collect_symbols, ComponentSymbol, RuntimeSymbol, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -8,7 +8,7 @@ import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
 from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
-from libcpr import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser, writer
+from app import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser, writer
 import re
 import struct
 import random

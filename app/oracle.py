@@ -1,4 +1,4 @@
-from libcpr import definitions, values, emitter, utilities, extractor, generator
+from app import definitions, values, emitter, utilities, extractor, generator
 from pysmt.shortcuts import is_sat, Not, And, is_unsat
 
 tautology_included = False

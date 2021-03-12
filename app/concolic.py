@@ -7,8 +7,8 @@ import operator
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
 
-import libcpr.generator
-from libcpr import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor,distance
+import app.generator
+from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor,distance
 import numpy
 
 
@@ -132,7 +132,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
         selected_patch = random.choice(filtered_patch_list)
 
     emitter.emit_patch(selected_patch, message="\t\tSelected patch: ")
-    patch_formula = libcpr.generator.generate_formula_from_patch(selected_patch)
+    patch_formula = app.generator.generate_formula_from_patch(selected_patch)
     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, selected_new_path)
     patch_space_constraint = patch_formula_extended
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:

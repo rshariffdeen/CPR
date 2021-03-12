@@ -1,4 +1,4 @@
-from libcpr import definitions, values, emitter
+from app import definitions, values, emitter
 import multiprocessing as mp
 
 

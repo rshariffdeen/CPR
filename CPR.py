@@ -2,9 +2,9 @@ import os
 import time
 import traceback
 import signal
-from libcpr import emitter, logger, definitions, values, builder, repair, \
+from app import emitter, logger, definitions, values, builder, repair, \
     configuration, reader, parallel, extractor
-from libcpr.concolic import run_concrete_execution
+from app.concolic import run_concrete_execution
 
 start_time = 0
 time_info = {

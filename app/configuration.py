@@ -3,8 +3,8 @@ import sys
 import re
 import shutil
 from pathlib import Path
-from libcpr import emitter, logger, definitions, values, reader, synthesis, extractor
-from libcpr.utilities import error_exit
+from app import emitter, logger, definitions, values, reader, synthesis, extractor
+from app.utilities import error_exit
 
 
 def read_conf(arg_list):

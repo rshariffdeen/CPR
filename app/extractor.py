@@ -3,7 +3,7 @@ from six.moves import cStringIO
 from pysmt.shortcuts import And
 import os
 
-from libcpr import emitter, utilities
+from app import emitter, utilities
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
 

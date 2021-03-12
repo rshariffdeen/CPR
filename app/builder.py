@@ -4,8 +4,8 @@
 
 import os
 import sys
-from libcpr.utilities import execute_command, error_exit
-from libcpr import definitions, values, logger, emitter
+from app.utilities import execute_command, error_exit
+from app import definitions, values, logger, emitter
 
 CC = "$TRIDENT_CC"
 CXX = "$TRIDENT_CXX"

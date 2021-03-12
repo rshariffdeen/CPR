@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sys
-sys.path.append('/CPR/libcpr')
+sys.path.append('/CPR/app')
 from concolic import generate_ktest, run_concolic_execution
 
 

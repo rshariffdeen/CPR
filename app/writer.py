@@ -4,8 +4,8 @@
 
 import pickle
 import json
-from libcpr import generator, utilities, values, emitter
-from libcpr.synthesis import program_to_code
+from app import generator, utilities, values, emitter
+from app.synthesis import program_to_code
 
 
 def write_as_json(data, output_file_path):
