@@ -95,7 +95,7 @@ def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
     for path_list in result_list:
         for path in path_list:
             con_loc, path_smt, path_str = path
-            filtered_list.append((con_loc, path_smt, path_str, arg_list, poc_path))
+            filtered_list.append(((con_loc, path_smt, path_str), arg_list, poc_path))
     return filtered_list
 
 
