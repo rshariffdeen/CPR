@@ -1,6 +1,6 @@
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from pysmt.shortcuts import is_sat
-from main import emitter, values, extractor, merger, oracle, generator
+from libcpr import emitter, values, extractor, merger, oracle, generator
 
 
 def refine_input_partition(path_condition, assertion, input_partition, is_multi_dimension):

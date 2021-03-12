@@ -5,8 +5,8 @@ import signal
 import random
 from contextlib import contextmanager
 
-import main.generator
-from main import logger, emitter, values, definitions, extractor
+import libcpr.generator
+from libcpr import logger, emitter, values, definitions, extractor
 import base64
 import hashlib
 import time
@@ -74,7 +74,7 @@ def build_program(program_path):
         build_clean(program_path)
     program_loc = "/".join(program_path.split("/")[:-1])
     compile_command = "cd " + program_loc + ";"
-    compile_command += "export TRIDENT_CC=/concolic-repair/main/trident-cc;" \
+    compile_command += "export TRIDENT_CC=/concolic-repair/libcpr/trident-cc;" \
                       "CC=\"$TRIDENT_CC\" CXX=\"$TRIDENT_CXX\" make -e;" \
                       "extract-bc " + program_name
     process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
@@ -179,7 +179,7 @@ def check_budget(time_budget):  # TODO implement time budget
 def count_concrete_patches_per_template(abstract_patch):
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
         return 1
-    patch_formula = main.generator.generate_formula_from_patch(abstract_patch)
+    patch_formula = libcpr.generator.generate_formula_from_patch(abstract_patch)
     patch_formula_str = patch_formula.serialize()
     patch_index = get_hash(patch_formula_str)
     patch_space = values.LIST_PATCH_SPACE[patch_index]

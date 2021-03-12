@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sys
-sys.path.append('/CPR/main')
+sys.path.append('/CPR/libcpr')
 from concolic import run_concolic_exploration
 
 ## compile the test.c

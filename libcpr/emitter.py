@@ -2,9 +2,9 @@
 
 import sys
 import os
-from main import definitions, values, logger
+from libcpr import definitions, values, logger
 import textwrap
-from main.synthesis import program_to_code
+from libcpr.synthesis import program_to_code
 
 rows, columns = os.popen('stty size', 'r').read().split()
 

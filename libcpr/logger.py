@@ -3,7 +3,7 @@
 import time
 import datetime
 import os
-from main import definitions, values
+from libcpr import definitions, values
 from shutil import copyfile
 
 

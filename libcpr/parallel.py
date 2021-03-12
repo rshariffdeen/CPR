@@ -1,8 +1,8 @@
 import multiprocessing as mp
-import main.generator
-from main import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
+import libcpr.generator
+from libcpr import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
 from typing import List, Dict, Optional
-from main.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
+from libcpr.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from pysmt.smtlib.parser import SmtLibParser
 from six.moves import cStringIO
@@ -181,7 +181,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
     var_relationship = TRUE
     if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_formula = main.generator.generate_formula_from_patch(patch)
+            patch_formula = libcpr.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
@@ -191,7 +191,7 @@ def validate_patches_parallel(patch_list, path_condition, assertion):
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
         lock = None
         for patch in patch_list:
-            patch_formula = main.generator.generate_formula_from_patch(patch)
+            patch_formula = libcpr.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             index = list(patch_list).index(patch)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
@@ -240,7 +240,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
     if values.DEFAULT_OPERATION_MODE in ["sequential"] or force_sequential:
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_formula = main.generator.generate_formula_from_patch(patch)
+            patch_formula = libcpr.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
@@ -252,7 +252,7 @@ def refine_patch_space(patch_list, path_condition, assertion, force_sequential=F
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
         for patch in patch_list:
             index = list(patch_list).index(patch)
-            patch_formula = main.generator.generate_formula_from_patch(patch)
+            patch_formula = libcpr.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, path_condition)
             # emitter.emit_patch(patch, message="\tabstract patch " + str(index) + " :")
             patch_formula_str = patch_formula.serialize()
@@ -310,7 +310,7 @@ def validate_input_generation(patch_list, new_path):
     result_list = []
     if values.DEFAULT_OPERATION_MODE in ["sequential"]:
         for patch in patch_list:
-            patch_formula = main.generator.generate_formula_from_patch(patch)
+            patch_formula = libcpr.generator.generate_formula_from_patch(patch)
             patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
             patch_space_constraint = patch_formula_extended
             if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
@@ -331,7 +331,7 @@ def validate_input_generation(patch_list, new_path):
         interrupt_event = threading.Event()
         for patch in patch_list:
             try:
-                patch_formula = main.generator.generate_formula_from_patch(patch)
+                patch_formula = libcpr.generator.generate_formula_from_patch(patch)
                 patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, new_path)
                 patch_space_constraint = patch_formula
                 if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:

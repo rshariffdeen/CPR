@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sys
-sys.path.append('/CPR/main')
+sys.path.append('/CPR/libcpr')
 from concolic import generate_ktest, run_concolic_execution, run_concrete_execution
 from utilities import build_program
 
@@ -38,7 +38,7 @@ assert os.path.getsize(klee_file_1) > 0
 # assert os.path.isfile(klee_file_2)
 # assert os.path.getsize(klee_file_2) > 0
 
-synthesis_command = "python3.6 ../../main/synthesis.py \
+synthesis_command = "python3.6 ../../libcpr/synthesis.py \
           --tests t1.smt2:klee-out-0 \
           --components components/*.smt2 ../../components/less-than.smt2 ../../components/constant_a.smt2  \
           --all"

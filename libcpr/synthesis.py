@@ -23,7 +23,7 @@ import pysmt.operators as op
 from funcy import all_fn, any_fn, complement
 import multiprocessing as mp
 from threading import Lock
-from main import values
+from libcpr import values
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
 
@@ -1618,7 +1618,7 @@ def load_components(comp_files: List[Path]) -> List[Component]:
     return components
 #
 #
-# def main(args):
+# def libcpr(args):
 #     parser = argparse.ArgumentParser('Trident synthesizer')
 #     parser.add_argument('--tests',
 #                         nargs='+',
@@ -1743,4 +1743,4 @@ def extract_constraints_from_patch(patch):
 
 # if __name__ == "__main__":
 #     import sys
-#     main(sys.argv[1:])
+#     libcpr(sys.argv[1:])

@@ -1,10 +1,10 @@
-import main.generator
-from main.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
-from main.synthesis import load_specification, Program, program_to_code
+import libcpr.generator
+from libcpr.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
+from libcpr.synthesis import load_specification, Program, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
 from pysmt.shortcuts import Not, And, is_sat, write_smtlib, to_smtlib, is_unsat
-from main import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
+from libcpr import emitter, values, distance, oracle, parallel, generator, extractor, utilities, concolic, merger, definitions, reader, writer
 import time
 import sys
 import os
@@ -63,7 +63,7 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
     for result in result_list:
         refined_space, index, patch_score, is_under_approx, is_over_approx = result
         patch = patch_list[index]
-        patch_constraint = main.generator.generate_formula_from_patch(patch)
+        patch_constraint = libcpr.generator.generate_formula_from_patch(patch)
         patch_constraint_str = patch_constraint.serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         values.LIST_PATCH_SCORE[patch_index] += patch_score
@@ -118,7 +118,7 @@ def update_rank_matrix(ranked_patch_list, iteration):
     rank = 0
     for patch in ranked_patch_list:
         rank = rank + 1
-        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula = libcpr.generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
         patch_index = str(utilities.get_hash(patch_formula_str))
         if patch_index in values.LIST_PATCH_RANKING:
@@ -139,7 +139,7 @@ def print_patch_list(patch_list):
         template_count = template_count + 1
         emitter.sub_sub_title("Patch #" + str(template_count))
         emitter.emit_patch(patch, message="\t\t")
-        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula = libcpr.generator.generate_formula_from_patch(patch)
         patch_formula_str = patch_formula.serialize()
         patch_index = utilities.get_hash(patch_formula_str)
         patch_score = values.LIST_PATCH_SCORE[patch_index]
@@ -172,7 +172,7 @@ def rank_patches(patch_list):
     # rank first based on coverage
     emitter.normal("\tcomputing rank for each patch")
     for patch in patch_list:
-        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula = libcpr.generator.generate_formula_from_patch(patch)
         patch_constraint_str = patch_formula.serialize()
         patch_code_str = ""
         for (lid, prog) in patch.items():
@@ -207,7 +207,7 @@ def run(project_path, program_path):
     patch_list = generator.generate_patch_set(project_path)
 
     for patch in patch_list:
-        patch_constraint_str = main.generator.generate_formula_from_patch(patch).serialize()
+        patch_constraint_str = libcpr.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         if patch_index in values.LIST_PATCH_SCORE:
             emitter.warning("\tcollision detected in patch score map")
@@ -265,7 +265,7 @@ def run_cegis(program_path, project_path, patch_list):
         emitter.sub_sub_title("Iteration: " + str(iteration))
         if patch is None:
             patch = next(patch_generator, None)
-        patch_formula = main.generator.generate_formula_from_patch(patch)
+        patch_formula = libcpr.generator.generate_formula_from_patch(patch)
         emitter.emit_patch(patch, message="\tgenerated patch")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
@@ -300,7 +300,7 @@ def run_cegis(program_path, project_path, patch_list):
     writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
     # patch = next(patch_generator, None)
     # while patch is not None:
-    #     patch_formula = main.generator.generate_formula_from_patch(patch)
+    #     patch_formula = libcpr.generator.generate_formula_from_patch(patch)
     #     patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
     #     violation_check = And(complete_specification, patch_formula_extended)
     #     if is_unsat(violation_check):

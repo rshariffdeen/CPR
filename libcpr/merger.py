@@ -1,6 +1,6 @@
 from pysmt.shortcuts import is_sat, Not, And, TRUE
 from pysmt.shortcuts import is_unsat
-from main import utilities, generator
+from libcpr import utilities, generator
 
 
 def get_sorted_space(partition_list):

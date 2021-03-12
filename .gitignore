@@ -2,7 +2,7 @@
 *.bc
 *.a
 .idea
-main/__pycache__/
+libcpr/__pycache__/
 logs
 output
 venv
