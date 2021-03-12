@@ -88,7 +88,7 @@ def refine_patch(p_specification, patch_formula, path_condition, index, patch_sp
         return None, index, patch_score, is_under_approx, is_over_approx
 
     if oracle.is_loc_in_trace(values.CONF_LOC_BUG):
-        parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
         patch_space_constraint = patch_formula
         if parameter_constraint:
             patch_space_constraint = And(patch_formula, parameter_constraint)
@@ -115,14 +115,14 @@ def refine_for_over_fit(patch_formula, path_condition, negated_path_condition, p
 
 
 def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specification):
-    parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+    parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = patch_formula
     if parameter_constraint:
         patch_space_constraint = And(patch_formula, parameter_constraint)
     path_feasibility = And(path_condition, And(patch_space_constraint, p_specification))
     path_constraint = And(path_condition, patch_formula)
     if values.VALID_INPUT_SPACE:
-        input_space_constraint = Not(generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
+        input_space_constraint = Not(smt2.generate_constraint_for_input_space(values.VALID_INPUT_SPACE))
         path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
         path_constraint = And(And(path_condition, input_space_constraint), patch_formula)
     # invalid input range is used to check for violations
@@ -142,14 +142,14 @@ def refine_for_under_approx(patch_formula, path_condition, patch_space, p_specif
 
 
 def refine_for_over_approx(patch_formula, path_condition, patch_space, p_specification):
-    parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+    parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
     patch_space_constraint = patch_formula
     if parameter_constraint:
         patch_space_constraint = And(patch_formula, parameter_constraint)
     path_feasibility = And(path_condition, And(patch_space_constraint, p_specification))
     path_constraint = And(path_condition, patch_formula)
     if values.VALID_INPUT_SPACE:
-        input_space_constraint = generator.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
+        input_space_constraint = smt2.generate_constraint_for_input_space(values.VALID_INPUT_SPACE)
         path_feasibility = And(path_condition, And(patch_space_constraint, input_space_constraint))
         path_constraint = And(And(path_condition, input_space_constraint), patch_formula)
     refined_patch_space = patch_space

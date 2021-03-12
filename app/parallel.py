@@ -1,11 +1,8 @@
 import multiprocessing as mp
 import app.generator
-from app import emitter, oracle, definitions, extractor, refine, values, generator, concolic, utilities, distance
-from typing import List, Dict, Optional
-from app.synthesis import Component, enumerate_trees, Specification, Program, extract_lids, extract_assigned, verify_parallel, ComponentSymbol
+from app import emitter, oracle, definitions, extractor, refine, values, generator, utilities, smt2
+from app.synthesis import ComponentSymbol
 from pysmt.shortcuts import is_sat, Not, And, TRUE
-from pysmt.smtlib.parser import SmtLibParser
-from six.moves import cStringIO
 from multiprocessing import TimeoutError
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
@@ -317,7 +314,7 @@ def validate_input_generation(patch_list, new_path):
                 patch_formula_str = str(patch_formula.serialize())
                 patch_index = utilities.get_hash(patch_formula_str)
                 patch_space = values.LIST_PATCH_SPACE[patch_index]
-                parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+                parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
                 if parameter_constraint:
                     patch_space_constraint = And(patch_formula_extended, parameter_constraint)
             index = list(patch_list).index(patch)
@@ -338,7 +335,7 @@ def validate_input_generation(patch_list, new_path):
                     patch_formula_str = str(patch_formula.serialize())
                     patch_index = utilities.get_hash(patch_formula_str)
                     patch_space = values.LIST_PATCH_SPACE[patch_index]
-                    parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+                    parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
                     if parameter_constraint:
                         patch_space_constraint = And(patch_formula_extended, parameter_constraint)
                 index = list(patch_list).index(patch)

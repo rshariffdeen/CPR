@@ -864,26 +864,7 @@ def generate_partition_for_input(constraint_info, partition_value, is_multi_dime
 
 
 
-def generate_constraint_for_input_space(input_space):
-    formula = None
-    for input_partition in input_space:
-        sub_formula = generate_constraint_for_input_partition(input_partition)
-        if formula is None:
-            formula = sub_formula
-        else:
-            formula = Or(formula, sub_formula)
-    return formula
 
-
-def generate_constraint_for_patch_space(patch_space):
-    formula = None
-    for patch_partition in patch_space:
-        sub_formula = smt2.generate_constraint_for_patch_partition(patch_partition)
-        if formula is None:
-            formula = sub_formula
-        else:
-            formula = Or(formula, sub_formula)
-    return formula
 
 
 # def generate_constraint_for_fixed_point(fixed_point_list):

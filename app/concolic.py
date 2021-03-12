@@ -8,7 +8,7 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
 
 import app.generator
-from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor,distance
+from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor,smt2
 import numpy
 
 
@@ -139,7 +139,7 @@ def select_patch_constraint_for_input(patch_list, selected_new_path):
         patch_formula_str = str(patch_formula.serialize())
         patch_index = utilities.get_hash(patch_formula_str)
         patch_space = values.LIST_PATCH_SPACE[patch_index]
-        parameter_constraint = generator.generate_constraint_for_patch_space(patch_space)
+        parameter_constraint = smt2.generate_constraint_for_patch_space(patch_space)
         if parameter_constraint:
             patch_space_constraint = And(patch_formula_extended, parameter_constraint)
     # add patch constraint and user-input->prog-var relationship
