@@ -45,7 +45,6 @@ class build_py(_build_py):
         return filtered_modules
 
 
-
 setup(
     name='cpr',
     version='0.1.0',
