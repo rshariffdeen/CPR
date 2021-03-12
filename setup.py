@@ -2,11 +2,11 @@ import os
 from setuptools import setup, find_packages
 from Cython.Build import cythonize
 from distutils.core import setup
-from distutils.extension import Extension
-from Cython.Distutils import build_ext
+
 
 EXCLUDE_FILES = [
-    'app/main.py'
+    'app/main.py',
+    'app/synthesis.py'
 ]
 
 
