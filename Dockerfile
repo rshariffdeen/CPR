@@ -140,7 +140,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-in
 
 RUN pypy3 -m easy_install cython
 RUN pypy3 -m easy_install setuptools
-RUN pypy3 -m easy_install pylint
 RUN pypy3 -m easy_install pysmt
 RUN pysmt-install --z3 --confirm-agreement
 RUN pypy3 -m easy_install funcy

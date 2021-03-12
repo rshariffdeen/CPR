@@ -118,7 +118,7 @@ def run(arg_list):
     time_info[definitions.KEY_DURATION_REPAIR] = str(duration)
 
 
-def main():
+if __name__ == "__main__":
     import sys
     is_error = False
     signal.signal(signal.SIGALRM, timeout_handler)
