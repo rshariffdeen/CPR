@@ -1616,104 +1616,104 @@ def load_components(comp_files: List[Path]) -> List[Component]:
         components.append((cid, normalized))
 
     return components
-
-
-def main(args):
-    parser = argparse.ArgumentParser('Trident synthesizer')
-    parser.add_argument('--tests',
-                        nargs='+',
-                        type=(lambda a: (a.split(':')[0], a.split(':')[1])),
-                        required=True,
-                        metavar='FILE:DIR',
-                        help='pairs of test assertion and klee paths directory')
-    parser.add_argument('--components',
-                        nargs='+',
-                        metavar='FILE',
-                        help='synthesis components')
-    parser.add_argument('--verify',
-                        nargs='+',
-                        type=(lambda a: (a.split(':')[0], a.split(':')[1])),
-                        metavar='LID:FILE',
-                        help='verify given expressions')
-    parser.add_argument('--depth',
-                        type=int,
-                        default=3,
-                        help='depth of synthesized expressions')
-    parser.add_argument('--all',
-                        action='store_true',
-                        help='generate all patches')
-    parser.add_argument('--all-values',
-                        nargs=1,
-                        type=(lambda a: (int(a.split(':')[0]), int(a.split(':')[1]))),
-                        required=False,
-                        metavar='LOWER_BOUND:UPPER_BOUND',
-                        help='generate all patches with concrete value enumeration within the given range')
-    parser.add_argument('--output',
-                        nargs='+',
-                        metavar='DIR',
-                        help='specify output directory')
-    args = parser.parse_args(args)
-
-    rootLogger = logging.getLogger()
-    rootLogger.setLevel(logging.INFO)
-    consoleHandler = logging.StreamHandler()
-    FORMAT = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s')
-    consoleHandler.setFormatter(FORMAT)
-    rootLogger.addHandler(consoleHandler)
-
-    spec_files = [(Path(a[0]), Path(a[1])) for a in args.tests]
-
-    specification = load_specification(spec_files)
-
-    components = []
-    if args.components:
-        comp_files = [Path(f) for f in args.components]
-        components = load_components(comp_files)
-
-    if args.output:
-        if not os.path.exists(args.output[0]):
-            os.makedirs(args.output[0])
-        logger.info(f"patches will be stored in: {args.output[0]}")
-
-    if args.all_values:
-        lower_bound = args.all_values[0][0]
-        upper_bound = args.all_values[0][1]
-        logger.info(f"concrete patch mode with valuation in range: [{lower_bound}, {upper_bound}]")
-
-    if args.verify:
-        program_files = { a[0]: Path(a[1]) for a in args.verify }
-        programs = load_programs(program_files, components)
-        result = verify(programs, specification)
-        if result:
-            print("SUCCESS")
-        else:
-            print("FAIL")
-    else:
-        if not components:
-            logger.error("components are not provided")
-            exit(1)
-        depth = args.depth
-        if args.all_values:
-            result = synthesize(components, depth, specification, True, lower_bound, upper_bound)
-        else:
-            result = synthesize(components, depth, specification)
-
-        if args.all or args.all_values:
-            for i, v in enumerate(result):
-                for (lid, prog) in v.items():
-                    print(f"#{i} {lid}:\t{program_to_code(prog)}")
-                    if args.output:
-                        export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
-
-        else:
-            programs = next(result, None)
-            if programs:
-                for (lid, prog) in programs.items():
-                    print(f"{lid}:\t{program_to_code(prog)}")
-                    if args.output:
-                        export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
-            else:
-                print("FAIL")
+#
+#
+# def main(args):
+#     parser = argparse.ArgumentParser('Trident synthesizer')
+#     parser.add_argument('--tests',
+#                         nargs='+',
+#                         type=(lambda a: (a.split(':')[0], a.split(':')[1])),
+#                         required=True,
+#                         metavar='FILE:DIR',
+#                         help='pairs of test assertion and klee paths directory')
+#     parser.add_argument('--components',
+#                         nargs='+',
+#                         metavar='FILE',
+#                         help='synthesis components')
+#     parser.add_argument('--verify',
+#                         nargs='+',
+#                         type=(lambda a: (a.split(':')[0], a.split(':')[1])),
+#                         metavar='LID:FILE',
+#                         help='verify given expressions')
+#     parser.add_argument('--depth',
+#                         type=int,
+#                         default=3,
+#                         help='depth of synthesized expressions')
+#     parser.add_argument('--all',
+#                         action='store_true',
+#                         help='generate all patches')
+#     parser.add_argument('--all-values',
+#                         nargs=1,
+#                         type=(lambda a: (int(a.split(':')[0]), int(a.split(':')[1]))),
+#                         required=False,
+#                         metavar='LOWER_BOUND:UPPER_BOUND',
+#                         help='generate all patches with concrete value enumeration within the given range')
+#     parser.add_argument('--output',
+#                         nargs='+',
+#                         metavar='DIR',
+#                         help='specify output directory')
+#     args = parser.parse_args(args)
+#
+#     rootLogger = logging.getLogger()
+#     rootLogger.setLevel(logging.INFO)
+#     consoleHandler = logging.StreamHandler()
+#     FORMAT = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s')
+#     consoleHandler.setFormatter(FORMAT)
+#     rootLogger.addHandler(consoleHandler)
+#
+#     spec_files = [(Path(a[0]), Path(a[1])) for a in args.tests]
+#
+#     specification = load_specification(spec_files)
+#
+#     components = []
+#     if args.components:
+#         comp_files = [Path(f) for f in args.components]
+#         components = load_components(comp_files)
+#
+#     if args.output:
+#         if not os.path.exists(args.output[0]):
+#             os.makedirs(args.output[0])
+#         logger.info(f"patches will be stored in: {args.output[0]}")
+#
+#     if args.all_values:
+#         lower_bound = args.all_values[0][0]
+#         upper_bound = args.all_values[0][1]
+#         logger.info(f"concrete patch mode with valuation in range: [{lower_bound}, {upper_bound}]")
+#
+#     if args.verify:
+#         program_files = { a[0]: Path(a[1]) for a in args.verify }
+#         programs = load_programs(program_files, components)
+#         result = verify(programs, specification)
+#         if result:
+#             print("SUCCESS")
+#         else:
+#             print("FAIL")
+#     else:
+#         if not components:
+#             logger.error("components are not provided")
+#             exit(1)
+#         depth = args.depth
+#         if args.all_values:
+#             result = synthesize(components, depth, specification, True, lower_bound, upper_bound)
+#         else:
+#             result = synthesize(components, depth, specification)
+#
+#         if args.all or args.all_values:
+#             for i, v in enumerate(result):
+#                 for (lid, prog) in v.items():
+#                     print(f"#{i} {lid}:\t{program_to_code(prog)}")
+#                     if args.output:
+#                         export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
+#
+#         else:
+#             programs = next(result, None)
+#             if programs:
+#                 for (lid, prog) in programs.items():
+#                     print(f"{lid}:\t{program_to_code(prog)}")
+#                     if args.output:
+#                         export_json(f"{args.output[0]}/{i}_{lid}.json", program_to_json(prog))
+#             else:
+#                 print("FAIL")
 
 def export_json(output_file, json_content):
     f = open(output_file, "w+")
@@ -1741,6 +1741,6 @@ def extract_constraints_from_patch(patch):
     substituted_patch = patch_constraint.substitute(program_substitution)
     return substituted_patch
 
-if __name__ == "__main__":
-    import sys
-    main(sys.argv[1:])
+# if __name__ == "__main__":
+#     import sys
+#     main(sys.argv[1:])
