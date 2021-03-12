@@ -8,7 +8,7 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
 
 import app.generator
-from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor,smt2
+from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor, smt2
 import numpy
 
 

@@ -3,7 +3,7 @@ import sys
 import re
 import shutil
 from pathlib import Path
-from app import emitter, logger, definitions, values, reader, synthesis, extractor
+from app import emitter, logger, definitions, values, reader, synthesis
 from app.utilities import error_exit
 
 
@@ -365,7 +365,7 @@ def collect_test_list():
     test_input_list = values.LIST_TEST_INPUT
     concretized_test_input_list = []
     for arg_list_str in test_input_list:
-        arg_list = extractor.extract_input_arg_list(arg_list_str)
+        arg_list = extract_input_arg_list(arg_list_str)
         concretized_arg_list = []
         for arg in arg_list:
             if "$POC_" in arg:
@@ -402,7 +402,7 @@ def collect_seed_list():
 
     if values.LIST_SEED_INPUT:
         for seed_arg_list_str in values.LIST_SEED_INPUT:
-            arg_list = extractor.extract_input_arg_list(seed_arg_list_str)
+            arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
             for arg in arg_list:
                 if "$POC_" in arg:
@@ -497,3 +497,11 @@ def update_configuration():
         values.CONF_TIME_CEGIS_REFINE = (int(refine) / total) * values.DEFAULT_TIME_DURATION
     sys.setrecursionlimit(values.DEFAULT_STACK_SIZE)
 
+
+def extract_input_arg_list(argument_str):
+    if "," not in argument_str:
+        argument_list = str(argument_str).split(" ")
+    else:
+        # argument_str = argument_str.replace("[", "").replace("]", "")
+        argument_list = str(argument_str).split(",")
+    return argument_list

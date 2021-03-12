@@ -1,10 +1,8 @@
-import os
 import json
 import pickle
 import re
 from app import emitter, definitions, values
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV
 import os
 from pysmt.smtlib.parser import SmtLibParser
 

@@ -2,6 +2,8 @@ import os
 import time
 import traceback
 import signal
+
+import app.configuration
 from app import emitter, logger, definitions, values, builder, repair, \
     configuration, reader, parallel, extractor
 from app.concolic import run_concrete_execution
@@ -59,7 +61,7 @@ def initialize():
     emitter.sub_title("Running Test-Suite")
     test_case_id = 0
     for argument_list in test_input_list:
-        print_argument_list = extractor.extract_input_arg_list(argument_list)
+        print_argument_list = app.configuration.extract_input_arg_list(argument_list)
         generalized_arg_list = []
         seed_file = None
         test_case_id = test_case_id + 1
@@ -74,7 +76,7 @@ def initialize():
         emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
         emitter.highlight("\tUsing Input: " + str(seed_file))
         emitter.debug("input list in test case:" + argument_list)
-        argument_list = extractor.extract_input_arg_list(argument_list)
+        argument_list = app.configuration.extract_input_arg_list(argument_list)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
         assert exit_code == 0
         # set location of bug/crash

@@ -1,4 +1,6 @@
+import app.configuration
 import app.generator
+import app.parallel
 from app.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
 from app.synthesis import load_specification, Program, program_to_code
 from pathlib import Path
@@ -204,9 +206,18 @@ def run(project_path, program_path):
     ## Generate all possible solutions by running the synthesizer.
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
-    patch_list = generator.generate_patch_set(project_path)
+    initial_patch_list = generator.generate_patch_set(project_path)
+    result_list = parallel.remove_duplicate_patches_parallel(initial_patch_list)
+    filtered_patch_list = []
+    for result in result_list:
+        is_redundant, index = result
+        patch = initial_patch_list[index]
+        if not is_redundant:
+            filtered_patch_list.append(patch)
 
-    for patch in patch_list:
+    index_map = generator.generate_patch_index_map(filtered_patch_list)
+    writer.write_as_json(index_map, definitions.FILE_PATCH_RANK_INDEX)
+    for patch in filtered_patch_list:
         patch_constraint_str = app.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
         if patch_index in values.LIST_PATCH_SCORE:
@@ -215,21 +226,21 @@ def run(project_path, program_path):
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = False
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = False
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
-    emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+    emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(filtered_patch_list)) + ":" + str(len(filtered_patch_list)))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-        values.COUNT_PATCH_START = utilities.count_concrete_patches(patch_list)
-        values.COUNT_TEMPLATE_START = len(patch_list)
+        values.COUNT_PATCH_START = utilities.count_concrete_patches(filtered_patch_list)
+        values.COUNT_TEMPLATE_START = len(filtered_patch_list)
     else:
-        values.COUNT_PATCH_START = len(patch_list)
+        values.COUNT_PATCH_START = len(filtered_patch_list)
 
     duration = format((time.time() - time_check) / 60, '.3f')
     values.TIME_TO_GENERATE = str(duration)
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
-    writer.write_patch_set(patch_list, definitions.FILE_PATCH_SET)
+    writer.write_patch_set(filtered_patch_list, definitions.FILE_PATCH_SET)
     if values.DEFAULT_REDUCE_METHOD == "cpr":
-        run_cpr(program_path, patch_list)
+        run_cpr(program_path, filtered_patch_list)
     elif values.DEFAULT_REDUCE_METHOD == "cegis":
-        run_cegis(program_path, project_path, patch_list)
+        run_cegis(program_path, project_path, filtered_patch_list)
 
     values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
     values.COUNT_PATHS_DETECTED = len(concolic.list_path_detected)
@@ -329,7 +340,7 @@ def run_cpr(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
-                argument_list = extractor.extract_input_arg_list(argument_list)
+                argument_list = app.configuration.extract_input_arg_list(argument_list)
 
                 generalized_arg_list = []
                 for arg in argument_list:
@@ -348,7 +359,7 @@ def run_cpr(program_path, patch_list):
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
-                generated_path_list = generator.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
+                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
@@ -411,7 +422,7 @@ def run_cpr(program_path, patch_list):
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
             time_check = time.time()
-            values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
             values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):

@@ -1,14 +1,14 @@
 from app.synthesis import load_specification, synthesize_parallel, Program, synthesize_lazy, program_to_formula, \
     collect_symbols, ComponentSymbol, RuntimeSymbol, program_to_code
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from six.moves import cStringIO
-from pysmt.shortcuts import is_sat, Not, And, Or, TRUE, BVSGE, BVSLE, Int, NotEquals, SBV, Equals, BVConcat, Select, BV
+from pysmt.shortcuts import Not, And, Or
 import os
 from pysmt.smtlib.parser import SmtLibParser
 from pysmt.typing import BV32, BV8, ArrayType
-from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_sat, is_unsat, to_smtlib
-from app import emitter, values, reader, parallel, definitions, extractor, oracle, utilities, parser, writer, smt2
+from pysmt.shortcuts import write_smtlib, get_model, Symbol, is_unsat
+from app import emitter, values, reader, definitions, extractor, oracle, utilities, parser
 import re
 import struct
 import random
@@ -157,19 +157,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     # values.COUNT_TEMPLATE_GEN = len(list_of_patches)
     # values.COUNT_PATCH_GEN = utilities.count_concrete_patches(list_of_patches)
     emitter.highlight("\tnumber of patches in pool: " + str(len(list_of_patches)))
-    result_list = parallel.remove_duplicate_patches_parallel(list_of_patches)
-    for result in result_list:
-        is_redundant, index = result
-        patch = list_of_patches[index]
-        if not is_redundant:
-            filtered_patch_list.append(patch)
-
-    emitter.highlight("\tnumber of patches in pool: " + str(len(filtered_patch_list)))
-    # filtered_list_of_patches = list(set(list_of_patches))
-    # emitter.warning("\t[warning] found " + str(len(list_of_patches) - len(filtered_list_of_patches)) + "duplicate patch(es)")
-    index_map = generate_patch_index_map(filtered_patch_list)
-    writer.write_as_json(index_map, definitions.FILE_PATCH_RANK_INDEX)
-    return filtered_patch_list
+    return list_of_patches
 
 
 def generate_flipped_path(ppc):
@@ -577,25 +565,6 @@ def generate_formula(formula_str):
     script = parser.get_script(cStringIO(formula_str))
     formula = script.get_last_formula()
     return formula
-
-
-def generate_symbolic_paths(ppc_list, arg_list, poc_path):
-    """
-       This function will analyse the partial path conditions collected at each branch location and isolate
-       the branch conditions added at each location, negate the constraint to create a new path
-              ppc_list : a dictionary containing the partial path condition at each branch location
-              returns a list of new partial path conditions
-    """
-    emitter.normal("\tgenerating new paths")
-    path_list = parallel.generate_special_paths_parallel(ppc_list, arg_list, poc_path)
-    path_count = len(path_list)
-    result_list = parallel.generate_symbolic_paths_parallel(ppc_list)
-    for result in result_list:
-        path_count = path_count + 1
-        path_list.append((result, arg_list, poc_path))
-
-    emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
-    return path_list
 
 
 def generate_ktest(argument_list, second_var_list, print_output=False):

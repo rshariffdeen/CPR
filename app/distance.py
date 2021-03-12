@@ -1,6 +1,4 @@
-from app import definitions, values, emitter
-import multiprocessing as mp
-
+from app import values, emitter
 
 def calculate_distance(loc_a, loc_b):
     min_distance = 10000000

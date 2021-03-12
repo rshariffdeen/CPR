@@ -100,15 +100,6 @@ def extract_parameter_list(model):
     return parameter_list, is_multi_dimension
 
 
-def extract_input_arg_list(argument_str):
-    if "," not in argument_str:
-        argument_list = str(argument_str).split(" ")
-    else:
-        # argument_str = argument_str.replace("[", "").replace("]", "")
-        argument_list = str(argument_str).split(",")
-    return argument_list
-
-
 def extract_largest_path_condition(dir_path):
     largest_path_condition = None
     pc_formula_len = 0

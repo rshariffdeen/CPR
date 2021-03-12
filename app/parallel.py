@@ -66,7 +66,7 @@ def abortable_worker(func, *args, **kwargs):
         return default_value, index
 
 
-def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
+def generate_special_paths(ppc_list, arg_list, poc_path):
     global pool, result_list, expected_count
     result_list = []
     path_list = []
@@ -96,7 +96,7 @@ def generate_special_paths_parallel(ppc_list, arg_list, poc_path):
     return filtered_list
 
 
-def generate_symbolic_paths_parallel(ppc_list):
+def generate_flipped_paths(ppc_list):
     global pool, result_list, expected_count
     result_list = []
     path_list = []
@@ -412,3 +412,20 @@ def validate_input_generation(patch_list, new_path):
 #         pool.join()
 #     return result_list
 
+def generate_symbolic_paths(ppc_list, arg_list, poc_path):
+    """
+       This function will analyse the partial path conditions collected at each branch location and isolate
+       the branch conditions added at each location, negate the constraint to create a new path
+              ppc_list : a dictionary containing the partial path condition at each branch location
+              returns a list of new partial path conditions
+    """
+    emitter.normal("\tgenerating new paths")
+    path_list = generate_special_paths(ppc_list, arg_list, poc_path)
+    path_count = len(path_list)
+    result_list = generate_flipped_paths(ppc_list)
+    for result in result_list:
+        path_count = path_count + 1
+        path_list.append((result, arg_list, poc_path))
+
+    emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
+    return path_list
