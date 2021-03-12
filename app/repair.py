@@ -91,8 +91,7 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
     return updated_patch_list
 
 
-def reduce(patch_list: List[Dict[str, Program]], path_to_concolic_exec_result: str,
-           assertion) -> List[Tuple[str, Program]]:  # TODO
+def reduce(patch_list, path_to_concolic_exec_result, assertion) -> List[Tuple[str, Program]]:  # TODO
     # Reduces the set of patch candidates based on the current path constraint
     # Iterate over patches and check if they still hold based on path constraint.
     path_constraint_file_path = str(path_to_concolic_exec_result) + "/test000001.smt2"
