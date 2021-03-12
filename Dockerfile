@@ -155,5 +155,5 @@ ENV DEBIAN_FRONTEND=dialog
 ENV TRIDENT_CC=/CPR/tools/trident-cc
 ENV TRIDENT_CXX=/CPR/tools/trident-cxx
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
-RUN python3.7 setup.py build_ext --inplace
+RUN pypy3 setup.py build_ext --inplace
 
