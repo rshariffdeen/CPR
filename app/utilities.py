@@ -4,7 +4,6 @@ import sys
 import signal
 import random
 from contextlib import contextmanager
-from app.generator import generate_formula_from_patch
 from app import logger, emitter, values, definitions
 import base64
 import hashlib
