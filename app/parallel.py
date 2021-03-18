@@ -77,11 +77,17 @@ def generate_special_paths(ppc_list, arg_list, poc_path):
     ppc_list.reverse()
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for con_loc, ppc_str in ppc_list:
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+            count = count + 1
             result_list.append(generator.generate_special_paths(con_loc, ppc_str))
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
         for con_loc, ppc_str in ppc_list:
+            if count == values.DEFAULT_GEN_SEARCH_LIMIT:
+                break
+            count = count + 1
             pool.apply_async(generator.generate_special_paths,
                              args=(con_loc, ppc_str),
                              callback=collect_result)
