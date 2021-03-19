@@ -459,7 +459,8 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
         arg_str = utilities.get_str_value(bit_vector)
         arg_value = utilities.get_signed_value(bit_vector) - 48
         # print(arg_name, arg_index, arg_value)
-        if str(argument_list[arg_index]).isnumeric():
+        if str(argument_list[arg_index]).isnumeric() or \
+                (not str(argument_list[arg_index]).isalpha() and any(op in str(argument_list[arg_index]) for op in ["+", "-", "/", "*"])):
             input_arg_dict[arg_index] = str(arg_value)
             # emitter.debug(arg_name, arg_value)
         else:
