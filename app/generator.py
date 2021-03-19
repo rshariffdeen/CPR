@@ -452,15 +452,28 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
             gen_arg_list[var_name] = var_byte_list
         else:
             gen_var_list[var_name] = var_byte_list
+    mask_list = values.MASK_BYTE_LIST
+    mask_map = dict()
+    if values.MASK_BYTE_LIST:
+        min_val = 0
+        new_idx = 0
+        max_val = len(argument_list)
+        for idx in range(min_val, max_val):
+            if idx not in mask_list:
+                mask_map[new_idx] = idx
+                new_idx = new_idx + 1
 
     for arg_name in gen_arg_list:
         bit_vector = gen_arg_list[arg_name]
         arg_index = int(str(arg_name).replace("arg", ""))
         arg_str = utilities.get_str_value(bit_vector)
         arg_value = utilities.get_signed_value(bit_vector) - 48
+        arg_index_orig = arg_index
+        if values.MASK_BYTE_LIST:
+            arg_index_orig = mask_map[arg_index_orig]
         # print(arg_name, arg_index, arg_value)
-        if str(argument_list[arg_index]).isnumeric() or \
-                (not str(argument_list[arg_index]).isalpha() and any(op in str(argument_list[arg_index]) for op in ["+", "-", "/", "*"])):
+        if str(argument_list[arg_index_orig]).isnumeric() or \
+                (not str(argument_list[arg_index_orig]).isalpha() and any(op in str(argument_list[arg_index_orig]) for op in ["+", "-", "/", "*"])):
             input_arg_dict[arg_index] = str(arg_value)
             # emitter.debug(arg_name, arg_value)
         else:
