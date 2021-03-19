@@ -426,7 +426,9 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path):
               returns a list of new partial path conditions
     """
     emitter.normal("\tgenerating new paths")
-    path_list = generate_special_paths(ppc_list, arg_list, poc_path)
+    path_list = []
+    if values.CONF_GEN_PATH_SPECIAL:
+        path_list = generate_special_paths(ppc_list, arg_list, poc_path)
     path_count = len(path_list)
     result_list = generate_flipped_paths(ppc_list)
     for result in result_list:

@@ -208,6 +208,10 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_IS_CRASH, '')
             if "true" in str(conf_text).lower():
                 values.CONF_IS_CRASH = True
+        elif definitions.CONF_GEN_SPECIAL_PATH in configuration:
+            conf_text = configuration.replace(definitions.CONF_GEN_SPECIAL_PATH, '')
+            if "false" in str(conf_text).lower():
+                values.CONF_GEN_PATH_SPECIAL = False
         elif definitions.CONF_IS_CPP in configuration:
             conf_text = configuration.replace(definitions.CONF_IS_CPP, '')
             if "true" in str(conf_text).lower():
@@ -248,6 +252,7 @@ def read_conf_file():
             values.CONF_TIMEOUT_SAT = int(configuration.replace(definitions.CONF_TIMEOUT_SAT, ''))
         elif definitions.CONF_TIMEOUT_KLEE in configuration:
             values.CONF_TIMEOUT_KLEE = int(configuration.replace(definitions.CONF_TIMEOUT_KLEE, ''))
+
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
@@ -468,6 +473,8 @@ def update_configuration():
         values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
     # if values.CONF_IS_CRASH:
     #     values.IS_CRASH = values.CONF_IS_CRASH
+    if values.CONF_GEN_PATH_SPECIAL:
+        values.DEFAULT_GEN_SPECIAL_PATH = values.CONF_GEN_PATH_SPECIAL
     if values.CONF_TIME_DURATION:
         values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
     if values.CONF_TIMEOUT_SAT:
