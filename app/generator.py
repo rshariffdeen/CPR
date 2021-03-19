@@ -452,14 +452,14 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
             gen_arg_list[var_name] = var_byte_list
         else:
             gen_var_list[var_name] = var_byte_list
-    mask_list = values.MASK_BYTE_LIST
+    mask_list = values.CONF_MASK_ARG
     mask_map = dict()
-    if values.MASK_BYTE_LIST:
+    if values.CONF_MASK_ARG:
         min_val = 0
         new_idx = 0
         max_val = len(argument_list)
         for idx in range(min_val, max_val):
-            if idx not in mask_list:
+            if str(idx) not in mask_list:
                 mask_map[new_idx] = idx
                 new_idx = new_idx + 1
 
@@ -469,7 +469,7 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
         arg_str = utilities.get_str_value(bit_vector)
         arg_value = utilities.get_signed_value(bit_vector) - 48
         arg_index_orig = arg_index
-        if values.MASK_BYTE_LIST:
+        if values.CONF_MASK_ARG:
             arg_index_orig = mask_map[arg_index_orig]
         # print(arg_name, arg_index, arg_value)
         if str(argument_list[arg_index_orig]).isnumeric() or \
