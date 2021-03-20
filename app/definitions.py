@@ -77,7 +77,7 @@ CONF_TEST_OUTPUT_LIST = "test_output_list:"
 CONF_SEED_FILE = "seed_file:"
 CONF_SEED_DIR = "seed_dir:"
 CONF_SEED_LIST = "seed_list:"
-CONF_GEN_SPECIAL_PATH = "gen_spec_path:"
+CONF_GEN_SPECIAL_PATH = "gen_special_path:"
 
 # ----------------- KEY DEFINITIONS -------------------
 
