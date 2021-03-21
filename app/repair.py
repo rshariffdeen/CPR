@@ -340,7 +340,6 @@ def run_cpr(program_path, patch_list):
                 values.ITERATION_NO = iteration
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
-
                 generalized_arg_list = []
                 for arg in argument_list:
                     if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
