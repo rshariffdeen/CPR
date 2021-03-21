@@ -611,6 +611,9 @@ def generate_ktest(argument_list, second_var_list, print_output=False):
         else:
             if argument in ["''"]:
                 argument = ""
+            if "\"" in argument:
+                ktest_command += " --sym-arg '" + str(argument) + "'"
+                continue
             ktest_command += " --sym-arg \"" + str(argument) + "\""
 
     for var in second_var_list:
