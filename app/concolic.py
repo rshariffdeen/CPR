@@ -458,13 +458,14 @@ def run_concolic_exploration(program_path, patch_list):
     binary_dir_path = "/".join(program_path.split("/")[:-1])
     assertion_template = values.SPECIFICATION_TXT
     max_count = 0
-    test_input_list = values.LIST_TEST_INPUT
+
     largest_assertion = None
     largest_path_condition = None
     while not satisfied:
         if iteration == 0:
             second_var_list = list()
             seed_id = 0
+            test_input_list = values.LIST_TEST_INPUT
             for argument_list in test_input_list:
                 poc_path = None
                 iteration = iteration + 1
@@ -472,6 +473,7 @@ def run_concolic_exploration(program_path, patch_list):
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
                 klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
                     if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
