@@ -427,7 +427,7 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path):
     """
     emitter.normal("\tgenerating new paths")
     path_list = []
-    if values.CONF_GEN_PATH_SPECIAL:
+    if values.DEFAULT_GEN_SPECIAL_PATH:
         path_list = generate_special_paths(ppc_list, arg_list, poc_path)
     path_count = len(path_list)
     result_list = generate_flipped_paths(ppc_list)
