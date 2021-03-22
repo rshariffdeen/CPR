@@ -492,7 +492,7 @@ def run_concolic_exploration(program_path, patch_list):
 
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
                 # assert exit_code == 0
-                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
@@ -530,9 +530,6 @@ def run_concolic_exploration(program_path, patch_list):
             second_var_list = values.SECOND_VAR_LIST
 
             gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
-            # values.LIST_GENERATED_PATH = generator.generate_symbolic_paths(values.LIST_PPC)
-            # values.LIST_PPC = []
-            # gen_arg_list, gen_var_list, _ = select_new_input(argument_list, second_var_list, [])
 
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
