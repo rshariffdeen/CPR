@@ -9,7 +9,8 @@ from pysmt.shortcuts import is_sat, Not, And, TRUE
 import pysmt.environment
 
 import app.generator
-from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, extractor, smt2, distance
+from app import emitter, values, reader, utilities, definitions, generator, oracle, parallel, \
+    extractor, smt2, distance, configuration
 import numpy
 
 
@@ -489,7 +490,7 @@ def run_concolic_exploration(program_path, patch_list):
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
 
-                exit_code = run_concolic_execution(program_path + ".bc", argument_list, second_var_list, True)
+                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
                 # assert exit_code == 0
                 generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
                 if generated_path_list:
