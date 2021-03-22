@@ -495,6 +495,8 @@ def update_configuration():
         values.DEFAULT_OPERATION_MODE = values.CONF_OPERATION_MODE
     if values.CONF_REDUCE_METHOD:
         values.DEFAULT_REDUCE_METHOD = values.CONF_REDUCE_METHOD
+    if values.DEFAULT_REDUCE_METHOD == "cegis":
+        values.DEFAULT_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[0]
     if values.CONF_COLLECT_STAT:
         values.DEFAULT_COLLECT_STAT = True
     if values.CONF_TIME_SPLIT:
