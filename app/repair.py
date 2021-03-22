@@ -265,27 +265,27 @@ def run_cegis(program_path, project_path, patch_list):
     time_check = time.time()
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
     count_throw = 0
-    patch_generator = generator.generate_patch(project_path, counter_example_list)
-    if not patch_generator:
-        emitter.error("[error] cannot generate a patch")
-    patch = None
     while not satisfied:
         iteration = iteration + 1
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
-        if patch is None:
-            patch = next(patch_generator, None)
+        patch_generator = generator.generate_patch(project_path, counter_example_list)
+        if not patch_generator:
+            emitter.error("[error] cannot generate a patch")
+        patch = next(patch_generator, None)
         patch_formula = app.generator.generate_formula_from_patch(patch)
-        emitter.emit_patch(patch, message="\tgenerated patch")
+        emitter.emit_patch(patch, message="\tgenerated patch: ")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
         violation_check = And(complete_specification, patch_formula_extended)
         if is_sat(violation_check):
             model = generator.generate_model(violation_check)
             # print(model)
-            input_arg_list, input_var_list = generator.generate_new_input(violation_check)
+            arg_list = values.ARGUMENT_LIST
+            poc_path = values.CONF_PATH_POC
+            input_arg_list, input_var_list = generator.generate_new_input(violation_check,arg_list, poc_path)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
-            exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
+            # exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             # assert exit_code == 0
             emitter.normal("\t\tgenerating new assertion")
             test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
@@ -316,7 +316,7 @@ def run_cegis(program_path, project_path, patch_list):
     #     if is_unsat(violation_check):
     #         count_final = count_final + 1
     #     patch = next(patch_generator, None)
-    emitter.emit_patch(patch, message="\tfinal patch")
+    emitter.emit_patch(patch, message="\tfinal patch: ")
     values.COUNT_PATCH_END = values.COUNT_PATCH_START - count_throw
 
 
