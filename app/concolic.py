@@ -556,6 +556,8 @@ def run_concolic_exploration(program_path, patch_list):
 
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
+            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
                 continue
