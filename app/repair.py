@@ -255,6 +255,9 @@ def run_cegis(program_path, project_path, patch_list):
     duration = (time.time() - time_check) / 60
     values.TIME_TO_EXPLORE = duration
     emitter.normal("\tcombining explored program paths")
+    if not assertion:
+        patch = patch_list[0]
+        emitter.emit_patch(patch, message="\tfinal patch: ")
     program_specification = generator.generate_program_specification(binary_dir_path)
     complete_specification = And(Not(assertion), program_specification)
     emitter.normal("\tcomputed the program specification formula")
