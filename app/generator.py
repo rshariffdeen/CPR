@@ -33,7 +33,7 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
-        test_index = str((int(test_output_list.index(output_spec)) * 2) )
+        test_index = str((int(test_output_list.index(output_spec))))
         klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
     if model_list:
@@ -477,7 +477,8 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
             input_arg_dict[arg_index] = str(arg_value)
             # emitter.debug(arg_name, arg_value)
         else:
-            input_arg_dict[arg_index] = arg_str
+            arg_str_filtered = str(arg_str).replace("<", "a").replace("&", "s").replace(">", "a").replace("'", "a")
+            input_arg_dict[arg_index] = arg_str_filtered
             # emitter.debug(arg_name, arg_str)
 
     # fill random values if not generated
