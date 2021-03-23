@@ -924,7 +924,9 @@ def synthesize_one_parallel(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                    const_dict[const_name] = value_int
                             patch = {lid: (tree, const_dict)}
                             index = atomic_patchlist_append(patch)
                             vc = verify_parallel(patch, specification)
@@ -952,7 +954,9 @@ def synthesize_one_parallel(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                    const_dict[const_name] = value_int
                             patch = {lid: (tree, const_dict)}
                             index = atomic_patchlist_append(patch)
                             vc = verify_parallel(patch, specification)
@@ -1169,7 +1173,9 @@ def synthesize_lazy(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                    const_dict[const_name] = value_int
                             result = verify({lid: (tree, const_dict)}, specification)
                             if result:
                                 tautology_included = True
@@ -1195,7 +1201,9 @@ def synthesize_lazy(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                   const_dict[const_name] = value_int
                             result = verify({lid: (tree, const_dict)}, specification)
                             if result:
                                 tautology_included = True
@@ -1351,7 +1359,9 @@ def synthesize_parallel(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                    const_dict[const_name] = value_int
                             patch = {lid: (tree, const_dict)}
                             index = atomic_patchlist_append(patch)
                             vc = verify_parallel(patch, specification)
@@ -1379,7 +1389,9 @@ def synthesize_parallel(components: List[Component],
                                 if sym_def not in model:
                                     continue
                                 value_sym = model[sym_def].simplify()
-                                const_dict[const_name] = int(str(value_sym).split("_")[0])
+                                value_int = int(str(value_sym).split("_")[0])
+                                if value_int < 2147483647:
+                                    const_dict[const_name] = value_int
                             patch = {lid: (tree, const_dict)}
                             index = atomic_patchlist_append(patch)
                             vc = verify_parallel(patch, specification)
