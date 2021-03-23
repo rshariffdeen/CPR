@@ -286,7 +286,7 @@ def run_cegis(program_path, project_path, patch_list):
             # print(model)
             arg_list = values.ARGUMENT_LIST
             poc_path = values.CONF_PATH_POC
-            input_arg_list, input_var_list = generator.generate_new_input(violation_check,arg_list, poc_path)
+            input_arg_list, input_var_list = generator.generate_new_input(violation_check, arg_list, poc_path)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
