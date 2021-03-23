@@ -204,7 +204,7 @@ def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
     time_check = time.time()
-    satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+    # satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     initial_patch_list = generator.generate_patch_set(project_path)
     result_list = parallel.remove_duplicate_patches_parallel(initial_patch_list)
     filtered_patch_list = []
@@ -267,6 +267,7 @@ def run_cegis(program_path, project_path, patch_list):
     output_dir = definitions.DIRECTORY_OUTPUT
     counter_example_list = []
     time_check = time.time()
+    values.CONF_TIME_CHECK = None
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_REFINE)
     count_throw = 0
     while not satisfied:
@@ -326,6 +327,7 @@ def run_cegis(program_path, project_path, patch_list):
 
 def run_cpr(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
+    values.CONF_TIME_CHECK = None
     satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     if satisfied:
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")

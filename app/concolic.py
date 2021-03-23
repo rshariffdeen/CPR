@@ -453,6 +453,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
 
 
 def run_concolic_exploration(program_path, patch_list):
+    values.CONF_TIME_CHECK = None
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
