@@ -437,7 +437,7 @@ def generate_constant_value_list(sym_path):
     return const_val_list
 
 
-def generate_new_input(sym_path, argument_list=None, poc_path=None):
+def generate_new_input(sym_path, argument_list=None, poc_path=None, gen_path=None):
     gen_arg_list = dict()
     gen_var_list = dict()
     input_var_list = list()
@@ -505,7 +505,7 @@ def generate_new_input(sym_path, argument_list=None, poc_path=None):
         var_size = len(bit_vector)
         if var_name in ["A-data", "A-data-stat"]:
             if var_name == "A-data":
-                generate_binary_file(bit_vector, poc_path)
+                generate_binary_file(bit_vector, poc_path, gen_path)
             continue
         if bit_vector:
             var_value = utilities.get_signed_value(bit_vector)
@@ -549,7 +549,7 @@ def generate_model_cli(formula):
     return model_byte_list
 
 
-def generate_binary_file(byte_array, seed_file_path):
+def generate_binary_file(byte_array, seed_file_path, gen_file_path=None):
     byte_list = []
     modified_index_list = []
     with open(seed_file_path, "rb") as poc_file:
@@ -568,7 +568,9 @@ def generate_binary_file(byte_array, seed_file_path):
     file_extension = ""
     if "." in seed_file_path:
         file_extension = str(seed_file_path).split(".")[-1]
-    values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO)
+    if not gen_file_path:
+        gen_file_path = definitions.DIRECTORY_OUTPUT + "/input-" + str(values.ITERATION_NO)
+    values.FILE_POC_GEN = gen_file_path
     if file_extension:
         values.FILE_POC_GEN = values.FILE_POC_GEN + "." + file_extension
     with open(values.FILE_POC_GEN, "wb") as new_input_file:
