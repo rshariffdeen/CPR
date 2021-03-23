@@ -270,9 +270,9 @@ def run_cegis(program_path, project_path, patch_list):
         values.ITERATION_NO = iteration
         emitter.sub_sub_title("Iteration: " + str(iteration))
         patch_generator = generator.generate_patch(project_path, counter_example_list)
-        if not patch_generator:
-            emitter.error("[error] cannot generate a patch")
         patch = next(patch_generator, None)
+        if not patch:
+            emitter.error("[error] cannot generate a patch")
         patch_formula = app.generator.generate_formula_from_patch(patch)
         emitter.emit_patch(patch, message="\tgenerated patch: ")
         patch_formula_extended = generator.generate_extended_patch_formula(patch_formula, largest_path_condition)
