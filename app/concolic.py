@@ -400,7 +400,8 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     input_argument = ""
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
-        # if "$POC" in argument:
+        if "$POC" in argument:
+            argument = values.FILE_POC_GEN
         #     if "_" in argument:
         #         file_index = "_".join(str(argument).split("_")[1:])
         #         argument = values.LIST_TEST_FILES[file_index]

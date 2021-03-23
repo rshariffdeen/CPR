@@ -287,6 +287,13 @@ def run_cegis(program_path, project_path, patch_list):
             # print(model)
             arg_list = values.ARGUMENT_LIST
             poc_path = values.CONF_PATH_POC
+            values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/violation-" + str(values.ITERATION_NO)
+            file_extension = ""
+            if "." in poc_path:
+                file_extension = str(poc_path).split(".")[-1]
+            if file_extension:
+                values.FILE_POC_GEN = values.FILE_POC_GEN + "." + file_extension
+            poc_path = values.FILE_POC_GEN
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, arg_list, poc_path)
             klee_out_dir = output_dir + "/klee-output-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
