@@ -473,7 +473,7 @@ def update_configuration():
         values.DEFAULT_STACK_SIZE = values.CONF_STACK_SIZE
     # if values.CONF_IS_CRASH:
     #     values.IS_CRASH = values.CONF_IS_CRASH
-    if values.CONF_GEN_PATH_SPECIAL:
+    if values.CONF_GEN_PATH_SPECIAL is not None:
         values.DEFAULT_GEN_SPECIAL_PATH = values.CONF_GEN_PATH_SPECIAL
     if values.CONF_TIME_DURATION:
         values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
