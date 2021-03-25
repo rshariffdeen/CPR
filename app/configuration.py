@@ -22,6 +22,12 @@ def read_conf(arg_list):
             elif definitions.ARG_DIST_METRIC in arg:
                 option = int(arg.replace(definitions.ARG_DIST_METRIC, ''))
                 values.CONF_DISTANCE_METRIC = values.OPTIONS_DIST_METRIC[option]
+            elif definitions.ARG_LOW_BOUND in arg:
+                bound_value = int(arg.replace(definitions.ARG_LOW_BOUND, ''))
+                values.CONF_LOW_BOUND = bound_value
+            elif definitions.ARG_MAX_BOUND in arg:
+                bound_value = int(arg.replace(definitions.ARG_MAX_BOUND, ''))
+                values.CONF_MAX_BOUND = bound_value
             elif definitions.ARG_RANK_LIMIT in arg:
                 values.CONF_RANK_LIMIT = int(arg.replace(definitions.ARG_RANK_LIMIT, ""))
             elif definitions.ARG_SELECTION_METHOD in arg:

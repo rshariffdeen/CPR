@@ -107,6 +107,9 @@ ARG_TIME_DURATION = "--time-duration="
 ARG_RANK_LIMIT = "--top-n="
 ARG_ITERATION_COUNT = "--iterations="
 ARG_COLLECT_STAT = "--stat"
+ARG_LOW_BOUND = "--low-bound="
+ARG_MAX_BOUND = "--max-bound="
+
 
 # ----------------- TOOLS --------------------------------
 TOOL_VECGEN = "third-party/deckard/cvecgen_fail "
