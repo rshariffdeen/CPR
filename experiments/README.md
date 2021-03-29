@@ -71,11 +71,29 @@ The output message at the end of the execution should look similar to the follow
 	Component Count Cus: 2
 	Gen Limit: 40
 
+### Analysing Results
+CPR performed 4 iterations with the concolic exploration.
+It generated 5 abstract patches (see "Template Start Count") and ended also with 5 (see "Template End Count").
+In the beginning, the 5 abstract patches represented 85 concrete patches (see "Patch Start Count").
+During exploration CPR ruled out 43 (= 85-42) of them.
+
+To better explore the final outcome, please check the CPR output directory which is in
+/CPR/output/<tag_id> (for this example the tag_id defined in the configuration file is 'crash') i.e. /CPR/output/crash
+Similarly, the logs are also stored in /CPR/logs/<tag_id>. 
+
+This output folder will contain "patch-set-gen" and "patch-set-ranked".
+"patch-set-gen" are the patches after the initial synthesis step.
+"patch-set-ranked" are the patches after CPR finished.
+
+Note that the order (i.e., the ranking) of the patches changed during our concolic exploration.
+The correct patch would be "x+1 == 0".
+CPR identifies "(constant_a == x)" with constant_a in [1, 1], which is semantically equivalent to the correct patch.
+CPR ranks this patch at position 1.
 
 For more examples refer [this guide](../doc/Examples.md)
 
 
-# Example Run
+# Running Experiments
 Following details how to run the scripts and the tool to replicate the results of our experiments.
 Once you build the docker image, you spin up a container as mentioned above. 
 
