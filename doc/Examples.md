@@ -11,12 +11,12 @@ set of general component, on which other components can be extended upon.
 
 
 ### Examples of Boolean Expression
-    python3.7 CPR.py --conf=tests/synthesis/comparisons/repair.conf
-    python3.7 CPR.py --conf=tests/synthesis/logical-connectors/repair.conf
+    pypy3 CPR.py --conf=tests/synthesis/comparisons/repair.conf
+    pypy3 CPR.py --conf=tests/synthesis/logical-connectors/repair.conf
 
 
 ### Example of Integer Expression
-    python3.7 CPR.py --conf=tests/synthesis/integer-expressions/repair.conf
+    pypy3 CPR.py --conf=tests/synthesis/integer-expressions/repair.conf
 
 
 ## User Specification
@@ -25,13 +25,13 @@ optionally initial test-cases can be provided for more efficient search for
 the correct repair. User can provide the initial test-cases in multiple forms.
 
 ### Exploit for Test Input
-    python3.7 CPR.py --conf=tests/user-specification/exploit/repair.conf
+    pypy3 CPR.py --conf=tests/user-specification/exploit/repair.conf
 
 ### Set of Values for Test Inputs
-    python3.7 CPR.py --conf=tests/user-specification/test-cases/repair.conf
+    pypy3 CPR.py --conf=tests/user-specification/test-cases/repair.conf
 
 ### Strings in a File for Test Inputs
-    python3.7 CPR.py --conf=tests/user-specification/test-suite-file/repair.conf
+    pypy3 CPR.py --conf=tests/user-specification/test-suite-file/repair.conf
 
 ### Directory with Files for Test Inputs
-    python3.7 CPR.py --conf=tests/user-specification/test-suite-dir/repair.conf
+    pypy3 CPR.py --conf=tests/user-specification/test-suite-dir/repair.conf

@@ -37,7 +37,7 @@ docker run --name cpr-container -it cpr bash
 You can check if everything is working well, by running a simple test-case from our test-suite. 
 
 ``
-cd /CPR; pypy3 CPR.py --conf=/CPR/tests/bug-types/div-zero/div-zero-1/repair.conf
+pypy3 CPR.py --conf=/CPR/tests/bug-types/div-zero/div-zero-1/repair.conf
 ``
 
 The program /CPR/tests/bug-types/div-zero/div-zero-1/test.c contains a simple division-by-zero error, which we want to fix with CPR.
@@ -107,5 +107,6 @@ python3.7 driver.py --bug-id=BUG_ID
 Alternatively, you can run the experiment manually (after setting up)
 
 ``
-cd /CPR; pypy3 CPR.py --conf=/path/to/configuration
+pypy3 CPR.py --conf=/path/to/configuration
 ``
+

@@ -102,6 +102,6 @@ rank_limit:-1
 ### Running CPR
 Now that we have setup everything, we run CPR to repair the sample program 
 
-    python3.7 CPR.py --conf=path/to/conf/file
+    pypy3 CPR.py --conf=path/to/conf/file
 
 

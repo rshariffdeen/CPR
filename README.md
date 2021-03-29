@@ -55,12 +55,13 @@ in the 'tests' directory.
 
 Run examples:
 
-    python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-1/repair.conf
-    python3.7 CPR.py --conf=tests/bug-types/div-zero/div-zero-2/repair.conf
+    pypy3 CPR.py --conf=tests/bug-types/div-zero/div-zero-1/repair.conf
+    pypy3 CPR.py --conf=tests/bug-types/div-zero/div-zero-2/repair.conf
 
 
 ## Documentation ##
 
 * [Getting Started](doc/GetStart.md)
 * [Example Usage](doc/Examples.md)
+* [Experiment Replication](experiments/README.md)  
 * [Manual](doc/Manual.md)
