@@ -1,0 +1,1 @@
+extern double fabs_fk(double k);

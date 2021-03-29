@@ -1,0 +1,9 @@
+-U px -E top -X 60 -Y 60 $POC_44-fail-palette-1c-1b test.tiff
+-U px -E top -X 60 -Y 60 $POC_39-fail-logluv-3c-16b test.tiff
+-U px -E top -X 60 -Y 60 $POC_40-fail-minisblack-1c-16b test.tiff
+-U px -E top -X 60 -Y 60 $POC_41-fail-minisblack-1c-8b test.tiff
+-U px -E top -X 60 -Y 60 $POC_43-fail-miniswhite-1c-1b test.tiff
+-U px -E top -X 60 -Y 60 $POC_45-fail-palette-1c-4b test.tiff
+-U px -E top -X 60 -Y 60 $POC_46-fail-palette-1c-8b test.tiff
+-U px -E top -X 60 -Y 60 $POC_47-fail-rgb-3c-16b test.tiff
+-U px -E top -X 60 -Y 60 $POC_48-fail-rgb-3c-8b test.tiff

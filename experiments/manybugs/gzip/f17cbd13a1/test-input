@@ -1,0 +1,1 @@
+-dc $POC_in - $POC_in < $POC_in > out

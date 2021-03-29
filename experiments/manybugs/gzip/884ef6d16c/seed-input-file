@@ -1,0 +1,6 @@
+-dc $POC_helin
+-dc $POC_memcpy-abuse
+-dc $POC_stdin - $POC_stdin < $POC_stdin
+-d $POC_trailing-nul-0
+-d $POC_trailing-nul-00
+-d $POC_trailing-nul-1

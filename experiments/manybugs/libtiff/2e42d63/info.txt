@@ -1,0 +1,4 @@
+Correct Fix:
+((image->xres == 0) || (image->yres == 0)) && (crop->res_unit != RESUNIT_NONE)
+((x == 0) || (y == 0)) && (z != 1)
+

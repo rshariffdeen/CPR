@@ -1,0 +1,305 @@
+[
+ {
+   "id": 1,
+   "bug_id": "CVE-2016-5321",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 2,
+   "bug_id": "CVE-2014-8128",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 3,
+   "bug_id": "CVE-2016-3186",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 4,
+   "bug_id": "CVE-2016-5314",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 5,
+   "bug_id": "CVE-2016-9273",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 6,
+   "bug_id": "bugzilla-2633",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 7,
+   "bug_id": "CVE-2016-10094",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 8,
+   "bug_id": "CVE-2017-7601",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 9,
+   "bug_id": "CVE-2016-3623",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 10,
+   "bug_id": "CVE-2017-7595",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 11,
+   "bug_id": "bugzilla-2611",
+   "benchmark": "extractfix",
+   "subject": "libtiff"
+ },
+ {
+   "id": 12,
+   "bug_id": "CVE-2018-10372",
+   "benchmark": "extractfix",
+   "subject": "binutils"
+ },
+ {
+   "id": 13,
+   "bug_id": "CVE-2017-15025",
+   "benchmark": "extractfix",
+   "subject": "binutils"
+ },
+ {
+   "id": 14,
+   "bug_id": "CVE-2016-1834",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 15,
+   "bug_id": "CVE-2016-1838",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 16,
+   "bug_id": "CVE-2016-1839",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 17,
+   "bug_id": "CVE-2012-5134",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 18,
+   "bug_id": "CVE-2017-5969",
+   "benchmark": "extractfix",
+   "subject": "libxml2"
+ },
+ {
+   "id": 19,
+   "bug_id": "CVE-2018-14498",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 20,
+   "bug_id": "CVE-2018-19664",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 21,
+   "bug_id": "CVE-2017-15232",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 22,
+   "bug_id": "CVE-2012-2806",
+   "benchmark": "extractfix",
+   "subject": "libjpeg"
+ },
+ {
+   "id": 23,
+   "bug_id": "bugzilla-26545",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 24,
+   "bug_id": "gnubug-25003",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 25,
+   "bug_id": "gnubug-25023",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 26,
+   "bug_id": "bugzilla-19784",
+   "benchmark": "extractfix",
+   "subject": "coreutils"
+ },
+ {
+   "id": 27,
+   "bug_id": "CVE-2016-8691",
+   "benchmark": "extractfix",
+   "subject": "jasper"
+ },
+ {
+   "id": 28,
+   "bug_id": "CVE-2016-9387",
+   "benchmark": "extractfix",
+   "subject": "jasper"
+ },
+ {
+   "id": 29,
+   "bug_id": "CVE-2017-9992",
+   "benchmark": "extractfix",
+   "subject": "ffmpeg"
+ },
+ {
+   "id": 30,
+   "bug_id": "bugzilla-1404",
+   "benchmark": "extractfix",
+   "subject": "ffmpeg"
+ },
+  {
+   "id": 31,
+   "bug_id": "insertion_sort",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 32,
+   "bug_id": "linear_search",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 33,
+   "bug_id": "string",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 34,
+   "bug_id": "eureka",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 35,
+   "bug_id": "nested_delay",
+   "benchmark": "svcomp",
+   "subject": "loop-crafted"
+ },
+ {
+   "id": 36,
+   "bug_id": "sum",
+   "benchmark": "svcomp",
+   "subject": "loops"
+ },
+ {
+   "id": 37,
+   "bug_id": "bubble_sort",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+ {
+   "id": 38,
+   "bug_id": "unique_list",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 39,
+   "bug_id": "standard_run",
+   "benchmark": "svcomp",
+   "subject": "array"
+ },
+  {
+   "id": 40,
+   "bug_id": "addition",
+   "benchmark": "svcomp",
+   "subject": "recursive"
+ },
+   {
+   "id": 41,
+   "bug_id": "884ef6d16c",
+   "benchmark": "manybugs",
+   "subject": "gzip"
+ },
+   {
+   "id": 42,
+   "bug_id": "f17cbd13a1",
+   "benchmark": "manybugs",
+   "subject": "gzip"
+ },
+   {
+   "id": 43,
+   "bug_id": "207c78a",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 44,
+   "bug_id": "0a36d7f",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 45,
+   "bug_id": "ee65c74",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 46,
+   "bug_id": "865f7b2",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 47,
+   "bug_id": "565eaa2",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 48,
+   "bug_id": "7d6e298",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+ ,
+   {
+   "id": 49,
+   "bug_id": "2e42d63",
+   "benchmark": "manybugs",
+   "subject": "libtiff"
+ }
+
+
+
+]

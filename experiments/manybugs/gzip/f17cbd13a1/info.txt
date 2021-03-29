@@ -1,0 +1,7 @@
+correct/developer patch:
+ifd = fileno(stdin);
+
+plausible:
+ifd = 0;
+
+
