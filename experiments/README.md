@@ -33,6 +33,14 @@ so that it is possible to check the logs and generated outputs also outside of t
 docker run --name cpr-container -it cpr bash
 ``
 
+## Test Input Files
+For our example test run, we choose /CPR/tests/bug-types/div-zero/div-zero-1, which is a simple divide-by-zero repair. There are 3 input files provided for this 
+example. 
+
+* /CPR/tests/bug-types/div-zero/div-zero-1/repair.conf shows the CPR configuration file.
+* /CPR/tests/bug-types/div-zero/div-zero-1/spec.smt2 shows the user-provided specification.
+* /CPR/tests/bug-types/div-zero/div-zero-1/t1.smt2 shows the expected output for the failing test case (x=1, as defined in the repair.conf at line 7).
+
 ## Test Run
 You can check if everything is working well, by running a simple test-case from our test-suite. 
 
