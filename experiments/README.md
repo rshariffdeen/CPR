@@ -220,7 +220,7 @@ If we put all this information together, it is clear, that CPR successfully iden
 Additionally, to the ranking our Table 1 and Table 3 also show information about the patch pool size and the path exploration. The information can be checked with the “Run time statistics” printed at the end of each experiment, or by checking the logs in /CPR/logs/<tag_id>.
 
 | Metric in Paper   | Description   | Metric in Logs/Output   |
-|----------|:-------------:|------:|
+|----------|----------|------|
 | P_init |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | “Patch Start Count” |
 | P_final |    the number of concrete patches after concolic exploration  |   “Patch End Count” |
 | phi_explored | number of explored paths |   “Paths Explored” |
@@ -233,4 +233,7 @@ Additionally, to the ranking our Table 1 and Table 3 also show information about
 ## General Notes
 The same steps need to be performed for all other subjects. The experimental results can differ for different computation power, e.g., when more or fewer paths can be explored in the given timeout of one hour. The reviewers can compare the number of explored paths in our experiments with their own experiments to detect such differences.
 
-
+# Additional Links
+* [Getting Started](../doc/GetStart.md)
+* [Example Usage](../doc/Examples.md)
+* [Manual](../doc/Manual.md)
