@@ -66,5 +66,14 @@ Run examples:
 * [Experiment Replication](experiments/README.md)  
 * [Manual](doc/Manual.md)
 
-License
+# People
+
+## Developers
+* Ridwan Shariffdeen
+* Yannic Noller
+
+## Contributors
+* Sergey Mechtaev 
+
+# License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
