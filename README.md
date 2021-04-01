@@ -65,3 +65,6 @@ Run examples:
 * [Example Usage](doc/Examples.md)
 * [Experiment Replication](experiments/README.md)  
 * [Manual](doc/Manual.md)
+
+License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
