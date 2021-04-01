@@ -219,12 +219,12 @@ sed -i ‘786i if(__trident_choice(“L65”, “bool”, (int[]){sp->tbuf_size,
 If we put all this information together, it is clear, that CPR successfully identified the developer patch at rank 1.
 Additionally, to the ranking our Table 1 and Table 3 also show information about the patch pool size and the path exploration. The information can be checked with the “Run time statistics” printed at the end of each experiment, or by checking the logs in /CPR/logs/<tag_id>.
 
-| Metric in Paper   |      Description      |  Metric in Logs/Output |
+| Metric in Paper   | Description   | Metric in Logs/Output   |
 |----------|:-------------:|------:|
-| P_init |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | Check “Patch Start Count” |
-| P_final |    the number of concrete patches after concolic exploration  |   Check “Patch End Count” |
-| phi_explored | number of explored paths |   Check “Paths Explored” |
-| phi_skipped | number of infeasible paths that have been skipped during concolic exploration|  Check “Paths Skipped” |
+| P_init |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | “Patch Start Count” |
+| P_final |    the number of concrete patches after concolic exploration  |   “Patch End Count” |
+| phi_explored | number of explored paths |   “Paths Explored” |
+| phi_skipped | number of infeasible paths that have been skipped during concolic exploration|  “Paths Skipped” |
 
 
 (In some cases CPR has more concrete patches after the patch synthesis: CPR works with abstract patches, which are not refined during synthesis, but pruned based on the failing test case. Therefore, abstract patches that in general allow to pass the failing test case would be kept completely, which means that some concrete values for the parameters might actually violate the failing test case. This is a technical detail and performance decision: an additional refinement of the abstract patches would slow down the initial patch synthesis significantly. In the paper we report the number of plausible patches that might deviate form “Patch Start Count” for some subjects, otherwise the comparison with CEGIS (which shows the actual number of plausible patches) would not be fair, as CPR could lead to a higher patch reduction ratio.)
