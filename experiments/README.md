@@ -221,8 +221,8 @@ Additionally, to the ranking our Table 1 and Table 3 also show information about
 
 | Metric in Paper   |      Description      |  Metric in Logs/Output |
 |----------|:-------------:|------:|
-| |P_init| |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | Check “Patch Start Count” |
-| |P_final| |    the number of concrete patches after concolic exploration  |   Check “Patch End Count” |
+| P_init |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | Check “Patch Start Count” |
+| P_final |    the number of concrete patches after concolic exploration  |   Check “Patch End Count” |
 | phi_explored | number of explored paths |   Check “Paths Explored” |
 | phi_skipped | number of infeasible paths that have been skipped during concolic exploration|  Check “Paths Skipped” |
 
