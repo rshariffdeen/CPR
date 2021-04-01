@@ -148,30 +148,31 @@ pypy3 CPR.py --conf=/CPR/tests/bug-types/div-zero/div-zero-1/repair.conf
 You can check the /output folder for intermediate results.
 For example after the initial generation of the patches: cat /output/CVE-2016-5314/patch-set-gen
 The expected output looks as follows:
-Patch #1
-L65: (x <= x)
-                Partition: 1
-                Patch Count: 1
-                Path Coverage: 0
-                Is Under-approximating: False
-                Is Over-approximating: False
-Patch #2
-L65: (x <= y)
-                Partition: 1
-                Patch Count: 1
-                Path Coverage: 0
-                Is Under-approximating: False
-                Is Over-approximating: False
-Patch #3
-L65: (x <= constant_a)
-                Partition: 1
-                        Constant: const_a
-                        Range: -10 <= const_a <= 10
-                        Dimension: 21
-                Patch Count: 21
-                Path Coverage: 0
-                Is Under-approximating: False
-                Is Over-approximating: False
+
+	Patch #1
+	L65: (x <= x)
+			Partition: 1
+			Patch Count: 1
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
+	Patch #2
+	L65: (x <= y)
+			Partition: 1
+			Patch Count: 1
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
+	Patch #3
+	L65: (x <= constant_a)
+			Partition: 1
+				Constant: const_a
+				Range: -10 <= const_a <= 10
+				Dimension: 21
+			Patch Count: 21
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
 ...
 
 In total there are 28 (abstract) patches generated for this subject, representing 388 concrete patches.
