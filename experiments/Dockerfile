@@ -41,6 +41,7 @@ ADD manybugs /experiments
 ADD svcomp /experiments
 ADD driver.py /experiments
 ADD meta-data /experiments
-
+RUN git config --global user.email "rshariffdeen@gmail.com"
+RUN git config --global user.name "Ridwan"
 WORKDIR /CPR
 
