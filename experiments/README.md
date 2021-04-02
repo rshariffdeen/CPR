@@ -33,6 +33,14 @@ so that it is possible to check the logs and generated outputs also outside of t
 docker run --name cpr-container -it cpr bash
 ``
 
+## Test Input Files
+For our example test run, we choose /CPR/tests/bug-types/div-zero/div-zero-1, which is a simple divide-by-zero repair. There are 3 input files provided for this 
+example. 
+
+* /CPR/tests/bug-types/div-zero/div-zero-1/repair.conf shows the CPR configuration file.
+* /CPR/tests/bug-types/div-zero/div-zero-1/spec.smt2 shows the user-provided specification.
+* /CPR/tests/bug-types/div-zero/div-zero-1/t1.smt2 shows the expected output for the failing test case (x=1, as defined in the repair.conf at line 7).
+
 ## Test Run
 You can check if everything is working well, by running a simple test-case from our test-suite. 
 
@@ -128,3 +136,104 @@ Alternatively, you can run the experiment manually (after setting up)
 pypy3 CPR.py --conf=/path/to/configuration
 ``
 
+## Running CVE-2016-5314
+Lets run one of the experiments (CVE-2016-5314) in our data-set using the following command. The experiment timeout is set to 1hr. 
+[Note: to stop a run, please use CTRL+z and kill the background process with “ps -aux | grep python | awk ‘{print $2}’ | xargs kill -9”.]
+
+``
+pypy3 CPR.py --conf=/CPR/tests/bug-types/div-zero/div-zero-1/repair.conf
+``
+
+## Intermediate Results
+You can check the /output folder for intermediate results.
+For example after the initial generation of the patches: cat /output/CVE-2016-5314/patch-set-gen
+The expected output looks as follows:
+
+	Patch #1
+	L65: (x <= x)
+			Partition: 1
+			Patch Count: 1
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
+	Patch #2
+	L65: (x <= y)
+			Partition: 1
+			Patch Count: 1
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
+	Patch #3
+	L65: (x <= constant_a)
+			Partition: 1
+				Constant: const_a
+				Range: -10 <= const_a <= 10
+				Dimension: 21
+			Patch Count: 21
+			Path Coverage: 0
+			Is Under-approximating: False
+			Is Over-approximating: False
+...
+
+In total there are 28 (abstract) patches generated for this subject, representing 388 concrete patches.
+Note that the initial ranking has no meaning and might vary. CPR will finish automatically after the timeout of 1 hour.
+
+## Final Results
+The correct patch, in this case, should be a guarded exit, check the developer patch at the corresponding commit.
+The link is https://github.com/vadz/libtiff/commit/391e77f
+
+```
++ if (sp->stream.avail_out > sp->tbuf_size)
++ {
++ 	TIFFErrorExt(tif->tif_clientdata, module, “sp->stream.avail_out > sp->tbuf_size”);
++ 	return (0);
++ }
+```
+The correct expression would be: sp->stream.avail_out > sp->tbuf_size
+
+In our paper Table 1, we show that CPR identifies a semantic-equivalent patch ranked at position *1*. Therefore, you can check the output file to compare with the patch at rank 1.
+
+```
+less /CPR/output/CVE-2016-5314/patch-set-ranked
+``` 
+
+
+The resulting CPR/output/CVE-2016-5314/patch-set-ranked will show the patch:
+	Patch #1
+	L65: (x < y)
+
+In the setup script: /experiments/extractfix/libtiff/CVE-2016-5314/setup.sh, we apply some annotation to inject our patch.
+In setup.sh:line 33:
+
+```
+sed -i ‘786i if(__trident_choice(“L65”, “bool”, (int[]){sp->tbuf_size,sp->stream.avail_out, nsamples}, (char*[]){“x”, “y”, “z”}, 3, (int*[]){}, (char*[]){}, 0)) return 0;\n’ libtiff/tif_pixarlog.c
+```
+
+
+"trident_choice" represents the function call to retrieve a patch
+* x is mapped to sp->tbuf_size
+* y is mapped to sp->stream.avail_out
+* z is mapped to nsamples
+
+
+If we put all this information together, it is clear, that CPR successfully identified the developer patch at rank 1.
+Additionally, to the ranking our Table 1 and Table 3 also show information about the patch pool size and the path exploration. The information can be checked with the “Run time statistics” printed at the end of each experiment, or by checking the logs in /CPR/logs/<tag_id>.
+
+| Metric in Paper   | Description   | Metric in Logs/Output   |
+|----------|----------|------|
+| P_init |  the number of plausible patches, mostly similar to the concrete patches after patch synthesis step (before concolic exploration) | “Patch Start Count” |
+| P_final |    the number of concrete patches after concolic exploration  |   “Patch End Count” |
+| phi_explored | number of explored paths |   “Paths Explored” |
+| phi_skipped | number of infeasible paths that have been skipped during concolic exploration|  “Paths Skipped” |
+
+
+(In some cases CPR has more concrete patches after the patch synthesis: CPR works with abstract patches, which are not refined during synthesis, but pruned based on the failing test case. Therefore, abstract patches that in general allow to pass the failing test case would be kept completely, which means that some concrete values for the parameters might actually violate the failing test case. This is a technical detail and performance decision: an additional refinement of the abstract patches would slow down the initial patch synthesis significantly. In the paper we report the number of plausible patches that might deviate form “Patch Start Count” for some subjects, otherwise the comparison with CEGIS (which shows the actual number of plausible patches) would not be fair, as CPR could lead to a higher patch reduction ratio.)
+
+
+## General Notes
+The same steps need to be performed for all other subjects. The experimental results can differ for different computation power, e.g., when more or fewer paths can be explored in the given timeout of one hour. The reviewers can compare the number of explored paths in our experiments with their own experiments to detect such differences.
+
+# Additional Links
+* [Getting Started](../doc/GetStart.md)
+* [Example Usage](../doc/Examples.md)
+* [Manual](../doc/Manual.md)
