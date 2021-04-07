@@ -40,7 +40,7 @@ to deploy and run our tool. Dependencies include:
 * LLVM 3.4
 * KLEE 1.4
 * Python 3.7
-* Z3Solver
+* Z3 SMT Solver
 * MathSAT Solver
 
 Build and run a container:
