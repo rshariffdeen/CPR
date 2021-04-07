@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr)
+
 # CPR - CardioPulmonary Resuscitation
 CPR: A new automated program repair technique based on concolic execution
 which works on patch abstraction with the sub-optimal goal of refining the patch to less over-fit 
