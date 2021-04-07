@@ -66,7 +66,6 @@ Run examples:
 * [Experiment Replication](experiments/README.md)  
 * [Manual](doc/Manual.md)
 
-# People
 
 ## Developers
 * Ridwan Shariffdeen
