@@ -1,4 +1,4 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr) [![DOI](https://zenodo.org/badge/281336186.svg)](https://zenodo.org/badge/latestdoi/281336186)
 
 # CPR - CardioPulmonary Resuscitation
 CPR: A new automated program repair technique based on concolic execution
