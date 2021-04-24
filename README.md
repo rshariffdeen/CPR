@@ -22,18 +22,13 @@ We leverage concolic path exploration to systematically traverse the input space
 Given a long enough time budget, this approach allows a significant reduction in the 
 pool of patch candidates, as shown by our experiments. 
 
-## Workflow
-Given the buggy program, a repair budget (time limit, iteration count), the fault location(s), 
-a user specification, the language components for the synthesis, a failing test-case 
-and optionally, a set of initial functional(passing) test cases, CPR generate a 
-refined set of patches that are less over-fitting. The user specification defines 
-the desired behavior of the repaired program (in addition to satisfying the given 
-test cases). If initial tests are available, we assume that at least one failing 
-test is available, which our method seeks to repair, apart from making sure that 
-the user provided specification holds for all paths traversed via concolic exploration. 
-Finally, CPR produces a ranked set of patches based on the explored input space. 
+CPR is a reconfigurable APR tool for C source-codes. CPR is:
 
-[comment]: <> (![CPR_Workflow]&#40;doc/workflow.jpg&#41;)
+* Extensible: CPR is designed so that it can be easily extended to plug in any component to replace existing
+* Efficient: CPR utilize parallel computing to improve performance
+
+
+
 
 ## Build and Dependencies
 We provide a ready-made container which includes all necessary envrionment set-up
