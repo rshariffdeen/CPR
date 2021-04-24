@@ -1,4 +1,4 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr) [![DOI](https://zenodo.org/badge/281336186.svg)](https://zenodo.org/badge/latestdoi/281336186)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4668317.svg)](https://doi.org/10.5281/zenodo.4668317)
 
 # CPR - CardioPulmonary Resuscitation
 CPR: A new automated program repair technique based on concolic execution
@@ -33,7 +33,7 @@ test is available, which our method seeks to repair, apart from making sure that
 the user provided specification holds for all paths traversed via concolic exploration. 
 Finally, CPR produces a ranked set of patches based on the explored input space. 
 
-![CPR_Workflow](doc/workflow.jpg)
+[comment]: <> (![CPR_Workflow]&#40;doc/workflow.jpg&#41;)
 
 ## Build and Dependencies
 We provide a ready-made container which includes all necessary envrionment set-up
