@@ -23,7 +23,7 @@ CPR requires a configuration file as input which provides values as following:
 
 
 
-One a configuraiton file is specified the tool can be invoked using the following command from the directory of the tool:
+One a configuration file is specified the tool can be invoked using the following command from the directory of the tool:
 ```
 python3.7 CPR.py --conf=/path/to/conf/file
 ```
