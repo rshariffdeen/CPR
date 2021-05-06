@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/rshariffdeen/cpr.svg)](https://hub.docker.com/r/rshariffdeen/cpr) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4668317.svg)](https://doi.org/10.5281/zenodo.4668317)
+
 # CPR - CardioPulmonary Resuscitation
 CPR: A new automated program repair technique based on concolic execution
 which works on patch abstraction with the sub-optimal goal of refining the patch to less over-fit 
@@ -20,18 +22,13 @@ We leverage concolic path exploration to systematically traverse the input space
 Given a long enough time budget, this approach allows a significant reduction in the 
 pool of patch candidates, as shown by our experiments. 
 
-## Workflow
-Given the buggy program, a repair budget (time limit, iteration count), the fault location(s), 
-a user specification, the language components for the synthesis, a failing test-case 
-and optionally, a set of initial functional(passing) test cases, CPR generate a 
-refined set of patches that are less over-fitting. The user specification defines 
-the desired behavior of the repaired program (in addition to satisfying the given 
-test cases). If initial tests are available, we assume that at least one failing 
-test is available, which our method seeks to repair, apart from making sure that 
-the user provided specification holds for all paths traversed via concolic exploration. 
-Finally, CPR produces a ranked set of patches based on the explored input space. 
+CPR is a reconfigurable APR tool for C source-codes. CPR is:
 
-![CPR_Workflow](doc/workflow.jpg)
+* Extensible: CPR is designed so that it can be easily extended to plug in any component to replace existing
+* Efficient: CPR utilize parallel computing to improve performance
+
+
+
 
 ## Build and Dependencies
 We provide a ready-made container which includes all necessary envrionment set-up
@@ -40,7 +37,7 @@ to deploy and run our tool. Dependencies include:
 * LLVM 3.4
 * KLEE 1.4
 * Python 3.7
-* Z3Solver
+* Z3 SMT Solver
 * MathSAT Solver
 
 Build and run a container:
@@ -66,7 +63,6 @@ Run examples:
 * [Experiment Replication](experiments/README.md)  
 * [Manual](doc/Manual.md)
 
-# People
 
 ## Developers
 * Ridwan Shariffdeen
