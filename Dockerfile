@@ -94,7 +94,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-in
     python3.7 \
     python3.7-dev \
     python3-pip \
-    python3.7-setuptools
+    python3-setuptools
 
 RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
