@@ -1,0 +1,2 @@
+BASEDIR=$(dirname "$0")
+export PATH=$PATH:$BASEDIR/bin

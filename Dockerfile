@@ -156,4 +156,4 @@ ENV TRIDENT_CC=/CPR/tools/trident-cc
 ENV TRIDENT_CXX=/CPR/tools/trident-cxx
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 RUN pypy3 setup.py build_ext --inplace
-
+RUN source /CPR/activate
