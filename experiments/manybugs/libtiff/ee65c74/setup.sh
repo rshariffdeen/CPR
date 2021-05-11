@@ -83,10 +83,10 @@ sed -i '131i \\tklee_assert(tif > 0);' src/test/long_tag.c
 
 ## Compile instrumentation and test driver.
 cd src
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32
 cd ./test
 make clean
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32 long_tag.log
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32 long_tag.log
 extract-bc long_tag
 
 # Copy remaining files to run CPR.
@@ -104,5 +104,5 @@ cd $dir_name
 #cd src/test/
 #gen-bout --sym-file "/data/manybugs/libtiff/0a36d7f/src/test/long_test.tiff"
 
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s long_tag.bc long_test.tiff
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s long_tag.bc long_test.tiff
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156

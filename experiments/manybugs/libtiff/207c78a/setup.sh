@@ -110,13 +110,13 @@ cd src
 #sed -i '346d' src/libtiff/tif_dirwrite.c
 #
 #cd src
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32
 #cd ./test
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
 #extract-bc short_tag
 #extract-bc long_tag
-##klee --posix-runtime --libc=uclibc -link-llvm-lib=/concolic-repair/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
+##klee --posix-runtime --libc=uclibc -link-llvm-lib=/CPR/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
 #
 #cd $current_dir
 #cp repair.conf $dir_name
@@ -155,7 +155,7 @@ cd src
 ##git commit -m 'remove longjmp calls'
 #
 #
-##make CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32
+##make CFLAGS="-ltrident_proxy -L/CPR/lib -g" -j32
 ##sed -i '358i }' tools/gif2tiff.c
 ##sed -i '353i { TRIDENT_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
 ##sed -i '352d' tools/gif2tiff.c

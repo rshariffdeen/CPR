@@ -9,7 +9,7 @@ current_dir=$PWD
 
 cp linear_search.c $program_dir
 cd $program_dir
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/concolic-repair/lib -lkleeRuntest -I/klee/source/include" -j32 linear_search
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 linear_search
 
 cd $current_dir
 mkdir -p $dir_name

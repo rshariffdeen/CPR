@@ -74,7 +74,7 @@ CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
 #git add libtiff/tif_ojpeg.c libtiff/tif_jpeg.c
 #git commit -m 'remove longjmp calls'
 
-make CFLAGS="-ltrident_proxy -L/concolic-repair/lib -g" -j32
+make CFLAGS="-ltrident_proxy -L/CPR/lib -g" -j32
 # Patch
 #sed -i '748i if (con->request.content_length > 0) {' mod_cgi.c
 # Trident
