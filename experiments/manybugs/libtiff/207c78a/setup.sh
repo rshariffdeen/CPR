@@ -110,10 +110,10 @@ cd src
 #sed -i '346d' src/libtiff/tif_dirwrite.c
 #
 #cd src
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32
 #cd ./test
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
+#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
 #extract-bc short_tag
 #extract-bc long_tag
 ##klee --posix-runtime --libc=uclibc -link-llvm-lib=/CPR/lib/libtrident_runtime.bca -write-smt2s short_tag.bc

@@ -54,7 +54,7 @@ sed -i '1642,1648d' gzip.c
 sed -i '1642i int ok = 1;' gzip.c
 
 # Compile instrumentation and test driver.
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -lkleeRuntest -I/klee/source/include -g -O0" -j32
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
 
 
 # Copy remaining files to run CPR.

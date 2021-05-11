@@ -9,7 +9,7 @@ current_dir=$PWD
 
 cp data_structures_set_multi_proc_ground-1.c $program_dir
 cd $program_dir
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/CPR/lib -lkleeRuntest -I/klee/source/include" -j32 data_structures_set_multi_proc_ground-1
+make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 data_structures_set_multi_proc_ground-1
 
 cd $current_dir
 mkdir -p $dir_name
