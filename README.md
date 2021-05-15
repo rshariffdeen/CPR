@@ -39,6 +39,7 @@ to deploy and run our tool. Dependencies include:
 * Python 3.7
 * Z3 SMT Solver
 * MathSAT Solver
+* Docker
 
 Build and run a container:
 
