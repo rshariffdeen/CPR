@@ -65,6 +65,11 @@ Run examples:
 * [Manual](doc/Manual.md)
 
 
+## Bugs ##
+CPR should be considered alpha-quality software. Bugs can be reported here:
+
+    https://github.com/rshariffdeen/CPR/issues
+    
 # Contributions
 We welcome contributions to improve this work, see [details](doc/Contributing.md)
 
