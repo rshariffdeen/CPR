@@ -74,3 +74,6 @@ Run examples:
 
 # License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+# Contributions
+We welcome contributions to improve this work, see [details](doc/Contributing.md)
