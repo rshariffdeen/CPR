@@ -65,6 +65,9 @@ Run examples:
 * [Manual](doc/Manual.md)
 
 
+# Contributions
+We welcome contributions to improve this work, see [details](doc/Contributing.md)
+
 ## Developers
 * Ridwan Shariffdeen
 * Yannic Noller
@@ -72,8 +75,17 @@ Run examples:
 ## Contributors
 * Sergey Mechtaev 
 
+## Publication ##
+**Concolic Program Repair** <br>
+Ridwan Shariffdeen, Yannic Noller, Lars Grunske, Abhik Roychoudhury <br>
+42nd ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI), 2021
+
+
+## Acknowledgements ##
+This work was partially supported by the National Satellite of Excellence in Trustworthy Software Systems, funded by National Research Foundation (NRF) Singapore. 
+
+
 # License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-# Contributions
-We welcome contributions to improve this work, see [details](doc/Contributing.md)
+
