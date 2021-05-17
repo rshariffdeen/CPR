@@ -1,4 +1,4 @@
-#Contributions
+# Contributions
 
 Contributions are welcome.  Please sign your contributions, according to
 the following text extracted from Documentation/SubmittingPatches.txt of
