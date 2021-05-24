@@ -48,6 +48,7 @@ def bootstrap(arg_list):
     configuration.collect_seed_list()
     # configuration.collect_var_mapping()
     configuration.load_component_list()
+    values.CONF_ARG_PASS = True
 
 
 def initialize():
