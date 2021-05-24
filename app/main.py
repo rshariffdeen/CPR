@@ -115,6 +115,8 @@ def run(arg_list):
     duration = format((time.time() - time_check) / 60, '.3f')
     time_info[definitions.KEY_DURATION_INITIALIZATION] = str(duration)
 
+    if values.CONF_ONLY_TEST:
+        return
     time_check = time.time()
     repair.run(values.CONF_PATH_PROJECT, values.CONF_PATH_PROGRAM)
     duration = format(((time.time() - time_check) / 60 - float(values.TIME_TO_GENERATE)), '.3f')

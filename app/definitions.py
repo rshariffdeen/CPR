@@ -109,6 +109,8 @@ ARG_ITERATION_COUNT = "--iterations="
 ARG_COLLECT_STAT = "--stat"
 ARG_LOW_BOUND = "--low-bound="
 ARG_MAX_BOUND = "--max-bound="
+ARG_ONLY_GEN = "--only-gen"
+ARG_ONLY_TEST = "--only-test"
 
 
 # ----------------- TOOLS --------------------------------

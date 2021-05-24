@@ -236,6 +236,8 @@ def run(project_path, program_path):
     values.TIME_TO_GENERATE = str(duration)
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
     writer.write_patch_set(filtered_patch_list, definitions.FILE_PATCH_SET)
+    if values.CONF_ONLY_GEN:
+        return
     if values.DEFAULT_REDUCE_METHOD == "cpr":
         run_cpr(program_path, filtered_patch_list)
     elif values.DEFAULT_REDUCE_METHOD == "cegis":

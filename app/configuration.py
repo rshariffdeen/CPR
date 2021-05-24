@@ -76,6 +76,10 @@ def read_conf(arg_list):
                 values.CONF_SKIP_GEN = True
             elif definitions.ARG_SKIP_TEST in arg:
                 values.CONF_SKIP_TEST = True
+            elif definitions.ARG_ONLY_GEN in arg:
+                values.CONF_ONLY_GEN = True
+            elif definitions.ARG_ONLY_TEST in arg:
+                values.CONF_ONLY_TEST = True
             elif definitions.ARG_TIME_DURATION in arg:
                 values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
             elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
