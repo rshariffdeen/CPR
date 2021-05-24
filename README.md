@@ -39,6 +39,7 @@ to deploy and run our tool. Dependencies include:
 * Python 3.7
 * Z3 SMT Solver
 * MathSAT Solver
+* Docker
 
 Build and run a container:
 
@@ -64,6 +65,14 @@ Run examples:
 * [Manual](doc/Manual.md)
 
 
+## Bugs ##
+CPR should be considered alpha-quality software. Bugs can be reported here:
+
+    https://github.com/rshariffdeen/CPR/issues
+    
+# Contributions
+We welcome contributions to improve this work, see [details](doc/Contributing.md)
+
 ## Developers
 * Ridwan Shariffdeen
 * Yannic Noller
@@ -71,5 +80,17 @@ Run examples:
 ## Contributors
 * Sergey Mechtaev 
 
+## Publication ##
+**Concolic Program Repair** <br>
+Ridwan Shariffdeen, Yannic Noller, Lars Grunske, Abhik Roychoudhury <br>
+42nd ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI), 2021
+
+
+## Acknowledgements ##
+This work was partially supported by the National Satellite of Excellence in Trustworthy Software Systems, funded by National Research Foundation (NRF) Singapore. 
+
+
 # License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+
