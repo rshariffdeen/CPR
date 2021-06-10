@@ -373,8 +373,9 @@ def print_configuration():
     emitter.configuration("collecting stats", str(values.DEFAULT_COLLECT_STAT))
     emitter.configuration("number of seeds", str(len(values.LIST_SEED_INPUT)))
     emitter.configuration("number of tests", str(len(values.LIST_TEST_INPUT)))
-    emitter.configuration("list of seeds", str(values.LIST_SEED_INPUT))
-    emitter.configuration("list of tests", str(values.LIST_TEST_INPUT))
+    emitter.configuration("list of seed ids", str(values.LIST_SEED_ID_LIST))
+    emitter.configuration("list of test ids", str(values.LIST_TEST_ID_LIST))
+
 
 def collect_test_list():
     emitter.normal("reading test configuration")
@@ -383,6 +384,7 @@ def collect_test_list():
             if values.CONF_TEST_SUITE_ID_LIST:
                 if str(test_id) not in values.CONF_TEST_SUITE_ID_LIST:
                     continue
+            values.LIST_TEST_ID_LIST.append(str(test_id))
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
             values.LIST_TEST_BINARY.append(bin_path)
             values.LIST_TEST_INPUT.append(test_input)
@@ -467,6 +469,7 @@ def collect_seed_list():
             if values.CONF_SEED_SUITE_ID_LIST:
                 if str(seed_id) not in values.CONF_SEED_SUITE_ID_LIST:
                     continue
+            values.LIST_SEED_ID_LIST.append(str(seed_id))
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
             values.LIST_SEED_BINARY.append(bin_path)
             values.LIST_SEED_INPUT.append(test_input)
