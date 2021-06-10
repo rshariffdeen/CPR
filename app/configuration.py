@@ -502,6 +502,8 @@ def collect_seed_list():
             for arg in arg_list:
                 if "$POC_" in arg:
                     file_index = "_".join(str(arg).split("_")[1:])
+                    if file_index not in values.LIST_SEED_FILES:
+                        continue
                     file_path = values.LIST_SEED_FILES[file_index]
                     concretized_arg_list.append(file_path)
                 elif "$POC" in arg:
