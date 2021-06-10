@@ -4,6 +4,7 @@ import traceback
 import signal
 
 import app.configuration
+import app.utilities
 from app import emitter, logger, definitions, values, builder, repair, \
     configuration, reader, parallel, extractor
 from app.concolic import run_concrete_execution
@@ -53,14 +54,20 @@ def bootstrap(arg_list):
 
 def initialize():
     emitter.title("Initializing Program")
-    program_path = values.CONF_PATH_PROGRAM
-    extractor.extract_byte_code(program_path)
     test_input_list = values.LIST_TEST_INPUT
     second_var_list = list()
     output_dir_path = definitions.DIRECTORY_OUTPUT
     emitter.sub_title("Running Test-Suite")
     test_case_id = 0
     for argument_list in test_input_list:
+        if values.LIST_TEST_BINARY:
+            program_path = values.LIST_TEST_BINARY[test_case_id]
+            values.CONF_PATH_PROGRAM = program_path
+        else:
+            program_path = values.CONF_PATH_PROGRAM
+        extractor.extract_byte_code(program_path)
+        if os.path.isfile(program_path + ".bc"):
+            app.utilities.error_exit("Unable to generate bytecode for " + program_path)
         print_argument_list = app.configuration.extract_input_arg_list(argument_list)
         generalized_arg_list = []
         seed_file = None

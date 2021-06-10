@@ -251,7 +251,6 @@ def run(project_path, program_path):
 def run_cegis(program_path, project_path, patch_list):
     test_output_list = values.LIST_TEST_OUTPUT
     test_template = reader.collect_specification(test_output_list[0])
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
     time_check = time.time()
     assertion, largest_path_condition = concolic.run_concolic_exploration(program_path, patch_list)
     duration = (time.time() - time_check) / 60
@@ -337,13 +336,19 @@ def run_cpr(program_path, patch_list):
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
-
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
             test_input_list = values.LIST_TEST_INPUT
             seed_id = 0
             for argument_list in test_input_list:
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[iteration]
+                    values.CONF_PATH_PROGRAM = program_path
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                extractor.extract_byte_code(program_path)
+                if os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
@@ -390,9 +395,9 @@ def run_cpr(program_path, patch_list):
                     continue
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
-                                                                    Path(binary_dir_path + "/klee-last/").resolve())
+                                                                    Path(klee_out_dir).resolve())
                 # print(assertion.serialize())
-                patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+                patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
                 emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
                 duration = (time.time() - time_check) / 60
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration

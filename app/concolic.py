@@ -463,7 +463,6 @@ def run_concolic_exploration(program_path, patch_list):
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
     assertion_template = values.SPECIFICATION_TXT
     max_count = 0
 
@@ -478,6 +477,14 @@ def run_concolic_exploration(program_path, patch_list):
                 poc_path = None
                 iteration = iteration + 1
                 seed_id = seed_id + 1
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[seed_id]
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                extractor.extract_byte_code(program_path)
+                if os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
+
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
                 output_dir_path = definitions.DIRECTORY_OUTPUT
