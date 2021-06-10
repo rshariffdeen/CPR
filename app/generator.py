@@ -104,7 +104,9 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     emitter.sub_sub_title("Loading Test-Results")
     test_index = -1
-    for arg_list in test_input_list:
+    count_seeds = len(values.LIST_SEED_INPUT)
+    count_inputs = len(test_input_list)
+    for arg_list in test_input_list[:count_inputs - count_seeds]:
         seed_file = None
         test_index = test_index + 1
         expected_output_file = None
