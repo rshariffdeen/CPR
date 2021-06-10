@@ -350,7 +350,8 @@ def run_cpr(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 output_dir_path = definitions.DIRECTORY_OUTPUT
-                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration-1)
+                klee_test_dir = output_dir_path + "/klee-out-test-" + str(iteration-1)
+                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
@@ -365,7 +366,7 @@ def run_cpr(program_path, patch_list):
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
                 emitter.highlight("\tUsing Input: " + str(poc_path))
                 values.ARGUMENT_LIST = generalized_arg_list
-                _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
+                _, second_var_list = generator.generate_angelic_val(klee_test_dir, generalized_arg_list, poc_path)
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
