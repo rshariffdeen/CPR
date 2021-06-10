@@ -78,7 +78,7 @@ def initialize():
         argument_list = app.configuration.extract_input_arg_list(argument_list)
         klee_out_dir = output_dir_path + "/klee-out-test-" + str(test_case_id-1)
         if values.LIST_TEST_BINARY:
-            program_path = values.LIST_TEST_BINARY[test_case_id]
+            program_path = values.LIST_TEST_BINARY[test_case_id-1]
             values.CONF_PATH_PROGRAM = program_path
         else:
             program_path = values.CONF_PATH_PROGRAM
