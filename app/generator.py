@@ -1069,7 +1069,7 @@ def generate_extended_patch_formula(patch_formula, path_condition):
     return constraint_formula
 
 
-def generate_program_specification(binary_path):
+def generate_program_specification():
     output_dir_path = definitions.DIRECTORY_OUTPUT
     dir_list = [f for f in os.listdir(output_dir_path) if not os.path.isfile(os.path.join(output_dir_path, f))]
     expected_output_list = values.LIST_TEST_OUTPUT
