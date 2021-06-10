@@ -479,15 +479,6 @@ def run_concolic_exploration(program_path, patch_list):
                 poc_path = None
                 iteration = iteration + 1
                 seed_id = seed_id + 1
-                if values.LIST_TEST_BINARY:
-                    program_path = values.LIST_TEST_BINARY[seed_id]
-                    values.CONF_PATH_PROGRAM = program_path
-                else:
-                    program_path = values.CONF_PATH_PROGRAM
-                extractor.extract_byte_code(program_path)
-                if not os.path.isfile(program_path + ".bc"):
-                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
-
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
                 output_dir_path = definitions.DIRECTORY_OUTPUT
@@ -505,6 +496,15 @@ def run_concolic_exploration(program_path, patch_list):
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
                 emitter.highlight("\tUsing Input: " + str(poc_path))
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[seed_id]
+                    values.CONF_PATH_PROGRAM = program_path
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                extractor.extract_byte_code(program_path)
+                if not os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
+
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
 

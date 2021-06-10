@@ -341,14 +341,6 @@ def run_cpr(program_path, patch_list):
             test_input_list = values.LIST_TEST_INPUT
             seed_id = 0
             for argument_list in test_input_list:
-                if values.LIST_TEST_BINARY:
-                    program_path = values.LIST_TEST_BINARY[iteration]
-                    values.CONF_PATH_PROGRAM = program_path
-                else:
-                    program_path = values.CONF_PATH_PROGRAM
-                extractor.extract_byte_code(program_path)
-                if not os.path.isfile(program_path + ".bc"):
-                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
@@ -370,6 +362,14 @@ def run_cpr(program_path, patch_list):
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
                 emitter.highlight("\tUsing Input: " + str(poc_path))
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[iteration]
+                    values.CONF_PATH_PROGRAM = program_path
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                extractor.extract_byte_code(program_path)
+                if not os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_test_dir, generalized_arg_list, poc_path)
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
