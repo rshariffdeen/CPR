@@ -375,21 +375,43 @@ def print_configuration():
 
 def collect_test_list():
     emitter.normal("reading test configuration")
-    if values.CONF_TEST_BINARY_LIST:
-        for binary_path in values.CONF_TEST_BINARY_LIST:
-            binary_path = values.CONF_DIR_SRC + "/" + binary_path
-            values.LIST_TEST_BINARY.append(binary_path)
-
-    if values.CONF_TEST_INPUT_LIST:
-        for test_input in values.CONF_TEST_INPUT_LIST:
+    if values.CONF_TEST_SUITE_CONFIG:
+        for test_id, (bin_path, test_input, expected_output) in values.CONF_TEST_SUITE_CONFIG:
+            bin_path = values.CONF_DIR_SRC + "/" + bin_path
+            values.LIST_TEST_BINARY.append(bin_path)
             values.LIST_TEST_INPUT.append(test_input)
-    elif values.CONF_TEST_INPUT_FILE:
-        with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
-            content_lines = in_file.readlines()
-            for content in content_lines:
-                values.LIST_TEST_INPUT.append(content.strip().replace("\n", ""))
+            values.LIST_TEST_OUTPUT.append(expected_output)
     else:
-        error_exit("No test input is given (at least one is required)")
+        if values.CONF_TEST_BINARY_LIST:
+            for binary_path in values.CONF_TEST_BINARY_LIST:
+                binary_path = values.CONF_DIR_SRC + "/" + binary_path
+                values.LIST_TEST_BINARY.append(binary_path)
+
+        if values.CONF_TEST_INPUT_LIST:
+            for test_input in values.CONF_TEST_INPUT_LIST:
+                values.LIST_TEST_INPUT.append(test_input)
+        elif values.CONF_TEST_INPUT_FILE:
+            with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
+                content_lines = in_file.readlines()
+                for content in content_lines:
+                    values.LIST_TEST_INPUT.append(content.strip().replace("\n", ""))
+        else:
+            error_exit("No test input is given (at least one is required)")
+
+        if values.CONF_TEST_OUTPUT_LIST:
+            for expected_output in values.CONF_TEST_OUTPUT_LIST:
+                values.LIST_TEST_OUTPUT.append(expected_output)
+        elif values.CONF_TEST_OUTPUT_DIR:
+            expected_output_dir = values.CONF_TEST_OUTPUT_DIR
+            file_list = [f for f in os.listdir(expected_output_dir) if
+                         os.path.isfile(os.path.join(expected_output_dir, f))]
+            for expected_output_file in file_list:
+                if ".smt2" in expected_output_file:
+                    expected_file_abs_path = expected_output_dir + "/" + expected_output_file
+                    expected_file_rel_path = str(expected_file_abs_path).replace(values.CONF_PATH_PROJECT + "/", "")
+                    values.LIST_TEST_OUTPUT.append(expected_file_rel_path)
+        else:
+            error_exit("No expected output is given (at least one is required)")
 
     if values.CONF_TEST_INPUT_DIR:
         test_file_dir = values.CONF_TEST_INPUT_DIR
@@ -409,19 +431,6 @@ def collect_test_list():
             test_file_index = str(test_file).split(".")[0]
         values.LIST_TEST_FILES[test_file_index] = values.CONF_PATH_POC
 
-    if values.CONF_TEST_OUTPUT_LIST:
-        for expected_output in values.CONF_TEST_OUTPUT_LIST:
-            values.LIST_TEST_OUTPUT.append(expected_output)
-    elif values.CONF_TEST_OUTPUT_DIR:
-        expected_output_dir = values.CONF_TEST_OUTPUT_DIR
-        file_list = [f for f in os.listdir(expected_output_dir) if os.path.isfile(os.path.join(expected_output_dir, f))]
-        for expected_output_file in file_list:
-            if ".smt2" in expected_output_file:
-                expected_file_abs_path = expected_output_dir + "/" + expected_output_file
-                expected_file_rel_path = str(expected_file_abs_path).replace(values.CONF_PATH_PROJECT + "/", "")
-                values.LIST_TEST_OUTPUT.append(expected_file_rel_path)
-    else:
-        error_exit("No expected output is given (at least one is required)")
 
     test_input_list = values.LIST_TEST_INPUT
     concretized_test_input_list = []
@@ -446,24 +455,30 @@ def collect_test_list():
 
 def collect_seed_list():
     emitter.normal("reading seed information")
-    if values.CONF_SEED_BINARY_LIST:
-        for binary_path in values.CONF_SEED_BINARY_LIST:
-            binary_path = values.CONF_DIR_SRC + "/" + binary_path
-            values.LIST_SEED_BINARY.append(binary_path)
-    if values.CONF_SEED_LIST:
-        for seed_input in values.CONF_SEED_LIST:
-            values.LIST_SEED_INPUT.append(seed_input)
-    if values.CONF_SEED_FILE:
-        with open(values.CONF_SEED_FILE, "r") as in_file:
-            content_lines = in_file.readlines()
-            for content in content_lines:
-                values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
-    if values.CONF_SEED_DIR:
-        seed_dir = values.CONF_SEED_DIR
-        file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
-        for seed_file in file_list:
-            seed_abs_path = seed_dir + "/" + seed_file
-            values.LIST_SEED_FILES.append(seed_abs_path)
+    if values.CONF_SEED_SUITE_CONFIG:
+        for seed_id, (bin_path, test_input) in values.CONF_SEED_SUITE_CONFIG:
+            bin_path = values.CONF_DIR_SRC + "/" + bin_path
+            values.LIST_TEST_BINARY.append(bin_path)
+            values.LIST_TEST_INPUT.append(test_input)
+    else:
+        if values.CONF_SEED_BINARY_LIST:
+            for binary_path in values.CONF_SEED_BINARY_LIST:
+                binary_path = values.CONF_DIR_SRC + "/" + binary_path
+                values.LIST_SEED_BINARY.append(binary_path)
+        if values.CONF_SEED_LIST:
+            for seed_input in values.CONF_SEED_LIST:
+                values.LIST_SEED_INPUT.append(seed_input)
+        elif values.CONF_SEED_FILE:
+            with open(values.CONF_SEED_FILE, "r") as in_file:
+                content_lines = in_file.readlines()
+                for content in content_lines:
+                    values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
+        elif values.CONF_SEED_DIR:
+            seed_dir = values.CONF_SEED_DIR
+            file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
+            for seed_file in file_list:
+                seed_abs_path = seed_dir + "/" + seed_file
+                values.LIST_SEED_FILES.append(seed_abs_path)
 
     if values.LIST_SEED_INPUT:
         seed_id = 0
