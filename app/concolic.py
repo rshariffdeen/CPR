@@ -69,12 +69,14 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = max(list_path_inprogress, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
     elif values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
@@ -84,12 +86,14 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
     else:
         ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
@@ -99,15 +103,17 @@ def select_new_path_condition():
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = (random.choice(ranked_list))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
 
-    return selected_path, control_loc, arg_list, poc_path
+    return selected_path, control_loc, arg_list, poc_path, bin_path
 
 
 def select_patch_constraint_for_input(patch_list, selected_new_path):
@@ -169,14 +175,14 @@ def select_new_input(patch_list=None):
     patch_constraint = TRUE
     new_path_count = 0
 
-    for (control_loc, generated_path, ppc_len), arg_list, poc_path in generated_path_list:
+    for (control_loc, generated_path, ppc_len), arg_list, poc_path, bin_path in generated_path_list:
         path_str = str(generated_path.serialize())
         if path_str not in (list_path_detected + list_path_explored):
             reach_patch_loc = 100 - path_str.count("angelic!")
             reach_obs_loc = 100 - path_str.count("obs!")
             ppc_len = 10000 - ppc_len
             list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc,
-                                         arg_list, poc_path))
+                                         arg_list, poc_path, bin_path))
             list_path_detected.append(str(generated_path.serialize()))
             new_path_count = new_path_count + 1
 
@@ -200,7 +206,7 @@ def select_new_input(patch_list=None):
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
                 return None, None, patch_list, None, None
-            selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
+            selected_new_path, selected_control_loc, argument_list, poc_path, bin_path = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
                 list_path_explored.append(str(selected_new_path.serialize()))
@@ -211,17 +217,18 @@ def select_new_input(patch_list=None):
             else:
                 list_path_infeasible.append(str(selected_new_path.serialize()))
     else:
-        selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
+        selected_new_path, selected_control_loc, argument_list, poc_path, bin_path = select_new_path_condition()
         list_path_explored.append(str(selected_new_path.serialize()))
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
+    emitter.highlight("\tSelected binary: " + str(bin_path))
     emitter.highlight("\tSelected arguments for mutation: " + str(argument_list))
     if poc_path:
         emitter.highlight("\tSelected seed file: " + str(poc_path))
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
-        return None, None, patch_list, argument_list, poc_path
-    return input_arg_list, input_var_list, patch_list, argument_list, poc_path
+        return None, None, patch_list, argument_list, poc_path, bin_path
+    return input_arg_list, input_var_list, patch_list, argument_list, poc_path, bin_path
 
 
 def run_concolic_execution(program, argument_list, second_var_list, print_output=False, klee_out_dir=None):
