@@ -292,7 +292,7 @@ def run_cegis(program_path, project_path, patch_list):
             values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/violation-" + str(values.ITERATION_NO)
             gen_path = values.FILE_POC_GEN
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, arg_list, poc_path, gen_path)
-            klee_out_dir = output_dir + "/klee-output-" + str(iteration)
+            klee_out_dir = output_dir + "/klee-out-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             # assert exit_code == 0
