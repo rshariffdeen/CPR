@@ -371,7 +371,10 @@ def print_configuration():
     emitter.configuration("operation mode", values.DEFAULT_OPERATION_MODE)
     emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
     emitter.configuration("collecting stats", str(values.DEFAULT_COLLECT_STAT))
-
+    emitter.configuration("number of seeds", str(len(values.LIST_SEED_INPUT)))
+    emitter.configuration("number of tests", str(len(values.LIST_TEST_INPUT)))
+    emitter.configuration("list of seeds", str(values.LIST_SEED_INPUT))
+    emitter.configuration("list of tests", str(values.LIST_TEST_INPUT))
 
 def collect_test_list():
     emitter.normal("reading test configuration")
