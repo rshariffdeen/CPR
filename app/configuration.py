@@ -427,8 +427,8 @@ def collect_test_list():
         file_list = [f for f in os.listdir(test_file_dir) if os.path.isfile(os.path.join(test_file_dir, f))]
         for test_file in file_list:
             test_file_index = test_file
-            if "." in test_file:
-                test_file_index = str(test_file).split(".")[0]
+            # if "." in test_file:
+            #     test_file_index = str(test_file).split(".")[0]
             test_abs_path = test_file_dir + "/" + test_file
             # if not values.CONF_PATH_POC:
             #     values.CONF_PATH_POC = test_abs_path
@@ -436,8 +436,8 @@ def collect_test_list():
     elif values.CONF_PATH_POC:
         test_file = values.CONF_PATH_POC
         test_file_index = test_file
-        if "." in test_file:
-            test_file_index = str(test_file).split(".")[0]
+        # if "." in test_file:
+        #     test_file_index = str(test_file).split(".")[0]
         values.LIST_TEST_FILES[test_file_index] = values.CONF_PATH_POC
 
 
@@ -490,8 +490,9 @@ def collect_seed_list():
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
         for seed_file in file_list:
+            seed_file_index = seed_file
             seed_abs_path = seed_dir + "/" + seed_file
-            values.LIST_SEED_FILES.append(seed_abs_path)
+            values.LIST_SEED_FILES[seed_file_index] = seed_abs_path
 
     if values.LIST_SEED_INPUT:
         seed_index = 0
@@ -501,7 +502,7 @@ def collect_seed_list():
             for arg in arg_list:
                 if "$POC_" in arg:
                     file_index = "_".join(str(arg).split("_")[1:])
-                    file_path = values.LIST_TEST_FILES[file_index]
+                    file_path = values.LIST_SEED_FILES[file_index]
                     concretized_arg_list.append(file_path)
                 elif "$POC" in arg:
                     file_index = list(values.LIST_TEST_FILES.keys())[0]
@@ -513,7 +514,6 @@ def collect_seed_list():
             values.LIST_TEST_INPUT.append(concretized_arg_str)
             values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_index])
             seed_index = seed_index + 1
-
 
 
 def collect_var_mapping():
