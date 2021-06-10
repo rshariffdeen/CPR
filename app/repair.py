@@ -363,7 +363,7 @@ def run_cpr(program_path, patch_list):
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
                 emitter.highlight("\tUsing Input: " + str(poc_path))
                 if values.LIST_TEST_BINARY:
-                    program_path = values.LIST_TEST_BINARY[iteration]
+                    program_path = values.LIST_TEST_BINARY[iteration-1]
                     values.CONF_PATH_PROGRAM = program_path
                 else:
                     program_path = values.CONF_PATH_PROGRAM
