@@ -77,8 +77,8 @@ CONF_TEST_OUTPUT_LIST = "test_output_list:"
 CONF_TEST_BINARY_CONFIG_FILE = "test_binary_config_file:"
 CONF_SEED_BINARY_CONFIG_FILE = "seed_binary_config_file:"
 CONF_TEST_SUITE_CONFIG = "path_test_suite:"
-CONF_TEST_SUITE_ID_LIST = "list_test_id:"
 CONF_SEED_SUITE_CONFIG = "path_seed_suite:"
+CONF_TEST_SUITE_ID_LIST = "list_test_id:"
 CONF_SEED_SUITE_ID_LIST = "list_seed_id:"
 
 CONF_SEED_FILE = "seed_file:"
@@ -118,6 +118,8 @@ ARG_LOW_BOUND = "--low-bound="
 ARG_MAX_BOUND = "--max-bound="
 ARG_ONLY_GEN = "--only-gen"
 ARG_ONLY_TEST = "--only-test"
+ARG_TEST_SUITE_ID_LIST = "--test-id-list="
+ARG_SEED_SUITE_ID_LIST = "--seed-id-list="
 
 
 # ----------------- TOOLS --------------------------------
