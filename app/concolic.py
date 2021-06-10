@@ -299,6 +299,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                    + "{0}".format(hit_location_flag) \
                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                    + values.CONF_KLEE_FLAGS + " " \
+                   + "-output-dir={0}".format(definitions.DIRECTORY_OUTPUT) \
                    + "--seed-out={0} ".format(ktest_path) \
                    + "{0} ".format(binary_name) \
                    + input_argument
@@ -475,7 +476,8 @@ def run_concolic_exploration(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                output_dir_path = definitions.DIRECTORY_OUTPUT
+                klee_out_dir = output_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:

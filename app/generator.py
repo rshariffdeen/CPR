@@ -31,10 +31,11 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
 
     spec_files = []
     binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
+    output_dir_path = definitions.DIRECTORY_OUTPUT
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
         test_index = str((int(test_output_list.index(output_spec))))
-        klee_spec_path = Path(binary_dir_path + "/klee-out-" + test_index)
+        klee_spec_path = Path(output_dir_path + "/klee-out-" + test_index)
         spec_files.append((output_spec_path, klee_spec_path))
     if model_list:
         for output_spec_path, klee_spec_path in model_list:
@@ -123,8 +124,9 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
             if os.path.isfile(expected_output_file):
                 output_spec_path = Path(os.path.abspath(expected_output_file))
         klee_spec_path = None
+        output_dir_path = definitions.DIRECTORY_OUTPUT
         if output_spec_path:
-            klee_spec_path = Path(binary_dir_path + "/klee-out-" + str(test_index))
+            klee_spec_path = Path(output_dir_path + "/klee-out-" + str(test_index))
             spec_files.append((output_spec_path, klee_spec_path))
         emitter.normal("\tTest #" + str(test_index + 1))
         emitter.highlight("\tInput Arg: " + str(arg_list))
@@ -1066,7 +1068,8 @@ def generate_extended_patch_formula(patch_formula, path_condition):
 
 
 def generate_program_specification(binary_path):
-    dir_list = [f for f in os.listdir(binary_path) if not os.path.isfile(os.path.join(binary_path, f))]
+    output_dir_path = definitions.DIRECTORY_OUTPUT
+    dir_list = [f for f in os.listdir(output_dir_path) if not os.path.isfile(os.path.join(output_dir_path, f))]
     expected_output_list = values.LIST_TEST_OUTPUT
     test_count = len(expected_output_list)
     max_skip_index = (test_count * 2) - 1
@@ -1074,7 +1077,7 @@ def generate_program_specification(binary_path):
     for dir_name in dir_list:
         if "klee-out-" not in dir_name:
             continue
-        dir_path = os.path.join(binary_path, dir_name)
+        dir_path = os.path.join(output_dir_path, dir_name)
         klee_index = int(dir_name.split("-")[-1])
         # if klee_index <= max_skip_index:
         #     continue
