@@ -280,6 +280,20 @@ def read_conf_file():
                 values.CONF_SEED_SUITE_CONFIG = reader.read_json(config_path)
             else:
                 error_exit("Seed suite configuration file not found at " + str(config_path))
+        elif definitions.CONF_TEST_BINARY_CONFIG_FILE in configuration:
+            config_path = configuration.replace(definitions.CONF_TEST_BINARY_CONFIG_FILE, "")
+            if os.path.isfile(config_path):
+                with open(config_path, "r") as conf_file:
+                    values.CONF_TEST_BINARY_LIST = [x.strip().replace("\n", "") for x in conf_file.readlines()]
+            else:
+                error_exit("Test binary configuration file not found at " + str(config_path))
+        elif definitions.CONF_SEED_BINARY_CONFIG_FILE in configuration:
+            config_path = configuration.replace(definitions.CONF_SEED_BINARY_CONFIG_FILE, "")
+            if os.path.isfile(config_path):
+                with open(config_path, "r") as conf_file:
+                    values.CONF_SEED_BINARY_LIST = [x.strip().replace("\n", "") for x in conf_file.readlines()]
+            else:
+                error_exit("Test binary configuration file not found at " + str(config_path))
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
