@@ -322,16 +322,15 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     os.chdir(current_dir)
 
     # collect artifacts
-    ppc_log_path = directory_path + "/klee-last/ppc.log"
-    trace_log_path = directory_path + "/klee-last/trace.log"
+    ppc_log_path = klee_out_dir + "/ppc.log"
+    trace_log_path = klee_out_dir + "/trace.log"
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_list, path_formula = reader.collect_symbolic_path(ppc_log_path, project_path)
         values.LIST_PPC = values.LIST_PPC = ppc_list
         values.LAST_PPC_FORMULA = path_formula
         values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     else:
-        klee_dir_path = directory_path + "/klee-last/"
-        values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_dir_path)
+        values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_out_dir)
         if values.LAST_PPC_FORMULA:
             ppc_list = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
             values.LIST_PPC = values.LIST_PPC + ppc_list
