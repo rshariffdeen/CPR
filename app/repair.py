@@ -292,7 +292,7 @@ def run_cegis(program_path, project_path, patch_list):
             values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/violation-" + str(values.ITERATION_NO)
             gen_path = values.FILE_POC_GEN
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, arg_list, poc_path, gen_path)
-            klee_out_dir = output_dir + "/klee-out-" + str(iteration)
+            klee_out_dir = output_dir + "/klee-out-repair-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             # assert exit_code == 0
@@ -350,7 +350,7 @@ def run_cpr(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 output_dir_path = definitions.DIRECTORY_OUTPUT
-                klee_out_dir = output_dir_path + "/klee-out-" + str(iteration-1)
+                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration-1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
@@ -413,7 +413,7 @@ def run_cpr(program_path, patch_list):
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
             output_dir_path = definitions.DIRECTORY_OUTPUT
-            klee_out_dir = output_dir_path + "/klee-out-" + str(iteration - 1)
+            klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
 

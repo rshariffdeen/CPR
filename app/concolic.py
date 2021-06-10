@@ -481,7 +481,7 @@ def run_concolic_exploration(program_path, patch_list):
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
                 output_dir_path = definitions.DIRECTORY_OUTPUT
-                klee_out_dir = output_dir_path + "/klee-out-" + str(iteration-1)
+                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration-1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
@@ -538,7 +538,7 @@ def run_concolic_exploration(program_path, patch_list):
             second_var_list = values.SECOND_VAR_LIST
             gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
             output_dir_path = definitions.DIRECTORY_OUTPUT
-            klee_out_dir = output_dir_path + "/klee-out-" + str(iteration - 1)
+            klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
                 break
