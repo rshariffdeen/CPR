@@ -461,8 +461,8 @@ def collect_seed_list():
         seed_id = 0
         for (bin_path, test_input) in values.CONF_SEED_SUITE_CONFIG:
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
-            values.LIST_TEST_BINARY.append(bin_path)
-            values.LIST_TEST_INPUT.append(test_input)
+            values.LIST_SEED_BINARY.append(bin_path)
+            values.LIST_SEED_INPUT.append(test_input)
             seed_id = seed_id + 1
     else:
         if values.CONF_SEED_BINARY_LIST:
