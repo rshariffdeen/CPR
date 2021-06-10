@@ -74,7 +74,7 @@ def initialize():
         emitter.sub_sub_title("Test Case #" + str(test_case_id))
         emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
         emitter.highlight("\tUsing Input: " + str(seed_file))
-
+        emitter.debug("input list in test case:" + argument_list)
         argument_list = app.configuration.extract_input_arg_list(argument_list)
         klee_out_dir = output_dir_path + "/klee-out-test-" + str(test_case_id - 1)
         if values.LIST_TEST_BINARY:
@@ -87,7 +87,7 @@ def initialize():
             app.utilities.error_exit("Unable to generate bytecode for " + program_path)
 
         emitter.highlight("\tUsing Binary: " + str(program_path))
-        emitter.debug("input list in test case:" + argument_list)
+
 
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_out_dir)
         assert exit_code == 0
