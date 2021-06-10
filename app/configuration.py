@@ -472,7 +472,7 @@ def collect_seed_list():
             values.LIST_SEED_ID_LIST.add(str(seed_id))
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
             values.LIST_SEED_BINARY.append(bin_path)
-            values.LIST_SEED_INPUT.append(test_input)
+            values.LIST_SEED_INPUT.append((seed_id, test_input))
     else:
         if values.CONF_SEED_BINARY_LIST:
             for binary_path in values.CONF_SEED_BINARY_LIST:
@@ -494,10 +494,9 @@ def collect_seed_list():
             values.LIST_SEED_FILES.append(seed_abs_path)
 
     if values.LIST_SEED_INPUT:
-        seed_id = 0
-        for seed_arg_list_str in values.LIST_SEED_INPUT:
+        for (seed_id, seed_arg_list_str) in values.LIST_SEED_INPUT:
             if values.CONF_SEED_SUITE_ID_LIST:
-                if seed_id + 1 not in values.CONF_SEED_SUITE_ID_LIST:
+                if seed_id not in values.CONF_SEED_SUITE_ID_LIST:
                     continue
             arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
