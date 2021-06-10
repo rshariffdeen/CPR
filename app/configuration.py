@@ -486,12 +486,12 @@ def collect_seed_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
-        elif values.CONF_SEED_DIR:
-            seed_dir = values.CONF_SEED_DIR
-            file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
-            for seed_file in file_list:
-                seed_abs_path = seed_dir + "/" + seed_file
-                values.LIST_SEED_FILES.append(seed_abs_path)
+    if values.CONF_SEED_DIR:
+        seed_dir = values.CONF_SEED_DIR
+        file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
+        for seed_file in file_list:
+            seed_abs_path = seed_dir + "/" + seed_file
+            values.LIST_SEED_FILES.append(seed_abs_path)
 
     if values.LIST_SEED_INPUT:
         seed_id = 0
