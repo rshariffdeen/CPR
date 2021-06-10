@@ -289,6 +289,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE) + " "
     if klee_out_dir:
         klee_command += "klee --output-dir=" + str(klee_out_dir) + " "
+        values.KLEE_LAST_DIR = klee_out_dir
     else:
         klee_command += "klee "
     klee_command += "--posix-runtime " \
@@ -417,6 +418,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         input_argument += " " + str(argument)
     if output_dir:
         klee_command = "klee --output-dir=" + str(output_dir) + " "
+        values.KLEE_LAST_DIR = output_dir
     else:
         klee_command = "klee "
     klee_command += "--posix-runtime " \
@@ -478,7 +480,8 @@ def run_concolic_exploration(program_path, patch_list):
                 iteration = iteration + 1
                 seed_id = seed_id + 1
                 if values.LIST_TEST_BINARY:
-                    program_path = values.LIST_TEST_BINARY[seed_id]
+                    program_path = values.CONF_DIR_SRC + "/" + values.LIST_TEST_BINARY[seed_id]
+                    values.CONF_PATH_PROGRAM = program_path
                 else:
                     program_path = values.CONF_PATH_PROGRAM
                 extractor.extract_byte_code(program_path)

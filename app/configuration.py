@@ -311,8 +311,10 @@ def read_conf_file():
             values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     else:
         values.CONF_DIR_SRC = values.CONF_PATH_PROJECT
-    if "/" != values.CONF_PATH_PROGRAM[0]:
-        values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
+
+    if values.CONF_PATH_PROGRAM:
+        if "/" != values.CONF_PATH_PROGRAM[0]:
+            values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
 
 
 def load_component_list():
@@ -515,11 +517,11 @@ def collect_var_mapping():
 
 def update_configuration():
     emitter.normal("updating configuration values")
-    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
-    values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
-    values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
-    values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
-    values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
+    klee_last_dir = values.KLEE_LAST_DIR
+    values.FILE_PPC_LOG = klee_last_dir + "/ppc.log"
+    values.FILE_EXPR_LOG = klee_last_dir + "/expr.log"
+    values.FILE_TRACE_LOG = klee_last_dir + "/trace.log"
+    values.FILE_MESSAGE_LOG = klee_last_dir + "/messages.txt"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
     definitions.DIRECTORY_LOG = definitions.DIRECTORY_LOG_BASE + "/" + values.CONF_TAG_ID
 

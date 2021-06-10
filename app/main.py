@@ -61,7 +61,7 @@ def initialize():
     test_case_id = 0
     for argument_list in test_input_list:
         if values.LIST_TEST_BINARY:
-            program_path = values.LIST_TEST_BINARY[test_case_id]
+            program_path = values.CONF_DIR_SRC + "/" + values.LIST_TEST_BINARY[test_case_id]
             values.CONF_PATH_PROGRAM = program_path
         else:
             program_path = values.CONF_PATH_PROGRAM
@@ -109,7 +109,7 @@ def run(arg_list):
     time_info[definitions.KEY_DURATION_BOOTSTRAP] = str(duration)
 
     time_check = time.time()
-    if not values.CONF_SKIP_BUILD:
+    if not values.CONF_SKIP_BUILD and values.CONF_PATH_PROGRAM:
         builder.build_normal()
         assert os.path.isfile(values.CONF_PATH_PROGRAM)
         assert os.path.getsize(values.CONF_PATH_PROGRAM) > 0

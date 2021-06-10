@@ -66,6 +66,7 @@ PREFIX_PPC_FORMULA = None
 NEGATED_PPC_FORMULA = None
 LAST_PPC_FORMULA = None
 SELECTED_PATCH = None
+KLEE_LAST_DIR = ""
 
 
 # ------------------ File Path Values ---------------

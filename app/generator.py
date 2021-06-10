@@ -30,7 +30,6 @@ def generate_patch(project_path, model_list=None) -> List[Dict[str, Program]]:
         depth = int(values.CONF_DEPTH_VALUE)
 
     spec_files = []
-    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     output_dir_path = definitions.DIRECTORY_OUTPUT
     for output_spec in test_output_list:
         output_spec_path = Path(project_path + "/" + output_spec)
@@ -101,7 +100,6 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         depth = int(values.CONF_DEPTH_VALUE)
 
     spec_files = []
-    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
     emitter.sub_sub_title("Loading Test-Results")
     test_index = -1
     count_seeds = len(values.LIST_SEED_INPUT)
