@@ -60,14 +60,6 @@ def initialize():
     emitter.sub_title("Running Test-Suite")
     test_case_id = 0
     for argument_list in test_input_list:
-        if values.LIST_TEST_BINARY:
-            program_path = values.LIST_TEST_BINARY[test_case_id]
-            values.CONF_PATH_PROGRAM = program_path
-        else:
-            program_path = values.CONF_PATH_PROGRAM
-        extractor.extract_byte_code(program_path)
-        if not os.path.isfile(program_path + ".bc"):
-            app.utilities.error_exit("Unable to generate bytecode for " + program_path)
         print_argument_list = app.configuration.extract_input_arg_list(argument_list)
         generalized_arg_list = []
         seed_file = None
@@ -85,6 +77,14 @@ def initialize():
         emitter.debug("input list in test case:" + argument_list)
         argument_list = app.configuration.extract_input_arg_list(argument_list)
         klee_out_dir = output_dir_path + "/klee-out-test-" + str(test_case_id-1)
+        if values.LIST_TEST_BINARY:
+            program_path = values.LIST_TEST_BINARY[test_case_id]
+            values.CONF_PATH_PROGRAM = program_path
+        else:
+            program_path = values.CONF_PATH_PROGRAM
+        extractor.extract_byte_code(program_path)
+        if not os.path.isfile(program_path + ".bc"):
+            app.utilities.error_exit("Unable to generate bytecode for " + program_path)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_out_dir)
         assert exit_code == 0
         # set location of bug/crash
