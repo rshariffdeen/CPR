@@ -109,10 +109,11 @@ def run(arg_list):
     time_info[definitions.KEY_DURATION_BOOTSTRAP] = str(duration)
 
     time_check = time.time()
-    if not values.CONF_SKIP_BUILD and values.CONF_PATH_PROGRAM:
+    if not values.CONF_SKIP_BUILD:
         builder.build_normal()
-        assert os.path.isfile(values.CONF_PATH_PROGRAM)
-        assert os.path.getsize(values.CONF_PATH_PROGRAM) > 0
+        if values.CONF_PATH_PROGRAM:
+            assert os.path.isfile(values.CONF_PATH_PROGRAM)
+            assert os.path.getsize(values.CONF_PATH_PROGRAM) > 0
     duration = format((time.time() - time_check) / 60, '.3f')
     time_info[definitions.KEY_DURATION_BUILD] = str(duration)
 

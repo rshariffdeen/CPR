@@ -378,12 +378,6 @@ def collect_test_list():
     if values.CONF_TEST_BINARY_LIST:
         for binary_path in values.CONF_TEST_BINARY_LIST:
             binary_path = values.CONF_DIR_SRC + "/" + binary_path
-            if os.path.isfile(binary_path):
-                extractor.extract_byte_code(binary_path)
-                if not os.path.isfile(binary_path + ".bc"):
-                    error_exit("error extract bc file from " + binary_path)
-            else:
-                error_exit("Binary not found for seeding at " + binary_path)
             values.LIST_TEST_BINARY.append(binary_path)
 
     if values.CONF_TEST_INPUT_LIST:
@@ -455,12 +449,6 @@ def collect_seed_list():
     if values.CONF_SEED_BINARY_LIST:
         for binary_path in values.CONF_SEED_BINARY_LIST:
             binary_path = values.CONF_DIR_SRC + "/" + binary_path
-            if os.path.isfile(binary_path):
-                extractor.extract_byte_code(binary_path)
-                if not os.path.isfile(binary_path + ".bc"):
-                    error_exit("error extract bc file from " + binary_path)
-            else:
-                error_exit("Binary not found for seeding at " + binary_path)
             values.LIST_SEED_BINARY.append(binary_path)
     if values.CONF_SEED_LIST:
         for seed_input in values.CONF_SEED_LIST:
