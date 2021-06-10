@@ -494,10 +494,8 @@ def collect_seed_list():
             values.LIST_SEED_FILES.append(seed_abs_path)
 
     if values.LIST_SEED_INPUT:
+        seed_index = 0
         for (seed_id, seed_arg_list_str) in values.LIST_SEED_INPUT:
-            if values.CONF_SEED_SUITE_ID_LIST:
-                if seed_id not in values.CONF_SEED_SUITE_ID_LIST:
-                    continue
             arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
             for arg in arg_list:
@@ -513,8 +511,9 @@ def collect_seed_list():
                     concretized_arg_list.append(arg)
             concretized_arg_str = ",".join(concretized_arg_list)
             values.LIST_TEST_INPUT.append(concretized_arg_str)
-            values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_id])
-            seed_id = seed_id + 1
+            values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_index])
+            seed_index = seed_index + 1
+
 
 
 def collect_var_mapping():
