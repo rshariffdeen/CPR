@@ -480,7 +480,7 @@ def run_concolic_exploration(program_path, patch_list):
                 iteration = iteration + 1
                 seed_id = seed_id + 1
                 if values.LIST_TEST_BINARY:
-                    program_path = values.CONF_DIR_SRC + "/" + values.LIST_TEST_BINARY[seed_id]
+                    program_path = values.LIST_TEST_BINARY[seed_id]
                     values.CONF_PATH_PROGRAM = program_path
                 else:
                     program_path = values.CONF_PATH_PROGRAM

@@ -342,7 +342,7 @@ def run_cpr(program_path, patch_list):
             seed_id = 0
             for argument_list in test_input_list:
                 if values.LIST_TEST_BINARY:
-                    program_path = values.CONF_DIR_SRC + "/" + values.LIST_TEST_BINARY[iteration]
+                    program_path = values.LIST_TEST_BINARY[iteration]
                     values.CONF_PATH_PROGRAM = program_path
                 else:
                     program_path = values.CONF_PATH_PROGRAM
