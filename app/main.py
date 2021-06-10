@@ -57,8 +57,7 @@ def initialize():
     extractor.extract_byte_code(program_path)
     test_input_list = values.LIST_TEST_INPUT
     second_var_list = list()
-    directory_path = "/".join(str(program_path).split("/")[:-1])
-    klee_out_dir = directory_path + "/klee-last"
+    output_dir_path = definitions.DIRECTORY_OUTPUT
     emitter.sub_title("Running Test-Suite")
     test_case_id = 0
     for argument_list in test_input_list:
@@ -78,7 +77,8 @@ def initialize():
         emitter.highlight("\tUsing Input: " + str(seed_file))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = app.configuration.extract_input_arg_list(argument_list)
-        exit_code = run_concrete_execution(program_path + ".bc", argument_list, True)
+        klee_out_dir = output_dir_path + "/klee-output-" + str(test_case_id-1)
+        exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_out_dir)
         assert exit_code == 0
         # set location of bug/crash
         values.IS_CRASH = False

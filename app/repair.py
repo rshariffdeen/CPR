@@ -350,7 +350,7 @@ def run_cpr(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 output_dir_path = definitions.DIRECTORY_OUTPUT
-                klee_out_dir = output_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                klee_out_dir = output_dir_path + "/klee-out-" + str(iteration-1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
@@ -366,7 +366,7 @@ def run_cpr(program_path, patch_list):
                 emitter.highlight("\tUsing Input: " + str(poc_path))
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
-                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
+                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
                 generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
@@ -412,6 +412,8 @@ def run_cpr(program_path, patch_list):
             time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
+            output_dir_path = definitions.DIRECTORY_OUTPUT
+            klee_out_dir = output_dir_path + "/klee-out-" + str(iteration - 1)
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
             gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
 
@@ -425,7 +427,7 @@ def run_cpr(program_path, patch_list):
             # print(">> new input: " + str(gen_arg_list))
 
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
+            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list, False, klee_out_dir)
             # assert exit_code == 0
             duration = (time.time() - time_check) / 60
             values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
@@ -441,9 +443,9 @@ def run_cpr(program_path, patch_list):
                 continue
             distance.update_distance_map()
             ## Reduces the set of patch candidates based on the current path constraint
-            assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
+            assertion, count_obs = generator.generate_assertion(assertion_template, Path(klee_out_dir).resolve())
             # print(assertion.serialize())
-            patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+            patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
             emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             duration = (time.time() - time_check) / 60
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
