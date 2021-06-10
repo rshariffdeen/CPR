@@ -77,7 +77,7 @@ def initialize():
         emitter.highlight("\tUsing Input: " + str(seed_file))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = app.configuration.extract_input_arg_list(argument_list)
-        klee_out_dir = output_dir_path + "/klee-out-repair-" + str(test_case_id-1)
+        klee_out_dir = output_dir_path + "/klee-out-test-" + str(test_case_id-1)
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_out_dir)
         assert exit_code == 0
         # set location of bug/crash
