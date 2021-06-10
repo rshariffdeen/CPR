@@ -482,7 +482,7 @@ def run_concolic_exploration(program_path, patch_list):
                 else:
                     program_path = values.CONF_PATH_PROGRAM
                 extractor.extract_byte_code(program_path)
-                if os.path.isfile(program_path + ".bc"):
+                if not os.path.isfile(program_path + ".bc"):
                     app.utilities.error_exit("Unable to generate bytecode for " + program_path)
 
                 values.ITERATION_NO = iteration

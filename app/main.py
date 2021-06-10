@@ -66,7 +66,7 @@ def initialize():
         else:
             program_path = values.CONF_PATH_PROGRAM
         extractor.extract_byte_code(program_path)
-        if os.path.isfile(program_path + ".bc"):
+        if not os.path.isfile(program_path + ".bc"):
             app.utilities.error_exit("Unable to generate bytecode for " + program_path)
         print_argument_list = app.configuration.extract_input_arg_list(argument_list)
         generalized_arg_list = []
