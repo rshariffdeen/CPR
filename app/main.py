@@ -44,11 +44,13 @@ def bootstrap(arg_list):
     configuration.read_conf(arg_list)
     configuration.read_conf_file()
     configuration.update_configuration()
-    configuration.print_configuration()
+
     configuration.collect_test_list()
     configuration.collect_seed_list()
+
     # configuration.collect_var_mapping()
     configuration.load_component_list()
+    configuration.print_configuration()
     values.CONF_ARG_PASS = True
 
 
