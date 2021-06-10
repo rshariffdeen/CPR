@@ -376,13 +376,15 @@ def print_configuration():
 def collect_test_list():
     emitter.normal("reading test configuration")
     if values.CONF_TEST_SUITE_CONFIG:
-        test_id = 0
-        for (bin_path, test_input, expected_output) in values.CONF_TEST_SUITE_CONFIG:
+        for (test_id, bin_path, test_input, expected_output) in values.CONF_TEST_SUITE_CONFIG:
+            if values.CONF_TEST_SUITE_ID_LIST:
+                if str(test_id) not in values.CONF_TEST_SUITE_ID_LIST:
+                    continue
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
             values.LIST_TEST_BINARY.append(bin_path)
             values.LIST_TEST_INPUT.append(test_input)
             values.LIST_TEST_OUTPUT.append(expected_output)
-            test_id = test_id + 1
+
     else:
         if values.CONF_TEST_BINARY_LIST:
             for binary_path in values.CONF_TEST_BINARY_LIST:
@@ -458,12 +460,13 @@ def collect_test_list():
 def collect_seed_list():
     emitter.normal("reading seed information")
     if values.CONF_SEED_SUITE_CONFIG:
-        seed_id = 0
-        for (bin_path, test_input) in values.CONF_SEED_SUITE_CONFIG:
+        for (seed_id, bin_path, test_input) in values.CONF_SEED_SUITE_CONFIG:
+            if values.CONF_SEED_SUITE_ID_LIST:
+                if str(seed_id) not in values.CONF_SEED_SUITE_ID_LIST:
+                    continue
             bin_path = values.CONF_DIR_SRC + "/" + bin_path
             values.LIST_SEED_BINARY.append(bin_path)
             values.LIST_SEED_INPUT.append(test_input)
-            seed_id = seed_id + 1
     else:
         if values.CONF_SEED_BINARY_LIST:
             for binary_path in values.CONF_SEED_BINARY_LIST:
@@ -487,6 +490,9 @@ def collect_seed_list():
     if values.LIST_SEED_INPUT:
         seed_id = 0
         for seed_arg_list_str in values.LIST_SEED_INPUT:
+            if values.CONF_SEED_SUITE_ID_LIST:
+                if seed_id + 1 not in values.CONF_SEED_SUITE_ID_LIST:
+                    continue
             arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
             for arg in arg_list:
