@@ -84,12 +84,10 @@ def initialize():
             values.CONF_PATH_PROGRAM = program_path
         else:
             program_path = values.CONF_PATH_PROGRAM
+        emitter.highlight("\tUsing Binary: " + str(program_path))
         extractor.extract_byte_code(program_path)
         if not os.path.isfile(program_path + ".bc"):
             app.utilities.error_exit("Unable to generate bytecode for " + program_path)
-
-        emitter.highlight("\tUsing Binary: " + str(program_path))
-
 
         exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_out_dir)
         assert exit_code == 0
