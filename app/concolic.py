@@ -293,7 +293,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_log_flag = "--log-ppc "
 
-    klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE) + " "
+    klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE_CONCOLIC) + " "
     if klee_out_dir:
         klee_command += "klee --output-dir=" + str(klee_out_dir) + " "
         values.KLEE_LAST_DIR = klee_out_dir
@@ -307,7 +307,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
                     "--log-trace " \
                     + "--external-calls=all " \
                     + "--link-llvm-lib={0} " .format(runtime_lib_path) \
-                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
+                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CONCOLIC) \
                     + "{0}".format(ppc_log_flag) \
                     + "{0}".format(hit_location_flag) \
                     + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
@@ -434,6 +434,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
                     "--external-calls=all " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
+                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CONCRETE) \
                     + "--link-llvm-lib={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument

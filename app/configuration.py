@@ -366,7 +366,7 @@ def print_configuration():
     emitter.configuration("repair method", values.DEFAULT_REDUCE_METHOD)
     emitter.configuration("timeout for CPR", values.DEFAULT_TIME_DURATION)
     emitter.configuration("timeout for sat", values.DEFAULT_TIMEOUT_SAT)
-    emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE)
+    emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE_CONCOLIC)
     emitter.configuration("distance metric", values.DEFAULT_DISTANCE_METRIC)
     emitter.configuration("operation mode", values.DEFAULT_OPERATION_MODE)
     emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
@@ -574,7 +574,7 @@ def update_configuration():
     if values.CONF_TIMEOUT_SAT:
         values.DEFAULT_TIMEOUT_SAT = values.CONF_TIMEOUT_SAT
     if values.CONF_TIMEOUT_KLEE:
-        values.DEFAULT_TIMEOUT_KLEE = values.CONF_TIMEOUT_KLEE
+        values.DEFAULT_TIMEOUT_KLEE_CONCOLIC = values.CONF_TIMEOUT_KLEE
     if values.CONF_RANK_LIMIT:
         values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
     if values.CONF_SELECTION_STRATEGY:
