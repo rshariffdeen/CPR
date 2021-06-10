@@ -66,7 +66,7 @@ def abortable_worker(func, *args, **kwargs):
         return default_value, index
 
 
-def generate_special_paths(ppc_list, arg_list, poc_path):
+def generate_special_paths(ppc_list, arg_list, poc_path, bin_path):
     global pool, result_list, expected_count
     result_list = []
     path_list = []
@@ -98,7 +98,7 @@ def generate_special_paths(ppc_list, arg_list, poc_path):
     for path_list in result_list:
         for path in path_list:
             con_loc, path_smt, path_str = path
-            filtered_list.append(((con_loc, path_smt, path_str), arg_list, poc_path))
+            filtered_list.append(((con_loc, path_smt, path_str), arg_list, poc_path, bin_path))
     return filtered_list
 
 
@@ -418,7 +418,7 @@ def validate_input_generation(patch_list, new_path):
 #         pool.join()
 #     return result_list
 
-def generate_symbolic_paths(ppc_list, arg_list, poc_path):
+def generate_symbolic_paths(ppc_list, arg_list, poc_path, bin_path):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
        the branch conditions added at each location, negate the constraint to create a new path
@@ -428,12 +428,12 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path):
     emitter.normal("\tgenerating new paths")
     path_list = []
     if values.DEFAULT_GEN_SPECIAL_PATH:
-        path_list = generate_special_paths(ppc_list, arg_list, poc_path)
+        path_list = generate_special_paths(ppc_list, arg_list, poc_path, bin_path)
     path_count = len(path_list)
     result_list = generate_flipped_paths(ppc_list)
     for result in result_list:
         path_count = path_count + 1
-        path_list.append((result, arg_list, poc_path))
+        path_list.append((result, arg_list, poc_path, bin_path))
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list

@@ -375,7 +375,7 @@ def run_cpr(program_path, patch_list):
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
-                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
+                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path, program_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
@@ -421,7 +421,7 @@ def run_cpr(program_path, patch_list):
             output_dir_path = definitions.DIRECTORY_OUTPUT
             klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
+            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path, program_path = select_new_input(patch_list)
 
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
@@ -440,7 +440,7 @@ def run_cpr(program_path, patch_list):
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
             time_check = time.time()
-            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path, program_path)
             values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
