@@ -3,7 +3,7 @@ import sys
 import re
 import shutil
 from pathlib import Path
-from app import emitter, logger, definitions, values, reader, synthesis
+from app import emitter, logger, definitions, values, reader, synthesis, extractor
 from app.utilities import error_exit
 
 
@@ -369,6 +369,16 @@ def print_configuration():
 
 def collect_test_list():
     emitter.normal("reading test configuration")
+    if values.CONF_TEST_BINARY_LIST:
+        for binary_path in values.CONF_TEST_BINARY_LIST:
+            if os.path.isfile(binary_path):
+                extractor.extract_byte_code(binary_path)
+                if not os.path.isfile(binary_path + ".bc"):
+                    error_exit("error extract bc file from " + binary_path)
+            else:
+                error_exit("Binary not found for seeding at " + binary_path)
+            values.LIST_TEST_BINARY.append(binary_path + ".bc")
+
     if values.CONF_TEST_INPUT_LIST:
         for test_input in values.CONF_TEST_INPUT_LIST:
             values.LIST_TEST_INPUT.append(test_input)
@@ -435,6 +445,15 @@ def collect_test_list():
 
 def collect_seed_list():
     emitter.normal("reading seed information")
+    if values.CONF_SEED_BINARY_LIST:
+        for binary_path in values.CONF_SEED_BINARY_LIST:
+            if os.path.isfile(binary_path):
+                extractor.extract_byte_code(binary_path)
+                if not os.path.isfile(binary_path + ".bc"):
+                    error_exit("error extract bc file from " + binary_path)
+            else:
+                error_exit("Binary not found for seeding at " + binary_path)
+            values.LIST_SEED_BINARY.append(binary_path + ".bc")
     if values.CONF_SEED_LIST:
         for seed_input in values.CONF_SEED_LIST:
             values.LIST_SEED_INPUT.append(seed_input)
