@@ -67,7 +67,7 @@ def initialize():
         seed_file = None
         test_case_id = test_case_id + 1
         for arg in print_argument_list:
-            if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
+            if arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
                 generalized_arg_list.append("$POC")
                 seed_file = arg
             else:
