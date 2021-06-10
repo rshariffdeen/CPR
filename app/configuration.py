@@ -264,7 +264,22 @@ def read_conf_file():
             values.CONF_TIMEOUT_SAT = int(configuration.replace(definitions.CONF_TIMEOUT_SAT, ''))
         elif definitions.CONF_TIMEOUT_KLEE in configuration:
             values.CONF_TIMEOUT_KLEE = int(configuration.replace(definitions.CONF_TIMEOUT_KLEE, ''))
-
+        elif definitions.CONF_TEST_SUITE_ID_LIST in configuration:
+            values.CONF_TEST_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_TEST_SUITE_ID_LIST, "").split(",")
+        elif definitions.CONF_SEED_SUITE_ID_LIST in configuration:
+            values.CONF_SEED_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_SEED_SUITE_ID_LIST, "").split(",")
+        elif definitions.CONF_TEST_SUITE_CONFIG in configuration:
+            config_path = configuration.replace(definitions.CONF_TEST_SUITE_CONFIG, "")
+            if os.path.isfile(config_path):
+                values.CONF_TEST_SUITE_CONFIG = reader.read_json(config_path)
+            else:
+                error_exit("Test suite configuration file not found at " + str(config_path))
+        elif definitions.CONF_SEED_SUITE_CONFIG in configuration:
+            config_path = configuration.replace(definitions.CONF_SEED_SUITE_CONFIG, "")
+            if os.path.isfile(config_path):
+                values.CONF_SEED_SUITE_CONFIG = reader.read_json(config_path)
+            else:
+                error_exit("Seed suite configuration file not found at " + str(config_path))
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")

@@ -74,6 +74,12 @@ CONF_TEST_INPUT_FILE = "test_input_file:"
 CONF_TEST_OUTPUT_FILE = "test_output_file:"
 CONF_TEST_INPUT_LIST = "test_input_list:"
 CONF_TEST_OUTPUT_LIST = "test_output_list:"
+
+CONF_TEST_SUITE_CONFIG = "path_test_suite:"
+CONF_TEST_SUITE_ID_LIST = "list_test_id:"
+CONF_SEED_SUITE_CONFIG = "path_seed_suite:"
+CONF_SEED_SUITE_ID_LIST = "list_seed_id:"
+
 CONF_SEED_FILE = "seed_file:"
 CONF_SEED_DIR = "seed_dir:"
 CONF_SEED_LIST = "seed_list:"
