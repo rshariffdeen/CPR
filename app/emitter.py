@@ -210,6 +210,7 @@ def emit_help():
     write("Usage: cpr [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
     write("Options are:", RED)
     write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", RED)
+    write("\t" + definitions.ARG_ITERATION_COUNT + "\t| " + "limit number of iterations for repair", RED)
     write("\t" + definitions.ARG_CEGIS_TIME_SPLIT + "\t| " + "specify time split ratio for CEGIS mode; explore:refine  in minutes(default=1:1)", RED)
     write("\t" + definitions.ARG_DEBUG + "\t| " + "enable debugging information", RED)
     write("\t" + definitions.ARG_OPERATION_MODE + "\t| " + "execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)", RED)
@@ -219,4 +220,5 @@ def emit_help():
     write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "patch type [0: concrete, 1: abstract] (default=0)", RED)
     write("\t" + definitions.ARG_REFINE_METHOD + "\t| " + "refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)", RED)
     write("\t" + definitions.ARG_REDUCE_METHOD + "\t| " + "reduce method [0: cpr, 1: cegis] (default=0)", RED)
+
 
