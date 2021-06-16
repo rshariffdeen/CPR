@@ -131,6 +131,12 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
             klee_spec_path = Path(output_dir_path + "/klee-out-test-" + str(test_index))
             spec_files.append((output_spec_path, klee_spec_path))
         emitter.normal("\tTest #" + str(test_index + 1))
+        if values.LIST_TEST_BINARY:
+            program_path = values.LIST_TEST_BINARY[test_index]
+            values.CONF_PATH_PROGRAM = program_path
+        else:
+            program_path = values.CONF_PATH_PROGRAM
+        emitter.highlight("\tUsing Binary: " + str(program_path))
         emitter.highlight("\tInput Arg: " + str(arg_list))
         if seed_file:
             emitter.highlight("\tInput file: " + str(seed_file))
