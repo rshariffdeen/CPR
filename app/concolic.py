@@ -194,7 +194,7 @@ def select_new_input(patch_list=None):
     if not list_path_inprogress:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
         emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-        return None, None, patch_list, None, None
+        return None, None, patch_list, None, None, None
     values.LIST_GENERATED_PATH = []
     patch_constraint = None
     selected_new_path = ""
@@ -205,7 +205,7 @@ def select_new_input(patch_list=None):
             if not list_path_inprogress:
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-                return None, None, patch_list, None, None
+                return None, None, patch_list, None, None, None
             selected_new_path, selected_control_loc, argument_list, poc_path, bin_path = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
