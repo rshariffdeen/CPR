@@ -502,7 +502,7 @@ def run_concolic_exploration(program_path, patch_list):
                         generalized_arg_list.append(arg)
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
-                emitter.highlight("\tUsing Input: " + str(poc_path))
+                emitter.highlight("\tUsing Input File: " + str(poc_path))
                 if values.LIST_TEST_BINARY:
                     program_path = values.LIST_TEST_BINARY[seed_id-1]
                     values.CONF_PATH_PROGRAM = program_path

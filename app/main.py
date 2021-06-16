@@ -75,7 +75,7 @@ def initialize():
 
         emitter.sub_sub_title("Test Case #" + str(test_case_id))
         emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
-        emitter.highlight("\tUsing Input: " + str(seed_file))
+        emitter.highlight("\tUsing Input File: " + str(seed_file))
         emitter.debug("input list in test case:" + argument_list)
         argument_list = app.configuration.extract_input_arg_list(argument_list)
         klee_out_dir = output_dir_path + "/klee-out-test-" + str(test_case_id - 1)
