@@ -398,7 +398,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
 #     return return_code
 
 
-def run_concrete_execution(program, argument_list, print_output=False, output_dir=None):
+def run_concrete_execution(program, argument_list, print_output=False, klee_out_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -413,6 +413,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     emitter.debug("changing directory:" + directory_path)
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
+    project_path = values.CONF_DIR_SRC
     input_argument = ""
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
@@ -426,9 +427,9 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         #         if values.FILE_POC_GEN:
         #             argument = values.FILE_POC_GEN
         input_argument += " " + str(argument)
-    if output_dir:
-        klee_command = "klee --output-dir=" + str(output_dir) + " "
-        values.KLEE_LAST_DIR = output_dir
+    if klee_out_dir:
+        klee_command = "klee --output-dir=" + str(klee_out_dir) + " "
+        values.KLEE_LAST_DIR = klee_out_dir
     else:
         klee_command = "klee "
     hit_location_flag = values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
@@ -452,6 +453,8 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     return_code = utilities.execute_command(klee_command)
     emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
+    trace_log_path = klee_out_dir + "/trace.log"
+    values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     return return_code
 
 #
