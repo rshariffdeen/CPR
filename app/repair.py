@@ -243,7 +243,7 @@ def run(project_path, program_path):
     elif values.DEFAULT_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, filtered_patch_list)
 
-    values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
+    values.COUNT_PATHS_EXPLORED_GEN = len(concolic.list_path_explored)
     values.COUNT_PATHS_DETECTED = len(concolic.list_path_detected)
     values.COUNT_PATHS_SKIPPED = len(concolic.list_path_infeasible)
 
@@ -295,6 +295,7 @@ def run_cegis(program_path, project_path, patch_list):
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             # assert exit_code == 0
+            values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
             emitter.normal("\t\tgenerating new assertion")
             test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
@@ -377,6 +378,7 @@ def run_cpr(program_path, patch_list):
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
+                values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
                 generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path, program_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
@@ -440,6 +442,7 @@ def run_cpr(program_path, patch_list):
             exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list, False, klee_out_dir)
             # assert exit_code == 0
             duration = (time.time() - time_check) / 60
+            values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
             values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)

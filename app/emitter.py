@@ -189,6 +189,7 @@ def end(time_info, is_error=False):
 
         statistics("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))
         statistics("Paths Explored: " + str(values.COUNT_PATHS_EXPLORED))
+        statistics("Paths Explored via Generation: " + str(values.COUNT_PATHS_EXPLORED_GEN))
         statistics("Paths Skipped: " + str(values.COUNT_PATHS_SKIPPED))
         statistics("Paths Hit Patch Loc: " + str(values.COUNT_HIT_PATCH_LOC))
         statistics("Paths Hit Observation Loc: " + str(values.COUNT_HIT_BUG_LOG))
