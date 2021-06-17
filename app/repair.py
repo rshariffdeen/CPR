@@ -342,10 +342,12 @@ def run_cpr(program_path, patch_list):
             test_input_list = values.LIST_TEST_INPUT
             seed_id = 0
             for argument_list in test_input_list:
+                seed_id = seed_id + 1
+                if seed_id not in values.USEFUL_SEED_ID_LIST:
+                    continue
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
-                seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 output_dir_path = definitions.DIRECTORY_OUTPUT
                 klee_test_dir = output_dir_path + "/klee-out-test-" + str(iteration-1)

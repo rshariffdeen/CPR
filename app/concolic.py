@@ -431,17 +431,22 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         values.KLEE_LAST_DIR = output_dir
     else:
         klee_command = "klee "
+    hit_location_flag = values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
+
     klee_command += "--posix-runtime " \
                     "--libc=uclibc " \
                     "--search=dfs " \
                     "--write-smt2s " \
                     "--external-calls=all " \
+                    "--log-trace " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
                     + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CONCRETE) \
+                    + " --hit-locations {0} ".format(hit_location_flag) \
                     + "--link-llvm-lib={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument
+
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = utilities.execute_command(klee_command)
