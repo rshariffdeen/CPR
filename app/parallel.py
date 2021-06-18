@@ -76,7 +76,7 @@ def generate_special_paths(ppc_list, arg_list, poc_path, bin_path):
     expected_count = len(ppc_list)
     ppc_list.reverse()
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
-        for con_loc, ppc_str in ppc_list:
+        for con_loc, ppc_str in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
             count = count + 1
@@ -84,7 +84,7 @@ def generate_special_paths(ppc_list, arg_list, poc_path, bin_path):
     else:
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
-        for con_loc, ppc_str in ppc_list:
+        for con_loc, ppc_str in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
                 break
             count = count + 1
@@ -111,7 +111,7 @@ def generate_flipped_paths(ppc_list):
     count = 0
     expected_count = len(ppc_list)
     ppc_list.reverse()
-    emitter.highlight("\t[info] found " + str(len(ppc_list)) + " branch locations")
+    emitter.highlight("\t\t[info] found " + str(len(ppc_list)) + " branch locations")
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if definitions.DIRECTORY_LIB in control_loc:
@@ -419,6 +419,7 @@ def validate_input_generation(patch_list, new_path):
 #         pool.join()
 #     return result_list
 
+
 def generate_symbolic_paths(ppc_list, arg_list, poc_path, bin_path):
     """
        This function will analyse the partial path conditions collected at each branch location and isolate
@@ -438,3 +439,4 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path, bin_path):
 
     emitter.highlight("\t\tgenerated " + str(path_count) + " flipped path(s)")
     return path_list
+
