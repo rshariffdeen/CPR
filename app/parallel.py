@@ -111,8 +111,9 @@ def generate_flipped_paths(ppc_list):
     count = 0
     expected_count = len(ppc_list)
     ppc_list.reverse()
+    emitter.highlight("\t[info] found " + str(len(ppc_list)) + " branch locations")
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
-        for control_loc, ppc in ppc_list:
+        for control_loc, ppc in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if definitions.DIRECTORY_LIB in control_loc:
                 continue
             if count == values.DEFAULT_GEN_SEARCH_LIMIT:
@@ -134,7 +135,7 @@ def generate_flipped_paths(ppc_list):
         emitter.normal("\t\tstarting parallel computing")
         pool = mp.Pool(mp.cpu_count(), initializer=mute)
         thread_list = []
-        for control_loc, ppc in ppc_list:
+        for control_loc, ppc in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if definitions.DIRECTORY_LIB in control_loc:
                 expected_count = expected_count - 1
                 continue
