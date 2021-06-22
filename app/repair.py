@@ -378,18 +378,19 @@ def run_cpr(program_path, patch_list):
                 if not os.path.isfile(program_path + ".bc"):
                     app.utilities.error_exit("Unable to generate bytecode for " + program_path)
 
-                exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_test_dir)
-                assert exit_code == 0
-                # set location of bug/crash
-                values.IS_CRASH = False
-                latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
-                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-                    continue
-                if latest_crash_loc:
-                    values.IS_CRASH = True
-                    emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))
-                    if latest_crash_loc not in values.CONF_LOC_LIST_CRASH:
-                        values.CONF_LOC_LIST_CRASH.append(latest_crash_loc)
+                if seed_id > count_fail_inputs:
+                    exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_test_dir)
+                    assert exit_code == 0
+                    # set location of bug/crash
+                    values.IS_CRASH = False
+                    latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
+                    if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                        continue
+                    if latest_crash_loc:
+                        values.IS_CRASH = True
+                        emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))
+                        if latest_crash_loc not in values.CONF_LOC_LIST_CRASH:
+                            values.CONF_LOC_LIST_CRASH.append(latest_crash_loc)
 
                 values.ARGUMENT_LIST = generalized_arg_list
 
