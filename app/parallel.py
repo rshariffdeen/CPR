@@ -111,7 +111,6 @@ def generate_flipped_paths(ppc_list):
     count = 0
     expected_count = len(ppc_list)
     ppc_list.reverse()
-    emitter.highlight("\t\t[info] found " + str(len(ppc_list)) + " branch locations")
     if values.DEFAULT_OPERATION_MODE in ["sequential", "semi-parallel"]:
         for control_loc, ppc in ppc_list[:values.DEFAULT_MAX_FLIPPINGS]:
             if definitions.DIRECTORY_LIB in control_loc:
@@ -434,6 +433,7 @@ def generate_symbolic_paths(ppc_list, arg_list, poc_path, bin_path):
               returns a list of new partial path conditions
     """
     emitter.normal("\tgenerating new paths")
+    emitter.highlight("\t\t[info] found " + str(len(ppc_list)) + " branch locations")
     path_list = []
     if values.DEFAULT_GEN_SPECIAL_PATH:
         path_list = generate_special_paths(ppc_list, arg_list, poc_path, bin_path)

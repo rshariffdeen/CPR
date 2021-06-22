@@ -103,6 +103,7 @@ def extract_parameter_list(model):
 def extract_largest_path_condition(dir_path):
     largest_path_condition = None
     pc_formula_len = 0
+    emitter.normal("\textracting largest symbolic path")
     file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
     for file_name in file_list:
         if ".smt2" in file_name:
