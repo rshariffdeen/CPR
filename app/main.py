@@ -97,8 +97,8 @@ def initialize():
         # set location of bug/crash
         values.IS_CRASH = False
         latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
-        if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            values.USEFUL_SEED_ID_LIST.append(test_case_id)
+        # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+        #     values.USEFUL_SEED_ID_LIST.append(test_case_id)
         if latest_crash_loc:
             values.IS_CRASH = True
             emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))

@@ -1,7 +1,7 @@
 import app.configuration
 import app.generator
 import app.parallel
-from app.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
+from app.concolic import run_concolic_execution, select_new_input, check_infeasible_paths, run_concrete_execution
 from app.synthesis import load_specification, Program, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -337,14 +337,17 @@ def run_cpr(program_path, patch_list):
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
+    test_input_list = values.LIST_TEST_INPUT
+    count_seeds = len(values.LIST_SEED_INPUT)
+    count_inputs = len(test_input_list)
+    count_fail_inputs = count_inputs - count_seeds
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
-            test_input_list = values.LIST_TEST_INPUT
             seed_id = 0
             for argument_list in test_input_list:
                 seed_id = seed_id + 1
-                if seed_id not in values.USEFUL_SEED_ID_LIST:
-                    continue
+                # if seed_id not in values.USEFUL_SEED_ID_LIST:
+                #     continue
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
@@ -374,6 +377,20 @@ def run_cpr(program_path, patch_list):
                 extractor.extract_byte_code(program_path)
                 if not os.path.isfile(program_path + ".bc"):
                     app.utilities.error_exit("Unable to generate bytecode for " + program_path)
+
+                exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_test_dir)
+                assert exit_code == 0
+                # set location of bug/crash
+                values.IS_CRASH = False
+                latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
+                if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                    continue
+                if latest_crash_loc:
+                    values.IS_CRASH = True
+                    emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))
+                    if latest_crash_loc not in values.CONF_LOC_LIST_CRASH:
+                        values.CONF_LOC_LIST_CRASH.append(latest_crash_loc)
+
                 values.ARGUMENT_LIST = generalized_arg_list
 
                 _, second_var_list = generator.generate_angelic_val(klee_test_dir, generalized_arg_list, poc_path)
