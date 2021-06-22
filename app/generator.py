@@ -178,14 +178,18 @@ def generate_flipped_path(ppc):
            returns satisfiability of the negated path
     """
     parser = SmtLibParser()
-    script = parser.get_script(cStringIO(ppc))
-    formula = script.get_last_formula()
-    prefix = formula.arg(0)
-    constraint = formula.arg(1)
-    new_path = And(prefix, Not(constraint))
-
-    assert str(new_path.serialize()) != str(formula.serialize())
-    return new_path
+    new_path = None
+    try:
+        script = parser.get_script(cStringIO(ppc))
+        formula = script.get_last_formula()
+        prefix = formula.arg(0)
+        constraint = formula.arg(1)
+        new_path = And(prefix, Not(constraint))
+        assert str(new_path.serialize()) != str(formula.serialize())
+    except Exception as ex:
+        emitter.debug("Pysmt parser error, skipping path flip")
+    finally:
+        return new_path
 
 
 def generate_true_constraint(path_constraint):

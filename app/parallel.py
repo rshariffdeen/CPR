@@ -124,6 +124,8 @@ def generate_flipped_paths(ppc_list):
             values.LIST_PATH_READ.append(ppc_str)
             count = count + 1
             new_path = generator.generate_flipped_path(ppc)
+            if new_path is None:
+                continue
             new_path_str = new_path.serialize()
             ppc_len = len(str(new_path.serialize()))
             path_list.append((control_loc, new_path, ppc_len))
@@ -149,6 +151,8 @@ def generate_flipped_paths(ppc_list):
             values.LIST_PATH_READ.append(ppc_str)
             count = count + 1
             new_path = generator.generate_flipped_path(ppc)
+            if new_path is None:
+                continue
             new_path_str = new_path.serialize()
             ppc_len = len(str(new_path.serialize()))
             path_list.append((control_loc, new_path, ppc_len))
