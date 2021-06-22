@@ -356,7 +356,9 @@ def validate_input_generation(patch_list, new_path):
             except ValueError:
                 emitter.warning("\t\tvalue found before completing pool")
                 break
+        pool.close()
         emitter.normal("\t\twaiting for thread completion")
+        pool.join()
     return result_list
 
 #
