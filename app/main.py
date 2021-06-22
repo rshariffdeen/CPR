@@ -52,6 +52,7 @@ def bootstrap(arg_list):
     configuration.load_component_list()
     configuration.print_configuration()
     values.CONF_ARG_PASS = True
+    app.utilities.check_budget(values.DEFAULT_TIME_DURATION)
 
 
 def initialize():
@@ -61,7 +62,9 @@ def initialize():
     output_dir_path = definitions.DIRECTORY_OUTPUT
     emitter.sub_title("Running Test-Suite")
     test_case_id = 0
-    for argument_list in test_input_list:
+    count_seeds = len(values.LIST_SEED_INPUT)
+    count_inputs = len(test_input_list)
+    for argument_list in test_input_list[:count_inputs - count_seeds]:
         print_argument_list = app.configuration.extract_input_arg_list(argument_list)
         generalized_arg_list = []
         seed_file = None
