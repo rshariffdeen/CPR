@@ -1117,7 +1117,7 @@ def generate_program_specification():
 def generate_ppc_from_formula(path_condition):
     ppc_list = list()
     emitter.normal("\textracting branches from path condition")
-    max_count = 4 * values.DEFAULT_MAX_FLIPPINGS
+    max_count = 2 * values.DEFAULT_MAX_FLIPPINGS
     while path_condition.is_and():
         constraint = path_condition.arg(1)
         constraint_str = str(constraint.serialize())
