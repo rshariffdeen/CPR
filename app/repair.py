@@ -484,12 +484,17 @@ def run_cpr(program_path, patch_list):
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
-        if values.DEFAULT_COLLECT_STAT:
-            ranked_patch_list = rank_patches(patch_list)
-            update_rank_matrix(ranked_patch_list, iteration)
-            definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
-            writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
-            writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
+
+        ranked_patch_list = rank_patches(patch_list)
+        update_rank_matrix(ranked_patch_list, iteration)
+        definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
+        writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
+        writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
+            values.COUNT_TEMPLATE_END = len(patch_list)
+        else:
+            values.COUNT_PATCH_END = len(ranked_patch_list)
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)
