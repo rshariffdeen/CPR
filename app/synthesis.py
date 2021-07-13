@@ -1562,11 +1562,14 @@ def get_all_constant_names(tree_content: Dict[str, 'ComponentTree']) -> Set[str]
     Collects all constant names in a tree.
     """
     names = set()
-
-    left_name = tree_content['left'][0][0]
-    left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
-    right_name = tree_content['right'][0][0]
-    right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
+    left_name = ""
+    right_name = ""
+    if "left" in tree_content.keys():
+        left_name = tree_content['left'][0][0]
+        left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
+    if "right" in tree_content.keys():
+        right_name = tree_content['right'][0][0]
+        right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
 
     # If left side is a leaf node, then check for constant.
     if not left_dict and left_name.startswith('constant_'):
