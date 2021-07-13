@@ -1564,6 +1564,8 @@ def get_all_constant_names(tree_content: Dict[str, 'ComponentTree']) -> Set[str]
     names = set()
     left_name = ""
     right_name = ""
+    left_dict = None
+    right_dict = None
     if "left" in tree_content.keys():
         left_name = tree_content['left'][0][0]
         left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
