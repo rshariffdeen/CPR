@@ -507,7 +507,7 @@ def run_concolic_exploration(program_path, patch_list):
                 for arg in argument_list:
                     if str(argument_list.index(arg)) in values.CONF_MASK_ARG:
                         generalized_arg_list.append(arg)
-                    if arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
+                    elif arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
