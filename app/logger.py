@@ -124,7 +124,7 @@ def end(time_duration, is_error=False):
     output("Reduce: " + str(time_duration[definitions.KEY_DURATION_REPAIR]) + " minutes")
     output("Iteration Count: " + str(values.ITERATION_NO))
     # output("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
-    output("Patch Explored Count: " + str(values.COUNT_PATCH_EXPLORED))
+    output("Abstract Patch Explored Count: " + str(values.COUNT_PATCH_EXPLORED))
     output("Patch Start Count: " + str(values.COUNT_PATCH_START))
     output("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
     output("Patch End Count: " + str(values.COUNT_PATCH_END))

@@ -178,7 +178,7 @@ def end(time_info, is_error=False):
         statistics("Reduce: " + str(time_info[definitions.KEY_DURATION_REPAIR]) + " minutes")
         statistics("Iteration Count: " + str(values.ITERATION_NO))
         # statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
-        statistics("Patch Explored Count: " + str(values.COUNT_PATCH_EXPLORED))
+        statistics("Abstract Patch Explored Count: " + str(values.COUNT_PATCH_EXPLORED))
         statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
         statistics("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
         statistics("Patch End Count: " + str(values.COUNT_PATCH_END))

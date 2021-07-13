@@ -160,7 +160,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
     else:
         result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
-    emitter.highlight("\tnumber of patches explored: " + str(values.COUNT_PATCH_EXPLORED))
+    emitter.highlight("\tnumber of abstract patches explored: " + str(values.COUNT_PATCH_EXPLORED))
     list_of_patches = [_ for _ in result]
     filtered_patch_list = []
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
