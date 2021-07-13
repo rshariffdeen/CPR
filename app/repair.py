@@ -371,7 +371,9 @@ def run_cpr(program_path, patch_list):
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
-                    if arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
+                    if str(argument_list.index(arg)) in values.CONF_MASK_ARG:
+                        generalized_arg_list.append(arg)
+                    elif arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
