@@ -375,6 +375,7 @@ def print_configuration():
     emitter.configuration("number of tests", str(len(values.LIST_TEST_INPUT)))
     emitter.configuration("list of seed ids", str(values.LIST_SEED_ID_LIST))
     emitter.configuration("list of test ids", str(values.LIST_TEST_ID_LIST))
+    emitter.configuration("masked input arg id list", values.CONF_MASK_ARG)
 
 
 def collect_test_list():
@@ -447,6 +448,8 @@ def collect_test_list():
         arg_list = extract_input_arg_list(arg_list_str)
         concretized_arg_list = []
         for arg in arg_list:
+            if str(arg_list.index(arg)) in values.CONF_MASK_ARG:
+                continue
             if "$POC_" in arg:
                 file_index = "_".join(str(arg).split("_")[1:])
                 file_path = values.LIST_TEST_FILES[file_index]
