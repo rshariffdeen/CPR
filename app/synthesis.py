@@ -1,5 +1,6 @@
 import argparse
 import logging
+import math
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
@@ -1104,11 +1105,20 @@ def synthesize_lazy(components: List[Component],
 
     optimized = True
     template_explored = 0
+    concrete_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
         template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
+
+        if contains_constant(tree[1]):
+            names = get_all_constant_names(tree[1])
+            range = upper_bound - lower_bound + 2
+            count_pairs = math.pow(range, len(names)) - range
+            concrete_explored = concrete_explored + count_pairs
+        else:
+            concrete_explored = concrete_explored + 1
 
         if optimized:
             ## Check for tautologies (TRUE) and contradictions (FALSE).
@@ -1262,7 +1272,9 @@ def synthesize_lazy(components: List[Component],
             result = verify({lid: (tree, {})}, specification)
             if result:
                 yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
-    values.COUNT_PATCH_EXPLORED = template_explored
+    values.COUNT_PATCHES_EXPLORED = concrete_explored
+    values.COUNT_TEMPLATES_EXPLORED = template_explored
+
 
 #TODO: enforce assigned variables in verification conditon
 #TODO: check hole types
@@ -1294,12 +1306,19 @@ def synthesize_parallel(components: List[Component],
     ## Open new pool for parallel execution.
     pool = mp.Pool(mp.cpu_count())
     template_explored = 0
+    concrete_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
         template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
-
+        if contains_constant(tree[1]):
+            names = get_all_constant_names(tree[1])
+            range = upper_bound - lower_bound + 2
+            count_pairs = math.pow(range, len(names)) - range
+            concrete_explored = concrete_explored + count_pairs
+        else:
+            concrete_explored = concrete_explored + 1
         if optimized:
             ## Check for tautologies (TRUE) and contradictions (FALSE).
             # 1. Check for x == x, x<=x, x>=x
@@ -1462,7 +1481,8 @@ def synthesize_parallel(components: List[Component],
     pool.close()
     logger.info("\t\twaiting for thread completion")
     pool.join()
-    values.COUNT_PATCH_EXPLORED = template_explored
+    values.COUNT_PATCHES_EXPLORED = concrete_explored
+    values.COUNT_TEMPLATES_EXPLORED = template_explored
     # assert(len(result_list) == len(path_list))
 
     #print("collected_patch_indeces=" + str(collected_patch_indeces))

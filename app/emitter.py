@@ -178,11 +178,12 @@ def end(time_info, is_error=False):
         statistics("Reduce: " + str(time_info[definitions.KEY_DURATION_REPAIR]) + " minutes")
         statistics("Iteration Count: " + str(values.ITERATION_NO))
         # statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
-        statistics("Abstract Patch Explored Count: " + str(values.COUNT_PATCH_EXPLORED))
+        statistics("Patch Explored Count: " + str(values.COUNT_PATCHES_EXPLORED))
         statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
         statistics("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
         statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
         if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            statistics("Template Explored Count: " + str(values.COUNT_TEMPLATES_EXPLORED))
             # statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
             statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
             statistics("Template End Seed Count: " + str(values.COUNT_TEMPLATE_END_SEED))
