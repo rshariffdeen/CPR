@@ -43,8 +43,9 @@ def timeout_handler(signum, frame):
 
 def shutdown(signum, frame):
     global stop_event
-    emitter.warning("Exiting due to Signal")
+    emitter.warning("Exiting due to Terminate Signal")
     stop_event.set()
+    raise SystemExit
 
 
 def bootstrap(arg_list):
@@ -153,10 +154,10 @@ def main():
     import sys
     is_error = False
     signal.signal(signal.SIGALRM, timeout_handler)
+    signal.signal(signal.SIGTERM, shutdown)
     try:
         run(sys.argv[1:])
-    except KeyboardInterrupt as e:
-        signal.signal(signal.SIGTERM, shutdown)
+    except SystemExit as e:
         total_duration = format((time.time() - start_time) / 60, '.3f')
         time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
         emitter.end(time_info, is_error)
@@ -165,11 +166,18 @@ def main():
         parallel.pool.terminate()
         parallel.pool.join()
         os.system("ps -aux | grep 'pypy3' | awk '{print $2}' | xargs kill -9")
+    except KeyboardInterrupt as e:
+        total_duration = format((time.time() - start_time) / 60, '.3f')
+        time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
+        emitter.end(time_info, is_error)
+        logger.end(time_info, is_error)
+        logger.store()
     except Exception as e:
         is_error = True
         emitter.error("Runtime Error")
         emitter.error(str(e))
         logger.error(traceback.format_exc())
+    finally:
         # Final running time and exit message
         # os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
         total_duration = format((time.time() - start_time) / 60, '.3f')
