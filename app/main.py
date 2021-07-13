@@ -156,7 +156,7 @@ def main():
     try:
         run(sys.argv[1:])
     except KeyboardInterrupt as e:
-        signal.signal(signal.SIGTERM, shutdown())
+        signal.signal(signal.SIGTERM, shutdown)
         total_duration = format((time.time() - start_time) / 60, '.3f')
         time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
         emitter.end(time_info, is_error)
