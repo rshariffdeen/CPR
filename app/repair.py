@@ -329,6 +329,19 @@ def run_cegis(program_path, project_path, patch_list):
     values.COUNT_PATCH_END = values.COUNT_PATCH_START - count_throw
 
 
+def compute_iteration_stat(patch_list, iteration):
+    ranked_patch_list = rank_patches(patch_list)
+    update_rank_matrix(ranked_patch_list, iteration)
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
+    writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
+    writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
+        values.COUNT_TEMPLATE_END = len(patch_list)
+    else:
+        values.COUNT_PATCH_END = len(ranked_patch_list)
+
+
 def run_cpr(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     values.CONF_TIME_CHECK = None
@@ -430,6 +443,8 @@ def run_cpr(program_path, patch_list):
                     emitter.warning(
                         "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
                     break
+                compute_iteration_stat(patch_list, iteration)
+
             emitter.success("\t\tend of concolic exploration using user-provided seeds")
             emitter.success("\t\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             values.COUNT_TEMPLATE_END_SEED = len(patch_list)
@@ -485,16 +500,7 @@ def run_cpr(program_path, patch_list):
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
 
-        ranked_patch_list = rank_patches(patch_list)
-        update_rank_matrix(ranked_patch_list, iteration)
-        definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
-        writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
-        writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
-        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
-            values.COUNT_TEMPLATE_END = len(patch_list)
-        else:
-            values.COUNT_PATCH_END = len(ranked_patch_list)
+            compute_iteration_stat(patch_list, iteration)
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)
