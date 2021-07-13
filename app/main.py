@@ -2,6 +2,7 @@ import os
 import time
 import traceback
 import signal
+import multiprocessing as mp
 
 import app.configuration
 import app.utilities
@@ -17,6 +18,8 @@ time_info = {
     definitions.KEY_DURATION_REPAIR: '0',
     definitions.KEY_DURATION_TOTAL: '0'
     }
+
+stop_event = mp.Event()
 
 
 def create_directories():
@@ -36,6 +39,12 @@ def create_directories():
 def timeout_handler(signum, frame):
     emitter.error("TIMEOUT Exception")
     raise Exception("end of time")
+
+
+def shutdown(signum, frame):
+    global stop_event
+    emitter.warning("Exiting due to Signal")
+    stop_event.set()
 
 
 def bootstrap(arg_list):
@@ -147,16 +156,20 @@ def main():
     try:
         run(sys.argv[1:])
     except KeyboardInterrupt as e:
-        is_error = True
+        signal.signal(signal.SIGTERM, shutdown())
+        total_duration = format((time.time() - start_time) / 60, '.3f')
+        time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
+        emitter.end(time_info, is_error)
+        logger.end(time_info, is_error)
+        logger.store()
         parallel.pool.terminate()
         parallel.pool.join()
-        logger.error(traceback.format_exc())
+        os.system("ps -aux | grep 'pypy3' | awk '{print $2}' | xargs kill -9")
     except Exception as e:
         is_error = True
         emitter.error("Runtime Error")
         emitter.error(str(e))
         logger.error(traceback.format_exc())
-    finally:
         # Final running time and exit message
         # os.system("ps -aux | grep 'python' | awk '{print $2}' | xargs kill -9")
         total_duration = format((time.time() - start_time) / 60, '.3f')
