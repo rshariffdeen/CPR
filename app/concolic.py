@@ -251,7 +251,9 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # argument_list = str(argument_str).split(" ")
     for argument in argument_list:
         index = list(argument_list).index(argument)
-        if "$POC" in argument:
+        if str(index) in values.CONF_MASK_ARG:
+            input_argument += " " + argument
+        elif "$POC" in argument:
             file_path = values.FILE_POC_GEN
             # if "_" in argument:
             #     file_index = "_".join(str(argument).split("_")[1:])
@@ -265,8 +267,6 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
             concrete_file = open(file_path, 'rb')
             bit_size = os.fstat(concrete_file.fileno()).st_size
             input_argument += " A --sym-files 1 " + str(bit_size) + " "
-        elif str(index) in values.CONF_MASK_ARG:
-            input_argument += " " + argument
         else:
             input_argument += " --sym-arg " + str(len(str(argument)))
     ktest_path, return_code = generator.generate_ktest(argument_list, second_var_list)

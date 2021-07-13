@@ -448,8 +448,6 @@ def collect_test_list():
         arg_list = extract_input_arg_list(arg_list_str)
         concretized_arg_list = []
         for arg in arg_list:
-            if str(arg_list.index(arg)) in values.CONF_MASK_ARG:
-                continue
             if "$POC_" in arg:
                 file_index = "_".join(str(arg).split("_")[1:])
                 file_path = values.LIST_TEST_FILES[file_index]
