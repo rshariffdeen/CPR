@@ -1103,8 +1103,9 @@ def synthesize_lazy(components: List[Component],
     contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
 
     optimized = True
-
+    template_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
+        template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
@@ -1261,7 +1262,7 @@ def synthesize_lazy(components: List[Component],
             result = verify({lid: (tree, {})}, specification)
             if result:
                 yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
-
+    values.COUNT_PATCH_EXPLORED = template_explored
 
 #TODO: enforce assigned variables in verification conditon
 #TODO: check hole types
@@ -1292,8 +1293,9 @@ def synthesize_parallel(components: List[Component],
     
     ## Open new pool for parallel execution.
     pool = mp.Pool(mp.cpu_count())
-
+    template_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
+        template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
@@ -1460,7 +1462,7 @@ def synthesize_parallel(components: List[Component],
     pool.close()
     logger.info("\t\twaiting for thread completion")
     pool.join()
-
+    values.COUNT_PATCH_EXPLORED = template_explored
     # assert(len(result_list) == len(path_list))
 
     #print("collected_patch_indeces=" + str(collected_patch_indeces))
