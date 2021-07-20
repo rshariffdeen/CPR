@@ -132,6 +132,10 @@ def read_conf_file():
             values.CONF_COMMAND_CONFIG = configuration.replace(definitions.CONF_COMMAND_CONFIG, '')
         elif definitions.CONF_RANK_LIMIT in configuration:
             values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
+        elif definitions.CONF_GENERALIZED_SEED_INPUT in configuration:
+            values.CONF_GENERALIZED_SEED_INPUT = str(configuration.replace(definitions.CONF_GENERALIZED_SEED_INPUT, ''))
+        elif definitions.CONF_GENERALIZED_TEST_INPUT in configuration:
+            values.CONF_GENERALIZED_TEST_INPUT = str(configuration.replace(definitions.CONF_GENERALIZED_TEST_INPUT, ''))
         elif definitions.CONF_SEED_FILE in configuration:
             seed_file_path = configuration.replace(definitions.CONF_SEED_FILE, '')
             if not os.path.isfile(seed_file_path):
@@ -411,16 +415,19 @@ def collect_test_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     test_input = content.strip().replace("\n", "")
-                    values.LIST_TEST_INPUT.append(test_input)
                     if "$POC_" in test_input:
                         test_input_file = test_input.split("$POC_")[1].split(" ")[0]
                         test_input_file_index = test_input_file
+                        if values.CONF_GENERALIZED_TEST_INPUT:
+                            test_input = values.CONF_GENERALIZED_TEST_INPUT.replace("$POC", test_input)
                         if test_input_file[0] != "/":
                             if values.CONF_SEED_DIR:
                                 test_input_file = values.CONF_SEED_DIR + "/" + test_input_file
                             else:
                                 test_input_file = values.CONF_DIR_SRC + "/" + test_input_file
                         values.LIST_TEST_FILES[test_input_file_index] = test_input_file
+
+                    values.LIST_TEST_INPUT.append(test_input)
         else:
             error_exit("No test input is given (at least one is required)")
 
@@ -503,16 +510,18 @@ def collect_seed_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     seed_input = content.strip().replace("\n", "")
-                    values.LIST_SEED_INPUT.append(seed_input)
                     if "$POC_" in seed_input:
                         seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
                         seed_input_file_index = seed_input_file
+                        if values.CONF_GENERALIZED_SEED_INPUT:
+                            seed_input = values.CONF_GENERALIZED_SEED_INPUT.replace("$POC", seed_input)
                         if seed_input_file[0] != "/":
                             if values.CONF_SEED_DIR:
                                 seed_input_file = values.CONF_SEED_DIR + "/" + seed_input_file
                             else:
                                 seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
                         values.LIST_SEED_FILES[seed_input_file_index] = seed_input_file
+                    values.LIST_SEED_INPUT.append(seed_input)
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]

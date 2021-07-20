@@ -86,7 +86,8 @@ CONF_SEED_DIR = "seed_dir:"
 CONF_SEED_LIST = "seed_list:"
 CONF_GEN_SPECIAL_PATH = "gen_special_path:"
 CONF_PRESERVE_BC = "preserve_bc:true"
-
+CONF_GENERALIZED_SEED_INPUT = "generalize_seed_input:"
+CONF_GENERALIZED_TEST_INPUT = "generalize_test_input:"
 
 # ----------------- KEY DEFINITIONS -------------------
 
