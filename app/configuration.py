@@ -517,7 +517,12 @@ def collect_seed_list():
 
     if values.LIST_SEED_INPUT:
         seed_index = 0
-        for (seed_id, seed_arg_list_str) in values.LIST_SEED_INPUT:
+        for seed in values.LIST_SEED_INPUT:
+            if isinstance(seed, tuple):
+                seed_id, seed_arg_list_str = seed
+            else:
+                seed_arg_list_str = seed
+                seed_id = values.LIST_SEED_INPUT.index(seed) + 1
             arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
             for arg in arg_list:
