@@ -486,7 +486,16 @@ def collect_seed_list():
             with open(values.CONF_SEED_FILE, "r") as in_file:
                 content_lines = in_file.readlines()
                 for content in content_lines:
-                    values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
+                    seed_input = content.strip().replace("\n", "")
+                    values.LIST_SEED_INPUT.append(seed_input)
+                    if "$POC_" in seed_input:
+                        seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
+                        if seed_input_file[0] != "/":
+                            if values.CONF_SEED_DIR:
+                                seed_input_file = values.CONF_SEED_DIR + "/" + seed_input_file
+                            else:
+                                seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
+                        values.LIST_SEED_FILES[seed_input_file] = seed_input_file
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
