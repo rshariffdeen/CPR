@@ -115,12 +115,13 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
             if arg in list(seed_file_list.values()):
                 seed_file = arg
                 break
-        if seed_file:
-            seed_name = seed_file.split("/")[-1].split(".")[0]
-            expected_output_file = values.CONF_TEST_OUTPUT_DIR + "/" + seed_name + ".smt2"
-            if os.path.isfile(expected_output_file):
-                output_spec_path = Path(os.path.abspath(expected_output_file))
-            arg_list = [x.replace(seed_file, "$POC") for x in arg_list]
+        if values.CONF_TEST_OUTPUT_DIR:
+            if seed_file:
+                arg_list = [x.replace(seed_file, "$POC") for x in arg_list]
+                seed_name = seed_file.split("/")[-1].split(".")[0]
+                expected_output_file = values.CONF_TEST_OUTPUT_DIR + "/" + seed_name + ".smt2"
+                if os.path.isfile(expected_output_file):
+                    output_spec_path = Path(os.path.abspath(expected_output_file))
         else:
             expected_output_file = project_path + "/" + test_output_list[test_index]
             if os.path.isfile(expected_output_file):
