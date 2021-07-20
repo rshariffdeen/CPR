@@ -270,6 +270,8 @@ def read_conf_file():
             values.CONF_KLEE_FLAGS = configuration.replace(definitions.CONF_KLEE_FLAGS, '')
         elif definitions.CONF_ITERATION_LIMIT in configuration:
             values.CONF_ITERATION_LIMIT = int(configuration.replace(definitions.CONF_ITERATION_LIMIT, ''))
+        elif definitions.CONF_MAX_FLIPPINGS in configuration:
+            values.CONF_MAX_FLIPPINGS = int(configuration.replace(definitions.CONF_MAX_FLIPPINGS, ''))
         elif definitions.CONF_STACK_SIZE in configuration:
             values.CONF_STACK_SIZE = int(configuration.replace(definitions.CONF_STACK_SIZE, ''))
         elif definitions.CONF_MASK_ARG in configuration:

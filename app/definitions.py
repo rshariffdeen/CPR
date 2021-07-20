@@ -80,6 +80,7 @@ CONF_TEST_SUITE_CONFIG = "path_test_suite:"
 CONF_SEED_SUITE_CONFIG = "path_seed_suite:"
 CONF_TEST_SUITE_ID_LIST = "list_test_id:"
 CONF_SEED_SUITE_ID_LIST = "list_seed_id:"
+CONF_MAX_FLIPPINGS = "max_flippings:"
 
 CONF_SEED_FILE = "seed_file:"
 CONF_SEED_DIR = "seed_dir:"
