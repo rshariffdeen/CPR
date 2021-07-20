@@ -76,6 +76,8 @@ def read_conf(arg_list):
                 values.CONF_ITERATION_LIMIT = int(arg.replace(definitions.ARG_ITERATION_COUNT, ""))
             elif definitions.ARG_COMP_ALL in arg:
                 values.CONF_ALL_COMPS = True
+            elif definitions.ARG_PRESERVE_BC in arg:
+                values.CONF_PRESERVE_BC = True
             elif definitions.ARG_SKIP_GENERATION in arg:
                 values.CONF_SKIP_GEN = True
             elif definitions.ARG_SKIP_TEST in arg:
@@ -232,6 +234,10 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_IS_CPP, '')
             if "true" in str(conf_text).lower():
                 values.CONF_IS_CPP = True
+        elif definitions.CONF_PRESERVE_BC in configuration:
+            conf_text = configuration.replace(definitions.CONF_PRESERVE_BC, '')
+            if "true" in str(conf_text).lower():
+                values.CONF_PRESERVE_BC = True
         elif definitions.CONF_FLAG_ASAN in configuration:
             values.CONF_FLAG_ASAN = configuration.replace(definitions.CONF_FLAG_ASAN, '')
         elif definitions.CONF_FLAGS_C in configuration:

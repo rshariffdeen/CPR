@@ -85,6 +85,8 @@ CONF_SEED_FILE = "seed_file:"
 CONF_SEED_DIR = "seed_dir:"
 CONF_SEED_LIST = "seed_list:"
 CONF_GEN_SPECIAL_PATH = "gen_special_path:"
+CONF_PRESERVE_BC = "preserve_bc:true"
+
 
 # ----------------- KEY DEFINITIONS -------------------
 
@@ -120,6 +122,7 @@ ARG_ONLY_GEN = "--only-gen"
 ARG_ONLY_TEST = "--only-test"
 ARG_TEST_SUITE_ID_LIST = "--test-id-list="
 ARG_SEED_SUITE_ID_LIST = "--seed-id-list="
+ARG_PRESERVE_BC = "--preserve-bc"
 
 
 # ----------------- TOOLS --------------------------------
