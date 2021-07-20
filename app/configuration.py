@@ -405,7 +405,7 @@ def collect_test_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     test_input = content.strip().replace("\n", "")
-                    values.LIST_TEST_INPUT.append()
+                    values.LIST_TEST_INPUT.append(test_input)
                     if "$POC_" in test_input:
                         test_input_file = test_input.split("$POC_")[1].split(" ")[0]
                         test_input_file_index = "$POC_" + test_input_file
