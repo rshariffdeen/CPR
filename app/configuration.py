@@ -415,6 +415,8 @@ def collect_test_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     test_input = content.strip().replace("\n", "")
+                    if test_input.isspace():
+                        continue
                     if "$POC_" in test_input:
                         test_input_file = test_input.split("$POC_")[1].split(" ")[0]
                         test_input_file_index = test_input_file
@@ -510,6 +512,8 @@ def collect_seed_list():
                 content_lines = in_file.readlines()
                 for content in content_lines:
                     seed_input = content.strip().replace("\n", "")
+                    if seed_input.isspace():
+                        continue
                     if "$POC_" in seed_input:
                         seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
                         seed_input_file_index = seed_input_file
