@@ -11,6 +11,27 @@ mv php-bug-2011-01-29-147382033a-5bb0a44e06 src
 cd src/php
 
 make clean
-CC=wllvm CXX=wllvm++ ./configure --enable-cli --disable-dom --disable-xml --disable-pear --disable-simplexml --disable-phar --disable-inline-optimization --disable-fileinfo
-CC=wllvm CXX=wllvm++ make  -j32
-CC=wllvm CXX=wllvm++ make sapi/cli/php -j32
+CC=wllvm CXX=wllvm++ ./configure  \
+                    --enable-static \
+                    --disable-shared \
+                    --disable-inline-optimization \
+                    --disable-xmlwriter \
+                    --disable-xmlreader  \
+                    --enable-cli  \
+                    --disable-dom \
+                    --disable-xml  \
+                    --disable-pear \
+                    --disable-simplexml  \
+                    --disable-phar \
+                    --disable-inline-optimization \
+                    --disable-fileinfo \
+                    --disable-libxml   \
+                    --without-pear  \
+                    --without-pcre-dir
+
+
+
+CC=wllvm CXX=wllvm++ LDFLAGS="-L/CPR/lib -ltrident_proxy" CFLAGS="-g -O0" CXXFLAGS="-g -O0"  make  -j32
+
+CC=wllvm CXX=wllvm++ CFLAGS="-no-asm -Dasm=error -D__asm__=error" CXXFLAGS="-no-asm -Dasm=error -D__asm__=error" make -j32
+

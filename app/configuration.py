@@ -515,7 +515,8 @@ def collect_seed_list():
                     concretized_arg_list.append(arg)
             concretized_arg_str = ",".join(concretized_arg_list)
             values.LIST_TEST_INPUT.append(concretized_arg_str)
-            values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_index])
+            if values.LIST_SEED_BINARY:
+                values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_index])
             seed_index = seed_index + 1
 
 
