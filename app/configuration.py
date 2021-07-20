@@ -404,7 +404,17 @@ def collect_test_list():
             with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
                 content_lines = in_file.readlines()
                 for content in content_lines:
-                    values.LIST_TEST_INPUT.append(content.strip().replace("\n", ""))
+                    test_input = content.strip().replace("\n", "")
+                    values.LIST_TEST_INPUT.append()
+                    if "$POC_" in test_input:
+                        test_input_file = test_input.split("$POC_")[1].split(" ")[0]
+                        test_input_file_index = "$POC_" + test_input_file
+                        if test_input_file[0] != "/":
+                            if values.CONF_SEED_DIR:
+                                test_input_file = values.CONF_SEED_DIR + "/" + test_input_file
+                            else:
+                                test_input_file = values.CONF_DIR_SRC + "/" + test_input_file
+                        values.LIST_TEST_FILES[test_input_file_index] = test_input_file
         else:
             error_exit("No test input is given (at least one is required)")
 
@@ -490,12 +500,13 @@ def collect_seed_list():
                     values.LIST_SEED_INPUT.append(seed_input)
                     if "$POC_" in seed_input:
                         seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
+                        seed_input_file_index = "$POC_" + seed_input_file
                         if seed_input_file[0] != "/":
                             if values.CONF_SEED_DIR:
                                 seed_input_file = values.CONF_SEED_DIR + "/" + seed_input_file
                             else:
                                 seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
-                        values.LIST_SEED_FILES[seed_input_file] = seed_input_file
+                        values.LIST_SEED_FILES[seed_input_file_index] = seed_input_file
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
