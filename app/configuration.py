@@ -408,7 +408,7 @@ def collect_test_list():
                     values.LIST_TEST_INPUT.append(test_input)
                     if "$POC_" in test_input:
                         test_input_file = test_input.split("$POC_")[1].split(" ")[0]
-                        test_input_file_index = "$POC_" + test_input_file
+                        test_input_file_index = test_input_file
                         if test_input_file[0] != "/":
                             if values.CONF_SEED_DIR:
                                 test_input_file = values.CONF_SEED_DIR + "/" + test_input_file
@@ -500,7 +500,7 @@ def collect_seed_list():
                     values.LIST_SEED_INPUT.append(seed_input)
                     if "$POC_" in seed_input:
                         seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
-                        seed_input_file_index = "$POC_" + seed_input_file
+                        seed_input_file_index = seed_input_file
                         if seed_input_file[0] != "/":
                             if values.CONF_SEED_DIR:
                                 seed_input_file = values.CONF_SEED_DIR + "/" + seed_input_file
