@@ -426,8 +426,8 @@ def collect_test_list():
                             else:
                                 test_input_file = values.CONF_DIR_SRC + "/" + test_input_file
                         values.LIST_TEST_FILES[test_input_file_index] = test_input_file
-
-                    values.LIST_TEST_INPUT.append(test_input)
+                    if test_input:
+                        values.LIST_TEST_INPUT.append(test_input)
         else:
             error_exit("No test input is given (at least one is required)")
 
@@ -521,7 +521,8 @@ def collect_seed_list():
                             else:
                                 seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
                         values.LIST_SEED_FILES[seed_input_file_index] = seed_input_file
-                    values.LIST_SEED_INPUT.append(seed_input)
+                    if seed_input:
+                        values.LIST_SEED_INPUT.append(seed_input)
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
