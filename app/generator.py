@@ -112,7 +112,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         expected_output_file = None
         output_spec_path = None
         for arg in arg_list:
-            if arg in list(seed_file_list.values()):
+            if arg in list(test_file_list.values()):
                 seed_file = arg
                 break
         if values.CONF_TEST_OUTPUT_DIR:
