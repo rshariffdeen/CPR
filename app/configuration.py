@@ -514,8 +514,13 @@ def collect_seed_list():
         elif values.CONF_SEED_FILE:
             with open(values.CONF_SEED_FILE, "r") as in_file:
                 content_lines = in_file.readlines()
+                seed_id = 0
                 for content in content_lines:
+                    seed_id = seed_id + 1
                     seed_input = content.strip().replace("\n", "")
+                    if values.CONF_SEED_SUITE_ID_LIST:
+                        if str(seed_id) not in values.CONF_SEED_SUITE_ID_LIST:
+                            continue
                     if seed_input.isspace():
                         continue
                     if "$POC_" in seed_input:
@@ -530,7 +535,7 @@ def collect_seed_list():
                                 seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
                         values.LIST_SEED_FILES[seed_input_file_index] = seed_input_file
                     if seed_input:
-                        values.LIST_SEED_INPUT.append(seed_input)
+                        values.LIST_SEED_INPUT.append((seed_id, seed_input))
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
