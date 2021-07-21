@@ -278,8 +278,10 @@ def read_conf_file():
             values.CONF_MASK_ARG = configuration.replace(definitions.CONF_MASK_ARG, '').split(",")
         elif definitions.CONF_TIMEOUT_SAT in configuration:
             values.CONF_TIMEOUT_SAT = int(configuration.replace(definitions.CONF_TIMEOUT_SAT, ''))
-        elif definitions.CONF_TIMEOUT_KLEE in configuration:
-            values.CONF_TIMEOUT_KLEE = int(configuration.replace(definitions.CONF_TIMEOUT_KLEE, ''))
+        elif definitions.CONF_TIMEOUT_CONCOLIC_RUN in configuration:
+            values.CONF_TIMEOUT_CONCOLIC_RUN = int(configuration.replace(definitions.CONF_TIMEOUT_CONCOLIC_RUN, ''))
+        elif definitions.CONF_TIMEOUT_CONCRETE_RUN in configuration:
+            values.CONF_TIMEOUT_CONCRETE_RUN = int(configuration.replace(definitions.CONF_TIMEOUT_CONCRETE_RUN, ''))
         elif definitions.CONF_TEST_SUITE_ID_LIST in configuration:
             values.CONF_TEST_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_TEST_SUITE_ID_LIST, "").split(",")
         elif definitions.CONF_SEED_SUITE_ID_LIST in configuration:
@@ -622,8 +624,10 @@ def update_configuration():
         values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
     if values.CONF_TIMEOUT_SAT:
         values.DEFAULT_TIMEOUT_SAT = values.CONF_TIMEOUT_SAT
-    if values.CONF_TIMEOUT_KLEE:
-        values.DEFAULT_TIMEOUT_KLEE_CONCOLIC = values.CONF_TIMEOUT_KLEE
+    if values.CONF_TIMEOUT_CONCOLIC_RUN:
+        values.DEFAULT_TIMEOUT_KLEE_CONCOLIC = values.CONF_TIMEOUT_CONCOLIC_RUN
+    if values.CONF_TIMEOUT_CONCRETE_RUN:
+        values.DEFAULT_TIMEOUT_KLEE_CONCRETE = values.CONF_TIMEOUT_CONCRETE_RUN
     if values.CONF_RANK_LIMIT:
         values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
     if values.CONF_SELECTION_STRATEGY:
