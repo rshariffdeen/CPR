@@ -165,7 +165,7 @@ def main():
         logger.store()
         parallel.pool.terminate()
         parallel.pool.join()
-        os.system("ps -aux | grep 'cpr' | awk '{print $2}' | xargs kill -9")
+        # os.system("ps -aux | grep 'cpr' | awk '{print $2}' | xargs kill -9")
     except KeyboardInterrupt as e:
         total_duration = format((time.time() - start_time) / 60, '.3f')
         time_info[definitions.KEY_DURATION_TOTAL] = str(total_duration)
