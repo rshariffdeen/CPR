@@ -96,9 +96,9 @@ def read_conf(arg_list):
                 else:
                     time_split = arg.replace(definitions.ARG_CEGIS_TIME_SPLIT, "")
                     values.CONF_TIME_SPLIT = time_split
-            elif arg == "-help" or arg == "--help":
+            elif arg in ["-help", "--help", "-h"]:
                 emitter.emit_help()
-                exit()
+                exit(0)
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.emit_help()
