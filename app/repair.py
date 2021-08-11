@@ -413,12 +413,13 @@ def run_cpr(program_path, patch_list):
                 exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
+                values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
                 values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
                 generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path, program_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
-                values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
+
                 # check if new path hits patch location / fault location
                 gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir, poc_path)
                 if values.FILE_POC_SEED not in values.MASK_BYTE_LIST:
@@ -439,8 +440,12 @@ def run_cpr(program_path, patch_list):
                 patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
                 emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
                 duration = (time.time() - time_check) / 60
+                emitter.note("\t\treduce finished in " + duration + ' minutes')
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
+                values.COUNT_TEMPLATE_END_SEED = len(patch_list)
+                values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
                 satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+
                 if satisfied:
                     emitter.warning(
                         "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
@@ -448,9 +453,8 @@ def run_cpr(program_path, patch_list):
                 compute_iteration_stat(patch_list, iteration)
 
             emitter.success("\t\tend of concolic exploration using user-provided seeds")
-            emitter.success("\t\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-            values.COUNT_TEMPLATE_END_SEED = len(patch_list)
-            values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
+            emitter.success("\t\t\t|P|=" + str(values.COUNT_PATCH_END_SEED) + ":" + str(values.COUNT_TEMPLATE_END_SEED))
+
 
         else:
             iteration = iteration + 1
@@ -498,6 +502,7 @@ def run_cpr(program_path, patch_list):
             patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
             emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             duration = (time.time() - time_check) / 60
+            emitter.note("\t\treduce finished in " + duration + ' minutes')
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
