@@ -185,3 +185,6 @@ def main():
         emitter.end(time_info, is_error)
         logger.end(time_info, is_error)
         logger.store()
+        if is_error:
+            exit(1)
+        exit(0)
