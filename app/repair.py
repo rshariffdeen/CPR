@@ -440,7 +440,7 @@ def run_cpr(program_path, patch_list):
                 patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
                 emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
                 duration = (time.time() - time_check) / 60
-                emitter.note("\t\treduce finished in " + duration + ' minutes')
+                emitter.note("\t\treduce finished in " + str(format(duration, '.3f')) + " minutes")
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
                 values.COUNT_TEMPLATE_END_SEED = len(patch_list)
                 values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
@@ -502,7 +502,7 @@ def run_cpr(program_path, patch_list):
             patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
             emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             duration = (time.time() - time_check) / 60
-            emitter.note("\t\treduce finished in " + duration + ' minutes')
+            emitter.note("\t\treduce finished in " + str(format(duration, '.3f')) + " minutes")
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
