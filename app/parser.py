@@ -1,3 +1,7 @@
+from app import utilities, definitions, values
+from pathlib import Path
+
+
 def parse_z3_output(z3_output):
     """
            This function will read the output log of z3 cli interface and extract/parse the values of the model
@@ -69,3 +73,31 @@ def parse_z3_output(z3_output):
             str_lambda += line
 
     return model
+
+
+def parse_component(comp_str):
+    str_comp_map = {
+        "==": "equal", "+": "addition", "=": "assignment", "&" : "bitwise-and",
+        "|": "bitwise-or", "~": "bitwise-not", "/": "division", ">=": "greater-or-equal",
+        ">": "greater-than", "<=": "less-or-equal", "&&": "logical-and", "||": "logical-or",
+        "!": "logical-not", "-": "subtraction", "*": "multiplication", "!=": "not-equal"
+                    }
+    if comp_str in str_comp_map.keys():
+        return str_comp_map[comp_str]
+    return None
+
+
+def parse_component_list(comp_str_list):
+    custom_comp_str_list = []
+    general_comp_str_list = []
+    for comp_str in comp_str_list:
+        if str(comp_str).isalnum():
+            comp_name = values.MAP_CUSTOM_COMPONENT[comp_str]
+            custom_comp_str_list.append(Path(definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"))
+        else:
+            gen_comp_name = parse_component(comp_str)
+            if gen_comp_name is None:
+                utilities.error_exit("Incompatible General Component Detected: {}".format(comp_str))
+            general_comp_str_list.append(comp_str)
+    return general_comp_str_list, custom_comp_str_list
+

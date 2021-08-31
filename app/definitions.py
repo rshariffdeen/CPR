@@ -10,7 +10,8 @@ DIRECTORY_LOG = ""
 DIRECTORY_LOG_BASE = DIRECTORY_ROOT + "/logs"
 DIRECTORY_TESTS = DIRECTORY_ROOT + "/tests"
 DIRECTORY_OUTPUT_BASE = DIRECTORY_ROOT + "/output"
-DIRECTORY_COMPONENTS = DIRECTORY_ROOT + "/components"
+DIRECTORY_COMPONENTS_GENERAL = DIRECTORY_ROOT + "/components"
+DIRECTORY_COMPONENTS_CUSTOM = ""
 DIRECTORY_OUTPUT = ""
 DIRECTORY_TMP = DIRECTORY_ROOT + "/tmp"
 DIRECTORY_BACKUP = DIRECTORY_ROOT + "/backup"
@@ -143,3 +144,4 @@ STYLE_FORMAT_COMMAND = "clang-format -style=LLVM "
 
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
+cust_comp_name_list = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o"]

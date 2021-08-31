@@ -3,7 +3,7 @@ import sys
 import re
 import shutil
 from pathlib import Path
-from app import emitter, logger, definitions, values, reader, synthesis, extractor
+from app import emitter, logger, definitions, values, reader, synthesis, extractor, parser
 from app.utilities import error_exit
 
 
@@ -346,7 +346,7 @@ def load_component_list():
     if definitions.DIRECTORY_TESTS in values.CONF_PATH_PROJECT:
         base_list = []
     gen_comp_files = []
-    os.chdir(definitions.DIRECTORY_COMPONENTS)
+    os.chdir(definitions.DIRECTORY_COMPONENTS_GENERAL)
 
     if values.LIST_LOADED_PATCHES:
         component_string_list = set()
@@ -355,8 +355,14 @@ def load_component_list():
             for token in token_list:
                 token = token.replace("(", "").replace(")", "")
                 component_string_list.add(token)
-        print(component_string_list)
-        exit()
+        gen_comp_str_list, cust_comp_str_list = parser.parse_component_list(component_string_list)
+        component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_GENERAL)
+        for comp_file in component_file_list:
+            if ".smt2" in comp_file:
+                if any(x in comp_file for x in gen_comp_str_list):
+                    gen_comp_files.append(Path(comp_file))
+                    emitter.note("\tloading component: " + str(comp_file))
+        values.CONF_CUSTOM_COMP_LIST = cust_comp_str_list
 
     else:
         if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
@@ -365,26 +371,26 @@ def load_component_list():
                 gen_comp_files.append(Path(component_name))
                 emitter.note("\tloading component: " + str(component_name))
         else:
-            component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS)
+            component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_GENERAL)
             for comp_file in component_file_list:
                 if ".smt2" in comp_file:
                     if any(x in comp_file for x in ["logical-not", "post-decrement", "post-increment", "minus", "constant", "assignment", "sequence", "greater", "remainder"]):
                         continue
                     gen_comp_files.append(Path(comp_file))
                     emitter.note("\tloading component: " + str(comp_file))
-        gen_comp_files = list(set(gen_comp_files))
-        general_components = synthesis.load_components(gen_comp_files)
+    gen_comp_files = list(set(gen_comp_files))
+    general_components = synthesis.load_components(gen_comp_files)
 
-        proj_comp_files = []
-        os.chdir(values.CONF_PATH_PROJECT)
-        for component_name in values.CONF_CUSTOM_COMP_LIST:
-            proj_comp_files.append(Path(component_name))
-            emitter.note("\tloading component: " + str(component_name))
-        project_components = synthesis.load_components(proj_comp_files)
-        values.LIST_COMPONENTS = project_components + general_components
-        values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
-        values.COUNT_COMPONENTS_CUS = len(project_components)
-        values.COUNT_COMPONENTS_GEN = len(general_components)
+    proj_comp_files = []
+    os.chdir(values.CONF_PATH_PROJECT)
+    for component_name in values.CONF_CUSTOM_COMP_LIST:
+        proj_comp_files.append(Path(component_name))
+        emitter.note("\tloading component: " + str(component_name))
+    project_components = synthesis.load_components(proj_comp_files)
+    values.LIST_COMPONENTS = project_components + general_components
+    values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
+    values.COUNT_COMPONENTS_CUS = len(project_components)
+    values.COUNT_COMPONENTS_GEN = len(general_components)
 
 
 def print_configuration():
@@ -516,6 +522,30 @@ def collect_patch_list():
     emitter.normal("reading patches from directory")
     patch_list = reader.read_patch_list(values.DEFAULT_PATCH_DIR)
     values.LIST_LOADED_PATCHES = patch_list
+    component_string_list = set()
+    if os.path.isdir(definitions.DIRECTORY_COMPONENTS_CUSTOM):
+        shutil.rmtree(definitions.DIRECTORY_COMPONENTS_CUSTOM)
+    if not os.path.isdir(definitions.DIRECTORY_COMPONENTS_CUSTOM):
+        os.makedirs(definitions.DIRECTORY_COMPONENTS_CUSTOM)
+    for patch in values.LIST_LOADED_PATCHES:
+        token_list = patch.split(" ")
+        for token in token_list:
+            token = token.replace("(", "").replace(")", "")
+            component_string_list.add(token)
+    comp_name_index = 0
+    for comp_str in component_string_list:
+        if str(comp_str).isalnum():
+            comp_name = definitions.cust_comp_name_list[comp_name_index]
+            values.MAP_CUSTOM_COMPONENT[comp_str] = comp_name
+            comp_name_index = comp_name_index + 1
+            comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
+            with open(comp_file_path, "w+") as c_file:
+                c_file.writelines("(declare-const rvalue_{} (_ BitVec 32)".format(comp_name))
+                c_file.writelines("(declare-const lvalue_{} (_ BitVec 32))".format(comp_name))
+                c_file.writelines("(declare-const rreturn (_ BitVec 32))")
+                c_file.writelines("(declare-const lreturn (_ BitVec 32))")
+                c_file.writelines("(assert (and (= rreturn rvalue_{0}) (= lreturn lvalue_{0}))))".format(comp_name))
+                c_file.close()
 
 
 def collect_seed_list():
@@ -638,6 +668,7 @@ def update_configuration():
     if values.CONF_PATCH_DIR:
         if os.path.isdir(values.CONF_PATCH_DIR):
             values.DEFAULT_PATCH_DIR = values.CONF_PATCH_DIR
+            definitions.DIRECTORY_COMPONENTS_CUSTOM = definitions.DIRECTORY_OUTPUT + "/components"
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
