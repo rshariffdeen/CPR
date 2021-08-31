@@ -540,7 +540,7 @@ def collect_patch_list():
             comp_name_index = comp_name_index + 1
             comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
             with open(comp_file_path, "w+") as c_file:
-                c_file.writelines("(declare-const rvalue_{} (_ BitVec 32)\n".format(comp_name))
+                c_file.writelines("(declare-const rvalue_{} (_ BitVec 32))\n".format(comp_name))
                 c_file.writelines("(declare-const lvalue_{} (_ BitVec 32))\n".format(comp_name))
                 c_file.writelines("(declare-const rreturn (_ BitVec 32))\n")
                 c_file.writelines("(declare-const lreturn (_ BitVec 32))\n")
