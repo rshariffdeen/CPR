@@ -1,7 +1,7 @@
 import app.configuration
 import app.generator
 import app.parallel
-from app.concolic import run_concolic_execution, select_new_input, check_infeasible_paths
+from app.concolic import run_concolic_execution, select_new_input, check_infeasible_paths, run_concrete_execution
 from app.synthesis import load_specification, Program, program_to_code
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -236,12 +236,14 @@ def run(project_path, program_path):
     values.TIME_TO_GENERATE = str(duration)
     definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-gen"
     writer.write_patch_set(filtered_patch_list, definitions.FILE_PATCH_SET)
+    if values.CONF_ONLY_GEN:
+        return
     if values.DEFAULT_REDUCE_METHOD == "cpr":
         run_cpr(program_path, filtered_patch_list)
     elif values.DEFAULT_REDUCE_METHOD == "cegis":
         run_cegis(program_path, project_path, filtered_patch_list)
 
-    values.COUNT_PATHS_EXPLORED = len(concolic.list_path_explored)
+    values.COUNT_PATHS_EXPLORED_GEN = len(concolic.list_path_explored)
     values.COUNT_PATHS_DETECTED = len(concolic.list_path_detected)
     values.COUNT_PATHS_SKIPPED = len(concolic.list_path_infeasible)
 
@@ -249,7 +251,6 @@ def run(project_path, program_path):
 def run_cegis(program_path, project_path, patch_list):
     test_output_list = values.LIST_TEST_OUTPUT
     test_template = reader.collect_specification(test_output_list[0])
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
     time_check = time.time()
     assertion, largest_path_condition = concolic.run_concolic_exploration(program_path, patch_list)
     duration = (time.time() - time_check) / 60
@@ -259,7 +260,7 @@ def run_cegis(program_path, project_path, patch_list):
         patch = patch_list[0]
         emitter.emit_patch(patch, message="\tfinal patch: ")
         return
-    program_specification = generator.generate_program_specification(binary_dir_path)
+    program_specification = generator.generate_program_specification()
     complete_specification = And(Not(assertion), program_specification)
     emitter.normal("\tcomputed the program specification formula")
     emitter.sub_title("Evaluating Patch Pool")
@@ -290,10 +291,11 @@ def run_cegis(program_path, project_path, patch_list):
             values.FILE_POC_GEN = definitions.DIRECTORY_OUTPUT + "/violation-" + str(values.ITERATION_NO)
             gen_path = values.FILE_POC_GEN
             input_arg_list, input_var_list = generator.generate_new_input(violation_check, arg_list, poc_path, gen_path)
-            klee_out_dir = output_dir + "/klee-output-" + str(iteration)
+            klee_out_dir = output_dir + "/klee-out-repair-" + str(iteration)
             klee_test_file = output_dir + "/klee-test-" + str(iteration)
             exit_code = concolic.run_concrete_execution(program_path + ".bc", input_arg_list, True, klee_out_dir)
             # assert exit_code == 0
+            values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
             emitter.normal("\t\tgenerating new assertion")
             test_assertion, count_obs = generator.generate_assertion(test_template, klee_out_dir)
             write_smtlib(test_assertion, klee_test_file)
@@ -327,6 +329,19 @@ def run_cegis(program_path, project_path, patch_list):
     values.COUNT_PATCH_END = values.COUNT_PATCH_START - count_throw
 
 
+def compute_iteration_stat(patch_list, iteration):
+    ranked_patch_list = rank_patches(patch_list)
+    update_rank_matrix(ranked_patch_list, iteration)
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
+    writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
+    writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
+    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+        values.COUNT_PATCH_END = utilities.count_concrete_patches(ranked_patch_list)
+        values.COUNT_TEMPLATE_END = len(patch_list)
+    else:
+        values.COUNT_PATCH_END = len(ranked_patch_list)
+
+
 def run_cpr(program_path, patch_list):
     emitter.sub_title("Evaluating Patch Pool")
     values.CONF_TIME_CHECK = None
@@ -335,23 +350,30 @@ def run_cpr(program_path, patch_list):
         emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
     iteration = 0
     assertion_template = values.SPECIFICATION_TXT
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
-
+    test_input_list = values.LIST_TEST_INPUT
+    count_seeds = len(values.LIST_SEED_INPUT)
+    count_inputs = len(test_input_list)
+    count_fail_inputs = count_inputs - count_seeds
     while not satisfied and len(patch_list) > 0:
         if iteration == 0:
-            test_input_list = values.LIST_TEST_INPUT
             seed_id = 0
             for argument_list in test_input_list:
+                seed_id = seed_id + 1
+                # if seed_id not in values.USEFUL_SEED_ID_LIST:
+                #     continue
                 time_check = time.time()
                 poc_path = None
                 iteration = iteration + 1
-                seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                output_dir_path = definitions.DIRECTORY_OUTPUT
+                klee_test_dir = output_dir_path + "/klee-out-test-" + str(iteration-1)
+                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
-                    if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
+                    if str(argument_list.index(arg)) in values.CONF_MASK_ARG:
+                        generalized_arg_list.append(arg)
+                    elif arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
@@ -360,17 +382,44 @@ def run_cpr(program_path, patch_list):
                         generalized_arg_list.append(arg)
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
-                emitter.highlight("\tUsing Input: " + str(poc_path))
+                emitter.highlight("\tUsing Input File: " + str(poc_path))
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[iteration-1]
+                    values.CONF_PATH_PROGRAM = program_path
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                emitter.highlight("\tUsing Binary: " + str(program_path))
+                extractor.extract_byte_code(program_path)
+                if not os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
+
+                if seed_id > count_fail_inputs:
+                    exit_code = run_concrete_execution(program_path + ".bc", argument_list, True, klee_test_dir)
+                    assert exit_code == 0
+                    # set location of bug/crash
+                    values.IS_CRASH = False
+                    latest_crash_loc = reader.collect_crash_point(values.FILE_MESSAGE_LOG)
+                    if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
+                        continue
+                    if latest_crash_loc:
+                        values.IS_CRASH = True
+                        emitter.success("\t\t\t[info] identified a crash location: " + str(latest_crash_loc))
+                        if latest_crash_loc not in values.CONF_LOC_LIST_CRASH:
+                            values.CONF_LOC_LIST_CRASH.append(latest_crash_loc)
+
                 values.ARGUMENT_LIST = generalized_arg_list
-                _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
-                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
+
+                _, second_var_list = generator.generate_angelic_val(klee_test_dir, generalized_arg_list, poc_path)
+                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
                 duration = (time.time() - time_check) / 60
-                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
+                values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
+                values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
+                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path, program_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
-                values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
+
                 # check if new path hits patch location / fault location
                 gen_masked_byte_list = generator.generate_mask_bytes(klee_out_dir, poc_path)
                 if values.FILE_POC_SEED not in values.MASK_BYTE_LIST:
@@ -386,21 +435,26 @@ def run_cpr(program_path, patch_list):
                     continue
                 time_check = time.time()
                 assertion, count_obs = generator.generate_assertion(assertion_template,
-                                                                    Path(binary_dir_path + "/klee-last/").resolve())
+                                                                    Path(klee_out_dir).resolve())
                 # print(assertion.serialize())
-                patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+                patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
                 emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
                 duration = (time.time() - time_check) / 60
+                emitter.note("\t\treduce finished in " + str(format(duration, '.3f')) + " minutes")
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
+                values.COUNT_TEMPLATE_END_SEED = len(patch_list)
+                values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
                 satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
+
                 if satisfied:
                     emitter.warning(
                         "\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
                     break
+                compute_iteration_stat(patch_list, iteration)
+
             emitter.success("\t\tend of concolic exploration using user-provided seeds")
-            emitter.success("\t\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
-            values.COUNT_TEMPLATE_END_SEED = len(patch_list)
-            values.COUNT_PATCH_END_SEED = utilities.count_concrete_patches(patch_list)
+            emitter.success("\t\t\t|P|=" + str(values.COUNT_PATCH_END_SEED) + ":" + str(values.COUNT_TEMPLATE_END_SEED))
+
 
         else:
             iteration = iteration + 1
@@ -409,9 +463,13 @@ def run_cpr(program_path, patch_list):
             time_check = time.time()
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
+            output_dir_path = definitions.DIRECTORY_OUTPUT
+            klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
             # if oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
-            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
-
+            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path, program_path = select_new_input(patch_list)
+            emitter.highlight("\tUsing Arguments: " + str(gen_arg_list))
+            emitter.highlight("\tUsing Input File: " + str(poc_path))
+            emitter.highlight("\tUsing Binary: " + str(program_path))
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
                 break
@@ -422,14 +480,15 @@ def run_cpr(program_path, patch_list):
             # print(">> new input: " + str(gen_arg_list))
 
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
+            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list, False, klee_out_dir)
             # assert exit_code == 0
             duration = (time.time() - time_check) / 60
+            values.COUNT_PATHS_EXPLORED = values.COUNT_PATHS_EXPLORED + 1
             values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
             time_check = time.time()
-            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path, program_path)
             values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):
@@ -438,20 +497,17 @@ def run_cpr(program_path, patch_list):
                 continue
             distance.update_distance_map()
             ## Reduces the set of patch candidates based on the current path constraint
-            assertion, count_obs = generator.generate_assertion(assertion_template, Path(binary_dir_path + "/klee-last/").resolve())
+            assertion, count_obs = generator.generate_assertion(assertion_template, Path(klee_out_dir).resolve())
             # print(assertion.serialize())
-            patch_list = reduce(patch_list, Path(binary_dir_path + "/klee-last/").resolve(), assertion)
+            patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
             emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
             duration = (time.time() - time_check) / 60
+            emitter.note("\t\treduce finished in " + str(format(duration, '.3f')) + " minutes")
             values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
             if satisfied:
                 emitter.warning("\t[warning] ending due to timeout of " + str(values.DEFAULT_TIME_DURATION) + " minutes")
-        if values.DEFAULT_COLLECT_STAT:
-            ranked_patch_list = rank_patches(patch_list)
-            update_rank_matrix(ranked_patch_list, iteration)
-            definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set-ranked-" + str(iteration)
-            writer.write_patch_set(ranked_patch_list, definitions.FILE_PATCH_SET)
-            writer.write_as_json(values.LIST_PATCH_RANKING, definitions.FILE_PATCH_RANK_MATRIX)
+
+            compute_iteration_stat(patch_list, iteration)
 
     if not patch_list:
         values.COUNT_PATCH_END = len(patch_list)

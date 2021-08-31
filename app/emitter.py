@@ -167,55 +167,61 @@ def configuration(setting, value):
 
 
 def end(time_info, is_error=False):
-    statistics("\nRun time statistics:\n-----------------------\n")
-    statistics("Startup: " + str(time_info[definitions.KEY_DURATION_BOOTSTRAP].format()) + " minutes")
-    statistics("Build: " + str(time_info[definitions.KEY_DURATION_BUILD]) + " minutes")
-    statistics("Testing: " + str(time_info[definitions.KEY_DURATION_INITIALIZATION]) + " minutes")
-    statistics("Synthesis: " + str(values.TIME_TO_GENERATE) + " minutes")
-    statistics("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
-    statistics("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
-    statistics("Reduce: " + str(time_info[definitions.KEY_DURATION_REPAIR]) + " minutes")
-    statistics("Iteration Count: " + str(values.ITERATION_NO))
-    # statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
-    statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
-    statistics("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
-    statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
-    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-        # statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
-        statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
-        statistics("Template End Seed Count: " + str(values.COUNT_TEMPLATE_END_SEED))
-        statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
+    if values.CONF_ARG_PASS:
+        statistics("\nRun time statistics:\n-----------------------\n")
+        statistics("Startup: " + str(time_info[definitions.KEY_DURATION_BOOTSTRAP].format()) + " minutes")
+        statistics("Build: " + str(time_info[definitions.KEY_DURATION_BUILD]) + " minutes")
+        statistics("Testing: " + str(time_info[definitions.KEY_DURATION_INITIALIZATION]) + " minutes")
+        statistics("Synthesis: " + str(values.TIME_TO_GENERATE) + " minutes")
+        statistics("Explore: " + format(values.TIME_TO_EXPLORE, ".3f") + " minutes")
+        statistics("Refine: " + format(values.TIME_TO_REDUCE, ".3f") + " minutes")
+        statistics("Reduce: " + str(time_info[definitions.KEY_DURATION_REPAIR]) + " minutes")
+        statistics("Iteration Count: " + str(values.ITERATION_NO))
+        # statistics("Patch Gen Count: " + str(values.COUNT_PATCH_GEN))
+        statistics("Patch Explored Count: " + str(values.COUNT_PATCHES_EXPLORED))
+        statistics("Patch Start Count: " + str(values.COUNT_PATCH_START))
+        statistics("Patch End Seed Count: " + str(values.COUNT_PATCH_END_SEED))
+        statistics("Patch End Count: " + str(values.COUNT_PATCH_END))
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+            statistics("Template Explored Count: " + str(values.COUNT_TEMPLATES_EXPLORED))
+            # statistics("Template Gen Count: " + str(values.COUNT_TEMPLATE_GEN))
+            statistics("Template Start Count: " + str(values.COUNT_TEMPLATE_START))
+            statistics("Template End Seed Count: " + str(values.COUNT_TEMPLATE_END_SEED))
+            statistics("Template End Count: " + str(values.COUNT_TEMPLATE_END))
 
-    statistics("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))
-    statistics("Paths Explored: " + str(values.COUNT_PATHS_EXPLORED))
-    statistics("Paths Skipped: " + str(values.COUNT_PATHS_SKIPPED))
-    statistics("Paths Hit Patch Loc: " + str(values.COUNT_HIT_PATCH_LOC))
-    statistics("Paths Hit Observation Loc: " + str(values.COUNT_HIT_BUG_LOG))
-    statistics("Paths Hit Crash Loc: " + str(values.COUNT_HIT_CRASH_LOC))
-    statistics("Paths Crashed: " + str(values.COUNT_HIT_CRASH))
-    statistics("Component Count: " + str(values.COUNT_COMPONENTS))
-    statistics("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
-    statistics("Component Count Cus: " + str(values.COUNT_COMPONENTS_CUS))
-    statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
-    if is_error:
-        error("\n" + values.TOOL_NAME + " exited with an error after " + time_info[
-            definitions.KEY_DURATION_TOTAL] + " minutes \n")
-    else:
-        success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[
-            definitions.KEY_DURATION_TOTAL] + " minutes \n")
+        statistics("Paths Detected: " + str(values.COUNT_PATHS_DETECTED))
+        statistics("Paths Explored: " + str(values.COUNT_PATHS_EXPLORED))
+        statistics("Paths Explored via Generation: " + str(values.COUNT_PATHS_EXPLORED_GEN))
+        statistics("Paths Skipped: " + str(values.COUNT_PATHS_SKIPPED))
+        statistics("Paths Hit Patch Loc: " + str(values.COUNT_HIT_PATCH_LOC))
+        statistics("Paths Hit Observation Loc: " + str(values.COUNT_HIT_BUG_LOG))
+        statistics("Paths Hit Crash Loc: " + str(values.COUNT_HIT_CRASH_LOC))
+        statistics("Paths Crashed: " + str(values.COUNT_HIT_CRASH))
+        statistics("Component Count: " + str(values.COUNT_COMPONENTS))
+        statistics("Component Count Gen: " + str(values.COUNT_COMPONENTS_GEN))
+        statistics("Component Count Cus: " + str(values.COUNT_COMPONENTS_CUS))
+        statistics("Gen Limit: " + str(values.DEFAULT_GEN_SEARCH_LIMIT))
+        if is_error:
+            error("\n" + values.TOOL_NAME + " exited with an error after " + time_info[
+                definitions.KEY_DURATION_TOTAL] + " minutes \n")
+        else:
+            success("\n" + values.TOOL_NAME + " finished successfully after " + time_info[
+                definitions.KEY_DURATION_TOTAL] + " minutes \n")
 
 
 def emit_help():
-    write("Usage: python3.6 CPR.py [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", RED)
-    write("Options are:", RED)
-    write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", RED)
-    write("\t" + definitions.ARG_CEGIS_TIME_SPLIT + "\t| " + "specify time split ratio for CEGIS mode; explore:refine  in minutes(default=1:1)", RED)
-    write("\t" + definitions.ARG_DEBUG + "\t| " + "enable debugging information", RED)
-    write("\t" + definitions.ARG_OPERATION_MODE + "\t| " + "execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)", RED)
-    write("\t" + definitions.ARG_DISABLE_DISTANCE_CAL + "\t| " + "disable distance calculation (default=enabled)", RED)
-    write("\t" + definitions.ARG_SELECTION_METHOD + "\t| " + "selection strategy [0: deterministic, 1: random] (default=0)", RED)
-    write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", RED)
-    write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "patch type [0: concrete, 1: abstract] (default=0)", RED)
-    write("\t" + definitions.ARG_REFINE_METHOD + "\t| " + "refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)", RED)
-    write("\t" + definitions.ARG_REDUCE_METHOD + "\t| " + "reduce method [0: cpr, 1: cegis] (default=0)", RED)
+    write("Usage: cpr [OPTIONS] " + definitions.ARG_CONF_FILE + "$FILE_PATH", WHITE)
+    write("Options are:", WHITE)
+    write("\t" + definitions.ARG_TIME_DURATION + "\t| " + "specify the time duration for repair in minutes", WHITE)
+    write("\t" + definitions.ARG_ITERATION_COUNT + "\t| " + "limit number of iterations for repair", WHITE)
+    write("\t" + definitions.ARG_CEGIS_TIME_SPLIT + "\t| " + "specify time split ratio for CEGIS mode; explore:refine  in minutes(default=1:1)", WHITE)
+    write("\t" + definitions.ARG_DEBUG + "\t| " + "enable debugging information", WHITE)
+    write("\t" + definitions.ARG_OPERATION_MODE + "\t| " + "execution mode [0: sequential, 1: semi-paralle, 2: parallel] (default = 0)", WHITE)
+    write("\t" + definitions.ARG_DISABLE_DISTANCE_CAL + "\t| " + "disable distance calculation (default=enabled)", WHITE)
+    write("\t" + definitions.ARG_SELECTION_METHOD + "\t| " + "selection strategy [0: deterministic, 1: random] (default=0)", WHITE)
+    write("\t" + definitions.ARG_DIST_METRIC + "\t| " + "distance metric [0: control-loc, 1: statement] (default=0)", WHITE)
+    write("\t" + definitions.ARG_PATCH_TYPE + "\t| " + "patch type [0: concrete, 1: abstract] (default=0)", WHITE)
+    write("\t" + definitions.ARG_REFINE_METHOD + "\t| " + "refine strategy [0: under-approx, 1: over-approx, 2: under-approx and over-approx, 3: none] (default=0)", WHITE)
+    write("\t" + definitions.ARG_REDUCE_METHOD + "\t| " + "reduce method [0: cpr, 1: cegis] (default=0)", WHITE)
+
 

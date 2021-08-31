@@ -7,3 +7,4 @@ logs
 output
 venv
 *.DS_Store
+.devcontainer

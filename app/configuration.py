@@ -3,7 +3,7 @@ import sys
 import re
 import shutil
 from pathlib import Path
-from app import emitter, logger, definitions, values, reader, synthesis
+from app import emitter, logger, definitions, values, reader, synthesis, extractor
 from app.utilities import error_exit
 
 
@@ -68,16 +68,28 @@ def read_conf(arg_list):
                 values.CONF_REDUCE_METHOD = values.OPTIONS_REDUCE_METHOD[option]
             elif definitions.ARG_SKIP_BUILD in arg:
                 values.CONF_SKIP_BUILD = True
+            elif definitions.ARG_TEST_SUITE_ID_LIST in arg:
+                values.CONF_TEST_SUITE_ID_LIST = str(arg).replace(definitions.ARG_TEST_SUITE_ID_LIST, "").split(",")
+            elif definitions.ARG_SEED_SUITE_ID_LIST in arg:
+                values.CONF_SEED_SUITE_ID_LIST = str(arg).replace(definitions.ARG_SEED_SUITE_ID_LIST, "").split(",")
             elif definitions.ARG_ITERATION_COUNT in arg:
                 values.CONF_ITERATION_LIMIT = int(arg.replace(definitions.ARG_ITERATION_COUNT, ""))
             elif definitions.ARG_COMP_ALL in arg:
                 values.CONF_ALL_COMPS = True
+            elif definitions.ARG_PRESERVE_BC in arg:
+                values.CONF_PRESERVE_BC = True
             elif definitions.ARG_SKIP_GENERATION in arg:
                 values.CONF_SKIP_GEN = True
             elif definitions.ARG_SKIP_TEST in arg:
                 values.CONF_SKIP_TEST = True
+            elif definitions.ARG_ONLY_GEN in arg:
+                values.CONF_ONLY_GEN = True
+            elif definitions.ARG_ONLY_TEST in arg:
+                values.CONF_ONLY_TEST = True
             elif definitions.ARG_TIME_DURATION in arg:
                 values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
+            elif definitions.ARG_PATCH_DIR in arg:
+                values.CONF_PATCH_DIR = arg.replace(definitions.ARG_PATCH_DIR, "")
             elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
                 if ":" not in arg:
                     emitter.error("Invalid option for " + definitions.ARG_CEGIS_TIME_SPLIT.replace("=", "") + " : " + arg)
@@ -86,7 +98,9 @@ def read_conf(arg_list):
                 else:
                     time_split = arg.replace(definitions.ARG_CEGIS_TIME_SPLIT, "")
                     values.CONF_TIME_SPLIT = time_split
-
+            elif arg in ["-help", "--help", "-h"]:
+                emitter.emit_help()
+                exit(0)
             else:
                 emitter.error("Invalid argument: " + arg)
                 emitter.emit_help()
@@ -120,6 +134,10 @@ def read_conf_file():
             values.CONF_COMMAND_CONFIG = configuration.replace(definitions.CONF_COMMAND_CONFIG, '')
         elif definitions.CONF_RANK_LIMIT in configuration:
             values.CONF_RANK_LIMIT = int(configuration.replace(definitions.CONF_RANK_LIMIT, ''))
+        elif definitions.CONF_GENERALIZED_SEED_INPUT in configuration:
+            values.CONF_GENERALIZED_SEED_INPUT = str(configuration.replace(definitions.CONF_GENERALIZED_SEED_INPUT, ''))
+        elif definitions.CONF_GENERALIZED_TEST_INPUT in configuration:
+            values.CONF_GENERALIZED_TEST_INPUT = str(configuration.replace(definitions.CONF_GENERALIZED_TEST_INPUT, ''))
         elif definitions.CONF_SEED_FILE in configuration:
             seed_file_path = configuration.replace(definitions.CONF_SEED_FILE, '')
             if not os.path.isfile(seed_file_path):
@@ -222,6 +240,10 @@ def read_conf_file():
             conf_text = configuration.replace(definitions.CONF_IS_CPP, '')
             if "true" in str(conf_text).lower():
                 values.CONF_IS_CPP = True
+        elif definitions.CONF_PRESERVE_BC in configuration:
+            conf_text = configuration.replace(definitions.CONF_PRESERVE_BC, '')
+            if "true" in str(conf_text).lower():
+                values.CONF_PRESERVE_BC = True
         elif definitions.CONF_FLAG_ASAN in configuration:
             values.CONF_FLAG_ASAN = configuration.replace(definitions.CONF_FLAG_ASAN, '')
         elif definitions.CONF_FLAGS_C in configuration:
@@ -250,15 +272,54 @@ def read_conf_file():
             values.CONF_KLEE_FLAGS = configuration.replace(definitions.CONF_KLEE_FLAGS, '')
         elif definitions.CONF_ITERATION_LIMIT in configuration:
             values.CONF_ITERATION_LIMIT = int(configuration.replace(definitions.CONF_ITERATION_LIMIT, ''))
+        elif definitions.CONF_MAX_FLIPPINGS in configuration:
+            values.CONF_MAX_FLIPPINGS = int(configuration.replace(definitions.CONF_MAX_FLIPPINGS, ''))
         elif definitions.CONF_STACK_SIZE in configuration:
             values.CONF_STACK_SIZE = int(configuration.replace(definitions.CONF_STACK_SIZE, ''))
         elif definitions.CONF_MASK_ARG in configuration:
             values.CONF_MASK_ARG = configuration.replace(definitions.CONF_MASK_ARG, '').split(",")
         elif definitions.CONF_TIMEOUT_SAT in configuration:
             values.CONF_TIMEOUT_SAT = int(configuration.replace(definitions.CONF_TIMEOUT_SAT, ''))
-        elif definitions.CONF_TIMEOUT_KLEE in configuration:
-            values.CONF_TIMEOUT_KLEE = int(configuration.replace(definitions.CONF_TIMEOUT_KLEE, ''))
-
+        elif definitions.CONF_TIMEOUT_CONCOLIC_RUN in configuration:
+            values.CONF_TIMEOUT_CONCOLIC_RUN = int(configuration.replace(definitions.CONF_TIMEOUT_CONCOLIC_RUN, ''))
+        elif definitions.CONF_TIMEOUT_CONCRETE_RUN in configuration:
+            values.CONF_TIMEOUT_CONCRETE_RUN = int(configuration.replace(definitions.CONF_TIMEOUT_CONCRETE_RUN, ''))
+        elif definitions.CONF_TEST_SUITE_ID_LIST in configuration:
+            values.CONF_TEST_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_TEST_SUITE_ID_LIST, "").split(",")
+        elif definitions.CONF_SEED_SUITE_ID_LIST in configuration:
+            values.CONF_SEED_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_SEED_SUITE_ID_LIST, "").split(",")
+        elif definitions.CONF_PATCH_DIR in configuration:
+            values.CONF_PATCH_DIR = configuration.replace(definitions.CONF_PATCH_DIR, "")
+        elif definitions.CONF_TEST_SUITE_CONFIG in configuration:
+            config_path = configuration.replace(definitions.CONF_TEST_SUITE_CONFIG, "")
+            config_path = values.CONF_PATH_PROJECT + "/" + config_path
+            if os.path.isfile(config_path):
+                values.CONF_TEST_SUITE_CONFIG = reader.read_json(config_path)
+            else:
+                error_exit("Test suite configuration file not found at " + str(config_path))
+        elif definitions.CONF_SEED_SUITE_CONFIG in configuration:
+            config_path = configuration.replace(definitions.CONF_SEED_SUITE_CONFIG, "")
+            config_path = values.CONF_PATH_PROJECT + "/" + config_path
+            if os.path.isfile(config_path):
+                values.CONF_SEED_SUITE_CONFIG = reader.read_json(config_path)
+            else:
+                error_exit("Seed suite configuration file not found at " + str(config_path))
+        elif definitions.CONF_TEST_BINARY_CONFIG_FILE in configuration:
+            config_path = configuration.replace(definitions.CONF_TEST_BINARY_CONFIG_FILE, "")
+            config_path = values.CONF_PATH_PROJECT + "/" + config_path
+            if os.path.isfile(config_path):
+                with open(config_path, "r") as conf_file:
+                    values.CONF_TEST_BINARY_LIST = [x.strip().replace("\n", "") for x in conf_file.readlines()]
+            else:
+                error_exit("Test binary configuration file not found at " + str(config_path))
+        elif definitions.CONF_SEED_BINARY_CONFIG_FILE in configuration:
+            config_path = configuration.replace(definitions.CONF_SEED_BINARY_CONFIG_FILE, "")
+            config_path = values.CONF_PATH_PROJECT + "/" + config_path
+            if os.path.isfile(config_path):
+                with open(config_path, "r") as conf_file:
+                    values.CONF_SEED_BINARY_LIST = [x.strip().replace("\n", "") for x in conf_file.readlines()]
+            else:
+                error_exit("Test binary configuration file not found at " + str(config_path))
 
     if not values.CONF_TAG_ID:
         emitter.error("[NOT FOUND] Tag ID ")
@@ -268,8 +329,10 @@ def read_conf_file():
             values.CONF_DIR_SRC = values.CONF_PATH_PROJECT + "/" + values.CONF_DIR_SRC
     else:
         values.CONF_DIR_SRC = values.CONF_PATH_PROJECT
-    if "/" != values.CONF_PATH_PROGRAM[0]:
-        values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
+
+    if values.CONF_PATH_PROGRAM:
+        if "/" != values.CONF_PATH_PROGRAM[0]:
+            values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
 
 
 def load_component_list():
@@ -321,33 +384,85 @@ def print_configuration():
     emitter.configuration("repair method", values.DEFAULT_REDUCE_METHOD)
     emitter.configuration("timeout for CPR", values.DEFAULT_TIME_DURATION)
     emitter.configuration("timeout for sat", values.DEFAULT_TIMEOUT_SAT)
-    emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE)
+    emitter.configuration("timeout for klee", values.DEFAULT_TIMEOUT_KLEE_CONCOLIC)
     emitter.configuration("distance metric", values.DEFAULT_DISTANCE_METRIC)
     emitter.configuration("operation mode", values.DEFAULT_OPERATION_MODE)
     emitter.configuration("iteration limit", values.DEFAULT_ITERATION_LIMIT)
     emitter.configuration("collecting stats", str(values.DEFAULT_COLLECT_STAT))
+    emitter.configuration("number of seeds", str(len(values.LIST_SEED_INPUT)))
+    emitter.configuration("number of tests", str(len(values.LIST_TEST_INPUT)))
+    emitter.configuration("list of seed ids", str(values.LIST_SEED_ID_LIST))
+    emitter.configuration("list of test ids", str(values.LIST_TEST_ID_LIST))
+    emitter.configuration("masked input arg id list", values.CONF_MASK_ARG)
 
 
 def collect_test_list():
     emitter.normal("reading test configuration")
-    if values.CONF_TEST_INPUT_LIST:
-        for test_input in values.CONF_TEST_INPUT_LIST:
+    if values.CONF_TEST_SUITE_CONFIG:
+        for (test_id, bin_path, test_input, expected_output) in values.CONF_TEST_SUITE_CONFIG:
+            if values.CONF_TEST_SUITE_ID_LIST:
+                if str(test_id) not in values.CONF_TEST_SUITE_ID_LIST:
+                    continue
+            values.LIST_TEST_ID_LIST.add(str(test_id))
+            bin_path = values.CONF_DIR_SRC + "/" + bin_path
+            values.LIST_TEST_BINARY.append(bin_path)
             values.LIST_TEST_INPUT.append(test_input)
-    elif values.CONF_TEST_INPUT_FILE:
-        with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
-            content_lines = in_file.readlines()
-            for content in content_lines:
-                values.LIST_TEST_INPUT.append(content.strip().replace("\n", ""))
+            values.LIST_TEST_OUTPUT.append(expected_output)
+
     else:
-        error_exit("No test input is given (at least one is required)")
+        if values.CONF_TEST_BINARY_LIST:
+            for binary_path in values.CONF_TEST_BINARY_LIST:
+                binary_path = values.CONF_DIR_SRC + "/" + binary_path
+                values.LIST_TEST_BINARY.append(binary_path)
+
+        if values.CONF_TEST_INPUT_LIST:
+            for test_input in values.CONF_TEST_INPUT_LIST:
+                values.LIST_TEST_INPUT.append(test_input)
+        elif values.CONF_TEST_INPUT_FILE:
+            with open(values.CONF_TEST_INPUT_FILE, "r") as in_file:
+                content_lines = in_file.readlines()
+                for content in content_lines:
+                    test_input = content.strip().replace("\n", "")
+                    if test_input.isspace():
+                        continue
+                    if "$POC_" in test_input:
+                        test_input_file = test_input.split("$POC_")[1].split(" ")[0]
+                        test_input_file_index = test_input_file
+                        if values.CONF_GENERALIZED_TEST_INPUT:
+                            test_input = values.CONF_GENERALIZED_TEST_INPUT.replace("$POC", test_input)
+                        if test_input_file[0] != "/":
+                            if values.CONF_SEED_DIR:
+                                test_input_file = values.CONF_SEED_DIR + "/" + test_input_file
+                            else:
+                                test_input_file = values.CONF_DIR_SRC + "/" + test_input_file
+                        values.LIST_TEST_FILES[test_input_file_index] = test_input_file
+                    if test_input:
+                        values.LIST_TEST_INPUT.append(test_input)
+        else:
+            error_exit("No test input is given (at least one is required)")
+
+        if values.CONF_TEST_OUTPUT_LIST:
+            for expected_output in values.CONF_TEST_OUTPUT_LIST:
+                values.LIST_TEST_OUTPUT.append(expected_output)
+        elif values.CONF_TEST_OUTPUT_DIR:
+            expected_output_dir = values.CONF_TEST_OUTPUT_DIR
+            file_list = [f for f in os.listdir(expected_output_dir) if
+                         os.path.isfile(os.path.join(expected_output_dir, f))]
+            for expected_output_file in file_list:
+                if ".smt2" in expected_output_file:
+                    expected_file_abs_path = expected_output_dir + "/" + expected_output_file
+                    expected_file_rel_path = str(expected_file_abs_path).replace(values.CONF_PATH_PROJECT + "/", "")
+                    values.LIST_TEST_OUTPUT.append(expected_file_rel_path)
+        else:
+            error_exit("No expected output is given (at least one is required)")
 
     if values.CONF_TEST_INPUT_DIR:
         test_file_dir = values.CONF_TEST_INPUT_DIR
         file_list = [f for f in os.listdir(test_file_dir) if os.path.isfile(os.path.join(test_file_dir, f))]
         for test_file in file_list:
             test_file_index = test_file
-            if "." in test_file:
-                test_file_index = str(test_file).split(".")[0]
+            # if "." in test_file:
+            #     test_file_index = str(test_file).split(".")[0]
             test_abs_path = test_file_dir + "/" + test_file
             # if not values.CONF_PATH_POC:
             #     values.CONF_PATH_POC = test_abs_path
@@ -355,23 +470,10 @@ def collect_test_list():
     elif values.CONF_PATH_POC:
         test_file = values.CONF_PATH_POC
         test_file_index = test_file
-        if "." in test_file:
-            test_file_index = str(test_file).split(".")[0]
+        # if "." in test_file:
+        #     test_file_index = str(test_file).split(".")[0]
         values.LIST_TEST_FILES[test_file_index] = values.CONF_PATH_POC
 
-    if values.CONF_TEST_OUTPUT_LIST:
-        for expected_output in values.CONF_TEST_OUTPUT_LIST:
-            values.LIST_TEST_OUTPUT.append(expected_output)
-    elif values.CONF_TEST_OUTPUT_DIR:
-        expected_output_dir = values.CONF_TEST_OUTPUT_DIR
-        file_list = [f for f in os.listdir(expected_output_dir) if os.path.isfile(os.path.join(expected_output_dir, f))]
-        for expected_output_file in file_list:
-            if ".smt2" in expected_output_file:
-                expected_file_abs_path = expected_output_dir + "/" + expected_output_file
-                expected_file_rel_path = str(expected_file_abs_path).replace(values.CONF_PATH_PROJECT + "/", "")
-                values.LIST_TEST_OUTPUT.append(expected_file_rel_path)
-    else:
-        error_exit("No expected output is given (at least one is required)")
 
     test_input_list = values.LIST_TEST_INPUT
     concretized_test_input_list = []
@@ -396,29 +498,72 @@ def collect_test_list():
 
 def collect_seed_list():
     emitter.normal("reading seed information")
-    if values.CONF_SEED_LIST:
-        for seed_input in values.CONF_SEED_LIST:
-            values.LIST_SEED_INPUT.append(seed_input)
-    if values.CONF_SEED_FILE:
-        with open(values.CONF_SEED_FILE, "r") as in_file:
-            content_lines = in_file.readlines()
-            for content in content_lines:
-                values.LIST_SEED_INPUT.append(content.strip().replace("\n", ""))
+    if values.CONF_SEED_SUITE_CONFIG:
+        for (seed_id, bin_path, test_input) in values.CONF_SEED_SUITE_CONFIG:
+            if values.CONF_SEED_SUITE_ID_LIST:
+                if str(seed_id) not in values.CONF_SEED_SUITE_ID_LIST:
+                    continue
+            values.LIST_SEED_ID_LIST.add(str(seed_id))
+            bin_path = values.CONF_DIR_SRC + "/" + bin_path
+            values.LIST_SEED_BINARY.append(bin_path)
+            values.LIST_SEED_INPUT.append((seed_id, test_input))
+    else:
+        if values.CONF_SEED_BINARY_LIST:
+            for binary_path in values.CONF_SEED_BINARY_LIST:
+                binary_path = values.CONF_DIR_SRC + "/" + binary_path
+                values.LIST_SEED_BINARY.append(binary_path)
+        if values.CONF_SEED_LIST:
+            for seed_input in values.CONF_SEED_LIST:
+                values.LIST_SEED_INPUT.append(seed_input)
+        elif values.CONF_SEED_FILE:
+            with open(values.CONF_SEED_FILE, "r") as in_file:
+                content_lines = in_file.readlines()
+                seed_id = 0
+                for content in content_lines:
+                    seed_id = seed_id + 1
+                    seed_input = content.strip().replace("\n", "")
+                    if values.CONF_SEED_SUITE_ID_LIST:
+                        if str(seed_id) not in values.CONF_SEED_SUITE_ID_LIST:
+                            continue
+                    if seed_input.isspace():
+                        continue
+                    if "$POC_" in seed_input:
+                        seed_input_file = seed_input.split("$POC_")[1].split(" ")[0]
+                        seed_input_file_index = seed_input_file
+                        if values.CONF_GENERALIZED_SEED_INPUT:
+                            seed_input = values.CONF_GENERALIZED_SEED_INPUT.replace("$POC", seed_input)
+                        if seed_input_file[0] != "/":
+                            if values.CONF_SEED_DIR:
+                                seed_input_file = values.CONF_SEED_DIR + "/" + seed_input_file
+                            else:
+                                seed_input_file = values.CONF_DIR_SRC + "/" + seed_input_file
+                        values.LIST_SEED_FILES[seed_input_file_index] = seed_input_file
+                    if seed_input:
+                        values.LIST_SEED_INPUT.append((seed_id, seed_input))
     if values.CONF_SEED_DIR:
         seed_dir = values.CONF_SEED_DIR
         file_list = [f for f in os.listdir(seed_dir) if os.path.isfile(os.path.join(seed_dir, f))]
         for seed_file in file_list:
+            seed_file_index = seed_file
             seed_abs_path = seed_dir + "/" + seed_file
-            values.LIST_SEED_FILES.append(seed_abs_path)
+            values.LIST_SEED_FILES[seed_file_index] = seed_abs_path
 
     if values.LIST_SEED_INPUT:
-        for seed_arg_list_str in values.LIST_SEED_INPUT:
+        seed_index = 0
+        for seed in values.LIST_SEED_INPUT:
+            if isinstance(seed, tuple):
+                seed_id, seed_arg_list_str = seed
+            else:
+                seed_arg_list_str = seed
+                seed_id = values.LIST_SEED_INPUT.index(seed) + 1
             arg_list = extract_input_arg_list(seed_arg_list_str)
             concretized_arg_list = []
             for arg in arg_list:
                 if "$POC_" in arg:
                     file_index = "_".join(str(arg).split("_")[1:])
-                    file_path = values.LIST_TEST_FILES[file_index]
+                    if file_index not in values.LIST_SEED_FILES:
+                        continue
+                    file_path = values.LIST_SEED_FILES[file_index]
                     concretized_arg_list.append(file_path)
                 elif "$POC" in arg:
                     file_index = list(values.LIST_TEST_FILES.keys())[0]
@@ -428,6 +573,9 @@ def collect_seed_list():
                     concretized_arg_list.append(arg)
             concretized_arg_str = ",".join(concretized_arg_list)
             values.LIST_TEST_INPUT.append(concretized_arg_str)
+            if values.LIST_SEED_BINARY:
+                values.LIST_TEST_BINARY.append(values.LIST_SEED_BINARY[seed_index])
+            seed_index = seed_index + 1
 
 
 def collect_var_mapping():
@@ -450,11 +598,11 @@ def collect_var_mapping():
 
 def update_configuration():
     emitter.normal("updating configuration values")
-    binary_dir_path = "/".join(values.CONF_PATH_PROGRAM.split("/")[:-1])
-    values.FILE_PPC_LOG = binary_dir_path + "/klee-last/ppc.log"
-    values.FILE_EXPR_LOG = binary_dir_path + "/klee-last/expr.log"
-    values.FILE_TRACE_LOG = binary_dir_path + "/klee-last/trace.log"
-    values.FILE_MESSAGE_LOG = binary_dir_path + "/klee-last/messages.txt"
+    klee_last_dir = values.KLEE_LAST_DIR
+    values.FILE_PPC_LOG = klee_last_dir + "/ppc.log"
+    values.FILE_EXPR_LOG = klee_last_dir + "/expr.log"
+    values.FILE_TRACE_LOG = klee_last_dir + "/trace.log"
+    values.FILE_MESSAGE_LOG = klee_last_dir + "/messages.txt"
     definitions.DIRECTORY_OUTPUT = definitions.DIRECTORY_OUTPUT_BASE + "/" + values.CONF_TAG_ID
     definitions.DIRECTORY_LOG = definitions.DIRECTORY_LOG_BASE + "/" + values.CONF_TAG_ID
 
@@ -465,6 +613,9 @@ def update_configuration():
     if os.path.isdir(definitions.DIRECTORY_LOG):
         shutil.rmtree(definitions.DIRECTORY_LOG)
     os.mkdir(definitions.DIRECTORY_LOG)
+    if values.CONF_PATCH_DIR:
+        if os.path.isdir(values.CONF_PATCH_DIR):
+            values.DEFAULT_PATCH_DIR = values.CONF_PATCH_DIR
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
@@ -485,8 +636,10 @@ def update_configuration():
         values.DEFAULT_TIME_DURATION = values.CONF_TIME_DURATION
     if values.CONF_TIMEOUT_SAT:
         values.DEFAULT_TIMEOUT_SAT = values.CONF_TIMEOUT_SAT
-    if values.CONF_TIMEOUT_KLEE:
-        values.DEFAULT_TIMEOUT_KLEE = values.CONF_TIMEOUT_KLEE
+    if values.CONF_TIMEOUT_CONCOLIC_RUN:
+        values.DEFAULT_TIMEOUT_KLEE_CONCOLIC = values.CONF_TIMEOUT_CONCOLIC_RUN
+    if values.CONF_TIMEOUT_CONCRETE_RUN:
+        values.DEFAULT_TIMEOUT_KLEE_CONCRETE = values.CONF_TIMEOUT_CONCRETE_RUN
     if values.CONF_RANK_LIMIT:
         values.DEFAULT_PATCH_RANK_LIMIT = values.CONF_RANK_LIMIT
     if values.CONF_SELECTION_STRATEGY:

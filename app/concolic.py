@@ -69,12 +69,14 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = max(list_path_inprogress, key=lambda item: item[2])
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
     elif values.DEFAULT_DISTANCE_METRIC == values.OPTIONS_DIST_METRIC[1]:
         control_loc = select_nearest_control_loc()
@@ -84,12 +86,14 @@ def select_new_path_condition():
             selected_path = selected_pair[1]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = (random.choice(path_list_at_loc))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
     else:
         ranked_list = sorted(list_path_inprogress, key=operator.itemgetter(4, 3, 2))
@@ -99,15 +103,17 @@ def select_new_path_condition():
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         else:
             selected_pair = (random.choice(ranked_list))
             selected_path = selected_pair[1]
             control_loc = selected_pair[0]
             arg_list = selected_pair[5]
             poc_path = selected_pair[6]
+            bin_path = selected_pair[7]
         list_path_inprogress.remove(selected_pair)
 
-    return selected_path, control_loc, arg_list, poc_path
+    return selected_path, control_loc, arg_list, poc_path, bin_path
 
 
 def select_patch_constraint_for_input(patch_list, selected_new_path):
@@ -169,14 +175,14 @@ def select_new_input(patch_list=None):
     patch_constraint = TRUE
     new_path_count = 0
 
-    for (control_loc, generated_path, ppc_len), arg_list, poc_path in generated_path_list:
+    for (control_loc, generated_path, ppc_len), arg_list, poc_path, bin_path in generated_path_list:
         path_str = str(generated_path.serialize())
         if path_str not in (list_path_detected + list_path_explored):
             reach_patch_loc = 100 - path_str.count("angelic!")
             reach_obs_loc = 100 - path_str.count("obs!")
             ppc_len = 10000 - ppc_len
             list_path_inprogress.append((control_loc, generated_path, ppc_len, reach_patch_loc, reach_obs_loc,
-                                         arg_list, poc_path))
+                                         arg_list, poc_path, bin_path))
             list_path_detected.append(str(generated_path.serialize()))
             new_path_count = new_path_count + 1
 
@@ -188,7 +194,7 @@ def select_new_input(patch_list=None):
     if not list_path_inprogress:
         emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
         emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-        return None, None, patch_list, None, None
+        return None, None, patch_list, None, None, None
     values.LIST_GENERATED_PATH = []
     patch_constraint = None
     selected_new_path = ""
@@ -199,8 +205,8 @@ def select_new_input(patch_list=None):
             if not list_path_inprogress:
                 emitter.note("\t\tCount paths explored: " + str(len(list_path_explored)))
                 emitter.note("\t\tCount paths remaining: " + str(len(list_path_inprogress)))
-                return None, None, patch_list, None, None
-            selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
+                return None, None, patch_list, None, None, None
+            selected_new_path, selected_control_loc, argument_list, poc_path, bin_path = select_new_path_condition()
             patch_constraint = select_patch_constraint_for_input(patch_list, selected_new_path)
             if patch_constraint:
                 list_path_explored.append(str(selected_new_path.serialize()))
@@ -211,20 +217,21 @@ def select_new_input(patch_list=None):
             else:
                 list_path_infeasible.append(str(selected_new_path.serialize()))
     else:
-        selected_new_path, selected_control_loc, argument_list, poc_path = select_new_path_condition()
+        selected_new_path, selected_control_loc, argument_list, poc_path, bin_path = select_new_path_condition()
         list_path_explored.append(str(selected_new_path.serialize()))
     emitter.highlight("\tSelected control location: " + selected_control_loc)
     emitter.highlight("\tSelected path: " + str(selected_new_path))
+    emitter.highlight("\tSelected binary: " + str(bin_path))
     emitter.highlight("\tSelected arguments for mutation: " + str(argument_list))
     if poc_path:
         emitter.highlight("\tSelected seed file: " + str(poc_path))
     input_arg_list, input_var_list = generator.generate_new_input(selected_new_path, argument_list, poc_path)
     if input_arg_list is None and input_var_list is None:
-        return None, None, patch_list, argument_list, poc_path
-    return input_arg_list, input_var_list, patch_list, argument_list, poc_path
+        return None, None, patch_list, argument_list, poc_path, bin_path
+    return input_arg_list, input_var_list, patch_list, argument_list, poc_path, bin_path
 
 
-def run_concolic_execution(program, argument_list, second_var_list, print_output=False):
+def run_concolic_execution(program, argument_list, second_var_list, print_output=False, klee_out_dir=None):
     """
     This function will execute the program in concolic mode using the generated ktest file
         program: the absolute path of the bitcode of the program
@@ -280,28 +287,38 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     # hit_location_flag = " "
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     # if values.CONF_DISTANCE_METRIC == "control-loc":
-    crash_locations = ', '.join(['{}'.format(loc) for loc in values.CONF_LOC_LIST_CRASH])
-    hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH + "," + crash_locations + " "
+    hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
+    if values.CONF_LOC_LIST_CRASH:
+        crash_locations = ', '.join(['{}'.format(loc) for loc in values.CONF_LOC_LIST_CRASH])
+        hit_location_flag += "," + crash_locations + " "
+    else:
+        hit_location_flag += " "
     ppc_log_flag = ""
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_log_flag = "--log-ppc "
-    klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE) + " klee " \
-                   "--posix-runtime " \
-                   "--libc=uclibc " \
-                   "--write-smt2s " \
-                   "-allow-seed-extension " \
-                   "-named-seed-matching " \
-                   "--log-trace " \
-                   + "--external-calls=all " \
-                   + "--link-llvm-lib={0} " .format(runtime_lib_path) \
-                   + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE) \
-                   + "{0}".format(ppc_log_flag) \
-                   + "{0}".format(hit_location_flag) \
-                   + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
-                   + values.CONF_KLEE_FLAGS + " " \
-                   + "--seed-out={0} ".format(ktest_path) \
-                   + "{0} ".format(binary_name) \
-                   + input_argument
+
+    klee_command = "timeout " + str(values.DEFAULT_TIMEOUT_KLEE_CONCOLIC) + " "
+    if klee_out_dir:
+        klee_command += "klee --output-dir=" + str(klee_out_dir) + " "
+        values.KLEE_LAST_DIR = klee_out_dir
+    else:
+        klee_command += "klee "
+    klee_command += "--posix-runtime " \
+                    "--libc=uclibc " \
+                    "--write-smt2s " \
+                    "-allow-seed-extension " \
+                    "-named-seed-matching " \
+                    "--log-trace " \
+                    + "--external-calls=all " \
+                    + "--link-llvm-lib={0} " .format(runtime_lib_path) \
+                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CONCOLIC) \
+                    + "{0}".format(ppc_log_flag) \
+                    + "{0}".format(hit_location_flag) \
+                    + "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
+                    + values.CONF_KLEE_FLAGS + " " \
+                    + "--seed-out={0} ".format(ktest_path) \
+                    + "{0} ".format(binary_name) \
+                    + input_argument
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = utilities.execute_command(klee_command)
@@ -309,16 +326,15 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     os.chdir(current_dir)
 
     # collect artifacts
-    ppc_log_path = directory_path + "/klee-last/ppc.log"
-    trace_log_path = directory_path + "/klee-last/trace.log"
+    ppc_log_path = klee_out_dir + "/ppc.log"
+    trace_log_path = klee_out_dir + "/trace.log"
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_list, path_formula = reader.collect_symbolic_path(ppc_log_path, project_path)
         values.LIST_PPC = values.LIST_PPC = ppc_list
         values.LAST_PPC_FORMULA = path_formula
         values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     else:
-        klee_dir_path = directory_path + "/klee-last/"
-        values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_dir_path)
+        values.LAST_PPC_FORMULA = extractor.extract_largest_path_condition(klee_out_dir)
         if values.LAST_PPC_FORMULA:
             ppc_list = generator.generate_ppc_from_formula(values.LAST_PPC_FORMULA)
             values.LIST_PPC = values.LIST_PPC + ppc_list
@@ -382,7 +398,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
 #     return return_code
 
 
-def run_concrete_execution(program, argument_list, print_output=False, output_dir=None):
+def run_concrete_execution(program, argument_list, print_output=False, klee_out_dir=None):
     """
     This function will execute the program in concrete mode using the concrete inputs
         program: the absolute path of the bitcode of the program
@@ -397,6 +413,7 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
     emitter.debug("changing directory:" + directory_path)
     os.chdir(directory_path)
     binary_name = str(program).split("/")[-1]
+    project_path = values.CONF_DIR_SRC
     input_argument = ""
     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
     for argument in argument_list:
@@ -410,25 +427,34 @@ def run_concrete_execution(program, argument_list, print_output=False, output_di
         #         if values.FILE_POC_GEN:
         #             argument = values.FILE_POC_GEN
         input_argument += " " + str(argument)
-    if output_dir:
-        klee_command = "klee --output-dir=" + str(output_dir) + " "
+    if klee_out_dir:
+        klee_command = "klee --output-dir=" + str(klee_out_dir) + " "
+        values.KLEE_LAST_DIR = klee_out_dir
     else:
         klee_command = "klee "
+    hit_location_flag = values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
+
     klee_command += "--posix-runtime " \
                     "--libc=uclibc " \
                     "--search=dfs " \
                     "--write-smt2s " \
                     "--external-calls=all " \
+                    "--log-trace " \
                     "--max-forks {0} ".format(values.DEFAULT_MAX_FORK) \
                     + values.CONF_KLEE_FLAGS + " " \
+                    + "--max-time={0} ".format(values.DEFAULT_TIMEOUT_KLEE_CONCRETE) \
+                    + " --hit-locations {0} ".format(hit_location_flag) \
                     + "--link-llvm-lib={0} ".format(runtime_lib_path) \
                     + "{0} ".format(binary_name) \
                     + input_argument
+
     if not print_output:
         klee_command += " > " + File_Log_Path + " 2>&1 "
     return_code = utilities.execute_command(klee_command)
     emitter.debug("changing directory:" + current_dir)
     os.chdir(current_dir)
+    trace_log_path = klee_out_dir + "/trace.log"
+    values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
     return return_code
 
 #
@@ -458,7 +484,6 @@ def run_concolic_exploration(program_path, patch_list):
     satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
     iteration = 0
     emitter.sub_title("Concolic Path Exploration")
-    binary_dir_path = "/".join(program_path.split("/")[:-1])
     assertion_template = values.SPECIFICATION_TXT
     max_count = 0
 
@@ -475,11 +500,14 @@ def run_concolic_exploration(program_path, patch_list):
                 seed_id = seed_id + 1
                 values.ITERATION_NO = iteration
                 emitter.sub_sub_title("Iteration: " + str(iteration))
-                klee_out_dir = binary_dir_path + "/klee-out-" + str(test_input_list.index(argument_list))
+                output_dir_path = definitions.DIRECTORY_OUTPUT
+                klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration-1)
                 argument_list = app.configuration.extract_input_arg_list(argument_list)
                 generalized_arg_list = []
                 for arg in argument_list:
-                    if arg in (values.LIST_SEED_FILES + list(values.LIST_TEST_FILES.values())):
+                    if str(argument_list.index(arg)) in values.CONF_MASK_ARG:
+                        generalized_arg_list.append(arg)
+                    elif arg in (list(values.LIST_SEED_FILES.values()) + list(values.LIST_TEST_FILES.values())):
                         poc_path = arg
                         values.FILE_POC_SEED = arg
                         values.FILE_POC_GEN = arg
@@ -488,22 +516,31 @@ def run_concolic_exploration(program_path, patch_list):
                         generalized_arg_list.append(arg)
                 emitter.sub_sub_title("Iteration: " + str(iteration) + " - Using Seed #" + str(seed_id))
                 emitter.highlight("\tUsing Arguments: " + str(generalized_arg_list))
-                emitter.highlight("\tUsing Input: " + str(poc_path))
+                emitter.highlight("\tUsing Input File: " + str(poc_path))
+                if values.LIST_TEST_BINARY:
+                    program_path = values.LIST_TEST_BINARY[seed_id-1]
+                    values.CONF_PATH_PROGRAM = program_path
+                else:
+                    program_path = values.CONF_PATH_PROGRAM
+                extractor.extract_byte_code(program_path)
+                if not os.path.isfile(program_path + ".bc"):
+                    app.utilities.error_exit("Unable to generate bytecode for " + program_path)
+
                 values.ARGUMENT_LIST = generalized_arg_list
                 _, second_var_list = generator.generate_angelic_val(klee_out_dir, generalized_arg_list, poc_path)
 
-                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True)
+                exit_code = run_concolic_execution(program_path + ".bc", generalized_arg_list, second_var_list, True, klee_out_dir)
                 # assert exit_code == 0
-                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path)
+                generated_path_list = app.parallel.generate_symbolic_paths(values.LIST_PPC, generalized_arg_list, poc_path, program_path)
                 if generated_path_list:
                     values.LIST_GENERATED_PATH = generated_path_list + values.LIST_GENERATED_PATH
                 values.LIST_PPC = []
-                klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-                assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
+                # klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
+                assertion, count_obs = generator.generate_assertion(assertion_template, klee_out_dir)
                 if count_obs > max_count:
                     max_count = count_obs
                     largest_assertion = assertion
-                    path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
+                    path_constraint_file_path = str(klee_out_dir) + "/test000001.smt2"
                     largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
 
                 satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
@@ -530,9 +567,9 @@ def run_concolic_exploration(program_path, patch_list):
 
             argument_list = values.ARGUMENT_LIST
             second_var_list = values.SECOND_VAR_LIST
-
-            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path = select_new_input(patch_list)
-
+            gen_arg_list, gen_var_list, patch_list, argument_list, poc_path, program_path = select_new_input(patch_list)
+            output_dir_path = definitions.DIRECTORY_OUTPUT
+            klee_out_dir = output_dir_path + "/klee-out-repair-" + str(iteration - 1)
             if not patch_list:
                 emitter.warning("\t\t[warning] unable to generate a patch")
                 break
@@ -542,21 +579,21 @@ def run_concolic_exploration(program_path, patch_list):
             assert gen_arg_list  # there should be a concrete input
             time_check = time.time()
             ## Concolic execution of concrete input and patch candidate to retrieve path constraint.
-            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list)
+            exit_code = run_concolic_execution(program_path + ".bc", gen_arg_list, gen_var_list, False, klee_out_dir)
             duration = (time.time() - time_check) / 60
             values.TIME_TO_EXPLORE = values.TIME_TO_EXPLORE + duration
             # assert exit_code == 0
-            klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
-            assertion, count_obs = generator.generate_assertion(assertion_template, klee_dir)
+            # klee_dir = Path(binary_dir_path + "/klee-last/").resolve()
+            assertion, count_obs = generator.generate_assertion(assertion_template, klee_out_dir)
             if count_obs > max_count:
                 max_count = count_obs
                 largest_assertion = assertion
-                path_constraint_file_path = str(klee_dir) + "/test000001.smt2"
+                path_constraint_file_path = str(klee_out_dir) + "/test000001.smt2"
                 largest_path_condition = extractor.extract_formula_from_file(path_constraint_file_path)
 
             # Checks for the current coverage.
             satisfied = utilities.check_budget(values.DEFAULT_TIMEOUT_CEGIS_EXPLORE)
-            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path)
+            values.LIST_GENERATED_PATH = app.parallel.generate_symbolic_paths(values.LIST_PPC, argument_list, poc_path, program_path)
             values.LIST_PPC = []
             # check if new path hits patch location / fault location
             if not oracle.is_loc_in_trace(values.CONF_LOC_PATCH):

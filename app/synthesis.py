@@ -1,5 +1,6 @@
 import argparse
 import logging
+import math
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Union, Optional, NamedTuple
@@ -1103,11 +1104,21 @@ def synthesize_lazy(components: List[Component],
     contradiction_included = not values.IS_CONTRADICTIONS_INCLUDED
 
     optimized = True
-
+    template_explored = 0
+    concrete_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
+        template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
+
+        if contains_constant(tree[1]):
+            dimension = len(get_all_constant_names(tree[1]))
+            range = upper_bound - lower_bound + 1
+            count_pairs = math.pow(range, dimension)
+            concrete_explored = concrete_explored + count_pairs
+        else:
+            concrete_explored = concrete_explored + 1
 
         if optimized:
             ## Check for tautologies (TRUE) and contradictions (FALSE).
@@ -1261,6 +1272,8 @@ def synthesize_lazy(components: List[Component],
             result = verify({lid: (tree, {})}, specification)
             if result:
                 yield {lid: (tree, { ComponentSymbol.parse(f).name:v for (f, v) in result.constants.items() })}
+    values.COUNT_PATCHES_EXPLORED = concrete_explored
+    values.COUNT_TEMPLATES_EXPLORED = template_explored
 
 
 #TODO: enforce assigned variables in verification conditon
@@ -1292,11 +1305,20 @@ def synthesize_parallel(components: List[Component],
     
     ## Open new pool for parallel execution.
     pool = mp.Pool(mp.cpu_count())
-
+    template_explored = 0
+    concrete_explored = 0
     for tree in enumerate_trees(components, depth, typ, False, True):
+        template_explored = template_explored + 1
         assigned = extract_assigned(tree)
         if len(assigned) != len(set(assigned)):
             continue
+        if contains_constant(tree[1]):
+            dimension = len(get_all_constant_names(tree[1]))
+            range = upper_bound - lower_bound + 1
+            count_pairs = math.pow(range, dimension)
+            concrete_explored = concrete_explored + count_pairs
+        else:
+            concrete_explored = concrete_explored + 1
 
         if optimized:
             ## Check for tautologies (TRUE) and contradictions (FALSE).
@@ -1460,7 +1482,8 @@ def synthesize_parallel(components: List[Component],
     pool.close()
     logger.info("\t\twaiting for thread completion")
     pool.join()
-
+    values.COUNT_PATCHES_EXPLORED = concrete_explored
+    values.COUNT_TEMPLATES_EXPLORED = template_explored
     # assert(len(result_list) == len(path_list))
 
     #print("collected_patch_indeces=" + str(collected_patch_indeces))
@@ -1539,11 +1562,16 @@ def get_all_constant_names(tree_content: Dict[str, 'ComponentTree']) -> Set[str]
     Collects all constant names in a tree.
     """
     names = set()
-
-    left_name = tree_content['left'][0][0]
-    left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
-    right_name = tree_content['right'][0][0]
-    right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
+    left_name = ""
+    right_name = ""
+    left_dict = None
+    right_dict = None
+    if "left" in tree_content.keys():
+        left_name = tree_content['left'][0][0]
+        left_dict = tree_content['left'][1] # if there is a non-empty dict, then left is no leaf node
+    if "right" in tree_content.keys():
+        right_name = tree_content['right'][0][0]
+        right_dict = tree_content['right'][1] # if there is a non-empty dict, then right is no leaf node
 
     # If left side is a leaf node, then check for constant.
     if not left_dict and left_name.startswith('constant_'):

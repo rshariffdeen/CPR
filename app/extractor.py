@@ -53,12 +53,13 @@ def extract_bit_vector(expression_str):
 
 
 def extract_byte_code(binary_path):
-    emitter.normal("\textracting bytecode")
-    directory_path = "/".join(binary_path.split("/")[:-1])
-    binary_name = binary_path.split("/")[-1]
-    extract_command = "cd " + directory_path + ";"
-    extract_command += "extract-bc " + binary_name
-    utilities.execute_command(extract_command)
+    if not utilities.values.CONF_PRESERVE_BC:
+        emitter.normal("\textracting bytecode")
+        directory_path = "/".join(binary_path.split("/")[:-1])
+        binary_name = binary_path.split("/")[-1]
+        extract_command = "cd " + directory_path + ";"
+        extract_command += "extract-bc " + binary_name
+        utilities.execute_command(extract_command)
 
 
 def extract_formula_from_file(spec_file_path):
@@ -103,6 +104,7 @@ def extract_parameter_list(model):
 def extract_largest_path_condition(dir_path):
     largest_path_condition = None
     pc_formula_len = 0
+    emitter.normal("\textracting largest symbolic path")
     file_list = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
     for file_name in file_list:
         if ".smt2" in file_name:

@@ -9,7 +9,6 @@ from Cython.Build import cythonize
 
 
 EXCLUDE_FILES = [
-    'app/main.py',
     'app/synthesis.py'
 ]
 
@@ -51,7 +50,8 @@ setup(
     packages=find_packages(),
     ext_modules=cythonize(
         get_ext_paths('app', EXCLUDE_FILES),
-        compiler_directives={'language_level': 3}
+        compiler_directives={'language_level': 3},
+        language_level="3"
     ),
     cmdclass={
         'build_py': build_py
