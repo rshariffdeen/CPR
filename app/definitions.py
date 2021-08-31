@@ -82,6 +82,7 @@ CONF_SEED_SUITE_CONFIG = "path_seed_suite:"
 CONF_TEST_SUITE_ID_LIST = "list_test_id:"
 CONF_SEED_SUITE_ID_LIST = "list_seed_id:"
 CONF_MAX_FLIPPINGS = "max_flippings:"
+CONF_PATCH_DIR = "patch_dir:"
 
 CONF_SEED_FILE = "seed_file:"
 CONF_SEED_DIR = "seed_dir:"
@@ -126,6 +127,7 @@ ARG_ONLY_TEST = "--only-test"
 ARG_TEST_SUITE_ID_LIST = "--test-id-list="
 ARG_SEED_SUITE_ID_LIST = "--seed-id-list="
 ARG_PRESERVE_BC = "--preserve-bc"
+ARG_PATCH_DIR = "--patch-dir="
 
 
 # ----------------- TOOLS --------------------------------

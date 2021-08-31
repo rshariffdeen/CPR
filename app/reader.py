@@ -299,3 +299,15 @@ def collect_specification(spec_file_path):
         with open(spec_file_path, 'r') as spec_file:
             spec_lines = spec_file.readlines()
     return spec_lines
+
+
+def read_patch_list(dir_patch):
+    patch_list = []
+    if os.path.isdir(dir_patch):
+        file_list = [f for f in os.listdir(dir_patch) if os.path.isfile(os.path.join(dir_patch, f))]
+        for patch_path in file_list:
+            if ".patch" in patch_path:
+                with open(patch_path, "r") as p_file:
+                    patch_line = p_file.readline().split("---> ")[-1].replace("\"", "")
+                    patch_list.append(patch_line)
+    return patch_list

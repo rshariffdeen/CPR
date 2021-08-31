@@ -88,6 +88,8 @@ def read_conf(arg_list):
                 values.CONF_ONLY_TEST = True
             elif definitions.ARG_TIME_DURATION in arg:
                 values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
+            elif definitions.ARG_PATCH_DIR in arg:
+                values.CONF_PATCH_DIR = arg.replace(definitions.ARG_PATCH_DIR, "")
             elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
                 if ":" not in arg:
                     emitter.error("Invalid option for " + definitions.ARG_CEGIS_TIME_SPLIT.replace("=", "") + " : " + arg)
@@ -286,6 +288,8 @@ def read_conf_file():
             values.CONF_TEST_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_TEST_SUITE_ID_LIST, "").split(",")
         elif definitions.CONF_SEED_SUITE_ID_LIST in configuration:
             values.CONF_SEED_SUITE_ID_LIST = str(configuration).replace(definitions.CONF_SEED_SUITE_ID_LIST, "").split(",")
+        elif definitions.CONF_PATCH_DIR in configuration:
+            values.CONF_PATCH_DIR = configuration.replace(definitions.CONF_PATCH_DIR, "")
         elif definitions.CONF_TEST_SUITE_CONFIG in configuration:
             config_path = configuration.replace(definitions.CONF_TEST_SUITE_CONFIG, "")
             config_path = values.CONF_PATH_PROJECT + "/" + config_path
@@ -609,6 +613,9 @@ def update_configuration():
     if os.path.isdir(definitions.DIRECTORY_LOG):
         shutil.rmtree(definitions.DIRECTORY_LOG)
     os.mkdir(definitions.DIRECTORY_LOG)
+    if values.CONF_PATCH_DIR:
+        if os.path.isdir(values.CONF_PATCH_DIR):
+            values.DEFAULT_PATCH_DIR = values.CONF_PATCH_DIR
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
     if values.CONF_LOW_BOUND:
