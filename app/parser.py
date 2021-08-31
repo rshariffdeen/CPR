@@ -80,7 +80,8 @@ def parse_component(comp_str):
         "==": "equal", "+": "addition", "=": "assignment", "&" : "bitwise-and",
         "|": "bitwise-or", "~": "bitwise-not", "/": "division", ">=": "greater-or-equal",
         ">": "greater-than", "<=": "less-or-equal", "&&": "logical-and", "||": "logical-or",
-        "!": "logical-not", "-": "subtraction", "*": "multiplication", "!=": "not-equal"
+        "!": "logical-not", "-": "subtraction", "*": "multiplication", "!=": "not-equal",
+        "<": "less-than"
                     }
     if comp_str in str_comp_map.keys():
         return str_comp_map[comp_str]
