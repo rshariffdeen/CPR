@@ -544,7 +544,7 @@ def collect_patch_list():
                 c_file.writelines("(declare-const lvalue_{} (_ BitVec 32))\n".format(comp_name))
                 c_file.writelines("(declare-const rreturn (_ BitVec 32))\n")
                 c_file.writelines("(declare-const lreturn (_ BitVec 32))\n")
-                c_file.writelines("(assert (and (= rreturn rvalue_{0}) (= lreturn lvalue_{0}))))\n".format(comp_name))
+                c_file.writelines("(assert (and (= rreturn rvalue_{0}) (= lreturn lvalue_{0})))\n".format(comp_name))
                 c_file.close()
 
 
