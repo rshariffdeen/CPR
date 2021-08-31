@@ -57,7 +57,8 @@ def bootstrap(arg_list):
 
     configuration.collect_test_list()
     configuration.collect_seed_list()
-
+    if values.DEFAULT_PATCH_DIR:
+        configuration.collect_patch_list()
     # configuration.collect_var_mapping()
     configuration.load_component_list()
     configuration.print_configuration()
