@@ -330,6 +330,10 @@ def read_conf_file():
     else:
         values.CONF_DIR_SRC = values.CONF_PATH_PROJECT
 
+    if values.CONF_PATCH_DIR:
+        if "/" != values.CONF_PATCH_DIR[0]:
+            values.CONF_PATCH_DIR = values.CONF_PATH_PROJECT + "/" + values.CONF_PATCH_DIR
+
     if values.CONF_PATH_PROGRAM:
         if "/" != values.CONF_PATH_PROGRAM[0]:
             values.CONF_PATH_PROGRAM = values.CONF_DIR_SRC + "/" + values.CONF_PATH_PROGRAM
