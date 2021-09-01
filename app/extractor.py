@@ -141,7 +141,7 @@ def extract_general_component_list(comp_str_list):
     general_comp_str_list = []
     for comp_str in comp_str_list:
         if not str(comp_str).isalnum():
-            gen_comp_name = parser.parse_component_name(comp_str)
+            gen_comp_name, _ = parser.parse_component_name(comp_str)
             if gen_comp_name is None:
                 utilities.error_exit("Incompatible General Component Detected: {}".format(comp_str))
             general_comp_str_list.append(gen_comp_name)
