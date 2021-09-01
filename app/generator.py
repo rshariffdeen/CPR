@@ -92,13 +92,7 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         values.DEFAULT_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[0]
         concrete_enumeration = True
         component_string_list = set()
-        list_of_patches = []
-        for patch_loc, patch_expr in values.LIST_LOADED_PATCHES:
-            token_list = patch_expr.split(" ")
-            for token in token_list:
-                token = token.replace("(", "").replace(")", "")
-                component_string_list.add(token)
-
+        list_of_patches = extractor.extract_patch_list()
 
     else:
         emitter.sub_title("Generating Patch Pool")

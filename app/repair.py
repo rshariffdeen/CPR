@@ -208,10 +208,8 @@ def run(project_path, program_path):
     definitions.FILE_PATCH_RANK_INDEX = definitions.DIRECTORY_OUTPUT + "/patch-index"
     definitions.FILE_PATCH_RANK_MATRIX = definitions.DIRECTORY_OUTPUT + "/patch-rank-matrix"
     # satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
-    if values.LIST_LOADED_PATCHES:
-        initial_patch_list = extractor.extract_patch_list()
-    else:
-        initial_patch_list = generator.generate_patch_set(project_path)
+
+    initial_patch_list = generator.generate_patch_set(project_path)
     result_list = parallel.remove_duplicate_patches_parallel(initial_patch_list)
     filtered_patch_list = []
     for result in result_list:
