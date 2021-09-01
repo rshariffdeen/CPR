@@ -82,7 +82,7 @@ def parse_component_name(comp_str):
     if comp_str in definitions.str_comp_map.keys():
         return definitions.str_comp_map[comp_str]
     if comp_str in values.MAP_COMPONENTS.keys():
-        return comp_str
+        return values.MAP_COMPONENTS[comp_str]
     return None
 
 
