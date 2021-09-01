@@ -537,6 +537,7 @@ def collect_patch_list():
     for comp_str in component_string_list:
         if str(comp_str).isnumeric():
             comp_name = "const_" + definitions.cust_comp_name_list[const_name_index]
+            values.MAP_CUSTOM_COMPONENT[comp_str] = comp_name
             const_name_index = const_name_index + 1
             comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
             with open(comp_file_path, "w+") as c_file:
