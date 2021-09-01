@@ -168,10 +168,13 @@ def extract_patch_list():
     for patch_str in values.LIST_LOADED_PATCHES:
         split_list = str(patch_str).split(" ")
         token_list = []
+        count_constants = 0
         for token in split_list:
             token = token.replace("(", "").replace(")", "")
             token_list.append(token)
+            if str(token).isnumeric():
+                count_constants = count_constants + 1
         root_index = extract_root_index(token_list)
-        patch = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:])
+        patch = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:], count_constants)
         patch_list.append(patch)
     return patch_list

@@ -78,38 +78,40 @@ def parse_z3_output(z3_output):
     return model
 
 
-def parse_component_name(comp_str):
+def parse_component_name(comp_str, count_constants):
     if comp_str in definitions.str_comp_map.keys():
         return definitions.str_comp_map[comp_str]
-    if comp_str in values.MAP_COMPONENTS.keys():
-        return values.MAP_COMPONENTS[comp_str]
+    elif comp_str in values.MAP_CUSTOM_COMPONENT_NAME.keys():
+        return values.MAP_CUSTOM_COMPONENT_NAME[comp_str]
+    elif str(comp_str).isnumeric():
+        return "const_" + definitions.cust_comp_name_list[count_constants-1], count_constants - 1
     return None
 
 
-def parse_component(comp_str):
-    comp_name = parse_component_name(comp_str)
+def parse_component(comp_str, count_constants):
+    comp_name, count_constants = parse_component_name(comp_str)
     if comp_name:
         if comp_name in values.MAP_COMPONENTS:
-            return values.MAP_COMPONENTS[comp_name]
+            return values.MAP_COMPONENTS[comp_name], count_constants
         else:
             utilities.error_exit("invalid component name: {}".format(comp_name))
     else:
         utilities.error_exit("invalid component string: {}".format(comp_str))
 
 
-def parse_patch(left_tree, root_str, right_tree):
-    root_comp = parse_component(root_str)
+def parse_patch(left_tree, root_str, right_tree, count_constants):
+    root_comp, count_constants = parse_component(root_str, count_constants)
     if len(left_tree) == 1:
-        left_comp_tree = parse_component(left_tree[0])
+        left_comp_tree, count_constants = parse_component(left_tree[0], count_constants)
     else:
         root_index = extractor.extract_root_index(left_tree)
-        left_comp_tree = parse_patch(left_tree[:root_index], left_tree[root_index], left_tree[root_index+1:])
+        left_comp_tree, count_constants = parse_patch(left_tree[:root_index], left_tree[root_index], left_tree[root_index+1:], count_constants)
 
     if len(right_tree) == 1:
-        right_comp_tree = parse_component(right_tree[0])
+        right_comp_tree, count_constants = parse_component(right_tree[0], count_constants)
     else:
         root_index = extractor.extract_root_index(right_tree)
-        right_comp_tree = parse_patch(right_tree[:root_index], right_tree[root_index], right_tree[root_index + 1:])
+        right_comp_tree, count_constants = parse_patch(right_tree[:root_index], right_tree[root_index], right_tree[root_index + 1:], count_constants)
 
     # construct full patch
     holes = collect_symbols(root_comp[1], any_fn(ComponentSymbol.is_lhole, ComponentSymbol.is_rhole))
@@ -120,4 +122,4 @@ def parse_patch(left_tree, root_str, right_tree):
         mappings["right"] = right_comp_tree
         mappings["left"] = left_comp_tree
     patch_tree = (root_comp, mappings)
-    return patch_tree
+    return patch_tree, count_constants
