@@ -364,7 +364,7 @@ def load_component_list():
         file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_CUSTOM)
         custom_comp_str_list = []
         for comp_file in file_list:
-            custom_comp_str_list.append(comp_file)
+            custom_comp_str_list.append(definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_file)
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_GENERAL)
         values.CONF_CUSTOM_COMP_LIST = custom_comp_str_list
         for comp_file in component_file_list:
@@ -566,7 +566,7 @@ def collect_patch_list():
                 c_file.writelines("(declare-const lreturn (_ BitVec 32))\n")
                 c_file.writelines("(assert (and (= rreturn rvalue_{0}) (= lreturn lvalue_{0})))\n".format(comp_name))
                 c_file.close()
-    for c in range(1, max_count_constants + 1):
+    for c in range(0, max_count_constants):
         comp_name = "const_" + definitions.cust_comp_name_list[c]
         comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
         with open(comp_file_path, "w+") as c_file:
