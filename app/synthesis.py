@@ -1114,8 +1114,8 @@ def synthesize_lazy(components: List[Component],
 
         if contains_constant(tree[1]):
             dimension = len(get_all_constant_names(tree[1]))
-            range = upper_bound - lower_bound + 1
-            count_pairs = math.pow(range, dimension)
+            v_range = upper_bound - lower_bound + 1
+            count_pairs = math.pow(v_range, dimension)
             concrete_explored = concrete_explored + count_pairs
         else:
             concrete_explored = concrete_explored + 1
@@ -1314,8 +1314,8 @@ def synthesize_parallel(components: List[Component],
             continue
         if contains_constant(tree[1]):
             dimension = len(get_all_constant_names(tree[1]))
-            range = upper_bound - lower_bound + 1
-            count_pairs = math.pow(range, dimension)
+            v_range = upper_bound - lower_bound + 1
+            count_pairs = math.pow(v_range, dimension)
             concrete_explored = concrete_explored + count_pairs
         else:
             concrete_explored = concrete_explored + 1
