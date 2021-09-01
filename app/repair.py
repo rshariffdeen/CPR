@@ -205,7 +205,10 @@ def run(project_path, program_path):
     ## Generate all possible solutions by running the synthesizer.
     time_check = time.time()
     # satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
-    initial_patch_list = generator.generate_patch_set(project_path)
+    if values.LIST_LOADED_PATCHES:
+        initial_patch_list = extractor.extract_patch_list()
+    else:
+        initial_patch_list = generator.generate_patch_set(project_path)
     result_list = parallel.remove_duplicate_patches_parallel(initial_patch_list)
     filtered_patch_list = []
     for result in result_list:
