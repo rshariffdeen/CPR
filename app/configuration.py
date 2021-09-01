@@ -533,8 +533,18 @@ def collect_patch_list():
             token = token.replace("(", "").replace(")", "")
             component_string_list.add(token)
     comp_name_index = 0
+    const_name_index = 0
     for comp_str in component_string_list:
-        if str(comp_str).isalnum():
+        if str(comp_str).isnumeric():
+            comp_name = "const_" + definitions.cust_comp_name_list[const_name_index]
+            const_name_index = const_name_index + 1
+            comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
+            with open(comp_file_path, "w+") as c_file:
+                c_file.writelines("(declare-const {}} (_ BitVec 32))\n".format(comp_name))
+                c_file.writelines("(declare-const rreturn (_ BitVec 32))\n")
+                c_file.writelines("(assert (= rreturn {}))\n".format(comp_name))
+                c_file.close()
+        elif str(comp_str).isalnum():
             comp_name = definitions.cust_comp_name_list[comp_name_index]
             values.MAP_CUSTOM_COMPONENT[comp_str] = comp_name
             comp_name_index = comp_name_index + 1

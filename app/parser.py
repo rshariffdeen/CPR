@@ -99,6 +99,6 @@ def parse_component_list(comp_str_list):
             gen_comp_name = parse_component(comp_str)
             if gen_comp_name is None:
                 utilities.error_exit("Incompatible General Component Detected: {}".format(comp_str))
-            general_comp_str_list.append(comp_str)
+            general_comp_str_list.append(gen_comp_name)
     return general_comp_str_list, custom_comp_str_list
 
