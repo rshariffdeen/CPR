@@ -150,15 +150,18 @@ def extract_general_component_list(comp_str_list):
 
 def extract_root_index(token_list):
     if len(token_list) > 1:
-        for token in token_list:
-            if token in ["&&", "||"]:
-                return token_list.index(token)
-            elif token in ["<", "<=", "==", "!=", ">=", ">"]:
-                return token_list.index(token)
-            elif token in ["+", "-", "*", "/"]:
-                return token_list.index(token)
-            elif token in ["|", "&"]:
-                return token_list.index(token)
+        if any(token in token_list for token in ["&&", "||"]):
+            intersection = list(set(token_list).intersection(set(list(["&&", "||"]))))
+            return token_list.index(intersection[0])
+        elif any(token in token_list for token in ["<", "<=", "==", "!=", ">=", ">"]):
+            intersection = list(set(token_list).intersection(set(list(["<", "<=", "==", "!=", ">=", ">"]))))
+            return token_list.index(intersection[0])
+        elif any(token in token_list for token in ["+", "-", "*", "/"]):
+            intersection = list(set(token_list).intersection(set(list(["+", "-", "*", "/"]))))
+            return token_list.index(intersection[0])
+        elif any(token in token_list for token in ["|", "&"]):
+            intersection = list(set(token_list).intersection(set(list(["|", "&"]))))
+            return token_list.index(intersection[0])
     else:
         utilities.error_exit("invalid token list to find root index")
 
