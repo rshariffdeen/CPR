@@ -86,6 +86,8 @@ def read_conf(arg_list):
                 values.CONF_ONLY_GEN = True
             elif definitions.ARG_ONLY_TEST in arg:
                 values.CONF_ONLY_TEST = True
+            elif definitions.ARG_PATCH_PARTITION in arg:
+                values.CONF_PATCH_PARTITION = True
             elif definitions.ARG_TIME_DURATION in arg:
                 values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
             elif definitions.ARG_PATCH_DIR in arg:
@@ -276,6 +278,8 @@ def read_conf_file():
             values.CONF_MAX_FLIPPINGS = int(configuration.replace(definitions.CONF_MAX_FLIPPINGS, ''))
         elif definitions.CONF_STACK_SIZE in configuration:
             values.CONF_STACK_SIZE = int(configuration.replace(definitions.CONF_STACK_SIZE, ''))
+        elif definitions.CONF_PATCH_PARTITION in configuration:
+            values.CONF_PATCH_PARTITION = configuration.replace(definitions.CONF_PATCH_PARTITION, "")
         elif definitions.CONF_MASK_ARG in configuration:
             values.CONF_MASK_ARG = configuration.replace(definitions.CONF_MASK_ARG, '').split(",")
         elif definitions.CONF_TIMEOUT_SAT in configuration:
@@ -740,6 +744,8 @@ def update_configuration():
         values.DEFAULT_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[0]
     if values.CONF_COLLECT_STAT:
         values.DEFAULT_COLLECT_STAT = True
+    if values.CONF_PATCH_PARTITION:
+        values.DEFAULT_PATCH_PARTITION = True
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)

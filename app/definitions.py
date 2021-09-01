@@ -92,6 +92,8 @@ CONF_GEN_SPECIAL_PATH = "gen_special_path:"
 CONF_PRESERVE_BC = "preserve_bc:"
 CONF_GENERALIZED_SEED_INPUT = "generalize_seed_input:"
 CONF_GENERALIZED_TEST_INPUT = "generalize_test_input:"
+CONF_PATCH_PARTITION = "partition:"
+
 
 # ----------------- KEY DEFINITIONS -------------------
 
@@ -129,6 +131,7 @@ ARG_TEST_SUITE_ID_LIST = "--test-id-list="
 ARG_SEED_SUITE_ID_LIST = "--seed-id-list="
 ARG_PRESERVE_BC = "--preserve-bc"
 ARG_PATCH_DIR = "--patch-dir="
+ARG_PATCH_PARTITION = "--partition"
 
 
 # ----------------- TOOLS --------------------------------
