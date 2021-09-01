@@ -78,7 +78,7 @@ def parse_z3_output(z3_output):
     return model
 
 
-def parse_component_name(comp_str, count_constants):
+def parse_component_name(comp_str, count_constants=0):
     if comp_str in definitions.str_comp_map.keys():
         return definitions.str_comp_map[comp_str]
     elif comp_str in values.MAP_CUSTOM_COMPONENT_NAME.keys():
@@ -89,7 +89,7 @@ def parse_component_name(comp_str, count_constants):
 
 
 def parse_component(comp_str, count_constants):
-    comp_name, count_constants = parse_component_name(comp_str)
+    comp_name, count_constants = parse_component_name(comp_str, count_constants)
     if comp_name:
         if comp_name in values.MAP_COMPONENTS:
             return values.MAP_COMPONENTS[comp_name], count_constants
