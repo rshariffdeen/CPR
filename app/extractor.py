@@ -137,7 +137,7 @@ def extract_child_expressions(patch_tree):
     return child_list
 
 
-def extract_component_list(comp_str_list):
+def extract_general_component_list(comp_str_list):
     general_comp_str_list = []
     for comp_str in comp_str_list:
         if not str(comp_str).isalnum():

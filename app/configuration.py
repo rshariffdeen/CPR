@@ -355,11 +355,12 @@ def load_component_list():
             count_constants = 0
             for token in token_list:
                 token = token.replace("(", "").replace(")", "")
-                if str(token).isnumeric():
-                    count_constants = count_constants + 1
-                    token = "constant_" + str(count_constants)
+                if str(token).isalnum():
+                    continue
+                    # count_constants = count_constants + 1
+                    # token = "constant_" + str(count_constants)
                 component_string_list.add(token)
-        gen_comp_str_list = extractor.extract_component_list(component_string_list)
+        gen_comp_str_list = extractor.extract_general_component_list(component_string_list)
         file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_CUSTOM)
         custom_comp_str_list = []
         for comp_file in file_list:
