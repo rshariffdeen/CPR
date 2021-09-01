@@ -178,6 +178,7 @@ def extract_patch_list():
             if str(token).isnumeric():
                 count_constants = count_constants + 1
         root_index = extract_root_index(token_list)
-        patch = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:], count_constants)
-        patch_list.append({patch_loc: patch})
+        patch_tree = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:], count_constants)
+        const_values = dict()
+        patch_list.append({patch_loc: (patch_tree, const_values)})
     return patch_list

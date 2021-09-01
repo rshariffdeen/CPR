@@ -115,10 +115,8 @@ def parse_patch(left_tree, root_str, right_tree, count_constants):
 
     # construct full patch
     holes = collect_symbols(root_comp[1], any_fn(ComponentSymbol.is_lhole, ComponentSymbol.is_rhole))
-    if not holes:
-        mappings = {}
-    else:
-        mappings = dict()
+    mappings = dict()
+    if holes:
         mappings["right"] = right_comp_tree
         mappings["left"] = left_comp_tree
     patch_tree = (root_comp, mappings)
