@@ -103,12 +103,14 @@ def parse_patch(left_tree, root_str, right_tree, count_constants):
     root_comp, count_constants = parse_component(root_str, count_constants)
     if len(left_tree) == 1:
         left_comp_tree, count_constants = parse_component(left_tree[0], count_constants)
+        left_comp_tree = (left_comp_tree, dict())
     else:
         root_index = extractor.extract_root_index(left_tree)
         left_comp_tree, count_constants = parse_patch(left_tree[:root_index], left_tree[root_index], left_tree[root_index+1:], count_constants)
 
     if len(right_tree) == 1:
         right_comp_tree, count_constants = parse_component(right_tree[0], count_constants)
+        right_comp_tree = (right_comp_tree, dict())
     else:
         root_index = extractor.extract_root_index(right_tree)
         right_comp_tree, count_constants = parse_patch(right_tree[:root_index], right_tree[root_index], right_tree[root_index + 1:], count_constants)
