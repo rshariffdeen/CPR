@@ -90,80 +90,96 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         emitter.normal("\tnumber of patches in pool: " + str(len(list_of_patches)))
         return list_of_patches
 
-    emitter.sub_title("Generating Patch Pool")
-    test_output_list = values.LIST_TEST_OUTPUT
-    test_input_list = values.LIST_TEST_INPUT
-    test_file_list = values.LIST_TEST_FILES
-    seed_file_list = values.LIST_SEED_FILES
-    components = values.LIST_COMPONENTS
-    depth = values.DEFAULT_DEPTH
-    if values.CONF_DEPTH_VALUE.isnumeric():
-        depth = int(values.CONF_DEPTH_VALUE)
+    if values.LIST_LOADED_PATCHES:
+        emitter.sub_sub_title("Reading Patches")
+        emitter.normal("\tloading patch space")
+        values.DEFAULT_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[0]
+        concrete_enumeration = True
+        component_string_list = set()
+        list_of_patches = []
+        for patch in values.LIST_LOADED_PATCHES:
+            token_list = patch.split(" ")
+            for token in token_list:
+                token = token.replace("(", "").replace(")", "")
+                component_string_list.add(token)
 
-    spec_files = []
-    emitter.sub_sub_title("Loading Test-Results")
-    test_index = -1
-    count_seeds = len(values.LIST_SEED_INPUT)
-    count_inputs = len(test_input_list)
-    for arg_list_str in test_input_list[:count_inputs - count_seeds]:
-        arg_list = configuration.extract_input_arg_list(arg_list_str)
-        seed_file = None
-        test_index = test_index + 1
-        expected_output_file = None
-        output_spec_path = None
-        for arg in arg_list:
-            if arg in list(test_file_list.values()):
-                seed_file = arg
-                break
-        if values.CONF_TEST_OUTPUT_DIR:
-            if seed_file:
-                arg_list = [x.replace(seed_file, "$POC") for x in arg_list]
-                seed_name = seed_file.split("/")[-1].split(".")[0]
-                expected_output_file = values.CONF_TEST_OUTPUT_DIR + "/" + seed_name + ".smt2"
+
+    else:
+        emitter.sub_title("Generating Patch Pool")
+        test_output_list = values.LIST_TEST_OUTPUT
+        test_input_list = values.LIST_TEST_INPUT
+        test_file_list = values.LIST_TEST_FILES
+        seed_file_list = values.LIST_SEED_FILES
+        components = values.LIST_COMPONENTS
+        depth = values.DEFAULT_DEPTH
+        if values.CONF_DEPTH_VALUE.isnumeric():
+            depth = int(values.CONF_DEPTH_VALUE)
+
+        spec_files = []
+        emitter.sub_sub_title("Loading Test-Results")
+        test_index = -1
+        count_seeds = len(values.LIST_SEED_INPUT)
+        count_inputs = len(test_input_list)
+        for arg_list_str in test_input_list[:count_inputs - count_seeds]:
+            arg_list = configuration.extract_input_arg_list(arg_list_str)
+            seed_file = None
+            test_index = test_index + 1
+            expected_output_file = None
+            output_spec_path = None
+            for arg in arg_list:
+                if arg in list(test_file_list.values()):
+                    seed_file = arg
+                    break
+            if values.CONF_TEST_OUTPUT_DIR:
+                if seed_file:
+                    arg_list = [x.replace(seed_file, "$POC") for x in arg_list]
+                    seed_name = seed_file.split("/")[-1].split(".")[0]
+                    expected_output_file = values.CONF_TEST_OUTPUT_DIR + "/" + seed_name + ".smt2"
+                    if os.path.isfile(expected_output_file):
+                        output_spec_path = Path(os.path.abspath(expected_output_file))
+            else:
+                expected_output_file = project_path + "/" + test_output_list[test_index]
                 if os.path.isfile(expected_output_file):
                     output_spec_path = Path(os.path.abspath(expected_output_file))
-        else:
-            expected_output_file = project_path + "/" + test_output_list[test_index]
-            if os.path.isfile(expected_output_file):
-                output_spec_path = Path(os.path.abspath(expected_output_file))
-        klee_spec_path = None
-        output_dir_path = definitions.DIRECTORY_OUTPUT
-        if output_spec_path:
-            klee_spec_path = Path(output_dir_path + "/klee-out-test-" + str(test_index))
-            spec_files.append((output_spec_path, klee_spec_path))
-        emitter.normal("\tTest #" + str(test_index + 1))
-        if values.LIST_TEST_BINARY:
-            program_path = values.LIST_TEST_BINARY[test_index]
-            values.CONF_PATH_PROGRAM = program_path
-        else:
-            program_path = values.CONF_PATH_PROGRAM
-        emitter.highlight("\tUsing Binary: " + str(program_path))
-        emitter.highlight("\tInput Arg: " + str(arg_list))
-        if seed_file:
-            emitter.highlight("\tInput file: " + str(seed_file))
-        emitter.highlight("\tOutput file: " + str(expected_output_file))
-        emitter.highlight("\tKlee Run: " + str(klee_spec_path))
+            klee_spec_path = None
+            output_dir_path = definitions.DIRECTORY_OUTPUT
+            if output_spec_path:
+                klee_spec_path = Path(output_dir_path + "/klee-out-test-" + str(test_index))
+                spec_files.append((output_spec_path, klee_spec_path))
+            emitter.normal("\tTest #" + str(test_index + 1))
+            if values.LIST_TEST_BINARY:
+                program_path = values.LIST_TEST_BINARY[test_index]
+                values.CONF_PATH_PROGRAM = program_path
+            else:
+                program_path = values.CONF_PATH_PROGRAM
+            emitter.highlight("\tUsing Binary: " + str(program_path))
+            emitter.highlight("\tInput Arg: " + str(arg_list))
+            if seed_file:
+                emitter.highlight("\tInput file: " + str(seed_file))
+            emitter.highlight("\tOutput file: " + str(expected_output_file))
+            emitter.highlight("\tKlee Run: " + str(klee_spec_path))
 
-    if model_list:
-        for output_spec_path, klee_spec_path in model_list:
-            spec_files.append((Path(output_spec_path), Path(klee_spec_path)))
+        if model_list:
+            for output_spec_path, klee_spec_path in model_list:
+                spec_files.append((Path(output_spec_path), Path(klee_spec_path)))
 
-    specification = load_specification(spec_files)
-    values.TEST_SPECIFICATION = specification
-    concrete_enumeration = False
-    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
-        concrete_enumeration = True
-    lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
-    upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
-    emitter.sub_sub_title("Synthesising Patches")
-    emitter.normal("\tenumerating patch space")
-    if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
-        result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
-    else:
-        result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
-    emitter.highlight("\tnumber of abstract patches explored: " + str(values.COUNT_TEMPLATES_EXPLORED))
-    emitter.highlight("\tnumber of concrete patches explored: " + str(values.COUNT_PATCHES_EXPLORED))
-    list_of_patches = [_ for _ in result]
+        specification = load_specification(spec_files)
+        values.TEST_SPECIFICATION = specification
+        concrete_enumeration = False
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+            concrete_enumeration = True
+        lower_bound = values.DEFAULT_PATCH_LOWER_BOUND
+        upper_bound = values.DEFAULT_PATCH_UPPER_BOUND + 1
+
+        emitter.sub_sub_title("Synthesising Patches")
+        emitter.normal("\tenumerating patch space")
+        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[0]:
+            result = synthesize_lazy(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+        else:
+            result = synthesize_parallel(components, depth, specification, concrete_enumeration, lower_bound, upper_bound)
+        emitter.highlight("\tnumber of abstract patches explored: " + str(values.COUNT_TEMPLATES_EXPLORED))
+        emitter.highlight("\tnumber of concrete patches explored: " + str(values.COUNT_PATCHES_EXPLORED))
+        list_of_patches = [_ for _ in result]
     filtered_patch_list = []
     # writer.write_as_pickle(list_of_patches, definitions.FILE_PATCH_SET)
     # values.COUNT_TEMPLATE_GEN = len(list_of_patches)

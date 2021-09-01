@@ -3,7 +3,7 @@ from six.moves import cStringIO
 from pysmt.shortcuts import And
 import os
 
-from app import emitter, utilities
+from app import emitter, utilities, parser, values
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
 
@@ -135,3 +135,43 @@ def extract_child_expressions(patch_tree):
         else:
             child_list = [patch_tree]
     return child_list
+
+
+def extract_component_list(comp_str_list):
+    general_comp_str_list = []
+    for comp_str in comp_str_list:
+        if not str(comp_str).isalnum():
+            gen_comp_name = parser.parse_component_name(comp_str)
+            if gen_comp_name is None:
+                utilities.error_exit("Incompatible General Component Detected: {}".format(comp_str))
+            general_comp_str_list.append(gen_comp_name)
+    return general_comp_str_list
+
+
+def extract_root_index(token_list):
+    if len(token_list) > 1:
+        for token in token_list:
+            if token in ["&&", "||"]:
+                return token_list.index(token)
+            elif token in ["<", "<=", "==", "!=", ">=", ">"]:
+                return token_list.index(token)
+            elif token in ["+", "-", "*", "/"]:
+                return token_list.index(token)
+            elif token in ["|", "&"]:
+                return token_list.index(token)
+    else:
+        utilities.error_exit("invalid token list to find root index")
+
+
+def extract_patch_list():
+    patch_list = []
+    for patch_str in values.LIST_LOADED_PATCHES:
+        split_list = str(patch_str).split(" ")
+        token_list = []
+        for token in split_list:
+            token = token.replace("(", "").replace(")", "")
+            token_list.append(token)
+        root_index = extract_root_index(token_list)
+        patch = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:])
+        patch_list.append(patch)
+    return patch_list

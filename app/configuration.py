@@ -352,17 +352,25 @@ def load_component_list():
         component_string_list = set()
         for patch in values.LIST_LOADED_PATCHES:
             token_list = patch.split(" ")
+            count_constants = 0
             for token in token_list:
                 token = token.replace("(", "").replace(")", "")
+                if str(token).isnumeric():
+                    count_constants = count_constants + 1
+                    token = "constant_" + str(count_constants)
                 component_string_list.add(token)
-        gen_comp_str_list, cust_comp_str_list = parser.parse_component_list(component_string_list)
+        gen_comp_str_list = extractor.extract_component_list(component_string_list)
+        file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_CUSTOM)
+        custom_comp_str_list = []
+        for comp_file in file_list:
+            custom_comp_str_list.append(comp_file)
         component_file_list = os.listdir(definitions.DIRECTORY_COMPONENTS_GENERAL)
+        values.CONF_CUSTOM_COMP_LIST = custom_comp_str_list
         for comp_file in component_file_list:
             if ".smt2" in comp_file:
                 if any(x in comp_file for x in gen_comp_str_list):
                     gen_comp_files.append(Path(comp_file))
                     emitter.note("\tloading component: " + str(comp_file))
-        values.CONF_CUSTOM_COMP_LIST = cust_comp_str_list
 
     else:
         if values.CONF_GENERAL_COMP_LIST and not values.CONF_ALL_COMPS:
@@ -388,6 +396,8 @@ def load_component_list():
         emitter.note("\tloading component: " + str(component_name))
     project_components = synthesis.load_components(proj_comp_files)
     values.LIST_COMPONENTS = project_components + general_components
+    for comp in values.LIST_COMPONENTS:
+        values.MAP_COMPONENTS[comp[0]] = comp
     values.COUNT_COMPONENTS = len(values.LIST_COMPONENTS)
     values.COUNT_COMPONENTS_CUS = len(project_components)
     values.COUNT_COMPONENTS_GEN = len(general_components)
@@ -527,24 +537,22 @@ def collect_patch_list():
         shutil.rmtree(definitions.DIRECTORY_COMPONENTS_CUSTOM)
     if not os.path.isdir(definitions.DIRECTORY_COMPONENTS_CUSTOM):
         os.makedirs(definitions.DIRECTORY_COMPONENTS_CUSTOM)
+    max_count_constants = 0
+    comp_name_index = 0
     for patch in values.LIST_LOADED_PATCHES:
         token_list = patch.split(" ")
+        count_constants = 0
         for token in token_list:
             token = token.replace("(", "").replace(")", "")
+            if str(token).isnumeric():
+                count_constants = count_constants + 1
             component_string_list.add(token)
-    comp_name_index = 0
-    const_name_index = 0
+        if count_constants > max_count_constants:
+            max_count_constants = count_constants
+
     for comp_str in component_string_list:
         if str(comp_str).isnumeric():
-            comp_name = "const_" + definitions.cust_comp_name_list[const_name_index]
-            values.MAP_CUSTOM_COMPONENT[comp_str] = comp_name
-            const_name_index = const_name_index + 1
-            comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
-            with open(comp_file_path, "w+") as c_file:
-                c_file.writelines("(declare-const {} (_ BitVec 32))\n".format(comp_name))
-                c_file.writelines("(declare-const rreturn (_ BitVec 32))\n")
-                c_file.writelines("(assert (= rreturn {}))\n".format(comp_name))
-                c_file.close()
+            continue
         elif str(comp_str).isalnum():
             comp_name = definitions.cust_comp_name_list[comp_name_index]
             values.MAP_CUSTOM_COMPONENT[comp_str] = comp_name
@@ -557,6 +565,14 @@ def collect_patch_list():
                 c_file.writelines("(declare-const lreturn (_ BitVec 32))\n")
                 c_file.writelines("(assert (and (= rreturn rvalue_{0}) (= lreturn lvalue_{0})))\n".format(comp_name))
                 c_file.close()
+    for c in range(1, max_count_constants + 1):
+        comp_name = "const_" + definitions.cust_comp_name_list[c]
+        comp_file_path = definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"
+        with open(comp_file_path, "w+") as c_file:
+            c_file.writelines("(declare-const {} (_ BitVec 32))\n".format(comp_name))
+            c_file.writelines("(declare-const rreturn (_ BitVec 32))\n")
+            c_file.writelines("(assert (= rreturn {}))\n".format(comp_name))
+            c_file.close()
 
 
 def collect_seed_list():

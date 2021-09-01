@@ -1,5 +1,8 @@
-from app import utilities, definitions, values
+from app import utilities, definitions, values, extractor
 from pathlib import Path
+import os
+from app.synthesis import ComponentSymbol, collect_symbols, ComponentSemantics
+from funcy import all_fn, any_fn, complement
 
 
 def parse_z3_output(z3_output):
@@ -75,30 +78,44 @@ def parse_z3_output(z3_output):
     return model
 
 
-def parse_component(comp_str):
-    str_comp_map = {
-        "==": "equal", "+": "addition", "=": "assignment", "&" : "bitwise-and",
-        "|": "bitwise-or", "~": "bitwise-not", "/": "division", ">=": "greater-or-equal",
-        ">": "greater-than", "<=": "less-or-equal", "&&": "logical-and", "||": "logical-or",
-        "!": "logical-not", "-": "subtraction", "*": "multiplication", "!=": "not-equal",
-        "<": "less-than"
-                    }
-    if comp_str in str_comp_map.keys():
-        return str_comp_map[comp_str]
+def parse_component_name(comp_str):
+    if comp_str in definitions.str_comp_map.keys():
+        return definitions.str_comp_map[comp_str]
     return None
 
 
-def parse_component_list(comp_str_list):
-    custom_comp_str_list = []
-    general_comp_str_list = []
-    for comp_str in comp_str_list:
-        if str(comp_str).isalnum():
-            comp_name = values.MAP_CUSTOM_COMPONENT[comp_str]
-            custom_comp_str_list.append(Path(definitions.DIRECTORY_COMPONENTS_CUSTOM + "/" + comp_name + ".smt2"))
+def parse_component(comp_str):
+    comp_name = parse_component_name(comp_str)
+    if comp_name:
+        if comp_name in values.MAP_COMPONENTS:
+            return values.MAP_COMPONENTS[comp_name]
         else:
-            gen_comp_name = parse_component(comp_str)
-            if gen_comp_name is None:
-                utilities.error_exit("Incompatible General Component Detected: {}".format(comp_str))
-            general_comp_str_list.append(gen_comp_name)
-    return general_comp_str_list, custom_comp_str_list
+            utilities.error_exit("invalid component name: {}".format(comp_name))
+    else:
+        utilities.error_exit("invalid component string: {}".format(comp_str))
 
+
+def parse_patch(left_tree, root_str, right_tree):
+    root_comp = parse_component(root_str)
+    if len(left_tree) == 1:
+        left_comp_tree = parse_component(left_tree[0])
+    else:
+        root_index = extractor.extract_root_index(left_tree)
+        left_comp_tree = parse_patch(left_tree[:root_index], left_tree[root_index], left_tree[root_index+1:])
+
+    if len(right_tree) == 1:
+        right_comp_tree = parse_component(right_tree[0])
+    else:
+        root_index = extractor.extract_root_index(right_tree)
+        right_comp_tree = parse_patch(right_tree[:root_index], right_tree[root_index], right_tree[root_index + 1:])
+
+    # construct full patch
+    holes = collect_symbols(root_comp[1], any_fn(ComponentSymbol.is_lhole, ComponentSymbol.is_rhole))
+    if not holes:
+        mappings = {}
+    else:
+        mappings = dict()
+        mappings["right"] = right_comp_tree
+        mappings["left"] = left_comp_tree
+    patch_tree = (root_comp, mappings)
+    return patch_tree
