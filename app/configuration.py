@@ -696,6 +696,7 @@ def update_configuration():
     if values.CONF_PATCH_DIR:
         if os.path.isdir(values.CONF_PATCH_DIR):
             values.DEFAULT_PATCH_DIR = values.CONF_PATCH_DIR
+            values.DEFAULT_PATCH_TYPE = values.OPTIONS_PATCH_TYPE[0]
             definitions.DIRECTORY_COMPONENTS_CUSTOM = definitions.DIRECTORY_OUTPUT + "/components"
     if values.CONF_MAX_BOUND:
         values.DEFAULT_PATCH_UPPER_BOUND = values.CONF_MAX_BOUND
