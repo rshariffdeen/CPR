@@ -184,7 +184,7 @@ def extract_patch_list():
         const_values = dict()
         index = 0
         for const in const_list:
-            const_values[definitions.cust_comp_name_list[index]] = const
+            const_values[definitions.cust_comp_name_list[index]] = int(const)
             index = index + 1
         patch_list.append({patch_loc: (patch_tree, const_values)})
     return patch_list
