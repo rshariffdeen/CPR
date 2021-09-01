@@ -3,7 +3,7 @@ from six.moves import cStringIO
 from pysmt.shortcuts import And
 import os
 
-from app import emitter, utilities, parser, values
+from app import emitter, utilities, parser, values, definitions
 from pathlib import Path
 from pysmt.smtlib.parser import SmtLibParser
 
@@ -172,13 +172,19 @@ def extract_patch_list():
         split_list = str(patch_str).split(" ")
         token_list = []
         count_constants = 0
+        const_list = []
         for token in split_list:
             token = token.replace("(", "").replace(")", "")
             token_list.append(token)
             if str(token).isnumeric():
+                const_list.append(token)
                 count_constants = count_constants + 1
         root_index = extract_root_index(token_list)
         patch_tree, _ = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:], count_constants)
         const_values = dict()
+        index = 0
+        for const in const_list:
+            const_values[definitions.cust_comp_name_list[index]] = const
+            index = index + 1
         patch_list.append({patch_loc: (patch_tree, const_values)})
     return patch_list
