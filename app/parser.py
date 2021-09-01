@@ -80,9 +80,9 @@ def parse_z3_output(z3_output):
 
 def parse_component_name(comp_str, count_constants=0):
     if comp_str in definitions.str_comp_map.keys():
-        return definitions.str_comp_map[comp_str]
+        return definitions.str_comp_map[comp_str], count_constants
     elif comp_str in values.MAP_CUSTOM_COMPONENT_NAME.keys():
-        return values.MAP_CUSTOM_COMPONENT_NAME[comp_str]
+        return values.MAP_CUSTOM_COMPONENT_NAME[comp_str], count_constants
     elif str(comp_str).isnumeric():
         return "const_" + definitions.cust_comp_name_list[count_constants-1], count_constants - 1
     return None
