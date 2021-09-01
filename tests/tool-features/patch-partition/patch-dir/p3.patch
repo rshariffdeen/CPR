@@ -1,0 +1,1 @@
+"/CPR/tests/tool-features/patch-dir/test.c""1 == 0" ---> "((x == 0) && (y == 0))"
