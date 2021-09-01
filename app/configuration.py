@@ -354,7 +354,7 @@ def load_component_list():
             token_list = patch_expr.split(" ")
             count_constants = 0
             for token in token_list:
-                token = token.replace("(", "").replace(")", "")
+                token = token.replace("(", "").replace(")", "").strip()
                 if str(token).isalnum():
                     continue
                     # count_constants = count_constants + 1
