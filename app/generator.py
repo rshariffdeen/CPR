@@ -80,10 +80,6 @@ def generate_patch_index_map(patch_list):
 
 def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]]:
 
-    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
-    definitions.FILE_PATCH_RANK_INDEX = definitions.DIRECTORY_OUTPUT + "/patch-index"
-    definitions.FILE_PATCH_RANK_MATRIX = definitions.DIRECTORY_OUTPUT + "/patch-rank-matrix"
-
     if values.CONF_SKIP_GEN:
         emitter.sub_title("Loading Patch Pool")
         list_of_patches = reader.read_pickle(definitions.FILE_PATCH_SET)

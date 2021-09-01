@@ -204,6 +204,9 @@ def run(project_path, program_path):
     emitter.title("Repairing Program")
     ## Generate all possible solutions by running the synthesizer.
     time_check = time.time()
+    definitions.FILE_PATCH_SET = definitions.DIRECTORY_OUTPUT + "/patch-set"
+    definitions.FILE_PATCH_RANK_INDEX = definitions.DIRECTORY_OUTPUT + "/patch-index"
+    definitions.FILE_PATCH_RANK_MATRIX = definitions.DIRECTORY_OUTPUT + "/patch-rank-matrix"
     # satisfied = utilities.check_budget(values.DEFAULT_TIME_DURATION)
     if values.LIST_LOADED_PATCHES:
         initial_patch_list = extractor.extract_patch_list()
