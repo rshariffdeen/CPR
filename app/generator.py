@@ -97,8 +97,8 @@ def generate_patch_set(project_path, model_list=None) -> List[Dict[str, Program]
         concrete_enumeration = True
         component_string_list = set()
         list_of_patches = []
-        for patch in values.LIST_LOADED_PATCHES:
-            token_list = patch.split(" ")
+        for patch_loc, patch_expr in values.LIST_LOADED_PATCHES:
+            token_list = patch_expr.split(" ")
             for token in token_list:
                 token = token.replace("(", "").replace(")", "")
                 component_string_list.add(token)

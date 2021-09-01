@@ -303,11 +303,12 @@ def collect_specification(spec_file_path):
 
 def read_patch_list(dir_patch):
     patch_list = []
+    patch_loc = "L9"
     if os.path.isdir(dir_patch):
         file_list = [os.path.join(dir_patch, f) for f in os.listdir(dir_patch) if os.path.isfile(os.path.join(dir_patch, f))]
         for patch_path in file_list:
             if ".patch" in patch_path:
                 with open(patch_path, "r") as p_file:
                     patch_line = p_file.readline().split("---> ")[-1].replace("\"", "")
-                    patch_list.append(patch_line)
+                    patch_list.append((patch_loc, patch_line))
     return patch_list

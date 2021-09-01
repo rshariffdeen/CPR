@@ -350,8 +350,8 @@ def load_component_list():
 
     if values.LIST_LOADED_PATCHES:
         component_string_list = set()
-        for patch in values.LIST_LOADED_PATCHES:
-            token_list = patch.split(" ")
+        for patch_loc, patch_expr in values.LIST_LOADED_PATCHES:
+            token_list = patch_expr.split(" ")
             count_constants = 0
             for token in token_list:
                 token = token.replace("(", "").replace(")", "")
@@ -540,8 +540,8 @@ def collect_patch_list():
         os.makedirs(definitions.DIRECTORY_COMPONENTS_CUSTOM)
     max_count_constants = 0
     comp_name_index = 0
-    for patch in values.LIST_LOADED_PATCHES:
-        token_list = patch.split(" ")
+    for patch_loc, patch_expr in values.LIST_LOADED_PATCHES:
+        token_list = patch_expr.split(" ")
         count_constants = 0
         for token in token_list:
             token = token.replace("(", "").replace(")", "")

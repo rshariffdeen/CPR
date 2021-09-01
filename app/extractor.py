@@ -165,7 +165,7 @@ def extract_root_index(token_list):
 
 def extract_patch_list():
     patch_list = []
-    for patch_str in values.LIST_LOADED_PATCHES:
+    for patch_loc, patch_str in values.LIST_LOADED_PATCHES:
         split_list = str(patch_str).split(" ")
         token_list = []
         count_constants = 0
@@ -176,5 +176,5 @@ def extract_patch_list():
                 count_constants = count_constants + 1
         root_index = extract_root_index(token_list)
         patch = parser.parse_patch(token_list[:root_index], token_list[root_index], token_list[root_index+1:], count_constants)
-        patch_list.append(patch)
+        patch_list.append({patch_loc: patch})
     return patch_list
