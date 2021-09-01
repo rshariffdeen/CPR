@@ -85,7 +85,7 @@ def parse_component_name(comp_str, count_constants=0):
         return values.MAP_CUSTOM_COMPONENT_NAME[comp_str], count_constants
     elif str(comp_str).isnumeric():
         return "const_" + definitions.cust_comp_name_list[count_constants-1], count_constants - 1
-    return None
+    return None, count_constants
 
 
 def parse_component(comp_str, count_constants):
