@@ -180,5 +180,9 @@ binary_operators = {
     'shift-right': '>>'
 }
 
-str_comp_map = binary_operators.update(unary_operators)
+str_comp_map = dict()
+str_comp_map.update(binary_operators)
+str_comp_map.update(unary_operators)
+str_comp_map = {y:x for x,y in str_comp_map.items()}
+
 
