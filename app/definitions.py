@@ -156,8 +156,6 @@ unary_operators = {
     'post-decrement': '--',
     'minus': '-',
     'logical-not': '!',
-    'bitwise-and': '&',
-    'bitwise-or': '|',
     'bitwise-not': '~'
 }
 binary_operators = {
@@ -177,7 +175,10 @@ binary_operators = {
     'logical-or': '||',
     'sequence': ';',
     'shift-left': '<<',
-    'shift-right': '>>'
+    'shift-right': '>>',
+    'bitwise-and': '&',
+    'bitwise-or': '|',
+    'bitwise-xor': '^'
 }
 
 str_comp_map = dict()
