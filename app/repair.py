@@ -164,12 +164,12 @@ def print_patch_list(patch_list):
             partition_index = partition_index + 1
             emitter.sub_sub_title("Partition #" + str(partition_index))
             for patch in patch_list:
-                template_count = template_count + 1
-                emitter.sub_sub_title("Patch #" + str(template_count))
-                emitter.emit_patch(patch, message="\t\t")
                 patch_formula = app.generator.generate_formula_from_patch(patch)
                 patch_formula_str = patch_formula.serialize()
                 patch_index = utilities.get_hash(patch_formula_str)
+                if patch_index not in partition:
+                    continue
+                emitter.emit_patch(patch, message="\t\t")
                 patch_score = values.LIST_PATCH_SCORE[patch_index]
                 concrete_patch_count = 1
                 if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
