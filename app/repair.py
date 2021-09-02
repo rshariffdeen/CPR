@@ -59,6 +59,9 @@ def recover_patch_list(result_list, patch_list, path_condition, assertion):
 
 def update_patch_list(result_list, patch_list, path_condition, assertion):
     updated_patch_list = []
+    sat_list = set()
+    unsat_list = set()
+
     if len(result_list) != len(patch_list):
         recover_list = recover_patch_list(result_list, patch_list, path_condition, assertion)
         result_list = result_list + recover_list
@@ -68,6 +71,10 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         patch_constraint = app.generator.generate_formula_from_patch(patch)
         patch_constraint_str = patch_constraint.serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
+        if patch_score > 0:
+            sat_list.add(patch_index)
+        else:
+            unsat_list.add(patch_index)
         values.LIST_PATCH_SCORE[patch_index] += patch_score
         if is_under_approx is not None:
             current_state = values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]
@@ -88,6 +95,19 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
                 # emitter.debug("Removing Patch", patch_list[index])
                 emitter.emit_patch(patch, message="\t\tRemoving Patch: ")
 
+    if len(values.PATCH_PARTITION) > 0:
+        partition_list = values.PATCH_PARTITION
+        updated_partition_list = []
+        for partition in partition_list:
+            patch_set = set(partition)
+            partition_sat = [x in sat_list for x in patch_set]
+            partition_unsat = [x in unsat_list for x in patch_set]
+            if partition_sat and partition_unsat:
+                updated_partition_list.append(partition_sat)
+                updated_partition_list.append(partition_unsat)
+            else:
+                updated_partition_list.append(partition)
+        values.PATCH_PARTITION = updated_partition_list
     return updated_patch_list
 
 
@@ -113,6 +133,7 @@ def reduce(patch_list, path_to_concolic_exec_result, assertion) -> List[Tuple[st
     if values.IS_CRASH and (count_patches_start == count_patches_end):
         emitter.warning("\t[Warning] program crashed, but no patch removed")
     return updated_patch_list
+
 
 
 def update_rank_matrix(ranked_patch_list, iteration):
@@ -220,6 +241,7 @@ def run(project_path, program_path):
 
     index_map = generator.generate_patch_index_map(filtered_patch_list)
     writer.write_as_json(index_map, definitions.FILE_PATCH_RANK_INDEX)
+    initial_partition = []
     for patch in filtered_patch_list:
         patch_constraint_str = app.generator.generate_formula_from_patch(patch).serialize()
         patch_index = utilities.get_hash(patch_constraint_str)
@@ -229,7 +251,10 @@ def run(project_path, program_path):
         values.LIST_PATCH_OVERAPPROX_CHECK[patch_index] = False
         values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index] = False
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
+        initial_partition.append(patch_index)
+    values.PATCH_PARTITION.append(initial_partition)
     emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(filtered_patch_list)) + ":" + str(len(filtered_patch_list)))
+    emitter.note("\t\t|Partitions|=".format(len(values.PATCH_PARTITION)))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = utilities.count_concrete_patches(filtered_patch_list)
         values.COUNT_TEMPLATE_START = len(filtered_patch_list)
@@ -530,6 +555,3 @@ def run_cpr(program_path, patch_list):
             values.COUNT_TEMPLATE_END = len(patch_list)
         else:
             values.COUNT_PATCH_END = len(ranked_patch_list)
-
-
-
