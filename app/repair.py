@@ -506,7 +506,8 @@ def run_cpr(program_path, patch_list):
                                                                     Path(klee_out_dir).resolve())
                 # print(assertion.serialize())
                 patch_list = reduce(patch_list, Path(klee_out_dir).resolve(), assertion)
-                emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+                emitter.note("\t\t|P| = " + str(utilities.count_concrete_patches(patch_list)) + ":" + str(len(patch_list)))
+                emitter.note("\t\t|Partitions| = " + str(len(values.PATCH_PARTITION)))
                 duration = (time.time() - time_check) / 60
                 emitter.note("\t\treduce finished in " + str(format(duration, '.3f')) + " minutes")
                 values.TIME_TO_REDUCE = values.TIME_TO_REDUCE + duration
