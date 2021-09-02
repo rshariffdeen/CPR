@@ -174,8 +174,9 @@ def extract_patch_list():
         count_constants = 0
         const_list = []
         for token in split_list:
-            token = token.replace("(", "").replace(")", "")
-            token_list.append(token)
+            token = token.replace("(", "").replace(")", "").replace("void*", "").strip()
+            if len(token) > 0:
+                token_list.append(token)
             if str(token).isnumeric():
                 const_list.append(token)
                 count_constants = count_constants + 1

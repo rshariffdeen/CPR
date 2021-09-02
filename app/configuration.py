@@ -360,8 +360,8 @@ def load_component_list():
             token_list = patch_expr.split(" ")
             count_constants = 0
             for token in token_list:
-                token = token.replace("(", "").replace(")", "").strip()
-                if str(token).isalnum():
+                token = token.replace("(", "").replace(")", "").replace("void*", "").strip()
+                if str(token).isalnum() or len(token) == 0:
                     continue
                     # count_constants = count_constants + 1
                     # token = "constant_" + str(count_constants)
@@ -550,7 +550,7 @@ def collect_patch_list():
         token_list = patch_expr.split(" ")
         count_constants = 0
         for token in token_list:
-            token = token.replace("(", "").replace(")", "")
+            token = token.replace("(", "").replace(")", "").replace("void*", "").strip()
             if str(token).isnumeric():
                 count_constants = count_constants + 1
             component_string_list.add(token)
@@ -560,7 +560,7 @@ def collect_patch_list():
     for comp_str in component_string_list:
         if str(comp_str).isnumeric():
             continue
-        elif str(comp_str).isalnum():
+        elif str(comp_str).isalnum() or any(x in str(comp_str) for x in ["->", "_", "."]):
             comp_name = definitions.cust_comp_name_list[comp_name_index]
             values.MAP_CUSTOM_COMPONENT_NAME[comp_str] = comp_name
             comp_name_index = comp_name_index + 1
