@@ -292,8 +292,8 @@ def run(project_path, program_path):
         values.LIST_PATCH_SPACE[patch_index] = generator.generate_patch_space(patch)
         initial_partition.append(patch_index)
     values.PATCH_PARTITION.append(initial_partition)
-    emitter.note("\t\t|P|=" + str(utilities.count_concrete_patches(filtered_patch_list)) + ":" + str(len(filtered_patch_list)))
-    emitter.note("\t\t|Partitions|=".format(len(values.PATCH_PARTITION)))
+    emitter.note("\t\t|P| = " + str(utilities.count_concrete_patches(filtered_patch_list)) + ":" + str(len(filtered_patch_list)))
+    emitter.note("\t\t|Partitions| = " + str(len(values.PATCH_PARTITION)))
     if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
         values.COUNT_PATCH_START = utilities.count_concrete_patches(filtered_patch_list)
         values.COUNT_TEMPLATE_START = len(filtered_patch_list)
