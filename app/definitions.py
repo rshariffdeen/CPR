@@ -132,6 +132,7 @@ ARG_SEED_SUITE_ID_LIST = "--seed-id-list="
 ARG_PRESERVE_BC = "--preserve-bc"
 ARG_PATCH_DIR = "--patch-dir="
 ARG_PATCH_PARTITION = "--partition"
+ARG_SHOW_PARTITIONS = "--show-partitions"
 
 
 # ----------------- TOOLS --------------------------------

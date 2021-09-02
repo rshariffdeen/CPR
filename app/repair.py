@@ -157,36 +157,75 @@ def print_patch_list(patch_list):
     if not patch_list:
         emitter.warning("\t[warning] unable to generate any patch")
         return
-    for patch in patch_list:
-        template_count = template_count + 1
-        emitter.sub_sub_title("Patch #" + str(template_count))
-        emitter.emit_patch(patch, message="\t\t")
-        patch_formula = app.generator.generate_formula_from_patch(patch)
-        patch_formula_str = patch_formula.serialize()
-        patch_index = utilities.get_hash(patch_formula_str)
-        patch_score = values.LIST_PATCH_SCORE[patch_index]
-        concrete_patch_count = 1
-        if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
-            patch_space = values.LIST_PATCH_SPACE[patch_index]
-            partition_count = 0
-            for partition in patch_space:
-                partition_count = partition_count + 1
-                emitter.highlight("\t\tPartition: " + str(partition_count))
-                for constant_name in partition:
-                    emitter.highlight("\t\t\tConstant: " + constant_name)
-                    constant_info = partition[constant_name]
-                    lower_bound = str(constant_info['lower-bound'])
-                    upper_bound = str(constant_info['upper-bound'])
-                    emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
-                    dimension = len(range(int(lower_bound), int(upper_bound) + 1))
-                    emitter.highlight("\t\t\tDimension: " + str(dimension))
-                    concrete_patch_count = utilities.count_concrete_patches_per_template(patch)
-        emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
-        emitter.highlight("\t\tPath Coverage: " + str(patch_score))
-        emitter.highlight("\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
-        emitter.highlight("\t\tIs Over-approximating: " + str(values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]))
-        if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
-            break
+    if values.DEFAULT_SHOW_PARTITIONS:
+        partition_list = values.PATCH_PARTITION
+        partition_index = 0
+        for partition in partition_list:
+            partition_index = partition_index + 1
+            emitter.sub_sub_title("Partition #" + str(partition_index))
+            for patch in patch_list:
+                template_count = template_count + 1
+                emitter.sub_sub_title("Patch #" + str(template_count))
+                emitter.emit_patch(patch, message="\t\t")
+                patch_formula = app.generator.generate_formula_from_patch(patch)
+                patch_formula_str = patch_formula.serialize()
+                patch_index = utilities.get_hash(patch_formula_str)
+                patch_score = values.LIST_PATCH_SCORE[patch_index]
+                concrete_patch_count = 1
+                if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+                    patch_space = values.LIST_PATCH_SPACE[patch_index]
+                    partition_count = 0
+                    for partition in patch_space:
+                        partition_count = partition_count + 1
+                        emitter.highlight("\t\tPartition: " + str(partition_count))
+                        for constant_name in partition:
+                            emitter.highlight("\t\t\tConstant: " + constant_name)
+                            constant_info = partition[constant_name]
+                            lower_bound = str(constant_info['lower-bound'])
+                            upper_bound = str(constant_info['upper-bound'])
+                            emitter.highlight(
+                                "\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                            dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+                            emitter.highlight("\t\t\tDimension: " + str(dimension))
+                            concrete_patch_count = utilities.count_concrete_patches_per_template(patch)
+                emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
+                emitter.highlight("\t\tPath Coverage: " + str(patch_score))
+                emitter.highlight(
+                    "\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
+                emitter.highlight("\t\tIs Over-approximating: " + str(values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]))
+                if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
+                    break
+    else:
+        for patch in patch_list:
+            template_count = template_count + 1
+            emitter.sub_sub_title("Patch #" + str(template_count))
+            emitter.emit_patch(patch, message="\t\t")
+            patch_formula = app.generator.generate_formula_from_patch(patch)
+            patch_formula_str = patch_formula.serialize()
+            patch_index = utilities.get_hash(patch_formula_str)
+            patch_score = values.LIST_PATCH_SCORE[patch_index]
+            concrete_patch_count = 1
+            if values.DEFAULT_PATCH_TYPE == values.OPTIONS_PATCH_TYPE[1]:
+                patch_space = values.LIST_PATCH_SPACE[patch_index]
+                partition_count = 0
+                for partition in patch_space:
+                    partition_count = partition_count + 1
+                    emitter.highlight("\t\tPartition: " + str(partition_count))
+                    for constant_name in partition:
+                        emitter.highlight("\t\t\tConstant: " + constant_name)
+                        constant_info = partition[constant_name]
+                        lower_bound = str(constant_info['lower-bound'])
+                        upper_bound = str(constant_info['upper-bound'])
+                        emitter.highlight("\t\t\tRange: " + lower_bound + " <= " + constant_name + " <= " + upper_bound)
+                        dimension = len(range(int(lower_bound), int(upper_bound) + 1))
+                        emitter.highlight("\t\t\tDimension: " + str(dimension))
+                        concrete_patch_count = utilities.count_concrete_patches_per_template(patch)
+            emitter.highlight("\t\tPatch Count: " + str(concrete_patch_count))
+            emitter.highlight("\t\tPath Coverage: " + str(patch_score))
+            emitter.highlight("\t\tIs Under-approximating: " + str(values.LIST_PATCH_UNDERAPPROX_CHECK[patch_index]))
+            emitter.highlight("\t\tIs Over-approximating: " + str(values.LIST_PATCH_OVERAPPROX_CHECK[patch_index]))
+            if template_count == values.DEFAULT_PATCH_RANK_LIMIT:
+                break
 
 
 def rank_patches(patch_list):

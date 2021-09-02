@@ -76,6 +76,8 @@ def read_conf(arg_list):
                 values.CONF_ITERATION_LIMIT = int(arg.replace(definitions.ARG_ITERATION_COUNT, ""))
             elif definitions.ARG_COMP_ALL in arg:
                 values.CONF_ALL_COMPS = True
+            elif definitions.ARG_SHOW_PARTITIONS in arg:
+                values.CONF_SHOW_PARTITIONS = True
             elif definitions.ARG_PRESERVE_BC in arg:
                 values.CONF_PRESERVE_BC = True
             elif definitions.ARG_SKIP_GENERATION in arg:
@@ -746,6 +748,8 @@ def update_configuration():
         values.DEFAULT_COLLECT_STAT = True
     if values.CONF_PATCH_PARTITION:
         values.DEFAULT_PATCH_PARTITION = True
+    if values.CONF_SHOW_PARTITIONS:
+        values.DEFAULT_SHOW_PARTITIONS = True
     if values.CONF_TIME_SPLIT:
         explore, refine = values.CONF_TIME_SPLIT.split(":")
         total = int(explore) + int(refine)
