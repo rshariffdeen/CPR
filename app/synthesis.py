@@ -24,7 +24,7 @@ import pysmt.operators as op
 from funcy import all_fn, any_fn, complement
 import multiprocessing as mp
 from threading import Lock
-from app import values
+from app import values, definitions
 logger = logging.getLogger(__name__)
 Formula = Union[pysmt.fnode.FNode]
 
@@ -360,29 +360,8 @@ def program_to_formula(program: Program) -> Formula:
 def program_to_code(program: Program) -> str:
     (tree, constants) = program
 
-    unary_operators = {
-        'post-increment': '++',
-        'post-decrement': '--',
-        'minus': '-',
-        'logical-not': '!'
-    }
-    binary_operators = {
-        'assignment': '=',
-        'addition': '+',
-        'subtraction': '-',
-        'multiplication': '*',
-        'division': '/',
-        'remainder': '%',
-        'equal': '==',
-        'not-equal': '!=',
-        'less-than': '<',
-        'less-or-equal': '<=',
-        'greater-than': '>',
-        'greater-or-equal': '>=',
-        'logical-and': '&&',
-        'logical-or': '||',
-        'sequence': ';'
-    }
+    unary_operators = definitions.unary_operators
+    binary_operators = definitions.binary_operators
 
     def tree_to_code(tree):
         ((cid, semantics), children) = tree

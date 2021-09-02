@@ -149,11 +149,36 @@ STYLE_FORMAT_COMMAND = "clang-format -style=LLVM "
 crash_word_list = ["abort", "core dumped", "crashed", "exception"]
 error_word_list = ["runtime error", "buffer-overflow", "unsigned integer overflow"]
 cust_comp_name_list = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o"]
-str_comp_map = {
-    "==": "equal", "+": "addition", "=": "assignment", "&": "bitwise-and",
-    "|": "bitwise-or", "~": "bitwise-not", "/": "division", ">=": "greater-or-equal",
-    ">": "greater-than", "<=": "less-or-equal", "&&": "logical-and", "||": "logical-or",
-    "!": "logical-not", "-": "subtraction", "*": "multiplication", "!=": "not-equal",
-    "<": "less-than"
+
+
+unary_operators = {
+    'post-increment': '++',
+    'post-decrement': '--',
+    'minus': '-',
+    'logical-not': '!',
+    'bitwise-and': '&',
+    'bitwise-or': '|',
+    'bitwise-not': '~'
 }
+binary_operators = {
+    'assignment': '=',
+    'addition': '+',
+    'subtraction': '-',
+    'multiplication': '*',
+    'division': '/',
+    'remainder': '%',
+    'equal': '==',
+    'not-equal': '!=',
+    'less-than': '<',
+    'less-or-equal': '<=',
+    'greater-than': '>',
+    'greater-or-equal': '>=',
+    'logical-and': '&&',
+    'logical-or': '||',
+    'sequence': ';',
+    'shift-left': '<<',
+    'shift-right': '>>'
+}
+
+str_comp_map = binary_operators.update(unary_operators)
 
