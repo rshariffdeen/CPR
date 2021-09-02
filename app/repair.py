@@ -100,8 +100,8 @@ def update_patch_list(result_list, patch_list, path_condition, assertion):
         updated_partition_list = []
         for partition in partition_list:
             patch_set = set(partition)
-            partition_sat = [x in sat_list for x in patch_set]
-            partition_unsat = [x in unsat_list for x in patch_set]
+            partition_sat = patch_set.intersection(sat_list)
+            partition_unsat = patch_set.intersection(unsat_list)
             if partition_sat and partition_unsat:
                 updated_partition_list.append(partition_sat)
                 updated_partition_list.append(partition_unsat)
