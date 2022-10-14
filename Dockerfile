@@ -31,21 +31,21 @@ ENV LLVM_COMPILER=clang
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
     bear \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-setuptools
+    python3.8 \
+    python3.8-dev \
+    python3.8-pip \
+    python3.8-setuptools
 
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install setuptools
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install pylint
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install cython==3.0a7
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install pysmt==0.9.1.dev132
+RUN python3.8 -m pip install --upgrade pip
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install setuptools
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install pylint
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install cython==3.0a7
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install pysmt==0.9.1.dev132
 RUN pysmt-install --z3 --confirm-agreement
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install funcy
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install six
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install numpy
-RUN python3 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install funcy
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install six
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install numpy
+RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install wllvm; return 0;
 
 ## Install PyPy JITC
 RUN add-apt-repository -y ppa:pypy/ppa
