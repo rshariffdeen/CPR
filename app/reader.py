@@ -37,6 +37,8 @@ def collect_symbolic_expression(log_path):
             for line in trace_file:
                 if '[klee:expr]' in line:
                     line = line.split("[klee:expr] ")[-1]
+                    if "[var-type]" in line:
+                        continue
                     var_name, var_expr = line.split(" : ")
                     var_expr = var_expr.replace("\n", "")
                     if "[program-var]" in var_name:
@@ -132,7 +134,7 @@ def collect_trace(file_path, project_path):
                     if project_path in line:
                         trace_line = str(line.replace("[klee:trace] ", ''))
                         trace_line = trace_line.strip()
-                        source_path, line_number = trace_line.split(":")
+                        source_path, line_number, _ , _ = trace_line.split(":")
                         source_path = os.path.abspath(source_path)
                         trace_line = source_path + ":" + str(line_number)
                         if (not list_trace) or (list_trace[-1] != trace_line):
