@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM rshariffdeen/ubuntu:18.04
 MAINTAINER Ridwan Shariffdeen <ridwan@comp.nus.edu.sg>
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y
@@ -40,7 +40,7 @@ RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install setuptools
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pylint
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install cython
-RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pysmt
+RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install pysmt==0.9.1.dev132
 RUN pysmt-install --z3 --confirm-agreement
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install funcy
 RUN python3.7 -m pip --disable-pip-version-check --no-cache-dir install six
@@ -56,7 +56,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-in
 
 RUN pypy3 -m easy_install cython
 RUN pypy3 -m easy_install setuptools
-RUN pypy3 -m easy_install pysmt
+RUN pypy3 -m easy_install pysmt==0.9.1.dev132
 RUN pysmt-install --z3 --confirm-agreement
 RUN pypy3 -m easy_install funcy
 RUN pypy3 -m easy_install six
