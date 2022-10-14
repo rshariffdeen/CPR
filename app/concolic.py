@@ -301,6 +301,10 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     if klee_out_dir:
         klee_command += "klee --output-dir=" + str(klee_out_dir) + " "
         values.KLEE_LAST_DIR = klee_out_dir
+        values.FILE_PPC_LOG = klee_out_dir + "/ppc.log"
+        values.FILE_EXPR_LOG = klee_out_dir + "/expr.log"
+        values.FILE_TRACE_LOG = klee_out_dir + "/trace.log"
+        values.FILE_MESSAGE_LOG = klee_out_dir + "/messages.txt"
     else:
         klee_command += "klee "
     klee_command += "--posix-runtime " \
@@ -330,7 +334,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
     trace_log_path = klee_out_dir + "/trace.log"
     if values.DEFAULT_DISTANCE_METRIC != values.OPTIONS_DIST_METRIC[2]:
         ppc_list, path_formula = reader.collect_symbolic_path(ppc_log_path, project_path)
-        values.LIST_PPC = values.LIST_PPC = ppc_list
+        values.LIST_PPC = values.LIST_PPC + ppc_list
         values.LAST_PPC_FORMULA = path_formula
         values.PREFIX_PPC_STR = reader.collect_symbolic_path_prefix(ppc_log_path, project_path)
     else:
@@ -430,6 +434,10 @@ def run_concrete_execution(program, argument_list, print_output=False, klee_out_
     if klee_out_dir:
         klee_command = "klee --output-dir=" + str(klee_out_dir) + " "
         values.KLEE_LAST_DIR = klee_out_dir
+        values.FILE_PPC_LOG = klee_out_dir + "/ppc.log"
+        values.FILE_EXPR_LOG = klee_out_dir + "/expr.log"
+        values.FILE_TRACE_LOG = klee_out_dir + "/trace.log"
+        values.FILE_MESSAGE_LOG = klee_out_dir + "/messages.txt"
     else:
         klee_command = "klee "
     hit_location_flag = values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
