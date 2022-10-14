@@ -1,5 +1,5 @@
 PROGRAM=test
-CC=$(TRIDENT_CC)
+CC=$(CPR_CC)
 CFLAGS=-g -O0 -ftrapv
 
 %.o: %.c

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#ifndef TRIDENT_OUTPUT
-#define TRIDENT_OUTPUT(id, typestr, value) value
+#ifndef CPR_OUTPUT
+#define CPR_OUTPUT(id, typestr, value) value
 #endif
 
 int main(int argc, char *argv[]) {
@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
   int res, z;
   if (x > 5)
-    y = __trident_choice("L9", "i32", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
+    y = __cpr_choice("L9", "i32", (int[]){x, y}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
   else
     y = y + 2;
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   }
 
   z = x * y;
-  TRIDENT_OUTPUT("obs", "i32", z);
+  CPR_OUTPUT("obs", "i32", z);
   res = 1000 / z;
   return 0;
 }

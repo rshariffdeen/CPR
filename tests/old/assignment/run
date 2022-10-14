@@ -4,7 +4,7 @@ PROGRAM=test
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-TRIDENT_CC="$(realpath ../../tools/trident-cc)"
+CPR_CC="$(realpath ../../tools/cpr-cc)"
 
 if [ -f "$PROGRAM" ]; then
    make clean
@@ -12,7 +12,7 @@ fi
 
 rm -rf klee-*
 
-CC="$TRIDENT_CC" make -e
+CC="$CPR_CC" make -e
 extract-bc "$PROGRAM"
 
 klee --posix-runtime --libc=uclibc --write-smt2s --output-dir=klee-t1 "${PROGRAM}.bc" 0

@@ -52,12 +52,12 @@ cd src
 
 ## Prepare for KLEE
 # Fix fabs calls (not supported by KLEE).
-sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
-sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
-#sed -i 's/fabs_trident/fabs/g' libtiff/tif_luv.c
-#sed -i 's/fabs_trident/fabs/g' tools/tiff2ps.c
+sed -i 's/fabs/fabs_cpr/g' libtiff/tif_luv.c
+sed -i 's/fabs/fabs_cpr/g' tools/tiff2ps.c
+#sed -i 's/fabs_cpr/fabs/g' libtiff/tif_luv.c
+#sed -i 's/fabs_cpr/fabs/g' tools/tiff2ps.c
 
-make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
+make CC=$CPR_CC CXX=$CPR_CXX -j32
 
 cd $dir_name
 #
@@ -65,28 +65,28 @@ cd $dir_name
 sed -i '33i // KLEE' src/libtiff/tif_dirread.c
 sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirread.c
 #
-sed -i '978i \\tif (__trident_choice("978", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' src/libtiff/tif_dirread.c
+sed -i '978i \\tif (__cpr_choice("978", "bool", (int[]){(tsize_t)dir->tdir_count, w, cc}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' src/libtiff/tif_dirread.c
 sed -i '979d' src/libtiff/tif_dirread.c
 #
 sed -i '35i // KLEE' src/test/long_tag.c
 sed -i '36i #include <klee/klee.h>' src/test/long_tag.c
-sed -i '37i #ifndef TRIDENT_OUTPUT' src/test/long_tag.c
-sed -i '38i #define TRIDENT_OUTPUT(id, typestr, value) value' src/test/long_tag.c
+sed -i '37i #ifndef CPR_OUTPUT' src/test/long_tag.c
+sed -i '38i #define CPR_OUTPUT(id, typestr, value) value' src/test/long_tag.c
 sed -i '39i #endif' src/test/long_tag.c
 #
 sed -i '69i \\tfilename = argv[1];'  src/test/long_tag.c
 sed -i '70,125 s/^/\/\//' src/test/long_tag.c
 sed -i '129i \\tklee_print_expr("tif=", tif);' src/test/long_tag.c
-sed -i '130i \\tTRIDENT_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
+sed -i '130i \\tCPR_OUTPUT("obs", "i32", tif);' src/test/long_tag.c
 sed -i '131i \\tklee_assert(tif > 0);' src/test/long_tag.c
 
 
 ## Compile instrumentation and test driver.
 cd src
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
+make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
 cd ./test
 make clean
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32 long_tag.log
+make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32 long_tag.log
 extract-bc long_tag
 
 # Copy remaining files to run CPR.
@@ -104,5 +104,5 @@ cd $dir_name
 #cd src/test/
 #gen-bout --sym-file "/data/manybugs/libtiff/0a36d7f/src/test/long_test.tiff"
 
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s long_tag.bc long_test.tiff
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s long_tag.bc long_test.tiff
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s --seed-out=file.bout --allow-seed-extension --named-seed-matching long_tag.bc A --sym-files 1 156

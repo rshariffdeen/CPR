@@ -46,24 +46,24 @@ CC=wllvm CXX=wllvm++ make CFLAGS="-g -O0 -static -I/klee/source/include -L/klee/
 cp ../diffs/mpn/generic/powm.c-13420 mpn/generic/powm.c
 sed -i '76i #include <klee/klee.h>' mpn/generic/powm.c
 sed -i '213d' mpn/generic/powm.c
-sed -i '213i b2p = ( __trident_choice("L1634", "i32", (int[]){rp, tp, n}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0));' mpn/generic/powm.c
+sed -i '213i b2p = ( __cpr_choice("L1634", "i32", (int[]){rp, tp, n}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0));' mpn/generic/powm.c
 sed -i '228i klee_silent_exit(0);' mpn/generic/powm.c
 
 sed -i '23i #include <klee/klee.h>' mpn/generic/add_n.c
 sed -i '23i #endif' mpn/generic/add_n.c
-sed -i '23i #define TRIDENT_OUTPUT(id, typestr, value) value' mpn/generic/add_n.c
-sed -i '23i #ifndef TRIDENT_OUTPUT' mpn/generic/add_n.c
+sed -i '23i #define CPR_OUTPUT(id, typestr, value) value' mpn/generic/add_n.c
+sed -i '23i #ifndef CPR_OUTPUT' mpn/generic/add_n.c
 #sed -i '45i klee_assert(vp - rp == 1 || up - rp == 1);' mpn/generic/add_n.c
-sed -i '45i TRIDENT_OUTPUT("obs", "i32", vp - rp == 1 || up - rp == 1);' mpn/generic/add_n.c
+sed -i '45i CPR_OUTPUT("obs", "i32", vp - rp == 1 || up - rp == 1);' mpn/generic/add_n.c
 
 cp $current_dir/t-jac.c tests/mpz/t-jac.c
-sed -i 's/wllvm++/\/CPR\/tools\/trident-cxx/g' mpn/Makefile
-sed -i 's/wllvm/\/CPR\/tools\/trident-cc/g' mpn/Makefile
-CC=$TRIDENT_CC CXX=$TRIDENT_CXX make CFLAGS="-g -O0 -static -I/klee/source/include -L/klee/build/lib -lkleeRuntest" -j32
+sed -i 's/wllvm++/\/CPR\/tools\/cpr-cxx/g' mpn/Makefile
+sed -i 's/wllvm/\/CPR\/tools\/cpr-cc/g' mpn/Makefile
+CC=$CPR_CC CXX=$CPR_CXX make CFLAGS="-g -O0 -static -I/klee/source/include -L/klee/build/lib -lkleeRuntest" -j32
 cd tests/mpz
-sed -i 's/wllvm++/\/CPR\/tools\/trident-cxx/g' Makefile
-sed -i 's/wllvm/\/CPR\/tools\/trident-cc/g' Makefile
-CC=$TRIDENT_CC CXX=$TRIDENT_CXX make CFLAGS="-g -O0 -static -I/klee/source/include -L/klee/build/lib -lkleeRuntest" t-jac
+sed -i 's/wllvm++/\/CPR\/tools\/cpr-cxx/g' Makefile
+sed -i 's/wllvm/\/CPR\/tools\/cpr-cc/g' Makefile
+CC=$CPR_CC CXX=$CPR_CXX make CFLAGS="-g -O0 -static -I/klee/source/include -L/klee/build/lib -lkleeRuntest" t-jac
 
 cd $current_dir
 cp repair.conf $dir_name

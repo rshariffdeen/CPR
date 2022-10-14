@@ -26,10 +26,10 @@ int main (int argc, char** argv) {
   i = 0;
   while ( i < N ) {
     if ( a[i] >= 0 && !b[i] ) f = 0;
-    if ( a[i] < 0 && __trident_choice("L290", "bool", (int[]){a[i],b[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ) f = 0;
+    if ( a[i] < 0 && __cpr_choice("L290", "bool", (int[]){a[i],b[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0) ) f = 0;
     i = i + 1;
   }
-  TRIDENT_OUTPUT("obs", "i32", f);
+  CPR_OUTPUT("obs", "i32", f);
   __VERIFIER_assert ( f );
   return 0;
 }

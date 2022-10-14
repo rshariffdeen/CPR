@@ -94,8 +94,8 @@ def build_program(program_path):
         build_clean(program_path)
     program_loc = "/".join(program_path.split("/")[:-1])
     compile_command = "cd " + program_loc + ";"
-    compile_command += "export TRIDENT_CC=/concolic-repair/app/trident-cc;" \
-                      "CC=\"$TRIDENT_CC\" CXX=\"$TRIDENT_CXX\" make -e;" \
+    compile_command += "export CPR_CC=/concolic-repair/app/cpr-cc;" \
+                      "CC=\"$CPR_CC\" CXX=\"$CPR_CXX\" make -e;" \
                       "extract-bc " + program_name
     process = subprocess.Popen([compile_command], stderr=subprocess.PIPE, shell=True)
     (output, error) = process.communicate()

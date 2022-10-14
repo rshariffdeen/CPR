@@ -285,7 +285,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
         values.LIST_BIT_LENGTH = bit_length_list
     emitter.normal("\texecuting klee in concolic mode")
     # hit_location_flag = " "
-    runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
+    runtime_lib_path = definitions.DIRECTORY_LIB + "/libcpr_runtime.bca"
     # if values.CONF_DISTANCE_METRIC == "control-loc":
     hit_location_flag = "--hit-locations " + values.CONF_LOC_BUG + "," + values.CONF_LOC_PATCH
     if values.CONF_LOC_LIST_CRASH:
@@ -373,7 +373,7 @@ def run_concolic_execution(program, argument_list, second_var_list, print_output
 #     os.chdir(directory_path)
 #     binary_name = str(program).split("/")[-1]
 #     emitter.normal("\texecuting klee in concolic mode")
-#     runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
+#     runtime_lib_path = definitions.DIRECTORY_LIB + "/libcpr_runtime.bca"
 #     input_argument = ""
 #     for argument in argument_list:
 #         if "$POC" in argument:
@@ -419,7 +419,7 @@ def run_concrete_execution(program, argument_list, print_output=False, klee_out_
     binary_name = str(program).split("/")[-1]
     project_path = values.CONF_DIR_SRC
     input_argument = ""
-    runtime_lib_path = definitions.DIRECTORY_LIB + "/libtrident_runtime.bca"
+    runtime_lib_path = definitions.DIRECTORY_LIB + "/libcpr_runtime.bca"
     for argument in argument_list:
         if "$POC" in argument:
             argument = values.FILE_POC_GEN

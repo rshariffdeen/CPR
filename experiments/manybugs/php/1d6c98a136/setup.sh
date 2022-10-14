@@ -31,7 +31,7 @@ CC=wllvm CXX=wllvm++ ./configure  \
 
 
 
-CC=wllvm CXX=wllvm++ LDFLAGS="-L/CPR/lib -ltrident_proxy" CFLAGS="-g -O0" CXXFLAGS="-g -O0"  make  -j32
+CC=wllvm CXX=wllvm++ LDFLAGS="-L/CPR/lib -lcpr_proxy" CFLAGS="-g -O0" CXXFLAGS="-g -O0"  make  -j32
 
 CC=wllvm CXX=wllvm++ CFLAGS="-no-asm -Dasm=error -D__asm__=error" CXXFLAGS="-no-asm -Dasm=error -D__asm__=error" make -j32
 

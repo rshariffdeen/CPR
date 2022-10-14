@@ -52,12 +52,12 @@ cd src
 
 ### Prepare for KLEE
 ## Fix fabs calls (not supported by KLEE).
-#sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
-#sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
-##sed -i 's/fabs_trident/fabs/g' libtiff/tif_luv.c
-##sed -i 's/fabs_trident/fabs/g' tools/tiff2ps.c
+#sed -i 's/fabs/fabs_cpr/g' libtiff/tif_luv.c
+#sed -i 's/fabs/fabs_cpr/g' tools/tiff2ps.c
+##sed -i 's/fabs_cpr/fabs/g' libtiff/tif_luv.c
+##sed -i 's/fabs_cpr/fabs/g' tools/tiff2ps.c
 #
-#make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
+#make CC=$CPR_CC CXX=$CPR_CXX -j32
 #
 #cd $dir_name
 #
@@ -97,26 +97,26 @@ cd src
 ### Instrument libtiff component.
 #sed -i '33i // KLEE' src/libtiff/tif_dirwrite.c
 #sed -i '34i #include <klee/klee.h>' src/libtiff/tif_dirwrite.c
-#sed -i '35i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirwrite.c
-#sed -i '36i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirwrite.c
+#sed -i '35i #ifndef CPR_OUTPUT' src/libtiff/tif_dirwrite.c
+#sed -i '36i #define CPR_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirwrite.c
 #sed -i '37i #endif' src/libtiff/tif_dirwrite.c
 #
 #sed -i '810i \\t\t\tklee_print_expr("val=",v[0]);' src/libtiff/tif_dirwrite.c
-#sed -i '811i \\t\t\tTRIDENT_OUTPUT("obs", "i32", v[0]);' src/libtiff/tif_dirwrite.c
+#sed -i '811i \\t\t\tCPR_OUTPUT("obs", "i32", v[0]);' src/libtiff/tif_dirwrite.c
 #
-#sed -i '343i \\t\t\tif(__trident_choice("L1634", "bool", (int[]){fip->field_tag, TIFFTAG_DOTRANGE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirwrite.c
+#sed -i '343i \\t\t\tif(__cpr_choice("L1634", "bool", (int[]){fip->field_tag, TIFFTAG_DOTRANGE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {' src/libtiff/tif_dirwrite.c
 #sed -i '344i \\t\t\t\tgoto bad;' src/libtiff/tif_dirwrite.c
 #sed -i '345i \\t\t\t} else if (!TIFFWriteNormalTag(tif, dir, fip))' src/libtiff/tif_dirwrite.c
 #sed -i '346d' src/libtiff/tif_dirwrite.c
 #
 #cd src
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32
+#make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32
 #cd ./test
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
-#make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
+#make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 short_tag.log
+#make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 long_tag.log
 #extract-bc short_tag
 #extract-bc long_tag
-##klee --posix-runtime --libc=uclibc -link-llvm-lib=/CPR/lib/libtrident_runtime.bca -write-smt2s short_tag.bc
+##klee --posix-runtime --libc=uclibc -link-llvm-lib=/CPR/lib/libcpr_runtime.bca -write-smt2s short_tag.bc
 #
 #cd $current_dir
 #cp repair.conf $dir_name
@@ -155,14 +155,14 @@ cd src
 ##git commit -m 'remove longjmp calls'
 #
 #
-##make CFLAGS="-ltrident_proxy -L/CPR/lib -g" -j32
+##make CFLAGS="-lcpr_proxy -L/CPR/lib -g" -j32
 ##sed -i '358i }' tools/gif2tiff.c
-##sed -i '353i { TRIDENT_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
+##sed -i '353i { CPR_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
 ##sed -i '352d' tools/gif2tiff.c
-##sed -i '352i while ((count = getc(infile)) &&  count <= 255 && (__trident_choice("L65", "bool", (int[]){count, status}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) )' tools/gif2tiff.c
-##sed -i '43i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' tools/gif2tiff.c
+##sed -i '352i while ((count = getc(infile)) &&  count <= 255 && (__cpr_choice("L65", "bool", (int[]){count, status}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) )' tools/gif2tiff.c
+##sed -i '43i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif\n' tools/gif2tiff.c
 ##git add tools/gif2tiff.c
-##git commit -m "instrument trident"
+##git commit -m "instrument cpr"
 #
 ##cd $current_dir
 ##cp repair.conf $dir_name

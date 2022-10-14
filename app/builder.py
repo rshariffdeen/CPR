@@ -7,11 +7,11 @@ import sys
 from app.utilities import execute_command, error_exit
 from app import definitions, values, logger, emitter
 
-CC = "$TRIDENT_CC"
-CXX = "$TRIDENT_CXX"
+CC = "$CPR_CC"
+CXX = "$CPR_CXX"
 C_FLAGS = "-g -O0  -static -e"
 CXX_FLAGS = "-g -O0 -static -e"
-LD_FLAGS = "-L/concolic-repair/lib -ltrident_runtime  -lkleeRuntest"
+LD_FLAGS = "-L/CPR/lib -lcpr_runtime  -lkleeRuntest"
 
 
 def config_project(project_path, is_llvm, custom_config_command=None):
@@ -198,12 +198,12 @@ def build_normal():
 
     emitter.sub_title("Building Program")
     emitter.normal("\tsetting environment variables")
-    execute_command("export TRIDENT_CC=" + definitions.DIRECTORY_TOOLS + "/trident-cc")
-    execute_command("export TRIDENT_CXX=" + definitions.DIRECTORY_TOOLS + "/trident-cxx")
+    execute_command("export CPR_CC=" + definitions.DIRECTORY_TOOLS + "/cpr-cc")
+    execute_command("export CPR_CXX=" + definitions.DIRECTORY_TOOLS + "/cpr-cxx")
 
     clean_project(values.CONF_DIR_SRC, values.CONF_PATH_PROGRAM)
-    CC = "$TRIDENT_CC"
-    CXX = "$TRIDENT_CXX"
+    CC = "$CPR_CC"
+    CXX = "$CPR_CXX"
     C_FLAGS = "-g -O0"
     CXX_FLAGS = "-g -O0"
     config_project(values.CONF_DIR_SRC, False, values.CONF_COMMAND_CONFIG)

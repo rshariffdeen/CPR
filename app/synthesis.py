@@ -444,8 +444,8 @@ def program_of_json(doc, components) -> Program:
 
 # Specification is a map:
 #   test id -> (list of paths, test assertion)
-# Path is a formula over special trident symbols (angelic, environment, output).
-# Test assertion is a formula over trident output symbols.
+# Path is a formula over special cpr symbols (angelic, environment, output).
+# Test assertion is a formula over cpr output symbols.
 # The semantics of specification is the satisfiability of
 #   for all tests. (V paths) ^ test assertion
 Specification = Dict[str, Tuple[List[Formula], Formula]]
@@ -496,7 +496,7 @@ class RuntimeSymbol(Enum):
     def parse(symbol: Formula) -> SymbolData:
         kind = RuntimeSymbol.check(symbol)
         if kind == None:
-            raise ValueError(f"not a valid trident symbol: {symbol}")
+            raise ValueError(f"not a valid cpr symbol: {symbol}")
         m = re.search(RuntimeSymbol._regex(kind), symbol.symbol_name())
         if kind == RuntimeSymbol.ANGELIC:
             return SymbolData(type=TridentType.parse(m.group(1)), lid=m.group(2), eid=int(m.group(3)))
@@ -507,7 +507,7 @@ class RuntimeSymbol(Enum):
         elif kind == RuntimeSymbol.OUTPUT:
             return SymbolData(type=TridentType.parse(m.group(1)), name=m.group(2), eid=int(m.group(3)))
         else:
-            logger.error(f"unsupported trident symbol kind {kind}")
+            logger.error(f"unsupported cpr symbol kind {kind}")
             exit(1)
 
     @staticmethod

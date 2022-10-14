@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     swapped = 0;
     int i = 1;
     while ( i < N ) {
-      if(__trident_choice("L290", "bool", (int[]){a[i - 1],a[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)){
+      if(__cpr_choice("L290", "bool", (int[]){a[i - 1],a[i]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)){
         int t = a[i];
         a[i] = a[i - 1];
         a[i-1] = t;
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
   int y;
   for ( x = 0 ; x < N ; x++ ) {
     for ( y = x+1 ; y < N ; y++ ) {
-       TRIDENT_OUTPUT("obs", "i32", a[y] - a[x]);
+       CPR_OUTPUT("obs", "i32", a[y] - a[x]);
       __VERIFIER_assert(  a[x] <= a[y]  );
     }
   }

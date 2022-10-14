@@ -26,8 +26,7 @@ COPY --from=rshariffdeen/llvm:6.0.0 /opt/llvm-6/ /opt/llvm-6/
 COPY --from=rshariffdeen/klee:latest /klee/ /klee
 COPY --from=rshariffdeen/klee:latest /klee-uclibc /klee-uclibc
 
-
-ENV PATH=/klee/build/bin/:${PATH}
+ENV PATH "/opt/llvm-6/bin:/klee/build/bin:${PATH}"
 ENV LLVM_COMPILER=clang
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y  --no-install-recommends --force-yes \
@@ -69,8 +68,8 @@ RUN git clone https://github.com/rshariffdeen/CPR.git /CPR
 WORKDIR /CPR
 RUN cd lib && KLEE_INCLUDE_PATH=/klee/source/include make
 ENV DEBIAN_FRONTEND=dialog
-ENV TRIDENT_CC=/CPR/tools/trident-cc
-ENV TRIDENT_CXX=/CPR/tools/trident-cxx
+ENV CPR_CC=/CPR/tools/cpr-cc
+ENV CPR_CXX=/CPR/tools/cpr-cxx
 RUN cd /klee/build/lib; ar rcs libkleeRuntest.a libkleeRuntest.so.1.0
 RUN pypy3 setup.py build_ext --inplace
 RUN ln -s /CPR/bin/cpr /usr/bin/cpr

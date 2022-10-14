@@ -41,20 +41,20 @@ cd $dir_name/src
 cp $dir_name/diffs/gzip.c-3eb6091d69 $dir_name/src/gzip.c
 #Instrument driver and libtiff
 sed -i '168i #endif' gzip.c
-sed -i '168i #define TRIDENT_OUTPUT(id, typestr, value) value' gzip.c
-sed -i '168i #ifndef TRIDENT_OUTPUT' gzip.c
+sed -i '168i #define CPR_OUTPUT(id, typestr, value) value' gzip.c
+sed -i '168i #ifndef CPR_OUTPUT' gzip.c
 sed -i '168i #include <klee/klee.h>' gzip.c
 sed -i '168i // KLEE' gzip.c
 
-sed -i '551i if (( __trident_choice("L1634", "bool", (int[]){z_len, MAX_SUFFIX, decompress}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)) ) { ' gzip.c
+sed -i '551i if (( __cpr_choice("L1634", "bool", (int[]){z_len, MAX_SUFFIX, decompress}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)) ) { ' gzip.c
 sed -i '552d' gzip.c
 sed -i '556i \\tklee_assert(z_len > 0);' gzip.c
-sed -i '556i \\tTRIDENT_OUTPUT("obs", "i32", z_len);' gzip.c
+sed -i '556i \\tCPR_OUTPUT("obs", "i32", z_len);' gzip.c
 sed -i '1642,1648d' gzip.c
 sed -i '1642i int ok = 1;' gzip.c
 
 # Compile instrumentation and test driver.
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
+make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
 
 
 # Copy remaining files to run CPR.

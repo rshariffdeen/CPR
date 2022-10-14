@@ -63,29 +63,29 @@ CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --with-pcre=yes
 #CC=wllvm CXX=wllvm++ ./configure CFLAGS='-g -O0' --enable-static --disable-shared --with-pcre=yes --with-ldap --with-bzip2 --with-openssl --with-gdbm --with-memcache --with-webdav-props --with-webdav-locks
 CC=wllvm CXX=wllvm++ make CFLAGS="-march=x86-64" -j32
 
-#sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
-#sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
+#sed -i 's/fabs/fabs_cpr/g' libtiff/tif_luv.c
+#sed -i 's/fabs/fabs_cpr/g' tools/tiff2ps.c
 #git add  libtiff/tif_luv.c tools/tiff2ps.c
 #git commit -m 'replace fabs with proxy function'
-#make CC=$TRIDENT_CC -j32
+#make CC=$CPR_CC -j32
 
 #sed -i '118d;221d' libtiff/tif_jpeg.c
 #sed -i '153d;2429d' libtiff/tif_ojpeg.c
 #git add libtiff/tif_ojpeg.c libtiff/tif_jpeg.c
 #git commit -m 'remove longjmp calls'
 
-make CFLAGS="-ltrident_proxy -L/CPR/lib -g" -j32
+make CFLAGS="-lcpr_proxy -L/CPR/lib -g" -j32
 # Patch
 #sed -i '748i if (con->request.content_length > 0) {' mod_cgi.c
 # Trident
-#sed -i '748i if (__trident_choice("L748", "bool", (int[]){con->request.content_length, i}, (char*[]){"con->request.content_length","i"}, 2, (int*[]){}, (char*[]){}, 0))) {' mod_cgi.c
+#sed -i '748i if (__cpr_choice("L748", "bool", (int[]){con->request.content_length, i}, (char*[]){"con->request.content_length","i"}, 2, (int*[]){}, (char*[]){}, 0))) {' mod_cgi.c
 #sed -i '750i }' mod_cgi.c
-#sed -i '353i { TRIDENT_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
+#sed -i '353i { CPR_OUTPUT("obs", "i32", count);\n if (count < 0) klee_abort();\n' tools/gif2tiff.c
 #sed -i '352d' tools/gif2tiff.c
-#sed -i '352i while ((count = getc(infile)) &&  count <= 255 && (__trident_choice("L65", "bool", (int[]){count, status}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) )' tools/gif2tiff.c
-#sed -i '43i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' tools/gif2tiff.c
+#sed -i '352i while ((count = getc(infile)) &&  count <= 255 && (__cpr_choice("L65", "bool", (int[]){count, status}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) )' tools/gif2tiff.c
+#sed -i '43i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif\n' tools/gif2tiff.c
 #git add tools/gif2tiff.c
-#git commit -m "instrument trident"
+#git commit -m "instrument cpr"
 
 #cd $current_dir
 #cp repair.conf $dir_name

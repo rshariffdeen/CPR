@@ -585,12 +585,12 @@ def collect_var_mapping():
     with open(source_file_path, 'r') as source_file:
         content = source_file.readlines()
         patch_line = content[int(line_number) - 1]
-        trident_call_str = re.findall("trident_choice\((.+?)\)[\),\s,;]", patch_line)[0]
-        patch_type = trident_call_str.split(",")[1]
+        cpr_call_str = re.findall("cpr_choice\((.+?)\)[\),\s,;]", patch_line)[0]
+        patch_type = cpr_call_str.split(",")[1]
         if patch_type == "bool":
             values.IS_PATCH_BOOL = True
-        prog_var_list = re.findall("{(.+?)}", trident_call_str)[0].split(",")
-        comp_name_list = re.findall("{(.+?)}", trident_call_str)[1].split(",")
+        prog_var_list = re.findall("{(.+?)}", cpr_call_str)[0].split(",")
+        comp_name_list = re.findall("{(.+?)}", cpr_call_str)[1].split(",")
         for i in range (0, len(prog_var_list)):
             values.MAP_PROG_VAR[comp_name_list[i].strip().replace("\"", "").replace("\'", "")] = prog_var_list[i]
     # print(values.MAP_PROG_VAR)

@@ -206,11 +206,11 @@ In the setup script: /experiments/extractfix/libtiff/CVE-2016-5314/setup.sh, we 
 In setup.sh:line 33:
 
 ```
-sed -i ‘786i if(__trident_choice(“L65”, “bool”, (int[]){sp->tbuf_size,sp->stream.avail_out, nsamples}, (char*[]){“x”, “y”, “z”}, 3, (int*[]){}, (char*[]){}, 0)) return 0;\n’ libtiff/tif_pixarlog.c
+sed -i ‘786i if(__cpr_choice(“L65”, “bool”, (int[]){sp->tbuf_size,sp->stream.avail_out, nsamples}, (char*[]){“x”, “y”, “z”}, 3, (int*[]){}, (char*[]){}, 0)) return 0;\n’ libtiff/tif_pixarlog.c
 ```
 
 
-"trident_choice" represents the function call to retrieve a patch
+"cpr_choice" represents the function call to retrieve a patch
 * x is mapped to sp->tbuf_size
 * y is mapped to sp->stream.avail_out
 * z is mapped to nsamples

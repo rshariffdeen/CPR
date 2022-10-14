@@ -28,9 +28,9 @@ CC=wllvm CXX=wllvm++  ./configure \
 
 CC=clang CXX=clang++ make  -j32
 
-sed -i 's/fabs/fabs_trident/g' ./ext/gd/libgd/gd.c
-sed -i 's/fabs/fabs_trident/g' ./ext/gd/libgd/gd_rotate.c
-sed -i 's/fabs/fabs_trident/g' ./ext/sqlite3/libsqlite/sqlite3.c
-sed -i 's/fabs/fabs_trident/g' ./ext/standard/math.c
+sed -i 's/fabs/fabs_cpr/g' ./ext/gd/libgd/gd.c
+sed -i 's/fabs/fabs_cpr/g' ./ext/gd/libgd/gd_rotate.c
+sed -i 's/fabs/fabs_cpr/g' ./ext/sqlite3/libsqlite/sqlite3.c
+sed -i 's/fabs/fabs_cpr/g' ./ext/standard/math.c
 
-make CXX=clang++ CC=clang LDFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib -lkleeRuntest" CFLAGS="-g -O0 -static"  sapi/cli/php
+make CXX=clang++ CC=clang LDFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib -lkleeRuntest" CFLAGS="-g -O0 -static"  sapi/cli/php

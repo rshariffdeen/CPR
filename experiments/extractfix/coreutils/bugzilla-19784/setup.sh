@@ -14,13 +14,13 @@ git checkout $commit_id
 
 
 sed -i '214,215d' src/make-prime-list.c
-sed -i '214i while((__trident_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)) && sieve[++i] == 0)' src/make-prime-list.c
-sed -i '215i TRIDENT_OUTPUT("obs", "i32", size - i);\n' src/make-prime-list.c
+sed -i '214i while((__cpr_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)) && sieve[++i] == 0)' src/make-prime-list.c
+sed -i '215i CPR_OUTPUT("obs", "i32", size - i);\n' src/make-prime-list.c
 git add src/make-prime-list.c
-git commit -m "instrument trident"
+git commit -m "instrument cpr"
 
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
+FORCE_UNSAFE_CONFIGURE=1 CC=$CPR_CC CXX=$CPR_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
 make CFLAGS="-fPIC -fPIE -L/klee/build/lib  -lkleeRuntest" CXXFLAGS=$CFLAGS src/make-prime-list -j32
 
 cd $current_dir

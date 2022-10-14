@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+CPR_RUNTIME_H="$SCRIPT_DIR/../lib/cpr_runtime.h"
+CPR_RUNTIME_LIB="$SCRIPT_DIR/../lib/"
+KLEE_LIB="/klee/build/lib/"
+
+wllvm++ -g -O0 -include "$CPR_RUNTIME_H" "$@" -L"$CPR_RUNTIME_LIB" -L"$KLEE_LIB" -lcpr_runtime -lcpr_proxy -lkleeRuntest

@@ -25,20 +25,20 @@ a user-provided specification for correctness of the patch.
 ```c
 #include <stdio.h>
 
-#ifndef TRIDENT_OUTPUT
-#define TRIDENT_OUTPUT(id, typestr, value) value
+#ifndef CPR_OUTPUT
+#define CPR_OUTPUT(id, typestr, value) value
 #endif
 
 int main(int argc, char *argv[]) {
   int x = atoi(argv[1]);
   int res, y;
-  if (__trident_choice("L9", "bool", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0))  {
+  if (__cpr_choice("L9", "bool", (int[]){x}, (char*[]){"x"}, 1, (int*[]){}, (char*[]){}, 0))  {
       return -1;
   }
 
   y = x - 1;
 
-  TRIDENT_OUTPUT("obs", "i32", y);
+  CPR_OUTPUT("obs", "i32", y);
   res = 1000 / y;
   return 0;
 }
@@ -47,14 +47,14 @@ int main(int argc, char *argv[]) {
 There are two important instrumentation required by CPR in order to generate
 a repair. First, CPR will synthesise an expression (in this case a boolean expression)
 to repair the program, the placeholder template for the expression needs to be 
-instrumented with the API call '__trident_choice'. It takes 3 arguments; a location identifier,
+instrumented with the API call '__cpr_choice'. It takes 3 arguments; a location identifier,
 type of expression and program variables for the expression. The location identifier is 
 to distinguish the expression for multi-line fixes. The type of expression dictates the
 components that can be used to synthesis the expression. For example; a boolean expression
 can use comparison operators such as ">", "!=",  while integer expressions can use operators such
 as "+", "/" etc. The last argument is a list of program variables to be used as
 inputs for the repair expression. Second, CPR validates each synthesised repair expression based on a user-provided specification
-which uses a program state/variable. "TRIDENT_OUTPUT" function can be used to 
+which uses a program state/variable. "CPR_OUTPUT" function can be used to 
 provide the necessary observation in the program. 
 
 In our example, we need to validate the user provided input 'x', hence the patch

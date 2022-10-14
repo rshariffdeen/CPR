@@ -169,7 +169,7 @@ void init_tables() {
     selector_instances = ht_create(65536);
 }
 
-int __trident_choice(char* lid, char* typestr,
+int __cpr_choice(char* lid, char* typestr,
                      int* rvals, char** rvals_ids, int rvals_size,
                      int** lvals, char** lvals_ids, int lvals_size){
     if (!choice_instances)
@@ -222,7 +222,7 @@ int __trident_choice(char* lid, char* typestr,
 }
 
 
-int __trident_output(char* id, char* typestr, int value){
+int __cpr_output(char* id, char* typestr, int value){
     if (!output_instances)
         init_tables();
     int previous = ht_get(output_instances, id);

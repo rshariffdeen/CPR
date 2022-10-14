@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-TRIDENT_RUNTIME_H="$SCRIPT_DIR/../lib/trident_runtime.h"
-TRIDENT_RUNTIME_LIB="$SCRIPT_DIR/../lib/"
-KLEE_LIB="/klee/build/lib/"
-
-wllvm -g -O0 -include "$TRIDENT_RUNTIME_H" "$@" -L"$TRIDENT_RUNTIME_LIB" -L"$KLEE_LIB" -ltrident_runtime -ltrident_proxy -lkleeRuntest

@@ -49,7 +49,7 @@ int main(int argc, char** argv){
 	  y = Source[j];
 	  if(distance[x] > distance[y] + Weight[j])
 	    {
-	      distance[x] = __trident_choice("L9", "i32", (int[]){distance[y], Weight[j]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
+	      distance[x] = __cpr_choice("L9", "i32", (int[]){distance[y], Weight[j]}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
 	    }
 	}
     }
@@ -65,7 +65,7 @@ int main(int argc, char** argv){
 
   for(i = 0; i < nodecount; i++)
     {
-      TRIDENT_OUTPUT("obs", "i32", distance[i]);
+      CPR_OUTPUT("obs", "i32", distance[i]);
       __VERIFIER_assert(distance[i]>=0);
     }
   return 0;

@@ -16,7 +16,7 @@ int insert( int set [] , int size , int value ) {
 int elem_exists( int set [ ] , int size , int value ) {
   int i;
   for ( i = 0 ; i < size ; i++ ) {
-    if ( set[ i ] == value ) return  __trident_choice("L290", "i32", (int[]){i,size}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
+    if ( set[ i ] == value ) return  __cpr_choice("L290", "i32", (int[]){i,size}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
   }
   return 0;
 }
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
   // this is not trivial!
   for ( x = 0 ; x < n ; x++ ) {
     for ( y = x + 1 ; y < n ; y++ ) {
-    TRIDENT_OUTPUT("obs", "i32",  set[ x ]  - set[ y ]);
+    CPR_OUTPUT("obs", "i32",  set[ x ]  - set[ y ]);
       __VERIFIER_assert(  set[ x ] != set[ y ]  );
     }
   }

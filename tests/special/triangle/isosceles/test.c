@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#ifndef TRIDENT_OUTPUT
-#define TRIDENT_OUTPUT(id, typestr, value) value
+#ifndef CPR_OUTPUT
+#define CPR_OUTPUT(id, typestr, value) value
 #endif
 
 #define INVALID -1
@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
         return INVALID;
   if ( a == b && b== c )
         return EQUILATERAL;
-  if ( a== b || __trident_choice("L9", "bool", (int[]){a,b,c}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)){
+  if ( a== b || __cpr_choice("L9", "bool", (int[]){a,b,c}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0)){
         int obs = (a-b) * (b-c) * (c - a);
-        TRIDENT_OUTPUT("obs", "i32", obs);
+        CPR_OUTPUT("obs", "i32", obs);
         return ISOSCELES;
   }
 

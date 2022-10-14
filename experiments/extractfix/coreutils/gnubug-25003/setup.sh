@@ -14,16 +14,16 @@ cd src
 git checkout $commit_id
 
 sed -i '987i klee_assert(initial_read > start);' src/split.c
-sed -i '987i TRIDENT_OUTPUT("obs", "i32", initial_read - start);\n' src/split.c
+sed -i '987i CPR_OUTPUT("obs", "i32", initial_read - start);\n' src/split.c
 sed -i '985d' src/split.c
-sed -i '985i if(__trident_choice("L290", "bool", (int[]){start, initial_read, bufsize}, (char*[]){"start","initial_read", "bufsize"}, 3, (int*[]){}, (char*[]){}, 0))' src/split.c
-sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/split.c
+sed -i '985i if(__cpr_choice("L290", "bool", (int[]){start, initial_read, bufsize}, (char*[]){"start","initial_read", "bufsize"}, 3, (int*[]){}, (char*[]){}, 0))' src/split.c
+sed -i '97i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif' src/split.c
 sed -i '97i #include <klee/klee.h>' src/split.c
 git add src/split.c
-git commit -m "instrument trident"
+git commit -m "instrument cpr"
 
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
+FORCE_UNSAFE_CONFIGURE=1 CC=$CPR_CC CXX=$CPR_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
 make CFLAGS="-fPIC -fPIE -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" CXXFLAGS=$CFLAGS -j32
 make CFLAGS="-fPIC -fPIE -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" CXXFLAGS=$CFLAGS src/split -j32
 

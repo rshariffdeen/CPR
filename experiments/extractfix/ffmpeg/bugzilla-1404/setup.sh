@@ -35,19 +35,19 @@ git commit -m 'change fabs to fabs_fk'
 #sed -i 's/av_cold //' libavcodec/dfa.c
 #sed -i 's/NULL_IF_CONFIG_SMALL("Chronomaster DFA")/"Chronomaster DFA"/' libavcodec/dfa.c
 
-#sed -i '180i TRIDENT_OUTPUT("obs", "i32", frame_end - frame - width - 4);' libavcodec/dfa.c
+#sed -i '180i CPR_OUTPUT("obs", "i32", frame_end - frame - width - 4);' libavcodec/dfa.c
 #sed -i "178d" libavcodec/dfa.c
-#sed -i '178i if (__trident_choice("L816", "i32", (int[]){width, frame_end, frame}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' libavcodec/dfa.c
-#sed -i '32i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' libavcodec/dfa.c
+#sed -i '178i if (__cpr_choice("L816", "i32", (int[]){width, frame_end, frame}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0))' libavcodec/dfa.c
+#sed -i '32i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif\n' libavcodec/dfa.c
 #git add libavcodec/dfa.c
-#git commit -m "instrument trident"
+#git commit -m "instrument cpr"
 
 
 
 cflags="-g -D__NO_STRING_INLINES  -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__  -I${dir_name}/deps/  -L${dir_name}/deps/ -lhook -Wno-everything"
 
-CC=$TRIDENT_CC
-CXX=$TRIDENT_CXX
+CC=$CPR_CC
+CXX=$CPR_CXX
 CFLAGS="$cflags"
 CXXFLAGS="$cflags"
 
@@ -85,7 +85,7 @@ make -j32 > /dev/null
 subject=tools/target_dec_cavs_fuzzer
 make ${subject}
 cp ${subject} ./
-KLEE_CFLAGS="-L/CPR/lib -ltrident_runtime -L/klee/build/lib  -L/klee/build/lib  -lkleeRuntest -lkleeBasic -lhook  -L${dir_name}/deps/"
+KLEE_CFLAGS="-L/CPR/lib -lcpr_runtime -L/klee/build/lib  -L/klee/build/lib  -lkleeRuntest -lkleeBasic -lhook  -L${dir_name}/deps/"
 PROJECT_CFALGS="-g -std=c++11 ${LIB_FUZZING_ENGINE} -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavresample -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -L${FFMPEG_DEPS_PATH}  -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil:libavresample -Qunused-arguments   libavdevice/libavdevice.a libavfilter/libavfilter.a libavformat/libavformat.a libavcodec/libavcodec.a libpostproc/libpostproc.a libswresample/libswresample.a libswscale/libswscale.a libavutil/libavutil.a -lavdevice -lavfilter -lavformat -lavcodec -lpostproc -lswresample -lswscale -lavutil -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lva -lva-drm -lva-x11 -lxcb -lXau -lXdmcp -lxcb -lXau -lXdmcp -lxcb-xfixes -lxcb-render -lxcb-shape -lxcb -lXau -lXdmcp -lxcb-shape -lxcb -lXau -lXdmcp -L ${FFMPEG_DEPS_PATH}   -lstdc++ -lm -lrt -ldl -lnuma -L${FFMPEG_DEPS_PATH} -lvpx -lm -lpthread -L${FFMPEG_DEPS_PATH} -lvpx -lm -lpthread -L${FFMPEG_DEPS_PATH} -lvpx -lm -lpthread -L${FFMPEG_DEPS_PATH} -lvpx -lm -lpthread -lvorbisenc -lvorbis -logg -ltheoraenc -ltheoradec -logg -L${FFMPEG_DEPS_PATH} -lopus -lm -L${FFMPEG_DEPS_PATH} -lopus -lm -lmp3lame -lfreetype -lz -lpng12 -lz -lm -L${FFMPEG_DEPS_PATH} -lfdk-aac -lm -lass -lm -lharfbuzz -lfontconfig -lexpat -lfreetype -lexpat -lfribidi -lfreetype -lz -lpng12 -lz -lm -lm -llzma -lz"
 make ${subject}
 wllvm -ggdb3 -Wall -W -o tools/target_dec_cavs_fuzzer tools/target_dec_cavs_fuzzer.o afl_driver.o ${PROJECT_CFALGS} ${KLEE_CFLAGS} -Wl,-rpath

@@ -63,8 +63,8 @@ int main()
   }
   int res = (j>nc_B-1);
 //  found = (j>nc_B-1)<<i;
-  found = __trident_choice("L9", "i32", (int[]){res, i}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
-  TRIDENT_OUTPUT("obs", "i32", found);
+  found = __cpr_choice("L9", "i32", (int[]){res, i}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0);
+  CPR_OUTPUT("obs", "i32", found);
   __VERIFIER_assert(found == 0 || found == 1);
 
   return 0;

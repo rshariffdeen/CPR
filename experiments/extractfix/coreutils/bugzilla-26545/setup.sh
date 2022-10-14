@@ -13,16 +13,16 @@ cd src
 git checkout $commit_id
 
 sed -i '292i klee_assert(i > size / 2 );\n' src/shred.c
-sed -i '292i TRIDENT_OUTPUT("obs", "i32", i - (size/2));\n' src/shred.c
+sed -i '292i CPR_OUTPUT("obs", "i32", i - (size/2));\n' src/shred.c
 sed -i '290d' src/shred.c
-sed -i '290i for(i = 3; (__trident_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)); i *= 2)' src/shred.c
-sed -i '97i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif' src/shred.c
+sed -i '290i for(i = 3; (__cpr_choice("L290", "bool", (int[]){size, i}, (char*[]){"size","i"}, 2, (int*[]){}, (char*[]){}, 0)); i *= 2)' src/shred.c
+sed -i '97i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif' src/shred.c
 sed -i '97i #include <klee/klee.h>' src/shred.c
 git add src/shred.c
-git commit -m "instrument trident"
+git commit -m "instrument cpr"
 
 ./bootstrap
-FORCE_UNSAFE_CONFIGURE=1 CC=$TRIDENT_CC CXX=$TRIDENT_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
+FORCE_UNSAFE_CONFIGURE=1 CC=$CPR_CC CXX=$CPR_CXX ./configure CFLAGS='-g -O0 -static -fPIE' CXXFLAGS="$CFLAGS"
 make CFLAGS="-fPIC -fPIE -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" CXXFLAGS=$CFLAGS -j32
 make CFLAGS="-fPIC -fPIE -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" CXXFLAGS=$CFLAGS src/shred -j32
 

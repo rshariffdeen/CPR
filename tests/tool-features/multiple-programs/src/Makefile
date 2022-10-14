@@ -1,4 +1,4 @@
-CC=$(TRIDENT_CC)
+CC=$(CPR_CC)
 
 all:
 	$(CC) -c -g util.c

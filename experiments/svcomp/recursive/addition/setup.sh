@@ -9,7 +9,7 @@ current_dir=$PWD
 
 cp Addition02.c $program_dir
 cd $program_dir
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC  LDFLAGS="-ltrident_runtime -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 Addition02
+make CXX=$CPR_CXX CC=$CPR_CC  LDFLAGS="-lcpr_runtime -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include" -j32 Addition02
 
 cd $current_dir
 mkdir -p $dir_name

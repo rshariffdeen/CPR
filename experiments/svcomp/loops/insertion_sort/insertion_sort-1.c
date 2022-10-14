@@ -4,8 +4,8 @@
 extern void abort(void);
 extern void __assert_fail(const char *, const char *, unsigned int, const char *) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__noreturn__));
 void reach_error() { __assert_fail("0", "insertion_sort-1.c", 3, "reach_error"); }
-#ifndef TRIDENT_OUTPUT
-#define TRIDENT_OUTPUT(id, typestr, value) value
+#ifndef CPR_OUTPUT
+#define CPR_OUTPUT(id, typestr, value) value
 #endif
 void __VERIFIER_assert(int cond) {
   if (!(cond)) {
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
       key = v[j];
       i = j - 1;
       while((i>=0) && (v[i]>key)) {
-        if(__trident_choice("L290", "bool", (int[]){i,a}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
+        if(__cpr_choice("L290", "bool", (int[]){i,a}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0))
          v[i+1] = v[i];
          i = i - 1;
       }
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   }      
   for (k=1;k<SIZE;k++){
        int diff = v[k] - v[k-1];
-       TRIDENT_OUTPUT("obs", "i32", diff);
+       CPR_OUTPUT("obs", "i32", diff);
     __VERIFIER_assert(v[k-1]<=v[k]);
 
    }

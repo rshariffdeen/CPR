@@ -20,7 +20,7 @@ int linear_search(int *a, int n, int q) {
   int constant = -1;
   while (j<n && a[j]!=q) {
     j++;
-    if(__trident_choice("L290", "bool", (int[]){j,constant}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) j=-1;
+    if(__cpr_choice("L290", "bool", (int[]){j,constant}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) j=-1;
   }
   if (j<SIZE) return 1;
   else return 0;
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
      int *a = malloc(sizeof(int)*SIZE);
     a[SIZE/2]=y;
     int ret = linear_search(a,SIZE,y);
-     TRIDENT_OUTPUT("obs", "i32", ret);
+     CPR_OUTPUT("obs", "i32", ret);
     __VERIFIER_assert(ret);
   }
 }

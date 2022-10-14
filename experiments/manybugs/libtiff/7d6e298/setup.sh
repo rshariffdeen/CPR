@@ -52,35 +52,35 @@ cd src
 
 ## Prepare for KLEE
 # Fix fabs calls (not supported by KLEE).
-sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
-sed -i 's/fabs/fabs_trident/g' tools/tiff2ps.c
-#sed -i 's/fabs_trident/fabs/g' libtiff/tif_luv.c
-#sed -i 's/fabs_trident/fabs/g' tools/tiff2ps.c
+sed -i 's/fabs/fabs_cpr/g' libtiff/tif_luv.c
+sed -i 's/fabs/fabs_cpr/g' tools/tiff2ps.c
+#sed -i 's/fabs_cpr/fabs/g' libtiff/tif_luv.c
+#sed -i 's/fabs_cpr/fabs/g' tools/tiff2ps.c
 
-make CC=$TRIDENT_CC CXX=$TRIDENT_CXX -j32
+make CC=$CPR_CC CXX=$CPR_CXX -j32
 
 cd $dir_name
 
 #Instrument driver and libtiff
 sed -i '34i // KLEE' src/libtiff/tif_dirinfo.c
 sed -i '35i #include <klee/klee.h>' src/libtiff/tif_dirinfo.c
-sed -i '36i #ifndef TRIDENT_OUTPUT' src/libtiff/tif_dirinfo.c
-sed -i '37i #define TRIDENT_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirinfo.c
+sed -i '36i #ifndef CPR_OUTPUT' src/libtiff/tif_dirinfo.c
+sed -i '37i #define CPR_OUTPUT(id, typestr, value) value' src/libtiff/tif_dirinfo.c
 sed -i '38i #endif' src/libtiff/tif_dirinfo.c
 #
-sed -i '294i \\t\ttif->tif_fields = __trident_choice("294", "i32", (int[]){tif->tif_fields, NULL, tif->tif_nfields}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0);' src/libtiff/tif_dirinfo.c
+sed -i '294i \\t\ttif->tif_fields = __cpr_choice("294", "i32", (int[]){tif->tif_fields, NULL, tif->tif_nfields}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0);' src/libtiff/tif_dirinfo.c
 sed -i '295d' src/libtiff/tif_dirinfo.c
 #
 sed -i '297i \\tint tmp_obs = _TIFFMergeFields(tif, fieldarray->fields, fieldarray->count);' src/libtiff/tif_dirinfo.c
 sed -i '298i \\tklee_print_expr("obs=", tmp_obs);' src/libtiff/tif_dirinfo.c
-sed -i '299i \\tTRIDENT_OUTPUT("obs", "i32", tmp_obs);' src/libtiff/tif_dirinfo.c
+sed -i '299i \\tCPR_OUTPUT("obs", "i32", tmp_obs);' src/libtiff/tif_dirinfo.c
 sed -i '300i \\tklee_assert(tmp_obs != 0);' src/libtiff/tif_dirinfo.c
 sed -i '301i \\tif(!tmp_obs) {' src/libtiff/tif_dirinfo.c
 sed -i '302d' src/libtiff/tif_dirinfo.c
 
 ## Compile instrumentation and test driver.
 cd src
-make CXX=$TRIDENT_CXX CC=$TRIDENT_CC CFLAGS="-ltrident_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
+make CXX=$CPR_CXX CC=$CPR_CC CFLAGS="-lcpr_proxy -L/CPR/lib -L/klee/build/lib  -lkleeRuntest -I/klee/source/include -g -O0" -j32
 cd tools
 extract-bc tiffcp
 
@@ -96,14 +96,14 @@ cp -rf test-expected-output $dir_name
 
 #### Test with KLEE
 #cd /data/manybugs/libtiff/865f7b2/src/tools
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/test-input-files/22-44-54-64-74-fail-palette-1c-1b.tiff test.tif
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/test-input-files/13-14-15-16-17-22-43-53-63-73-fail-miniswhite-1c-1b.tiff test.tif
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/seed-dir/2-pass-long_test.tiff test.tif
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/seed-dir/22-40-50-60-70-pass-minisblack-1c-16b.tiff test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/test-input-files/22-44-54-64-74-fail-palette-1c-1b.tiff test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/test-input-files/13-14-15-16-17-22-43-53-63-73-fail-miniswhite-1c-1b.tiff test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/seed-dir/2-pass-long_test.tiff test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s tiffcp.bc /data/manybugs/libtiff/865f7b2/seed-dir/22-40-50-60-70-pass-minisblack-1c-16b.tiff test.tif
 ##
 #cd /data/manybugs/libtiff/865f7b2/test-input-files
 #gen-bout --sym-file "/data/manybugs/libtiff/865f7b2/test-input-files/22-44-54-64-74-fail-palette-1c-1b.tiff"
 #cd /data/manybugs/libtiff/865f7b2/src/tools
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s --seed-out=/data/manybugs/libtiff/865f7b2/test-input-files/file.bout --allow-seed-extension --resolve-path --named-seed-matching tiffcp.bc A --sym-files 1 3312 test.tif
-#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libtrident_runtime.bca --write-smt2s --seed-out=/data/manybugs/libtiff/865f7b2/test-input-files/file.bout --allow-seed-extension --resolve-path --named-seed-matching tiffcp.bc A --sym-files 1 3312 test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s --seed-out=/data/manybugs/libtiff/865f7b2/test-input-files/file.bout --allow-seed-extension --resolve-path --named-seed-matching tiffcp.bc A --sym-files 1 3312 test.tif
+#klee --posix-runtime --libc=uclibc --link-llvm-lib=/CPR/lib/libcpr_runtime.bca --write-smt2s --seed-out=/data/manybugs/libtiff/865f7b2/test-input-files/file.bout --allow-seed-extension --resolve-path --named-seed-matching tiffcp.bc A --sym-files 1 3312 test.tif
 ##

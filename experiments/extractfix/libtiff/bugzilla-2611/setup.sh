@@ -16,17 +16,17 @@ git checkout $commit_id
 CC=wllvm CXX=wllvm++ ./configure --enable-static --disable-shared
 CC=wllvm CXX=wllvm++ make -j32
 
-sed -i 's/fabs/fabs_trident/g' libtiff/tif_luv.c
+sed -i 's/fabs/fabs_cpr/g' libtiff/tif_luv.c
 git add  libtiff/tif_luv.c
 git commit -m 'replace fabs with proxy function'
 
-make CFLAGS="-ltrident_proxy -L/CPR/lib" -j32
+make CFLAGS="-lcpr_proxy -L/CPR/lib" -j32
 
-sed -i '816i TRIDENT_OUTPUT("obs", "i32", sp->bytes_per_line);' libtiff/tif_ojpeg.c
-sed -i '816i if(__trident_choice("L816", "bool", (int[]){sp->bytes_per_line, cc}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) return -1;\n' libtiff/tif_ojpeg.c
-sed -i '178i #ifndef TRIDENT_OUTPUT\n#define TRIDENT_OUTPUT(id, typestr, value) value\n#endif\n' libtiff/tif_ojpeg.c
+sed -i '816i CPR_OUTPUT("obs", "i32", sp->bytes_per_line);' libtiff/tif_ojpeg.c
+sed -i '816i if(__cpr_choice("L816", "bool", (int[]){sp->bytes_per_line, cc}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) return -1;\n' libtiff/tif_ojpeg.c
+sed -i '178i #ifndef CPR_OUTPUT\n#define CPR_OUTPUT(id, typestr, value) value\n#endif\n' libtiff/tif_ojpeg.c
 git add libtiff/tif_ojpeg.c
-git commit -m "instrument trident"
+git commit -m "instrument cpr"
 
 
 cd $current_dir

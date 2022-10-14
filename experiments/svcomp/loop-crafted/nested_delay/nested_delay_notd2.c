@@ -35,14 +35,14 @@ int main(int argc, char** argv) {
 		if(c==last && st==0) {
 			a = a+1;
 		}
-		else if(st==1 && __trident_choice("L9", "bool", (int[]){last, SIZE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {
+		else if(st==1 && __cpr_choice("L9", "bool", (int[]){last, SIZE}, (char*[]){"x", "y"}, 2, (int*[]){}, (char*[]){}, 0)) {
 			d++;
 		}
 		if(d == SIZE) {
 			a = 0;
 			b = 1;
 		}
-	    TRIDENT_OUTPUT("obs", "bool", a==b && c==SIZE);
+	    CPR_OUTPUT("obs", "bool", a==b && c==SIZE);
 		__VERIFIER_assert(a==b && c==SIZE);
 	}
 	return 0;

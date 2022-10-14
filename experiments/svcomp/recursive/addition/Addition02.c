@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
         return 0;
     }
     int result = addition(m,n);
-    if (__trident_choice("L290", "bool", (int[]){m,n, result}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0) ) {
+    if (__cpr_choice("L290", "bool", (int[]){m,n, result}, (char*[]){"x", "y", "z"}, 3, (int*[]){}, (char*[]){}, 0) ) {
         return 0;
     } else {
-        TRIDENT_OUTPUT("obs", "i32", result - (m + n));
+        CPR_OUTPUT("obs", "i32", result - (m + n));
         ERROR: {reach_error();abort();}
     }
 }
