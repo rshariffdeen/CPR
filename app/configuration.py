@@ -87,7 +87,7 @@ def read_conf(arg_list):
             elif definitions.ARG_ONLY_TEST in arg:
                 values.CONF_ONLY_TEST = True
             elif definitions.ARG_TIME_DURATION in arg:
-                values.CONF_TIME_DURATION = int(arg.replace(definitions.ARG_TIME_DURATION, ""))
+                values.CONF_TIME_DURATION = float(arg.replace(definitions.ARG_TIME_DURATION, ""))
             elif definitions.ARG_PATCH_DIR in arg:
                 values.CONF_PATCH_DIR = arg.replace(definitions.ARG_PATCH_DIR, "")
             elif definitions.ARG_CEGIS_TIME_SPLIT in arg:
