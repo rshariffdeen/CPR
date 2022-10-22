@@ -10,3 +10,6 @@ float fabs_cpr(float a){
   return -a;
 }
 
+float rint_cpr(float a){
+  return (int) a;
+}
