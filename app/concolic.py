@@ -463,6 +463,11 @@ def run_concrete_execution(program, argument_list, print_output=False, klee_out_
     os.chdir(current_dir)
     trace_log_path = klee_out_dir + "/trace.log"
     values.LIST_TRACE = reader.collect_trace(trace_log_path, project_path)
+    if values.COUNT_HIT_PATCH_LOC == 0:
+        emitter.warning("\t\t[warning] execution did not observe patch location, possible misconfiguration")
+    if values.COUNT_HIT_BUG_LOG == 0:
+        emitter.warning("\t\t[warning] execution did not observe error location, possible misconfiguration")
+
     return return_code
 
 #
